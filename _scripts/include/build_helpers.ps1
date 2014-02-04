@@ -262,6 +262,13 @@ function Do-Build-Solution($solution, $configuration, $buildPlatform, $progressA
 		}
 	}
 	
+	$mParam = "/m"
+	if ($noParallelBuild)
+	{
+		# Parallel build must be disabled for overlapping projects in a solution
+		$mParam = ""
+	}
+	
 	# Other MSBuild options:
 	#   /v:quiet
 	#   /clp:ErrorsOnly
@@ -273,7 +280,7 @@ function Do-Build-Solution($solution, $configuration, $buildPlatform, $progressA
 	#   1591: Missing XML documentation for public type or member
 
 	$buildError = $false
-	& $msbuildBin /nologo "$sourcePath\$solution" /t:Rebuild /p:Configuration="$configuration" /p:Platform="$buildPlatform" /v:minimal /p:WarningLevel=1 /m
+	& $msbuildBin /nologo "$sourcePath\$solution" /t:Rebuild /p:Configuration="$configuration" /p:Platform="$buildPlatform" /v:minimal /p:WarningLevel=1 $mParam
 	if (-not $?)
 	{
 		$buildError = $true

@@ -20,6 +20,10 @@ $revId = Get-GitRevision
 #
 $env:FASTBUILD = ""
 
+# Disable parallel builds for overlapping projects in a solution
+#
+$noParallelBuild = $true
+
 # ---------------------------------------------------------------------------------
 
 Write-Host "Application version: $revId"
@@ -30,7 +34,7 @@ Write-Host "Application version: $revId"
 
 if ($config -eq "all" -or $config.Contains("build-debug"))
 {
-	Build-Solution "FieldLog.sln" "Debug" "Any CPU" 6
+	Build-Solution "FieldLog.sln" "Debug" "Any CPU" 5
 
 	if ($config -eq "all" -or $config.Contains("sign-app"))
 	{
@@ -42,7 +46,7 @@ if ($config -eq "all" -or $config.Contains("build-debug"))
 
 if ($config -eq "all" -or $config.Contains("build-release"))
 {
-	Build-Solution "FieldLog.sln" "Release" "Any CPU" 6
+	Build-Solution "FieldLog.sln" "Release" "Any CPU" 5
 
 	if ($config -eq "all" -or $config.Contains("sign-app"))
 	{

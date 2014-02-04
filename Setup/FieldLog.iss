@@ -105,9 +105,8 @@ Source: "..\FieldLogViewer\bin\Release\FieldLog.dll"; DestDir: "{app}"; Flags: i
 ; FieldLog assembly
 Source: "..\FieldLog\bin\Release\FieldLog.dll"; DestDir: "{app}\FieldLog assembly (.NET 4.0)"; Flags: ignoreversion
 Source: "..\FieldLog\bin\Release\FieldLog.xml"; DestDir: "{app}\FieldLog assembly (.NET 4.0)"; Flags: ignoreversion
-; TODO: Enable NET20 builds in build script
-;Source: "..\FieldLog\bin\ReleaseNET20\FieldLog.dll"; DestDir: "{app}\FieldLog assembly (.NET 2.0)"; Flags: ignoreversion
-;Source: "..\FieldLog\bin\ReleaseNET20\FieldLog.xml"; DestDir: "{app}\FieldLog assembly (.NET 2.0)"; Flags: ignoreversion
+Source: "..\FieldLog\bin\ReleaseNET20\FieldLog.dll"; DestDir: "{app}\FieldLog assembly (.NET 2.0)"; Flags: ignoreversion
+Source: "..\FieldLog\bin\ReleaseNET20\FieldLog.xml"; DestDir: "{app}\FieldLog assembly (.NET 2.0)"; Flags: ignoreversion
 
 [Registry]
 ; Register .fl file name extension
@@ -127,7 +126,7 @@ Name: "{group}\FieldLogViewer"; Filename: "{app}\FieldLogViewer.exe"; IconFilena
 ;Name: "{group}\FieldLog Documentation"; Filename: "{app}\FieldLog Documentation.pdf"
 Name: "{group}\FieldLog website"; Filename: "http://dev.unclassified.de/source/fieldlog"
 Name: "{group}\FieldLog assembly (.NET 4.0)"; Filename: "{app}\FieldLog assembly (.NET 4.0)\"
-;Name: "{group}\FieldLog assembly (.NET 2.0)"; Filename: "{app}\FieldLog assembly (.NET 2.0)\"
+Name: "{group}\FieldLog assembly (.NET 2.0)"; Filename: "{app}\FieldLog assembly (.NET 2.0)\"
 
 [Run]
 ;Filename: {app}\FieldLogViewer.exe; WorkingDir: {app}; Flags: nowait postinstall

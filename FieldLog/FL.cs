@@ -1088,8 +1088,10 @@ namespace Unclassified.FieldLog
 					case 4:
 						// Subdirectory in My Documents (if not in service account)
 						logFileBasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), execFile + "-log" + Path.DirectorySeparatorChar + execFile);
-						if (logFileBasePath.ToLowerInvariant().StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.Windows).ToLowerInvariant()))
+						if (logFileBasePath.ToLowerInvariant().StartsWith(Environment.GetEnvironmentVariable("windir").ToLowerInvariant()))
 						{
+							// (Environment.SpecialFolder.Windows is not available in .NET 2.0 but
+							// the environment variable %windir% is just as good.)
 							// This is a service account profile path somewhere hidden in the Windows
 							// directory that cannot be easily accessed from other accounts.
 							// Reject this path and try the next one instead.

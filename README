@@ -12,6 +12,24 @@ The log viewer, FieldLogViewer, loads a set of log files and displays the log it
 
 An easy to use log sumit tool (not yet implemented) will guide the user through the process of selecting the relevant log files, packaging them for transport and choosing a suitable transport method. Sending an e-mail, using an HTTP or FTP server, sending with Bluetooth, and copying the package to a local directory are the planned transport methods. This tool can be started in response to an unhandled or unrecoverable application error so that the user is prompted with the right information and can submit trace logs while they're fresh.
 
-Licence
+REQUIREMENTS
+
+Any version of Microsoft Windows supported by the .NET framework should do. The WPF-based FieldLogViewer application likely requires Windows XP or newer.
+
+The Microsoft .NET Framework 4.0 Client Profile is required for complete support of all packages. If your application is targeting .NET 2.0, you can still use the FieldLog assembly in your project to write log files. The log submit tool is currently also planned to support .NET 2.0 as well. So you can deploy FieldLog with your .NET 2.0 project but need .NET 4.0 to view the log files.
+
+The solution and project files are created by Microsoft Visual Studio 2010 SP1. Any edition (Professional, Premium, Ultimate) should do. IIRC, newer versions of Visual Studio use the same file format so you should be able to open the solution in Visual Studio 2012/2013 as well.
+
+The setup is built using InnoSetup. It requires the InnoSetup preprocessor which is included in the Inno Setup QuickStart Pack. Version 5.5 has been tested to work.
+
+The build script is implemented in PowerShell and has been tested with PowerShell 2.0. Version 3.0 should also work fine. Older versions may fail. The build script searches the registry and other available sources to find the .NET build tools, InnoSetup, Git and other required tools. It works on 32 and 64 bit systems (though it's only really been used on Windows 7 64 bit systems).
+
+BUILDING
+
+There is a number of entry scripts for the automated build process. These scripts are located in the "_scripts" directory and starting with "build". The scripts start the common build script with certain section names that are pretty much described by the file name. "build_all.cmd", for example, builds everything there is to build. "build_release.cmd" only builds the solution in the Release configuration and "build_release_setup.cmd" additionally creates a setup executable in the "Setup" directory. The assembly and setup version are determined from the currently checked out Git revision. The common build script is implemented in PowerShell and is smart enough to find all installed tools automatically.
+
+It is also possible to open the solution file in the repository's root directory with Visual Studio and work with it as usual. To create the setup executable, you need a current version of InnoSetup (use the Unicode Inno Setup QuickStart Pack download).
+
+LICENCE
 
 This software is released under the terms of the GNU GPL licence, version 3. You can find the detailed terms and conditions in the download or on the GNU website <http://www.gnu.org/licenses/gpl-3.0.html>.

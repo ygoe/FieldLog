@@ -1,0 +1,10 @@
+﻿#path=C:\path\to\prefix
+maxfilesize=50k
+maxtotalsize=100m
+keeptrace=14d
+keepcheckpoint=14d
+keepinfo=21d
+keepnotice=21d
+keepwarning=30d
+keeperror=30d
+keepcritical=30d

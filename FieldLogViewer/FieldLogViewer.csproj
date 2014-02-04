@@ -1,0 +1,294 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1C7994D4-0E71-4EDE-8832-0FDB6FFFF7B7}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Unclassified.FieldLogViewer</RootNamespace>
+    <AssemblyName>FieldLogViewer</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Debug\FieldLogViewer.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Release\FieldLogViewer.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Images\FieldLog.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="InTheHand.Net.Personal">
+      <HintPath>lib\InTheHand.Net.Personal.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="AppSettings.cs" />
+    <Compile Include="Converters\ListItemsConverter.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="Unclassified\DebugMonitor.cs" />
+    <Compile Include="Unclassified\DelayedCall.cs" />
+    <Compile Include="Unclassified\ListExtensions.cs" />
+    <Compile Include="Unclassified\PropertyExtensions.cs" />
+    <Compile Include="Unclassified\Settings.cs" />
+    <Compile Include="Unclassified\StringExtensions.cs" />
+    <Compile Include="Unclassified\TaskHelper.cs" />
+    <Compile Include="Unclassified\UI\AnimationHelper.cs" />
+    <Compile Include="Unclassified\UI\DelegateCommand.cs" />
+    <Compile Include="Unclassified\UI\EnumerationExtension.cs" />
+    <Compile Include="Unclassified\UI\SmoothVirtualizingStackPanel.cs" />
+    <Compile Include="Unclassified\UI\ScrollViewerOffsetMediator.cs" />
+    <Compile Include="Unclassified\UI\SmoothVirtualizingPanel.cs" />
+    <Compile Include="Unclassified\UI\ViewCommand.cs" />
+    <Compile Include="Unclassified\UI\Wpf32Window.cs" />
+    <Compile Include="Unclassified\UI\TextBoxExtensions.cs" />
+    <Compile Include="Unclassified\UI\WindowExtensions.cs" />
+    <Compile Include="ViewModel\DetailsMessageViewModel.cs" />
+    <Compile Include="ViewModel\FieldLogTextItemViewModel.cs" />
+    <Compile Include="ViewModel\FieldLogItemViewModel.cs" />
+    <Compile Include="ViewModel\FieldLogDataItemViewModel.cs" />
+    <Compile Include="ViewModel\FieldLogScopeItemViewModel.cs" />
+    <Compile Include="ViewModel\FieldLogExceptionItemViewModel.cs" />
+    <Compile Include="ViewModel\DebugMessageViewModel.cs" />
+    <Compile Include="ViewModel\FieldLogExceptionViewModel.cs" />
+    <Compile Include="ViewModel\FieldLogStackFrameViewModel.cs" />
+    <Compile Include="ViewModel\FilterConditionGroupViewModel.cs" />
+    <Compile Include="ViewModel\FilterConditionViewModel.cs" />
+    <Compile Include="ViewModel\FilterViewModel.cs" />
+    <Compile Include="ViewModel\LogItemViewModelBase.cs" />
+    <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="ViewModel\SettingsViewModel.cs" />
+    <Compile Include="ViewModel\ViewModelBase.cs" />
+    <Compile Include="View\DetailsMessage.xaml.cs">
+      <DependentUpon>DetailsMessage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\FieldLogExceptionItemView.xaml.cs">
+      <DependentUpon>FieldLogExceptionItemView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\FieldLogScopeItemView.xaml.cs">
+      <DependentUpon>FieldLogScopeItemView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\FieldLogDataItemView.xaml.cs">
+      <DependentUpon>FieldLogDataItemView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\FieldLogExceptionView.xaml.cs">
+      <DependentUpon>FieldLogExceptionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Bluetooth.cs" />
+    <Compile Include="View\FieldLogTextItemView.xaml.cs">
+      <DependentUpon>FieldLogTextItemView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\SettingsWindow.xaml.cs">
+      <DependentUpon>SettingsWindow.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Resources\Other.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Resources\MenuStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\DetailsMessage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\FieldLogExceptionItemView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\FieldLogScopeItemView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\FieldLogDataItemView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\FieldLogExceptionView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\FieldLogTextItemView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\SettingsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="app.manifest" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FieldLog\FieldLog.csproj">
+      <Project>{5024F0F3-092C-414A-94C6-36764C4D42EA}</Project>
+      <Name>FieldLog</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\DataItem2_14.png" />
+    <Resource Include="Images\DataItem_14.png" />
+    <Resource Include="Images\ExceptionItem_14.png" />
+    <Resource Include="Images\TextItem_14.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ScopeItem_Enter_14.png" />
+    <Resource Include="Images\ScopeItem_Leave_14.png" />
+    <Resource Include="Images\ScopeItem_ThreadEnd_14.png" />
+    <Resource Include="Images\ScopeItem_ThreadStart_14.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ScopeItem_LogShutdown_14.png" />
+    <Resource Include="Images\ScopeItem_LogStart_14.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Prio_Checkpoint_14.png" />
+    <Resource Include="Images\Prio_Critical_14.png" />
+    <Resource Include="Images\Prio_Error_14.png" />
+    <Resource Include="Images\Prio_Info_14.png" />
+    <Resource Include="Images\Prio_Notice_14.png" />
+    <Resource Include="Images\Prio_Trace_14.png" />
+    <Resource Include="Images\Prio_Warning_14.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\diag_32_full.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Windows_14.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Transparent_14.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\FieldLog.ico" />
+    <Resource Include="Images\FLDocument.ico" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>if not defined FASTBUILD "$(SolutionDir)\_tools\GitRevisionTool.exe" -ai "$(ProjectDir)"</PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>if not defined FASTBUILD "$(SolutionDir)\_tools\GitRevisionTool.exe" -si "$(ProjectDir)"
+"$(SolutionDir)\_tools\InsertIcons.exe" "$(TargetPath)" "$(ProjectDir)\Images\FLDocument.ico";"$(ProjectDir)\Images\FieldLog.ico"</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

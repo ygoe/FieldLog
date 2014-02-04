@@ -1,0 +1,165 @@
+﻿<UserControl
+	x:Class="Unclassified.FieldLogViewer.View.FieldLogExceptionItemView"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+	xmlns:my="clr-namespace:Unclassified.FieldLogViewer"
+	xmlns:u="clr-namespace:Unclassified.UI" 
+	xmlns:v="clr-namespace:Unclassified.FieldLogViewer.View" 
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	mc:Ignorable="d" 
+	d:DesignHeight="673" d:DesignWidth="572"
+	Focusable="False">
+	<UserControl.Resources>
+	</UserControl.Resources>
+	
+	<Grid Background="{Binding DetailBackground}">
+		<ScrollViewer VerticalScrollBarVisibility="Auto">
+			<Grid Margin="10" VerticalAlignment="Top">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+				</Grid.RowDefinitions>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="100"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+
+				<TextBlock Grid.Row="0" Grid.Column="0" Text="Time:"/>
+				<TextBox Grid.Row="0" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Time, StringFormat='yyyy-MM-dd  HH:mm:ss.ffffff', Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,0,0" Text="Event counter:"/>
+				<TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EventCounterAndSourceFile, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="2" Grid.Column="0" Margin="0,0,0,0" Text="Priority:"/>
+				<Grid Grid.Row="2" Grid.Column="1" Margin="1,0,0,0">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="*"/>
+					</Grid.ColumnDefinitions>
+
+					<Image Grid.Column="0" Source="{Binding PrioImageSource}" Width="14" Height="14"/>
+					<TextBox Grid.Column="1" Margin="2,0,0,0" Text="{Binding PrioTitle, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+				</Grid>
+
+				<TextBlock Grid.Row="3" Grid.Column="0" Margin="0,0,0,0" Text="Session:"/>
+				<TextBox Grid.Row="3" Grid.Column="1" Margin="0,0,0,0" Text="{Binding SessionId, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="4" Grid.Column="0" Margin="0,0,0,0" Text="Thread:"/>
+				<TextBox Grid.Row="4" Grid.Column="1" Margin="0,0,0,0" Text="{Binding ThreadId, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="5" Grid.Column="0" Margin="0,0,0,0" Text="Context:"/>
+				<TextBox Grid.Row="5" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Context, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<v:FieldLogExceptionView
+					Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
+					Margin="0,6,0,0"
+					DataContext="{Binding ExceptionVM}"/>
+				
+				<TextBlock Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,6,0,0" Text="Environment" FontWeight="Bold"/>
+
+				<TextBlock Grid.Row="8" Grid.Column="0" Margin="0,0,0,0" Text="OSType:"/>
+				<TextBox Grid.Row="8" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.OSType, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="9" Grid.Column="0" Margin="0,0,0,0" Text="OSVersion:"/>
+				<TextBox Grid.Row="9" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.OSVersion, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="10" Grid.Column="0" Margin="0,0,0,0" Text="OSEdition:"/>
+				<TextBox Grid.Row="10" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.OSEdition, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="11" Grid.Column="0" Margin="0,0,0,0" Text="OSServicePack:"/>
+				<TextBox Grid.Row="11" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.OSServicePack, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="12" Grid.Column="0" Margin="0,0,0,0" Text="OSIs64Bit:"/>
+				<TextBox Grid.Row="12" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.OSIs64Bit, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="13" Grid.Column="0" Margin="0,0,0,0" Text="OSIsAppServer:"/>
+				<TextBox Grid.Row="13" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.OSIsAppServer, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="14" Grid.Column="0" Margin="0,0,0,0" Text="OSLanguage:"/>
+				<TextBox Grid.Row="14" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.OSLanguage, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="15" Grid.Column="0" Margin="0,0,0,0" Text="AppCompatLayer:"/>
+				<TextBox Grid.Row="15" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.AppCompatLayer, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="16" Grid.Column="0" Margin="0,0,0,0" Text="ClrType:"/>
+				<TextBox Grid.Row="16" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.ClrType, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="17" Grid.Column="0" Margin="0,0,0,0" Text="CultureName:"/>
+				<TextBox Grid.Row="17" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.CultureName, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="18" Grid.Column="0" Margin="0,0,0,0" Text="CurrentDirectory:"/>
+				<TextBox Grid.Row="18" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.CurrentDirectory, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="19" Grid.Column="0" Margin="0,0,0,0" Text="EnvironmentVars:"/>
+				<TextBox Grid.Row="19" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.EnvironmentVariables, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="20" Grid.Column="0" Margin="0,0,0,0" Text="CpuCount:"/>
+				<TextBox Grid.Row="20" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.CpuCount, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="21" Grid.Column="0" Margin="0,0,0,0" Text="HostName:"/>
+				<TextBox Grid.Row="21" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.HostName, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="22" Grid.Column="0" Margin="0,0,0,0" Text="UserName:"/>
+				<TextBox Grid.Row="22" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.UserName, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="23" Grid.Column="0" Margin="0,0,0,0" Text="IsInteractive:"/>
+				<TextBox Grid.Row="23" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.IsInteractive, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="24" Grid.Column="0" Margin="0,0,0,0" Text="ExecutablePath:"/>
+				<TextBox Grid.Row="24" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.ExecutablePath, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="25" Grid.Column="0" Margin="0,0,0,0" Text="CommandLine:"/>
+				<TextBox Grid.Row="25" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.CommandLine, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="26" Grid.Column="0" Margin="0,0,0,0" Text="AppVersion:"/>
+				<TextBox Grid.Row="26" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.AppVersion, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="27" Grid.Column="0" Margin="0,0,0,0" Text="IsProcess64Bit:"/>
+				<TextBox Grid.Row="27" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.IsProcess64Bit, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="28" Grid.Column="0" Margin="0,0,0,0" Text="ProcessMemory:"/>
+				<TextBox Grid.Row="28" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.ProcessMemory, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="29" Grid.Column="0" Margin="0,0,0,0" Text="PeakProcessMemory:"/>
+				<TextBox Grid.Row="29" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.PeakProcessMemory, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="30" Grid.Column="0" Margin="0,0,0,0" Text="TotalMemory:"/>
+				<TextBox Grid.Row="30" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.TotalMemory, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="31" Grid.Column="0" Margin="0,0,0,0" Text="AvailableMemory:"/>
+				<TextBox Grid.Row="31" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.AvailableMemory, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+			</Grid>
+		</ScrollViewer>
+	</Grid>
+</UserControl>

@@ -1,0 +1,34 @@
+﻿<Window
+	x:Class="SmoothListTest.MainWindow"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:slt="clr-namespace:SmoothListTest"
+	Title="SmoothListTest"
+	Height="300" Width="450">
+
+	<Grid Margin="12">
+		<ListBox
+			Name="listBox1"
+			Grid.IsSharedSizeScope="True"
+			SelectionMode="Extended">
+			<ListBox.ItemsPanel>
+				<ItemsPanelTemplate>
+					<slt:SmoothVirtualizedPanel/>
+				</ItemsPanelTemplate>
+			</ListBox.ItemsPanel>
+			<ListBox.Resources>
+				<DataTemplate DataType="{x:Type slt:DataItem}">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition SharedSizeGroup="Counter"/>
+							<ColumnDefinition Width="*"/>
+						</Grid.ColumnDefinitions>
+
+						<TextBlock Grid.Column="0" Text="{Binding Counter}" HorizontalAlignment="Right"/>
+						<TextBlock Grid.Column="1" Text="{Binding Name}" Margin="8,0,0,0"/>
+					</Grid>
+				</DataTemplate>
+			</ListBox.Resources>
+		</ListBox>
+	</Grid>
+</Window>

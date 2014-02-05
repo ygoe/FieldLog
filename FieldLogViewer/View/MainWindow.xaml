@@ -75,7 +75,8 @@
 				Grid.IsSharedSizeScope="True"
 				HorizontalContentAlignment="Stretch"
 				BorderThickness="0"
-				SelectionMode="Extended">
+				SelectionMode="Extended"
+				Visibility="{Binding LogItemsVisibility}">
 				<ListBox.ItemsPanel>
 					<ItemsPanelTemplate>
 						<u:SmoothVirtualizingPanel ItemHeight="18" Loaded="SmoothVirtualizingPanel_Loaded"/>
@@ -227,7 +228,11 @@
 				</ListBox.Resources>
 			</ListBox>
 
-			<ContentControl Name="ItemDetails" Grid.Column="1" Focusable="False">
+			<ContentControl
+				Name="ItemDetails"
+				Grid.Column="1"
+				Focusable="False"
+				Visibility="{Binding ItemDetailsVisibility}">
 				<ContentControl.Content>
 					<MultiBinding Converter="{StaticResource listItemsConverter}">
 						<!-- The list to observe must be the very first binding (index 0) for the converter to work -->
@@ -260,6 +265,13 @@
 					</DataTemplate>
 				</ContentControl.Resources>
 			</ContentControl>
+			
+			<TextBlock
+				Grid.Column="0" Grid.ColumnSpan="2"
+				VerticalAlignment="Center" HorizontalAlignment="Center"
+				Visibility="{Binding LoadingMsgVisibility}"
+				FontStyle="Italic"
+				Text="Loading log files, please wait..."/>
 		</Grid>
 	</Grid>
 </Window>

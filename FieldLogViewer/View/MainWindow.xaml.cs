@@ -262,8 +262,13 @@ namespace Unclassified.FieldLogViewer.View
 		public void FinishedReadingFiles()
 		{
 			System.Diagnostics.Debug.WriteLine("ViewCommand: FinishedReadingFiles");
-
 			logItemsSmoothScrollActive = true;
+			ScrollToEnd();
+		}
+
+		[ViewCommand]
+		public void ScrollToEnd()
+		{
 			FindLogItemsScroll();
 			if (logItemsScroll != null)
 			{

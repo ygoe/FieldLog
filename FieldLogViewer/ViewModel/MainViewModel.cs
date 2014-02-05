@@ -105,12 +105,25 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		private void InitializeCommands()
 		{
-			LoadLogCommand = new DelegateCommand(OnLoadLog);
+			LoadLogCommand = new DelegateCommand(OnLoadLog, CanLoadLog);
 			StopLiveCommand = new DelegateCommand(OnStopLive, CanStopLive);
 			LoadMapCommand = new DelegateCommand(OnLoadMap);
 			SettingsCommand = new DelegateCommand(OnSettings);
 		}
 
+		private void InvalidateCommands()
+		{
+			LoadLogCommand.RaiseCanExecuteChanged();
+			StopLiveCommand.RaiseCanExecuteChanged();
+			LoadMapCommand.RaiseCanExecuteChanged();
+			SettingsCommand.RaiseCanExecuteChanged();
+		}
+
+		private bool CanLoadLog()
+		{
+			return !isLoadingFiles;
+		}
+		
 		private void OnLoadLog()
 		{
 			OpenFileDialog dlg = new OpenFileDialog();
@@ -130,7 +143,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		private bool CanStopLive()
 		{
-			return !isLiveStopped;
+			return !isLoadingFiles && !isLiveStopped;
 		}
 
 		private void OnStopLive()
@@ -183,8 +196,20 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		private bool isLiveScrollingEnabled = true;
 		public bool IsLiveScrollingEnabled
 		{
-			get { return isLiveScrollingEnabled; }
-			set { CheckUpdate(value, ref isLiveScrollingEnabled, "IsLiveScrollingEnabled"); }
+			get
+			{
+				return isLiveScrollingEnabled;
+			}
+			set
+			{
+				if (CheckUpdate(value, ref isLiveScrollingEnabled, "IsLiveScrollingEnabled"))
+				{
+					if (isLiveScrollingEnabled)
+					{
+						ViewCommandManager.Invoke("ScrollToEnd");
+					}
+				}
+			}
 		}
 		
 		public ObservableCollection<LogItemViewModelBase> LogItems
@@ -241,7 +266,35 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						RefreshLogItemsFilterView();
 					}
 					OnPropertyChanged("FilteredLogItems");
+					OnPropertyChanged("LogItemsVisibility");
+					OnPropertyChanged("ItemDetailsVisibility");
+					OnPropertyChanged("LoadingMsgVisibility");
+					InvalidateCommands();
 				}
+			}
+		}
+
+		public Visibility LogItemsVisibility
+		{
+			get
+			{
+				return !isLoadingFiles ? Visibility.Visible : Visibility.Collapsed;
+			}
+		}
+
+		public Visibility ItemDetailsVisibility
+		{
+			get
+			{
+				return !isLoadingFiles ? Visibility.Visible : Visibility.Collapsed;
+			}
+		}
+
+		public Visibility LoadingMsgVisibility
+		{
+			get
+			{
+				return isLoadingFiles ? Visibility.Visible : Visibility.Collapsed;
 			}
 		}
 

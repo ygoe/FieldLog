@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Unclassified.FieldLog;
+using System.Windows;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
@@ -85,6 +86,14 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			get
 			{
 				return IsRepeated ? "Yes" : "No";
+			}
+		}
+
+		public Visibility EnvVisibility
+		{
+			get
+			{
+				return Type == FieldLogScopeType.LogStart ? Visibility.Visible : Visibility.Collapsed;
 			}
 		}
 	}

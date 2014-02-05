@@ -103,20 +103,29 @@ namespace ConsoleDemo
 
 		private static void ThrowException1()
 		{
-			ThrowException1a();
+			using (new FieldLogScope("ThrowException1"))
+			{
+				ThrowException1a();
+			}
 		}
 
 		private static void ThrowException1a()
 		{
-			ThrowException1b();
+			using (new FieldLogScope("ThrowException1a"))
+			{
+				ThrowException1b();
+			}
 		}
 
 		private static void ThrowException1b()
 		{
-			throw new InvalidOperationException(
-				"You can't do that!",
-				new ApplicationException("An inner message 1",
-					new ApplicationException("An inner message 2")));
+			using (new FieldLogScope("ThrowException1b"))
+			{
+				throw new InvalidOperationException(
+					"You can't do that!",
+					new ApplicationException("An inner message 1",
+						new ApplicationException("An inner message 2")));
+			}
 		}
 	}
 }

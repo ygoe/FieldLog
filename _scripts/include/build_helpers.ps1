@@ -1,7 +1,9 @@
 # Build script helper functions
 
+# Configuration defaults
 $toolsPath = "../_tools/"
-$gitRevisionFormat = "{bmin:2014:4}.{commit:6}{!:+}"
+$gitRevisionFormat = "{commit:8}{!:+}"
+$svnRevisionFormat = "{commit}{!:+}"
 
 function Check-FileName($fn)
 {
@@ -134,7 +136,7 @@ function Get-Platform()
 function Get-GitRevision()
 {
 	# Determine current repository revision
-	$revId = & ($toolsPath + "GitRevisionTool") --format $global:gitRevisionFormat "$sourcePath"
+	$revId = & ($toolsPath + "GitRevisionTool") --format "$global:gitRevisionFormat" "$sourcePath"
 	if ($revId -eq $null)
 	{
 		WaitError "Repository revision could not be determined"
@@ -147,7 +149,7 @@ function Get-GitRevision()
 function Get-SvnRevision()
 {
 	# Determine current repository revision
-	$revId = & ($toolsPath + "SvnRevisionTool") --format "{commit}{!:+}" "$sourcePath"
+	$revId = & ($toolsPath + "SvnRevisionTool") --format "$global:svnRevisionFormat" "$sourcePath"
 	if ($revId -eq $null)
 	{
 		WaitError "Repository revision could not be determined"
@@ -173,6 +175,15 @@ function Get-AssemblyInfoVersion($sourceFile, $attributeName)
 		exit 1
 	}
 	return $revId
+}
+
+function IsSelected($part)
+{
+	if ($global:configParts -eq "all" -or $global:configParts.Contains($part))
+	{
+		return $true
+	}
+	return $false
 }
 
 $actions = @()
@@ -506,8 +517,9 @@ function Do-Sign-File($file, $keyFile, $password, $progressAfter)
 	& ($toolsPath + "FlashConsoleWindow") -progress $progressAfter
 }
 
-function Begin-BuildScript($projectTitle, $batchMode = $false)
+function Begin-BuildScript($projectTitle, $configParts, $batchMode = $false)
 {
+	$global:configParts = $configParts
 	$global:batchMode = $batchMode
 
 	#cmd /c color f0

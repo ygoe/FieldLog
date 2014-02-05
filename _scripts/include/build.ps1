@@ -2,7 +2,7 @@ param($config, $batchMode = "")
 
 . (($MyInvocation.MyCommand.Definition | split-path -parent) + "\build_helpers.ps1")
 
-Begin-BuildScript "FieldLog" ($batchMode -eq "batch")
+Begin-BuildScript "FieldLog" "$config" ($batchMode -eq "batch")
 
 # -----------------------------  SCRIPT CONFIGURATION  ----------------------------
 
@@ -13,7 +13,8 @@ $sourcePath = $MyInvocation.MyCommand.Definition | split-path -parent | split-pa
 # Set the application version number. Disable for Git repository revision.
 #
 #$revId = "1.0"
-#$revId = Get-AssemblyInfoVersion "TxTranslation\Properties\AssemblyInfo.cs" "AssemblyInformationalVersion"
+#$revId = Get-AssemblyInfoVersion "ProjectDirectory\Properties\AssemblyInfo.cs" "AssemblyInformationalVersion"
+$gitRevisionFormat = "{bmin:2014:4}.{commit:6}{!:+}"
 $revId = Get-GitRevision
 
 # Disable FASTBUILD mode to always include a full version number in the assembly version info.
@@ -28,15 +29,15 @@ $noParallelBuild = $true
 
 Write-Host "Application version: $revId"
 
-# -------------------------------  PERFORM ACTIONS  -------------------------------
+# ------------------------------  ACTION DEFINITION  ------------------------------
 
 # ---------- Debug builds ----------
 
-if ($config -eq "all" -or $config.Contains("build-debug"))
+if (IsSelected("build-debug"))
 {
-	Build-Solution "FieldLog.sln" "Debug" "Any CPU" 5
+	Build-Solution "FieldLog.sln" "Debug" "Any CPU" 6
 
-	if ($config -eq "all" -or $config.Contains("sign-app"))
+	if (IsSelected("sign-app"))
 	{
 		Sign-File "FieldLog\bin\Debug\FieldLogViewer.exe" "signkey.pfx" "@signkey.password" 1
 	}
@@ -44,11 +45,11 @@ if ($config -eq "all" -or $config.Contains("build-debug"))
 
 # ---------- Release builds ----------
 
-if ($config -eq "all" -or $config.Contains("build-release"))
+if (IsSelected("build-release"))
 {
-	Build-Solution "FieldLog.sln" "Release" "Any CPU" 5
+	Build-Solution "FieldLog.sln" "Release" "Any CPU" 6
 
-	if ($config -eq "all" -or $config.Contains("sign-app"))
+	if (IsSelected("sign-app"))
 	{
 		Sign-File "FieldLogViewer\bin\Release\FieldLogViewer.exe" "signkey.pfx" "@signkey.password" 1
 	}
@@ -56,11 +57,11 @@ if ($config -eq "all" -or $config.Contains("build-release"))
 
 # ---------- Release setups ----------
 
-if ($config -eq "all" -or $config.Contains("setup-release"))
+if (IsSelected("setup-release"))
 {
 	Create-Setup "Setup\FieldLog.iss" Release 1
 
-	if ($config -eq "all" -or $config.Contains("sign-setup"))
+	if (IsSelected("sign-setup"))
 	{
 		Sign-File "Setup\FieldLogSetup-$revId.exe" "signkey.pfx" "@signkey.password" 1
 	}

@@ -28,7 +28,7 @@ BUILDING
 
 There is a number of entry scripts for the automated build process. These scripts are located in the "_scripts" directory and starting with "build". The scripts start the common build script with certain section names that are pretty much described by the file name. "build_all.cmd", for example, builds everything there is to build. "build_release.cmd" only builds the solution in the Release configuration and "build_release_setup.cmd" additionally creates a setup executable in the "Setup" directory. The assembly and setup version are determined from the currently checked out Git revision. The common build script is implemented in PowerShell and is smart enough to find all installed tools automatically.
 
-It is also possible to open the solution file in the repository's root directory with Visual Studio and work with it as usual. To create the setup executable, you need a current version of InnoSetup (use the Unicode Inno Setup QuickStart Pack download).
+It is also possible to open the solution file in the repository's root directory with Visual Studio and work with it as usual. You probably need to unload the project "FieldLog.NET20" first to avoid compiler confusion. To create the setup executable, you need a current version of InnoSetup (use the Unicode Inno Setup QuickStart Pack download).
 
 LICENCE
 

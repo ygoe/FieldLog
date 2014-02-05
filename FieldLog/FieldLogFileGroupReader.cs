@@ -9,8 +9,13 @@ using System.Threading;
 
 namespace Unclassified.FieldLog
 {
-	// NOTE: This class is full of .NET 4.0 code so it's not included in the NET20 project altogether.
-
+	/// <summary>
+	/// Implements a virtual log file reader that reads all log files concurrently and returns the
+	/// log items from all files in the order of their time value.
+	/// </summary>
+	/// <remarks>
+	/// This class is full of .NET 4.0 code so it's not included in the NET20 project altogether.
+	/// </remarks>
 	public class FieldLogFileGroupReader
 	{
 		private FileSystemWatcher fsw;
@@ -29,7 +34,7 @@ namespace Unclassified.FieldLog
 		/// readers for each priority and links additional readers for existing files to them.
 		/// A FileSystemWatcher is set up to add new files as they are created.
 		/// </summary>
-		/// <param name="basePath"></param>
+		/// <param name="basePath">The path and file prefix of the log files to read.</param>
 		/// <param name="readWaitHandle">The wait handle that will be signalled after all files
 		/// have been read to the end and if the last reader is now going to wait for further data
 		/// to be appended to the file.</param>
@@ -65,18 +70,32 @@ namespace Unclassified.FieldLog
 			closeTask = Task.Factory.StartNew<bool>(WaitForClose);
 		}
 
+		/// <summary>
+		/// Implements the task that waits for a new log file to be created.
+		/// </summary>
+		/// <returns>The return value is not used.</returns>
 		private bool WaitForNewFile()
 		{
 			newFileEvent.WaitOne();
 			return false;
 		}
 
+		/// <summary>
+		/// Implements the task that waits for the close event.
+		/// </summary>
+		/// <returns>The return value is not used.</returns>
 		private bool WaitForClose()
 		{
 			closeEvent.WaitOne();
 			return false;
 		}
 
+		/// <summary>
+		/// Called when the FileSystemWatcher found a newly created file of the currently used
+		/// log file set.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void fsw_Created(object sender, FileSystemEventArgs e)
 		{
 			if (closeEvent.WaitOne(0)) return;   // Already closing...
@@ -96,6 +115,11 @@ namespace Unclassified.FieldLog
 			}
 		}
 
+		/// <summary>
+		/// Finds all currently existing log files and adds a new reader for each of them.
+		/// </summary>
+		/// <param name="basePath"></param>
+		/// <param name="prio"></param>
 		private void FindLogFiles(string basePath, FieldLogPriority prio)
 		{
 			lock (readerLock)
@@ -115,6 +139,12 @@ namespace Unclassified.FieldLog
 			}
 		}
 
+		/// <summary>
+		/// Creates a new log file reader and adds it to the priority's log file enumerator.
+		/// </summary>
+		/// <param name="prio"></param>
+		/// <param name="fileName"></param>
+		/// <param name="fromFsw"></param>
 		private void AddNewReader(FieldLogPriority prio, string fileName, bool fromFsw)
 		{
 			// Must be within a lock(readerLock)!
@@ -155,6 +185,12 @@ namespace Unclassified.FieldLog
 			newFileEvent.Set();
 		}
 
+		/// <summary>
+		/// Reads the next log item from the log file group. If all files have been read until the
+		/// end, this method blocks until a new log item was written to any file, or until the
+		/// close event was set.
+		/// </summary>
+		/// <returns>The next log item, or null if there are no more log items and the waiting was cancelled.</returns>
 		public FieldLogItem ReadLogItem()
 		{
 			while (true)
@@ -251,6 +287,10 @@ namespace Unclassified.FieldLog
 			}
 		}
 
+		/// <summary>
+		/// Starts a new Task that calls the ReadLogItem method.
+		/// </summary>
+		/// <returns>The new Task instance.</returns>
 		public Task<FieldLogItem> ReadLogItemAsync()
 		{
 			return Task<FieldLogItem>.Factory.StartNew(ReadLogItem);

@@ -52,12 +52,19 @@
 	/// </summary>
 	public enum FieldLogItemType
 	{
+		/// <summary>Invalid value.</summary>
 		None,
+		/// <summary>The file record contains a shared string value.</summary>
 		StringData,
+		/// <summary>The file record contains a FieldLogTextItem.</summary>
 		Text,
+		/// <summary>The file record contains a FieldLogDataItem.</summary>
 		Data,
+		/// <summary>The file record contains a FieldLogExceptionItem.</summary>
 		Exception,
+		/// <summary>The file record contains a FieldLogScopeItem.</summary>
 		Scope,
+		/// <summary>The file record contains a repeated FieldLogScopeItem.</summary>
 		RepeatedScope
 	}
 }

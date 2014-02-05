@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace Unclassified.FieldLog
 {
+	/// <summary>
+	/// Reads log items from a log file.
+	/// </summary>
 	public class FieldLogFileReader : IDisposable
 	{
 		#region Private data
@@ -32,6 +35,11 @@ namespace Unclassified.FieldLog
 
 		#region Constructor
 
+		/// <summary>
+		/// Initialises a new instance of the FieldLogFileReader class.
+		/// </summary>
+		/// <param name="fileName">The name of the log file to read.</param>
+		/// <param name="waitMode">true to wait for more items at the end of the file, false to indicate the end of the file and return.</param>
 		public FieldLogFileReader(string fileName, bool waitMode)
 		{
 			FileName = fileName;
@@ -69,6 +77,9 @@ namespace Unclassified.FieldLog
 
 		#region Public properties
 
+		/// <summary>
+		/// Gets the name of the log file.
+		/// </summary>
 		public string FileName { get; private set; }
 
 		/// <summary>
@@ -100,7 +111,6 @@ namespace Unclassified.FieldLog
 		/// Setting a value for NextReader unsets WaitMode for this reader. This property is
 		/// thread-safe.
 		/// </summary>
-		/// <param name="reader">Reader to continue reading with.</param>
 		public FieldLogFileReader NextReader
 		{
 			get
@@ -368,6 +378,9 @@ namespace Unclassified.FieldLog
 
 		#region IDispose members
 
+		/// <summary>
+		/// Closes the open log file.
+		/// </summary>
 		public void Dispose()
 		{
 			if (fileStream != null)

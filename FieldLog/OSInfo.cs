@@ -1201,99 +1201,179 @@ namespace Unclassified.FieldLog
 
 	#region Type, Version and Edition enumerations
 
+	/// <summary>
+	/// Defines operating system type values.
+	/// </summary>
 	public enum OSType
 	{
+		/// <summary>A client system.</summary>
 		Client,
+		/// <summary>A server system.</summary>
 		Server,
+		/// <summary>A server core system.</summary>
 		ServerCore
 	}
 
+	/// <summary>
+	/// Defines operating system version values.
+	/// </summary>
 	public enum OSVersion
 	{
+		/// <summary>Unknown version.</summary>
 		Unknown = 0,
 
+		/// <summary>Not Windows.</summary>
 		NonWindows = 1,
-		
+
+		/// <summary>Windows 98</summary>
 		Windows98 = 10,
+		/// <summary>Windows 98 SE</summary>
 		Windows98SE,
+		/// <summary>Windows ME</summary>
 		WindowsME,
+		/// <summary>Windows NT 4</summary>
 		WindowsNT4,
+		/// <summary>Windows 2000</summary>
 		Windows2000,
+		/// <summary>Windows XP</summary>
 		WindowsXP,
+		/// <summary>Windows Vista</summary>
 		WindowsVista,
+		/// <summary>Windows 7</summary>
 		Windows7,
+		/// <summary>Windows 8</summary>
 		Windows8,
+		/// <summary>Windows 8.1</summary>
 		Windows81,
 
+		/// <summary>Windows 2000 Server</summary>
 		Windows2000Server = 100,
+		/// <summary>Windows Home Server</summary>
 		WindowsHomeServer,
+		/// <summary>Windows Server 2003</summary>
 		WindowsServer2003,
+		/// <summary>Windows Server 2003 R2</summary>
 		WindowsServer2003R2,
+		/// <summary>Windows Server 2008</summary>
 		WindowsServer2008,
+		/// <summary>Windows Server 2008 R2</summary>
 		WindowsServer2008R2,
+		/// <summary>Windows Server 2012</summary>
 		WindowsServer2012,
+		/// <summary>Windows Server 2012 R2</summary>
 		WindowsServer2012R2,
 
+		/// <summary>A future version of Windows not yet known by this implementation.</summary>
 		WindowsFuture = 200
 	}
 
+	/// <summary>
+	/// Defines operating system edition values.
+	/// </summary>
 	public enum OSEdition
 	{
+		/// <summary>No special edition.</summary>
 		None = 0,
 
 		// NOTE: There should also exist a Windows 2000 Standard Edition, but I can't find anything about it
+		/// <summary>Windows 2000 Professional.</summary>
 		Windows2000Professional,
+		/// <summary>Windows 2000 Server.</summary>
 		Windows2000Server,
+		/// <summary>Windows 2000 Advanced Server.</summary>
 		Windows2000AdvancedServer,
+		/// <summary>Windows 2000 Datacenter Server.</summary>
 		Windows2000DatacenterServer,
 
+		/// <summary>Windows XP Starter.</summary>
 		WindowsXPStarter,
+		/// <summary>Windows XP Home.</summary>
 		WindowsXPHome,
+		/// <summary>Windows XP Professional.</summary>
 		WindowsXPProfessional,
+		/// <summary>Windows XP Media Center.</summary>
 		WindowsXPMediaCenter,
+		/// <summary>Windows XP Tablet PC.</summary>
 		WindowsXPTabletPC,
+		/// <summary>Windows XP Professional x64.</summary>
 		WindowsXPProfessionalX64,
 
+		/// <summary>Windows Vista Starter.</summary>
 		WindowsVistaStarter,
+		/// <summary>Windows Vista Home Basic.</summary>
 		WindowsVistaHomeBasic,
+		/// <summary>Windows Vista Home Premium.</summary>
 		WindowsVistaHomePremium,
+		/// <summary>Windows Vista Business.</summary>
 		WindowsVistaBusiness,
+		/// <summary>Windows Vista Enterprise.</summary>
 		WindowsVistaEnterprise,
+		/// <summary>Windows Vista Ultimate.</summary>
 		WindowsVistaUltimate,
 
+		/// <summary>Windows 7 Starter.</summary>
 		Windows7Starter,
+		/// <summary>Windows 7 Home Basic.</summary>
 		Windows7HomeBasic,
+		/// <summary>Windows 7 Home Premium.</summary>
 		Windows7HomePremium,
+		/// <summary>Windows 7 Professional.</summary>
 		Windows7Professional,
+		/// <summary>Windows 7 Enterprise.</summary>
 		Windows7Enterprise,
+		/// <summary>Windows 7 Ultimate.</summary>
 		Windows7Ultimate,
 
+		/// <summary>Windows 8 ("Core").</summary>
 		Windows8Core,
+		/// <summary>Windows 8 Pro.</summary>
 		Windows8Pro,
+		/// <summary>Windows 8 Enterprise.</summary>
 		Windows8Enterprise,
 
+		/// <summary>Windows Server 2003/2003 R2 Web.</summary>
 		WindowsServer2003Web = 100,
+		/// <summary>Windows Server 2003/2003 R2 Standard.</summary>
 		WindowsServer2003Standard,
+		/// <summary>Windows Server 2003/2003 R2 Enterprise.</summary>
 		WindowsServer2003Enterprise,
+		/// <summary>Windows Server 2003/2003 R2 Datacenter.</summary>
 		WindowsServer2003Datacenter,
+		/// <summary>Windows Server 2003/2003 R2 Cluster.</summary>
 		WindowsServer2003Cluster,
+		/// <summary>Windows Server 2003/2003 R2 Storage.</summary>
 		WindowsServer2003Storage,
+		/// <summary>Windows Server 2003/2003 R2 Small Business.</summary>
 		WindowsServer2003SmallBusiness,
+		/// <summary>Windows Server 2003/2003 R2 Home.</summary>
 		WindowsServer2003Home,
 
+		/// <summary>Windows Server 2008/2008 R2 Foundation.</summary>
 		WindowsServer2008Foundation,
+		/// <summary>Windows Server 2008/2008 R2 Standard.</summary>
 		WindowsServer2008Standard,
+		/// <summary>Windows Server 2008/2008 R2 Enterprise.</summary>
 		WindowsServer2008Enterprise,
+		/// <summary>Windows Server 2008/2008 R2 Datacenter.</summary>
 		WindowsServer2008Datacenter,
+		/// <summary>Windows Server 2008/2008 R2 HPC.</summary>
 		WindowsServer2008Hpc,
+		/// <summary>Windows Server 2008/2008 R2 Web.</summary>
 		WindowsServer2008Web,
+		/// <summary>Windows Server 2008/2008 R2 Storage.</summary>
 		WindowsServer2008Storage,
+		/// <summary>Windows Server 2008/2008 R2 Small Business.</summary>
 		WindowsServer2008SmallBusiness,
+		/// <summary>Windows Server 2008/2008 R2 Essential Business.</summary>
 		WindowsServer2008EssentialBusiness,
 
+		/// <summary>Windows Server 2012/2012 R2 Foundation.</summary>
 		WindowsServer2012Foundation,
+		/// <summary>Windows Server 2012/2012 R2 Essentials.</summary>
 		WindowsServer2012Essentials,
+		/// <summary>Windows Server 2012/2012 R2 Standard.</summary>
 		WindowsServer2012Standard,
+		/// <summary>Windows Server 2012/2012 R2 Datacenter.</summary>
 		WindowsServer2012Datacenter,
 	}
 

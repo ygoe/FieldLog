@@ -8,24 +8,38 @@ using System.Globalization;
 
 namespace Unclassified.FieldLog
 {
+	/// <summary>
+	/// Wraps an Exception instance for use in FieldLog logging.
+	/// </summary>
 	public class FieldLogException
 	{
-		/// <summary>Approximate data size of this log item. Used for buffer size estimation.</summary>
+		/// <summary>Gets the approximated data size of this log item. Used for buffer size estimation.</summary>
 		public int Size { get; protected set; }
 
+		/// <summary>Gets the exception type name.</summary>
 		public string Type { get; private set; }
+		/// <summary>Gets the exception message.</summary>
 		public string Message { get; private set; }
+		/// <summary>Gets the exception code.</summary>
 		public int Code { get; private set; }
+		/// <summary>Gets additional data provided by the exception.</summary>
 		public string Data { get; private set; }
+		/// <summary>Gets the stack frames of the exception.</summary>
 		public FieldLogStackFrame[] StackFrames { get; private set; }
+		/// <summary>Gets the inner exceptions of the exception.</summary>
 		public FieldLogException[] InnerExceptions { get; private set; }
 
+		/// <summary>Gets the original Exception instance.</summary>
 		public Exception Exception { get; private set; }
 
 		private FieldLogException()
 		{
 		}
 
+		/// <summary>
+		/// Initialises a new instance of the FieldLogException class.
+		/// </summary>
+		/// <param name="ex">The Exception instance.</param>
 		public FieldLogException(Exception ex)
 		{
 			Exception = ex;
@@ -153,6 +167,10 @@ namespace Unclassified.FieldLog
 			}
 		}
 
+		/// <summary>
+		/// Writes the exception fields to the log file writer.
+		/// </summary>
+		/// <param name="writer">The log file writer to write to.</param>
 		internal void Write(FieldLogFileWriter writer)
 		{
 			writer.AddBuffer(Type);
@@ -178,6 +196,10 @@ namespace Unclassified.FieldLog
 			}
 		}
 
+		/// <summary>
+		/// Reads the exception fields from the specified log file reader.
+		/// </summary>
+		/// <param name="reader">The log file reader to read from.</param>
 		internal static FieldLogException Read(FieldLogFileReader reader)
 		{
 			FieldLogException ex = new FieldLogException();
@@ -201,24 +223,38 @@ namespace Unclassified.FieldLog
 		}
 	}
 
+	/// <summary>
+	/// Wraps a StackFrame instance for the FieldLogException class.
+	/// </summary>
 	public class FieldLogStackFrame
 	{
-		/// <summary>Approximate data size of this log item. Used for buffer size estimation.</summary>
+		/// <summary>Gets the approximated data size of this log item. Used for buffer size estimation.</summary>
 		public int Size { get; protected set; }
 
+		/// <summary>Gets the module name.</summary>
 		public string Module { get; private set; }
+		/// <summary>Gets the defining type name.</summary>
 		public string TypeName { get; private set; }
+		/// <summary>Gets the executed method name.</summary>
 		public string MethodName { get; private set; }
+		/// <summary>Gets the executed method parameters signature.</summary>
 		public string MethodSignature { get; private set; }
 		// TODO: Also include method parameter types (and names, if available). Check with Dotfuscator map file about the required format.
+		/// <summary>Gets the source code file name.</summary>
 		public string FileName { get; private set; }
+		/// <summary>Gets the source code line number.</summary>
 		public int Line { get; private set; }
+		/// <summary>Gets the source code column number.</summary>
 		public int Column { get; private set; }
 
 		private FieldLogStackFrame()
 		{
 		}
 
+		/// <summary>
+		/// Initialises a new instance of the FieldLogStackFrame class.
+		/// </summary>
+		/// <param name="stackFrame">The StackFrame instance.</param>
 		public FieldLogStackFrame(StackFrame stackFrame)
 		{
 			Module = stackFrame.GetMethod().DeclaringType.Module.FullyQualifiedName;
@@ -249,6 +285,10 @@ namespace Unclassified.FieldLog
 				4 + 4;
 		}
 
+		/// <summary>
+		/// Writes the stack frame fields to the log file writer.
+		/// </summary>
+		/// <param name="writer">The log file writer to write to.</param>
 		internal void Write(FieldLogFileWriter writer)
 		{
 			writer.AddBuffer(Module);
@@ -260,6 +300,10 @@ namespace Unclassified.FieldLog
 			writer.AddBuffer(Column);
 		}
 
+		/// <summary>
+		/// Reads the stack frame fields from the specified log file reader.
+		/// </summary>
+		/// <param name="reader">The log file reader to read from.</param>
 		internal static FieldLogStackFrame Read(FieldLogFileReader reader)
 		{
 			FieldLogStackFrame frame = new FieldLogStackFrame();

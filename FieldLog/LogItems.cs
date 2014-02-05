@@ -5,20 +5,23 @@ namespace Unclassified.FieldLog
 {
 	#region Log item data structures
 
+	/// <summary>
+	/// Abstract base class that defines a log item.
+	/// </summary>
 	public abstract class FieldLogItem
 	{
-		/// <summary>Approximate data size of this log item. Used for buffer size estimation.</summary>
+		/// <summary>Gets the approximated data size of this log item. Used for buffer size estimation.</summary>
 		public int Size { get; protected set; }
 
-		/// <summary>Log items counter. Used for correct ordering of log items with the exact same time value. May wrap around.</summary>
+		/// <summary>Gets the log item counter. Used for correct ordering of log items with the exact same time value. May wrap around.</summary>
 		public int EventCounter { get; internal set; }
-		/// <summary>Exact time when the log item was generated.</summary>
+		/// <summary>Gets the exact time when the log item was generated.</summary>
 		public DateTime Time { get; private set; }
-		/// <summary>Priority of the log item.</summary>
+		/// <summary>Gets the priority of the log item.</summary>
 		public FieldLogPriority Priority { get; private set; }
-		/// <summary>Current unique process execution ID.</summary>
+		/// <summary>Gets the current unique process execution ID of the log item.</summary>
 		public Guid SessionId { get; private set; }
-		/// <summary>Current thread ID.</summary>
+		/// <summary>Gets the current thread ID of the log item.</summary>
 		public int ThreadId { get; private set; }
 
 		/// <summary>
@@ -26,11 +29,18 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		public string LogItemSourceFileName { get; private set; }
 
+		/// <summary>
+		/// Initialises a new instance of the FieldLogItem class with Trace priority.
+		/// </summary>
 		public FieldLogItem()
 			: this(FieldLogPriority.Trace)
 		{
 		}
 
+		/// <summary>
+		/// Initialises a new instance of the FieldLogItem class.
+		/// </summary>
+		/// <param name="priority">The priority of the new log item.</param>
 		public FieldLogItem(FieldLogPriority priority)
 		{
 			Time = FL.UtcNow;
@@ -45,11 +55,20 @@ namespace Unclassified.FieldLog
 			Size = 4 + 4 + 8 + 4 + 16 + 4;
 		}
 
+		/// <summary>
+		/// Converts the data of the current FieldLogItem object to its equivalent string
+		/// representation.
+		/// </summary>
+		/// <returns>A string representation of the value of the current FieldLogItem object.</returns>
 		public override string ToString()
 		{
 			return "FieldLogItem(EventCounter=" + EventCounter + ", Time=" + Time.ToString("yyyyMMdd'T'HHmmss") + ", Priority=" + Priority + ")";
 		}
 
+		/// <summary>
+		/// Writes the common log item fields to the log file writer.
+		/// </summary>
+		/// <param name="writer">The log file writer to write to.</param>
 		internal virtual void Write(FieldLogFileWriter writer)
 		{
 			writer.AddBuffer(Time.Ticks);
@@ -76,6 +95,10 @@ namespace Unclassified.FieldLog
 			throw new ArgumentException("Unsupported log item type (" + (int) type + ")");
 		}
 
+		/// <summary>
+		/// Reads the common log item fields from the specified log file reader.
+		/// </summary>
+		/// <param name="reader">The log file reader to read from.</param>
 		protected void ReadBaseData(FieldLogFileReader reader)
 		{
 			LogItemSourceFileName = reader.FileName;
@@ -87,32 +110,55 @@ namespace Unclassified.FieldLog
 		}
 	}
 
+	/// <summary>
+	/// Defines a log item that contains a simple text message.
+	/// </summary>
 	public class FieldLogTextItem : FieldLogItem
 	{
-		/// <summary>Text message.</summary>
+		/// <summary>Gets the text message.</summary>
 		public string Text { get; private set; }
-		/// <summary>Additional details of the log event.</summary>
+		/// <summary>Gets additional details of the log event.</summary>
 		public string Details { get; private set; }
 
 		private FieldLogTextItem()
 		{
 		}
 
+		/// <summary>
+		/// Initialises a new instance of the FieldLogTextItem class with Trace priority.
+		/// </summary>
+		/// <param name="text">The text message.</param>
 		public FieldLogTextItem(string text)
 			: this(FieldLogPriority.Trace, text, null)
 		{
 		}
 
+		/// <summary>
+		/// Initialises a new instance of the FieldLogTextItem class with Trace priority.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">Additional details of the log event.</param>
 		public FieldLogTextItem(string text, string details)
 			: this(FieldLogPriority.Trace, text, details)
 		{
 		}
 
+		/// <summary>
+		/// Initialises a new instance of the FieldLogTextItem class.
+		/// </summary>
+		/// <param name="priority">The priority of the new log item.</param>
+		/// <param name="text">The text message.</param>
 		public FieldLogTextItem(FieldLogPriority priority, string text)
 			: this(priority, text, null)
 		{
 		}
 
+		/// <summary>
+		/// Initialises a new instance of the FieldLogTextItem class.
+		/// </summary>
+		/// <param name="priority">The priority of the new log item.</param>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">Additional details of the log event.</param>
 		public FieldLogTextItem(FieldLogPriority priority, string text, string details)
 			: base(priority)
 		{
@@ -123,11 +169,20 @@ namespace Unclassified.FieldLog
 				(Details != null ? Details.Length * 2 : 0);
 		}
 
+		/// <summary>
+		/// Converts the data of the current FieldLogTextItem object to its equivalent string
+		/// representation.
+		/// </summary>
+		/// <returns>A string representation of the value of the current FieldLogTextItem object.</returns>
 		public override string ToString()
 		{
 			return "FieldLogTextItem(EventCounter=" + EventCounter + ", Time=" + Time.ToString("yyyyMMdd'T'HHmmss") + ", Priority=" + Priority + ", Text=" + Text + ")";
 		}
 
+		/// <summary>
+		/// Writes the log item fields to the log file writer.
+		/// </summary>
+		/// <param name="writer">The log file writer to write to.</param>
 		internal override void Write(FieldLogFileWriter writer)
 		{
 			writer.SetItemType(FieldLogItemType.Text);
@@ -137,6 +192,10 @@ namespace Unclassified.FieldLog
 			writer.WriteBuffer();
 		}
 
+		/// <summary>
+		/// Reads the log item fields from the specified log file reader.
+		/// </summary>
+		/// <param name="reader">The log file reader to read from.</param>
 		internal static FieldLogTextItem Read(FieldLogFileReader reader)
 		{
 			FieldLogTextItem item = new FieldLogTextItem();
@@ -147,11 +206,14 @@ namespace Unclassified.FieldLog
 		}
 	}
 
+	/// <summary>
+	/// Defines a log item that contains a variable name and value.
+	/// </summary>
 	public class FieldLogDataItem : FieldLogItem
 	{
-		/// <summary>Name of the data item.</summary>
+		/// <summary>Gets the name of the data item.</summary>
 		public string Name { get; private set; }
-		/// <summary>Value of the data item.</summary>
+		/// <summary>Gets the value of the data item.</summary>
 		public string Value { get; private set; }
 
 		// TODO: Add helper methods to serialise objects or other data types, e.g. to JSON
@@ -160,11 +222,22 @@ namespace Unclassified.FieldLog
 		{
 		}
 
+		/// <summary>
+		/// Initialises a new instance of the FieldLogDataItem class with Trace priority.
+		/// </summary>
+		/// <param name="name">The name of the data item. Can be an arbitrary string that is useful for the logging purpose.</param>
+		/// <param name="value">The value of the data item. Must be converted to a string, line breaks are allowed for structuring.</param>
 		public FieldLogDataItem(string name, string value)
 			: this(FieldLogPriority.Trace, name, value)
 		{
 		}
 
+		/// <summary>
+		/// Initialises a new instance of the FieldLogDataItem class.
+		/// </summary>
+		/// <param name="priority">The priority of the new log item.</param>
+		/// <param name="name">The name of the data item. Can be an arbitrary string that is useful for the logging purpose.</param>
+		/// <param name="value">The value of the data item. Must be converted to a string, line breaks are allowed for structuring.</param>
 		public FieldLogDataItem(FieldLogPriority priority, string name, string value)
 			: base(priority)
 		{
@@ -175,11 +248,20 @@ namespace Unclassified.FieldLog
 				(Value != null ? Value.Length * 2 : 0);
 		}
 
+		/// <summary>
+		/// Converts the data of the current FieldLogDataItem object to its equivalent string
+		/// representation.
+		/// </summary>
+		/// <returns>A string representation of the value of the current FieldLogDataItem object.</returns>
 		public override string ToString()
 		{
 			return "FieldLogDataItem(EventCounter=" + EventCounter + ", Time=" + Time.ToString("yyyyMMdd'T'HHmmss") + ", Priority=" + Priority + ", Name=" + Name + ")";
 		}
 
+		/// <summary>
+		/// Writes the log item fields to the log file writer.
+		/// </summary>
+		/// <param name="writer">The log file writer to write to.</param>
 		internal override void Write(FieldLogFileWriter writer)
 		{
 			writer.SetItemType(FieldLogItemType.Data);
@@ -189,6 +271,10 @@ namespace Unclassified.FieldLog
 			writer.WriteBuffer();
 		}
 
+		/// <summary>
+		/// Reads the log item fields from the specified log file reader.
+		/// </summary>
+		/// <param name="reader">The log file reader to read from.</param>
 		internal static FieldLogDataItem Read(FieldLogFileReader reader)
 		{
 			FieldLogDataItem item = new FieldLogDataItem();
@@ -199,31 +285,59 @@ namespace Unclassified.FieldLog
 		}
 	}
 
+	/// <summary>
+	/// Defines a log item that contains exception and environment information.
+	/// </summary>
 	public class FieldLogExceptionItem : FieldLogItem
 	{
+		/// <summary>Gets the exception instance.</summary>
 		public FieldLogException Exception { get; private set; }
+		/// <summary>Gets the context in which the exception has been thrown.</summary>
 		public string Context { get; private set; }
+		/// <summary>Gets the environment at the time of creating the log item.</summary>
 		public FieldLogEventEnvironment EnvironmentData { get; private set; }
 
 		private FieldLogExceptionItem()
 		{
 		}
 
+		/// <summary>
+		/// Initialises a new instance of the FieldLogExceptionItem class with Trace priority.
+		/// </summary>
+		/// <param name="ex">The exception instance.</param>
 		public FieldLogExceptionItem(Exception ex)
 			: this(FieldLogPriority.Critical, ex, null)
 		{
 		}
 
+		/// <summary>
+		/// Initialises a new instance of the FieldLogExceptionItem class with Trace priority.
+		/// </summary>
+		/// <param name="ex">The exception instance.</param>
+		/// <param name="context">The context in which the exception has been thrown. Can be an
+		/// arbitrary string that is useful for the logging purpose.</param>
 		public FieldLogExceptionItem(Exception ex, string context)
 			: this(FieldLogPriority.Critical, ex, context)
 		{
 		}
 
+		/// <summary>
+		/// Initialises a new instance of the FieldLogExceptionItem class.
+		/// </summary>
+		/// <param name="priority">The priority of the new log item.</param>
+		/// <param name="ex">The exception instance.</param>
 		public FieldLogExceptionItem(FieldLogPriority priority, Exception ex)
 			: this(priority, ex, null)
 		{
 		}
 
+		/// <summary>
+		/// Initialises a new instance of the FieldLogExceptionItem class.
+		/// </summary>
+		/// <param name="priority">The priority of the new log item.</param>
+		/// <param name="ex">The exception instance.</param>
+		/// <param name="context">The context in which the exception has been thrown. Can be an
+		/// arbitrary string that is useful for the logging purpose.</param>
 		public FieldLogExceptionItem(FieldLogPriority priority, Exception ex, string context)
 			: base(priority)
 		{
@@ -236,11 +350,20 @@ namespace Unclassified.FieldLog
 				EnvironmentData.Size;
 		}
 
+		/// <summary>
+		/// Converts the data of the current FieldLogExceptionItem object to its equivalent string
+		/// representation.
+		/// </summary>
+		/// <returns>A string representation of the value of the current FieldLogExceptionItem object.</returns>
 		public override string ToString()
 		{
 			return "FieldLogExceptionItem(EventCounter=" + EventCounter + ", Time=" + Time.ToString("yyyyMMdd'T'HHmmss") + ", Priority=" + Priority + ", Message=" + Exception.Message + ")";
 		}
 
+		/// <summary>
+		/// Writes the log item fields to the log file writer.
+		/// </summary>
+		/// <param name="writer">The log file writer to write to.</param>
 		internal override void Write(FieldLogFileWriter writer)
 		{
 			writer.SetItemType(FieldLogItemType.Exception);
@@ -251,6 +374,10 @@ namespace Unclassified.FieldLog
 			writer.WriteBuffer();
 		}
 
+		/// <summary>
+		/// Reads the log item fields from the specified log file reader.
+		/// </summary>
+		/// <param name="reader">The log file reader to read from.</param>
 		internal static FieldLogExceptionItem Read(FieldLogFileReader reader)
 		{
 			FieldLogExceptionItem item = new FieldLogExceptionItem();
@@ -262,19 +389,22 @@ namespace Unclassified.FieldLog
 		}
 	}
 
+	/// <summary>
+	/// Defines a log item that contains code scope information.
+	/// </summary>
 	public class FieldLogScopeItem : FieldLogItem
 	{
-		/// <summary>Type of the scope event.</summary>
+		/// <summary>Gets the scope type.</summary>
 		public FieldLogScopeType Type { get; private set; }
-		/// <summary>New scope nesting level after the log item. The last scope item in a thread should be 0.</summary>
+		/// <summary>Gets the new scope nesting level after the log item. The last scope item in a thread should be 0.</summary>
 		public int Level { get; private set; }
-		/// <summary>Scope name. Should be application-unique and hierarchical for easier analysis.</summary>
+		/// <summary>Gets the scope name. Should be application-unique and hierarchical for easier analysis.</summary>
 		public string Name { get; private set; }
-		/// <summary>Indicates whether this is a background thread. (Only valid when entering a thread scope.)</summary>
+		/// <summary>Gets a value indicating whether this is a background thread. (Only valid when entering a thread scope.)</summary>
 		public bool IsBackgroundThread { get; private set; }
-		/// <summary>Indicates whether this is a pool thread. (Only valid when entering a thread scope.)</summary>
+		/// <summary>Gets a value indicating whether this is a pool thread. (Only valid when entering a thread scope.)</summary>
 		public bool IsPoolThread { get; private set; }
-		/// <summary>Process static environment data. (Only valid when entering a process scope.)</summary>
+		/// <summary>Gets the process static environment data. (Only valid when entering a process scope.)</summary>
 		public FieldLogEventEnvironment EnvironmentData { get; private set; }
 
 		/// <summary>
@@ -295,11 +425,22 @@ namespace Unclassified.FieldLog
 		{
 		}
 
+		/// <summary>
+		/// Initialises a new instance of the FieldLogExceptionItem class with Trace priority.
+		/// </summary>
+		/// <param name="type">The scope type.</param>
+		/// <param name="name">The scope name.</param>
 		public FieldLogScopeItem(FieldLogScopeType type, string name)
 			: this(FieldLogPriority.Trace, type, name)
 		{
 		}
 
+		/// <summary>
+		/// Initialises a new instance of the FieldLogExceptionItem class.
+		/// </summary>
+		/// <param name="priority">The priority of the new log item.</param>
+		/// <param name="type">The scope type.</param>
+		/// <param name="name">The scope name.</param>
 		public FieldLogScopeItem(FieldLogPriority priority, FieldLogScopeType type, string name)
 			: base(priority)
 		{
@@ -325,11 +466,20 @@ namespace Unclassified.FieldLog
 				4 + 4 + 4 + 4 + 4;
 		}
 
+		/// <summary>
+		/// Converts the data of the current FieldLogScopeItem object to its equivalent string
+		/// representation.
+		/// </summary>
+		/// <returns>A string representation of the value of the current FieldLogScopeItem object.</returns>
 		public override string ToString()
 		{
 			return "FieldLogScopeItem(EventCounter=" + EventCounter + ", Time=" + Time.ToString("yyyyMMdd'T'HHmmss") + ", Priority=" + Priority + ", Scope=" + Type + ")";
 		}
 
+		/// <summary>
+		/// Writes the log item fields to the log file writer.
+		/// </summary>
+		/// <param name="writer">The log file writer to write to.</param>
 		internal override void Write(FieldLogFileWriter writer)
 		{
 			writer.SetItemType(IsRepeated ? FieldLogItemType.RepeatedScope : FieldLogItemType.Scope);
@@ -353,6 +503,11 @@ namespace Unclassified.FieldLog
 			writer.WriteBuffer();
 		}
 
+		/// <summary>
+		/// Reads the log item fields from the specified log file reader.
+		/// </summary>
+		/// <param name="reader">The log file reader to read from.</param>
+		/// <param name="isRepeated">true if the log item is repeated from a previous file, false if it is written for the first time.</param>
 		internal static FieldLogScopeItem Read(FieldLogFileReader reader, bool isRepeated)
 		{
 			FieldLogScopeItem item = new FieldLogScopeItem();
@@ -382,22 +537,35 @@ namespace Unclassified.FieldLog
 
 	#region Scope helpers
 
+	/// <summary>
+	/// Provides an IDisposable implementation to help in general scope logging.
+	/// </summary>
 	public class FieldLogScope : IDisposable
 	{
 		private string name;
 
+		/// <summary>
+		/// Initialises a new instance of the FieldLogScope class.
+		/// </summary>
+		/// <param name="name">The scope name.</param>
 		public FieldLogScope(string name)
 		{
 			this.name = name;
 			FL.Enter(name);
 		}
 
+		/// <summary>
+		/// Logs the end of the current scope.
+		/// </summary>
 		public void Dispose()
 		{
 			FL.Leave(name);
 			GC.SuppressFinalize(this);
 		}
 
+		/// <summary>
+		/// Finalises the FieldLogScope instance. This generates an Error log item.
+		/// </summary>
 		~FieldLogScope()
 		{
 			FL.Error("FieldLogScope.Dispose was not called! Scope levels before this item may be wrong.", "Name = " + name);
@@ -405,22 +573,35 @@ namespace Unclassified.FieldLog
 		}
 	}
 
+	/// <summary>
+	/// Provides an IDisposable implementation to help in thread scope logging.
+	/// </summary>
 	public class FieldLogThreadScope : IDisposable
 	{
 		private string name;
 
+		/// <summary>
+		/// Initialises a new instance of the FieldLogThreadScope class.
+		/// </summary>
+		/// <param name="name">The thread scope name.</param>
 		public FieldLogThreadScope(string name)
 		{
 			this.name = name;
 			FL.LogScope(FieldLogScopeType.ThreadStart, name);
 		}
 
+		/// <summary>
+		/// Logs the end of the current scope.
+		/// </summary>
 		public void Dispose()
 		{
 			FL.LogScope(FieldLogScopeType.ThreadEnd, name);
 			GC.SuppressFinalize(this);
 		}
 
+		/// <summary>
+		/// Finalises the FieldLogThreadScope instance. This generates an Error log item.
+		/// </summary>
 		~FieldLogThreadScope()
 		{
 			FL.Error("FieldLogThreadScope.Dispose was not called! Scope levels before this item may be wrong.", "Name = " + name);

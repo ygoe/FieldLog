@@ -2,23 +2,45 @@
 
 namespace Unclassified.FieldLog
 {
+	/// <summary>
+	/// Supports the iteration over log items in a sequence of FieldLogFileReader instances linked
+	/// by their NextReader property.
+	/// </summary>
 	public class FieldLogFileEnumerator : IEnumerator<FieldLogItem>
 	{
 		private FieldLogFileReader reader;
 		private FieldLogFileReader firstReader;
 		private FieldLogItem item;
 
+		/// <summary>
+		/// Initialises a new instance of the FieldLogFileEnumerator class.
+		/// </summary>
+		/// <param name="reader">The first file reader instance.</param>
 		public FieldLogFileEnumerator(FieldLogFileReader reader)
 		{
 			this.reader = reader;
 			this.firstReader = reader;
 		}
 		
+		/// <summary>
+		/// Gets the log item at the current position of the enumerator.
+		/// </summary>
 		public FieldLogItem Current
 		{
 			get { return item; }
 		}
 
+		/// <summary>
+		/// Gets the log item at the current position of the enumerator.
+		/// </summary>
+		object System.Collections.IEnumerator.Current
+		{
+			get { return item; }
+		}
+
+		/// <summary>
+		/// Disposes of all FieldLogFileReader in this enumerator, beginning with the first.
+		/// </summary>
 		public void Dispose()
 		{
 			FieldLogFileReader r = firstReader;
@@ -30,11 +52,15 @@ namespace Unclassified.FieldLog
 			}
 		}
 
-		object System.Collections.IEnumerator.Current
-		{
-			get { return item; }
-		}
-
+		/// <summary>
+		/// Advances the enumerator to the next log item of the currently read log file. If there
+		/// are no more items in this file and there is a NextReader set, the first log item of the
+		/// next file reader is selected. If there are no more items in this file and WaitMode is
+		/// set, the method will block until another log item is appended to the current file or
+		/// the wait operation is cancelled by a close event.
+		/// </summary>
+		/// <returns>true if the enumerator was successfully advanced to the next log item;
+		/// false if the enumerator has passed the end of the collection.</returns>
 		public bool MoveNext()
 		{
 			item = reader.ReadLogItem();
@@ -55,6 +81,10 @@ namespace Unclassified.FieldLog
 			return item != null;
 		}
 
+		/// <summary>
+		/// Sets the enumerator to its initial position, which is before the first log item of the
+		/// first log file.
+		/// </summary>
 		public void Reset()
 		{
 			reader = firstReader;
@@ -62,7 +92,8 @@ namespace Unclassified.FieldLog
 		}
 
 		/// <summary>
-		/// Sets the close signal. This may only work if WaitMode is set.
+		/// Sets the close signal for the currently used log file reader. This may only have the
+		/// desired effect if WaitMode is set for this log file reader.
 		/// </summary>
 		public void Close()
 		{
@@ -72,6 +103,9 @@ namespace Unclassified.FieldLog
 			}
 		}
 
+		/// <summary>
+		/// Gets the first log file reader of this enumerator.
+		/// </summary>
 		public FieldLogFileReader FirstReader
 		{
 			get
@@ -80,6 +114,9 @@ namespace Unclassified.FieldLog
 			}
 		}
 
+		/// <summary>
+		/// Gets the last log file reader of this enumerator.
+		/// </summary>
 		public FieldLogFileReader LastReader
 		{
 			get
@@ -93,6 +130,11 @@ namespace Unclassified.FieldLog
 			}
 		}
 
+		/// <summary>
+		/// Determines whether the enumerator contains the specified log file.
+		/// </summary>
+		/// <param name="fileName">The full name of the log file to locate in the enumerator.</param>
+		/// <returns>true if the enumerator contains the specified log file reader; otherwise, false.</returns>
 		public bool ContainsFile(string fileName)
 		{
 			FieldLogFileReader r = firstReader;

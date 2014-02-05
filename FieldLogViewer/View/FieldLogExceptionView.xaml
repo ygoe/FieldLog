@@ -29,16 +29,16 @@
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
 
-			<TextBlock Grid.Row="0" Grid.Column="0" Margin="0,6,0,0" Text="Exception type:"/>
-			<TextBox Grid.Row="0" Grid.Column="1" Margin="0,6,0,0" Text="{Binding Type, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+			<TextBlock Grid.Row="0" Grid.Column="0" Margin="0,8,0,0" Text="Exception type:"/>
+			<TextBox Grid.Row="0" Grid.Column="1" Margin="0,8,0,0" Text="{Binding Type, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
 			<TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,0,0" Text="Message:"/>
 			<TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Message, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
-			<TextBlock Grid.Row="2" Grid.Column="0" Margin="0,6,0,0" Text="Stack frames:"/>
+			<TextBlock Grid.Row="2" Grid.Column="0" Margin="0,8,0,0" Text="Stack frames:"/>
 			<ItemsControl
 				Grid.Row="2" Grid.Column="1"
-				Margin="0,6,0,0"
+				Margin="0,8,0,0"
 				ItemsSource="{Binding StackFrameVMs}">
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
@@ -62,8 +62,8 @@
 				</ItemsControl.ItemTemplate>
 			</ItemsControl>
 
-			<TextBlock Grid.Row="3" Grid.Column="0" Margin="0,6,0,0" Text="Error code:"/>
-			<TextBox Grid.Row="3" Grid.Column="1" Margin="0,6,0,0" Text="{Binding Code, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+			<TextBlock Grid.Row="3" Grid.Column="0" Margin="0,8,0,0" Text="Error code:"/>
+			<TextBox Grid.Row="3" Grid.Column="1" Margin="0,8,0,0" Text="{Binding Code, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
 			<TextBlock Grid.Row="4" Grid.Column="0" Margin="0,0,0,0" Text="Other data:"/>
 			<TextBox Grid.Row="4" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Data, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
@@ -75,7 +75,7 @@
 				ItemsSource="{Binding InnerExceptionVMs}">
 				<ItemsControl.Resources>
 					<DataTemplate DataType="{x:Type vm:FieldLogExceptionViewModel}">
-						<v:FieldLogExceptionView Margin="0,6,0,0"/>
+						<v:FieldLogExceptionView Margin="0,8,0,0"/>
 					</DataTemplate>
 				</ItemsControl.Resources>
 			</ItemsControl>

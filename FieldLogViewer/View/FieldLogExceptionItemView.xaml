@@ -58,11 +58,8 @@
 				<TextBlock Grid.Row="0" Grid.Column="0" Text="Time:"/>
 				<TextBox Grid.Row="0" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Time, StringFormat='yyyy-MM-dd  HH:mm:ss.ffffff', Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
-				<TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,0,0" Text="Event counter:"/>
-				<TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EventCounterAndSourceFile, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
-
-				<TextBlock Grid.Row="2" Grid.Column="0" Margin="0,0,0,0" Text="Priority:"/>
-				<Grid Grid.Row="2" Grid.Column="1" Margin="1,0,0,0">
+				<TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,0,0" Text="Priority:"/>
+				<Grid Grid.Row="1" Grid.Column="1" Margin="1,0,0,0">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="Auto"/>
 						<ColumnDefinition Width="*"/>
@@ -71,6 +68,9 @@
 					<Image Grid.Column="0" Source="{Binding PrioImageSource}" Width="14" Height="14"/>
 					<TextBox Grid.Column="1" Margin="2,0,0,0" Text="{Binding PrioTitle, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 				</Grid>
+
+				<TextBlock Grid.Row="2" Grid.Column="0" Margin="0,0,0,0" Text="Event counter:"/>
+				<TextBox Grid.Row="2" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EventCounterAndSourceFile, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
 				<TextBlock Grid.Row="3" Grid.Column="0" Margin="0,0,0,0" Text="Session:"/>
 				<TextBox Grid.Row="3" Grid.Column="1" Margin="0,0,0,0" Text="{Binding SessionId, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
@@ -86,7 +86,7 @@
 					Margin="0,6,0,0"
 					DataContext="{Binding ExceptionVM}"/>
 				
-				<TextBlock Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,6,0,0" Text="Environment" FontWeight="Bold"/>
+				<TextBlock Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,8,0,0" Text="Environment" FontWeight="Bold"/>
 
 				<TextBlock Grid.Row="8" Grid.Column="0" Margin="0,0,0,0" Text="OSType:"/>
 				<TextBox Grid.Row="8" Grid.Column="1" Margin="0,0,0,0" Text="{Binding EnvironmentData.OSType, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>

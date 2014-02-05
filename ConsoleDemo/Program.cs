@@ -11,7 +11,7 @@ namespace ConsoleDemo
 	{
 		static void Main(string[] args)
 		{
-			FL.SetCustomLogFileBasePath(null);
+			FL.AcceptLogFileBasePath();
 
 			Console.WriteLine("FieldLog writer demo application");
 			Console.WriteLine();

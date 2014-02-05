@@ -1020,24 +1020,40 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Sets an application-defined base path for writing log files to.
 		/// </summary>
-		/// <param name="path">Log file base path. This is an absolute path to a directory and a file name prefix. Set this null to use the default set of paths.</param>
+		/// <param name="path">Log file base path. This is an absolute path to a directory and a file name prefix.</param>
 		/// <remarks>
 		/// FieldLog tries to find a working path to write log files to automatically. The
 		/// application can specify a custom path that will be tried before all automatic defaults.
 		/// If this path is null or doesn't work, the other default paths are tested and the first
 		/// working path will be used. No attempt to find a working path is made until this method
-		/// is called, either with a custom path or not. Calling this method with the parameter
-		/// null just tells FieldLog that the default paths are okay and logs shall be written
-		/// there.
+		/// or <see cref="AcceptLogFileBasePath"/> is called.
 		/// </remarks>
 		public static void SetCustomLogFileBasePath(string path)
 		{
+			if (path == null) throw new ArgumentNullException("path");
+
 			lock (customLogPathLock)
 			{
 				if (customLogFileBasePathSet)
 					throw new InvalidOperationException("The custom log file path has already been set.");
 
 				customLogFileBasePath = path;
+				customLogFileBasePathSet = true;
+			}
+		}
+
+		/// <summary>
+		/// Accepts FieldLogs default log path strategy or a path specified in the flconfig file.
+		/// </summary>
+		/// <remarks>
+		/// Calling this method just tells FieldLog that the default paths are okay and logs shall
+		/// be written there if not specified otherwise in the flconfig file. No attempt to find a
+		/// working path is made until this method or <see cref="AcceptLogFileBasePath"/> is called.
+		/// </remarks>
+		public static void AcceptLogFileBasePath()
+		{
+			lock (customLogPathLock)
+			{
 				customLogFileBasePathSet = true;
 			}
 		}
@@ -1486,8 +1502,8 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		private static void ResetLogConfiguration()
 		{
-			maxFileSize = 1 * 1024 * 1024 /* MiB */;
-			maxTotalSize = 2L * 1024 * 1024 * 1024 /* GiB */;
+			maxFileSize = 100 * 1024 /* KiB */;
+			maxTotalSize = 200L * 1024 * 1024 /* MiB */;
 			priorityKeepTimes.Clear();
 			priorityKeepTimes[FieldLogPriority.Trace] = TimeSpan.FromHours(3);
 			priorityKeepTimes[FieldLogPriority.Checkpoint] = TimeSpan.FromHours(3);

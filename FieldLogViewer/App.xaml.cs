@@ -10,6 +10,7 @@ using System.Windows;
 using Unclassified.FieldLogViewer.View;
 using Unclassified.FieldLogViewer.ViewModel;
 using Unclassified;
+using Unclassified.FieldLog;
 
 namespace Unclassified.FieldLogViewer
 {
@@ -57,6 +58,8 @@ namespace Unclassified.FieldLogViewer
 		protected override void OnStartup(StartupEventArgs e)
 		{
 			base.OnStartup(e);
+
+			FL.AcceptLogFileBasePath();
 
 			// Create main window and view model
 			var view = new MainWindow();

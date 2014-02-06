@@ -12,7 +12,8 @@
 	ShowInTaskbar="False"
 	Title="Settings"
 	Height="300" Width="600"
-	LocationChanged="Window_LocationChanged" SizeChanged="Window_SizeChanged">
+	LocationChanged="Window_LocationChanged" SizeChanged="Window_SizeChanged"
+	Closed="Window_Closed">
 	
 	<Grid>
 		<TabControl Margin="10" SelectedIndex="1">
@@ -32,16 +33,17 @@
 						<ColumnDefinition Width="Auto"/>
 						<ColumnDefinition Width="Auto"/>
 						<ColumnDefinition Width="Auto"/>
-						<ColumnDefinition Width="Auto"/>
 					</Grid.ColumnDefinitions>
 					
 					<TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Filter:"/>
 					
 					<ComboBox
 						Grid.Row="0" Grid.Column="1" Margin="4,0,0,0"
+						IsEditable="True" IsTextSearchEnabled="False"
 						ItemsSource="{Binding Filters}"
 						SelectedItem="{Binding SelectedFilter}"
-						DisplayMemberPath="DisplayName"/>
+						DisplayMemberPath="DisplayName"
+						Text="{Binding SelectedFilter.DisplayName, Mode=TwoWay}" SelectionChanged="ComboBox_SelectionChanged" />
 					
 					<Button
 						Grid.Row="0" Grid.Column="2" Margin="4,0,0,0" Padding="6,1"
@@ -55,15 +57,13 @@
 
 					<Button
 						Grid.Row="0" Grid.Column="4" Margin="4,0,0,0" Padding="6,1"
-						Command="{Binding RenameFilterCommand}"
-						Content="Rename"/>
-
-					<Button
-						Grid.Row="0" Grid.Column="5" Margin="4,0,0,0" Padding="6,1"
 						Command="{Binding DeleteFilterCommand}"
 						Content="Delete"/>
 
-					<ScrollViewer Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="6" Margin="0,8,0,0">
+					<ScrollViewer
+						Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5"
+						Margin="0,8,0,0"
+						Visibility="{Binding SelectedFilter.AcceptAll, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}">
 						<Grid Margin="0,0,4,0">
 							<Grid.RowDefinitions>
 								<RowDefinition Height="Auto"/>

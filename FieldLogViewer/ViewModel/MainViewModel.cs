@@ -57,7 +57,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			Filters.ForNewOld(
 				f => f.FilterChanged += LogItemsFilterChanged,
 				f => f.FilterChanged -= LogItemsFilterChanged);
-			Filters.Add(new FilterViewModel(true) { DisplayName = "Show all" });
+			Filters.Add(new FilterViewModel(true));
 
 			foreach (string s in AppSettings.Instance.Filters)
 			{
@@ -331,9 +331,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
-		public void LogItemsFilterChanged()
+		public void LogItemsFilterChanged(bool affectsItems)
 		{
-			RefreshLogItemsFilterView();
+			if (affectsItems)
+			{
+				RefreshLogItemsFilterView();
+			}
 			AppSettings.Instance.Filters = Filters.Where(f => !f.AcceptAll).Select(f => f.SaveToString()).ToArray();
 		}
 

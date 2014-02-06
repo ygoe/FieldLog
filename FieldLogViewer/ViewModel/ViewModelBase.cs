@@ -31,9 +31,17 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				if (value != this.displayName)
 				{
 					this.displayName = value;
+					OnDisplayNameChanged();
 					OnPropertyChanged("DisplayName");
 				}
 			}
+		}
+
+		/// <summary>
+		/// Raised when the DisplayName property on this object has a new value.
+		/// </summary>
+		protected virtual void OnDisplayNameChanged()
+		{
 		}
 
 		#endregion Common view properties

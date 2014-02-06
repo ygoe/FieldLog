@@ -89,7 +89,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 							Value = FilterScopeType.Enter.ToString();
 							break;
 					}
-					OnFilterChanged();
+					OnFilterChanged(true);
 				}
 			}
 		}
@@ -102,7 +102,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			{
 				if (CheckUpdate(value, ref negate, "Negate"))
 				{
-					OnFilterChanged();
+					OnFilterChanged(true);
 				}
 			}
 		}
@@ -115,7 +115,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			{
 				if (CheckUpdate(value, ref comparison, "Comparison"))
 				{
-					OnFilterChanged();
+					OnFilterChanged(true);
 				}
 			}
 		}
@@ -128,7 +128,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			{
 				if (CheckUpdate(value, ref this.value, "Value"))
 				{
-					OnFilterChanged();
+					OnFilterChanged(true);
 				}
 			}
 		}
@@ -299,11 +299,11 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		/// <summary>
 		/// Raises the FilterChanged event.
 		/// </summary>
-		public void OnFilterChanged()
+		public void OnFilterChanged(bool affectsItems)
 		{
 			if (enableFilterChangedEvent)
 			{
-				parentConditionGroup.OnFilterChanged();
+				parentConditionGroup.OnFilterChanged(affectsItems);
 			}
 		}
 
@@ -813,6 +813,20 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		}
 
 		#endregion Filter logic
+
+		#region Duplicate
+
+		public FilterConditionViewModel GetDuplicate(FilterConditionGroupViewModel newParent)
+		{
+			FilterConditionViewModel newCond = new FilterConditionViewModel(newParent);
+			newCond.Column = this.Column;
+			newCond.Negate = this.Negate;
+			newCond.Comparison = this.Comparison;
+			newCond.Value = this.Value;
+			return newCond;
+		}
+
+		#endregion Duplicate
 	}
 
 	enum FilterColumn

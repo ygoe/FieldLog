@@ -54,5 +54,58 @@ namespace Unclassified.FieldLogViewer.View
 		}
 
 		#endregion Window event handlers
+
+		private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			var comboBox = sender as ComboBox;
+			if (comboBox == null) return;
+
+			var textBox = FindChild(comboBox, "PART_EditableTextBox", typeof(TextBox)) as TextBox;
+			if (textBox == null) return;
+
+			textBox.SelectAll();
+		}
+
+		private DependencyObject FindChild(DependencyObject reference, string childName, Type childType)
+		{
+			DependencyObject foundChild = null;
+			if (reference != null)
+			{
+				int childrenCount = VisualTreeHelper.GetChildrenCount(reference);
+				for (int i = 0; i < childrenCount; i++)
+				{
+					var child = VisualTreeHelper.GetChild(reference, i);
+					// If the child is not of the request child type child
+					if (child.GetType() != childType)
+					{
+						// recursively drill down the tree
+						foundChild = FindChild(child, childName, childType);
+					}
+					else if (!string.IsNullOrEmpty(childName))
+					{
+						var frameworkElement = child as FrameworkElement;
+						// If the child's name is set for search
+						if (frameworkElement != null && frameworkElement.Name == childName)
+						{
+							// if the child's name is of the request name
+							foundChild = child;
+							break;
+						}
+					}
+					else
+					{
+						// child element found.
+						foundChild = child;
+						break;
+					}
+				}
+			}
+			return foundChild;
+		}
+
+		private void Window_Closed(object sender, EventArgs e)
+		{
+			MainWindow.Instance.Focus();
+		}
 	}
 }

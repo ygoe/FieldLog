@@ -11,13 +11,17 @@ namespace Unclassified.FieldLogViewer.ViewModel
 {
 	class FilterViewModel : ViewModelBase
 	{
+		#region Private data
+
+		private string fixedDisplayName;
+
+		#endregion Private data
+
 		#region Constructors
 
 		public FilterViewModel()
 		{
-			this.ConditionGroups = new ObservableCollection<FilterConditionGroupViewModel>();
-			this.ConditionGroups.CollectionChanged += ConditionGroups_CollectionChanged;
-			this.ConditionGroups.Add(new FilterConditionGroupViewModel(this));
+			ConditionGroups = new ObservableCollection<FilterConditionGroupViewModel>();
 
 			InitializeCommands();
 		}
@@ -26,6 +30,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			: this()
 		{
 			AcceptAll = acceptAll;
+
+			if (AcceptAll)
+			{
+				fixedDisplayName = "Show all";
+				DisplayName = fixedDisplayName;
+			}
 		}
 
 		#endregion Constructors
@@ -38,17 +48,22 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			if (ConditionGroups.Count > 0)
 			{
-				bool isFirst = true;
-				foreach (var cg in ConditionGroups)
-				{
-					cg.IsFirst = isFirst;
-					isFirst = false;
-				}
-				OnFilterChanged();
+				UpdateFirstStatus();
+				OnFilterChanged(true);
 			}
 			else if (!isLoading)
 			{
 				Dispatcher.CurrentDispatcher.BeginInvoke((Action) OnCreateConditionGroup, DispatcherPriority.Normal);
+			}
+		}
+
+		private void UpdateFirstStatus()
+		{
+			bool isFirst = true;
+			foreach (var cg in ConditionGroups)
+			{
+				cg.IsFirst = isFirst;
+				isFirst = false;
 			}
 		}
 
@@ -72,7 +87,19 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		#region Data properties
 
-		public ObservableCollection<FilterConditionGroupViewModel> ConditionGroups { get; private set; }
+		private ObservableCollection<FilterConditionGroupViewModel> conditionGroups;
+		public ObservableCollection<FilterConditionGroupViewModel> ConditionGroups
+		{
+			get { return conditionGroups; }
+			private set
+			{
+				if (CheckUpdate(value, ref conditionGroups, "ConditionGroups"))
+				{
+					ConditionGroups.CollectionChanged += ConditionGroups_CollectionChanged;
+					UpdateFirstStatus();
+				}
+			}
+		}
 
 		public bool AcceptAll { get; private set; }
 
@@ -129,17 +156,30 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		/// <summary>
 		/// Raised when the filter definition has changed.
 		/// </summary>
-		public event Action FilterChanged;
+		public event Action<bool> FilterChanged;
 
 		/// <summary>
 		/// Raises the FilterChanged event.
 		/// </summary>
-		public void OnFilterChanged()
+		public void OnFilterChanged(bool affectsItems)
 		{
 			var handler = FilterChanged;
 			if (handler != null)
 			{
-				handler();
+				handler(affectsItems);
+			}
+		}
+
+		protected override void OnDisplayNameChanged()
+		{
+			if (AcceptAll)
+			{
+				// The accept-all filter cannot be renamed. Revert the change.
+				TaskHelper.WhenLoaded(() => { DisplayName = fixedDisplayName; });
+			}
+			else
+			{
+				OnFilterChanged(false);
 			}
 		}
 
@@ -160,5 +200,31 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		}
 
 		#endregion Filter logic
+
+		#region Create new
+
+		public static FilterViewModel CreateNew()
+		{
+			FilterViewModel newFilter = new FilterViewModel();
+			newFilter.DisplayName = DateTime.Now.ToString();
+			FilterConditionGroupViewModel newGroup = new FilterConditionGroupViewModel(newFilter);
+			newGroup.Conditions.Add(new FilterConditionViewModel(newGroup));
+			newFilter.ConditionGroups.Add(newGroup);
+			return newFilter;
+		}
+
+		#endregion Create new
+
+		#region Duplicate
+
+		public FilterViewModel GetDuplicate()
+		{
+			FilterViewModel newFilter = new FilterViewModel();
+			newFilter.DisplayName = this.DisplayName + " (copy)";
+			newFilter.ConditionGroups = new ObservableCollection<FilterConditionGroupViewModel>(ConditionGroups.Select(cg => cg.GetDuplicate(newFilter)));
+			return newFilter;
+		}
+
+		#endregion Duplicate
 	}
 }

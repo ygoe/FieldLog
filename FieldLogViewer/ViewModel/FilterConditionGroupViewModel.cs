@@ -25,9 +25,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			this.parentFilter = parentFilter;
 
-			this.Conditions = new ObservableCollection<FilterConditionViewModel>();
-			this.Conditions.CollectionChanged += Conditions_CollectionChanged;
-			this.Conditions.Add(new FilterConditionViewModel(this));
+			Conditions = new ObservableCollection<FilterConditionViewModel>();
 
 			InitializeCommands();
 		}
@@ -55,17 +53,22 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			
 			if (Conditions.Count > 0)
 			{
-				bool isFirst = true;
-				foreach (var c in Conditions)
-				{
-					c.IsFirst = isFirst;
-					isFirst = false;
-				}
-				OnFilterChanged();
+				UpdateFirstStatus();
+				OnFilterChanged(true);
 			}
 			else
 			{
 				parentFilter.ConditionGroups.Remove(this);
+			}
+		}
+
+		private void UpdateFirstStatus()
+		{
+			bool isFirst = true;
+			foreach (var c in Conditions)
+			{
+				c.IsFirst = isFirst;
+				isFirst = false;
 			}
 		}
 
@@ -172,7 +175,19 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		#region Data properties
 
-		public ObservableCollection<FilterConditionViewModel> Conditions { get; private set; }
+		private ObservableCollection<FilterConditionViewModel> conditions;
+		public ObservableCollection<FilterConditionViewModel> Conditions
+		{
+			get { return conditions; }
+			private set
+			{
+				if (CheckUpdate(value, ref conditions, "Conditions"))
+				{
+					Conditions.CollectionChanged += Conditions_CollectionChanged;
+					UpdateFirstStatus();
+				}
+			}
+		}
 
 		private bool isFirst;
 		public bool IsFirst
@@ -241,9 +256,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		#region Change notification
 
-		public void OnFilterChanged()
+		public void OnFilterChanged(bool affectsItems)
 		{
-			parentFilter.OnFilterChanged();
+			parentFilter.OnFilterChanged(affectsItems);
 		}
 
 		#endregion Change notification
@@ -262,5 +277,16 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		}
 
 		#endregion Filter logic
+
+		#region Duplicate
+
+		public FilterConditionGroupViewModel GetDuplicate(FilterViewModel newParent)
+		{
+			FilterConditionGroupViewModel newGroup = new FilterConditionGroupViewModel(newParent);
+			newGroup.Conditions = new ObservableCollection<FilterConditionViewModel>(Conditions.Select(c => c.GetDuplicate(newGroup)));
+			return newGroup;
+		}
+
+		#endregion Duplicate
 	}
 }

@@ -112,6 +112,7 @@
     <Compile Include="Unclassified\StringExtensions.cs" />
     <Compile Include="Unclassified\TaskHelper.cs" />
     <Compile Include="Unclassified\UI\AnimationHelper.cs" />
+    <Compile Include="Unclassified\UI\BoolToVisibilityConverter.cs" />
     <Compile Include="Unclassified\UI\DelegateCommand.cs" />
     <Compile Include="Unclassified\UI\EnumerationExtension.cs" />
     <Compile Include="Unclassified\UI\SmoothVirtualizingStackPanel.cs" />

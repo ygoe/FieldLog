@@ -21,30 +21,27 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		public DelegateCommand CreateFilterCommand { get; private set; }
 		public DelegateCommand DuplicateFilterCommand { get; private set; }
-		public DelegateCommand RenameFilterCommand { get; private set; }
 		public DelegateCommand DeleteFilterCommand { get; private set; }
 
 		private void InitializeCommands()
 		{
 			CreateFilterCommand = new DelegateCommand(OnCreateFilter);
 			DuplicateFilterCommand = new DelegateCommand(OnDuplicateFilter);
-			RenameFilterCommand = new DelegateCommand(OnRenameFilter);
 			DeleteFilterCommand = new DelegateCommand(OnDeleteFilter);
 		}
 
 		private void OnCreateFilter()
 		{
-			MainViewModel.Instance.Filters.Add(new FilterViewModel() { DisplayName = DateTime.Now.ToString() });
+			var newFilter = FilterViewModel.CreateNew();
+			MainViewModel.Instance.Filters.Add(newFilter);
+			MainViewModel.Instance.SelectedFilter = newFilter;
 		}
 
 		private void OnDuplicateFilter()
 		{
-			// TODO
-		}
-
-		private void OnRenameFilter()
-		{
-			// TODO: Replace ComboBox and buttons with TextBox and OK/Cancel buttons (?)
+			var newFilter = SelectedFilter.GetDuplicate();
+			MainViewModel.Instance.Filters.Add(newFilter);
+			MainViewModel.Instance.SelectedFilter = newFilter;
 		}
 
 		private void OnDeleteFilter()

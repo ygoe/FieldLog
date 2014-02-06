@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace Unclassified.FieldLog
 {
-	#region Log item data structures
+	#region Log item base class
 
 	/// <summary>
 	/// Abstract base class that defines a log item.
@@ -110,6 +110,10 @@ namespace Unclassified.FieldLog
 		}
 	}
 
+	#endregion Log item base class
+
+	#region Text log item class
+
 	/// <summary>
 	/// Defines a log item that contains a simple text message.
 	/// </summary>
@@ -206,6 +210,10 @@ namespace Unclassified.FieldLog
 		}
 	}
 
+	#endregion Text log item class
+
+	#region Data log item class
+
 	/// <summary>
 	/// Defines a log item that contains a variable name and value.
 	/// </summary>
@@ -284,6 +292,10 @@ namespace Unclassified.FieldLog
 			return item;
 		}
 	}
+
+	#endregion Data log item class
+
+	#region Exception log item class
 
 	/// <summary>
 	/// Defines a log item that contains exception and environment information.
@@ -388,6 +400,10 @@ namespace Unclassified.FieldLog
 			return item;
 		}
 	}
+
+	#endregion Exception log item class
+
+	#region Scope log item class
 
 	/// <summary>
 	/// Defines a log item that contains code scope information.
@@ -531,9 +547,9 @@ namespace Unclassified.FieldLog
 		}
 	}
 
-	// TODO: Prepare time measurement by log items (not only temporarily in the log viewer) - with multiple intermediate times, with multiple timers
+	#endregion Scope log item class
 
-	#endregion Log item data structures
+	// TODO: Prepare time measurement by log items (not only temporarily in the log viewer) - with multiple intermediate times, with multiple timers
 
 	#region Scope helpers
 

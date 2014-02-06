@@ -10,6 +10,9 @@ using System.Threading;
 
 namespace Unclassified.FieldLog
 {
+	/// <summary>
+	/// Implements the FieldLog system and provides logging methods for applications.
+	/// </summary>
 	public static class FL
 	{
 		#region Native interop
@@ -185,6 +188,10 @@ namespace Unclassified.FieldLog
 
 		#region Static constructor
 
+		/// <summary>
+		/// Initialises the static FieldLog environment, time measurement, worker threads and
+		/// application error handlers. This is called automatically when the process is started.
+		/// </summary>
 		static FL()
 		{
 			// Link the high-precision stopwatch with the current time for later high-precision
@@ -420,7 +427,7 @@ namespace Unclassified.FieldLog
 			}
 			msg += "\n\n";
 
-			msg += ExceptionUserMessageRecursive(exItem.Exception, 0);
+			msg += ExceptionUserMessageRecursive(exItem.Exception);
 			if (!string.IsNullOrEmpty(exItem.Context))
 			{
 				msg += AppErrorDialogContext + " " + exItem.Context + "\n";
@@ -506,7 +513,18 @@ namespace Unclassified.FieldLog
 			}
 		}
 
-		public static string ExceptionUserMessageRecursive(FieldLogException ex, int level)
+		/// <summary>
+		/// Formats the message text of an exception and all inner exceptions for display in a user
+		/// dialog.
+		/// </summary>
+		/// <param name="ex">The exception to format.</param>
+		/// <returns></returns>
+		public static string ExceptionUserMessageRecursive(FieldLogException ex)
+		{
+			return ExceptionUserMessageRecursive(ex, 0);
+		}
+
+		private static string ExceptionUserMessageRecursive(FieldLogException ex, int level)
 		{
 			string msg;
 			if (level == 0)
@@ -531,71 +549,134 @@ namespace Unclassified.FieldLog
 
 		#region Text log methods for each priority
 
+		/// <summary>
+		/// Writes a text log item with Trace priority to the log file.
+		/// </summary>
+		/// <param name="text">The text message.</param>
 		public static void Trace(string text)
 		{
 			Text(FieldLogPriority.Trace, text);
 		}
 
+		/// <summary>
+		/// Writes a text log item with Checkpoint priority to the log file.
+		/// </summary>
+		/// <param name="text">The text message.</param>
 		public static void Checkpoint(string text)
 		{
 			Text(FieldLogPriority.Checkpoint, text);
 		}
 
+		/// <summary>
+		/// Writes a text log item with Info priority to the log file.
+		/// </summary>
+		/// <param name="text">The text message.</param>
 		public static void Info(string text)
 		{
 			Text(FieldLogPriority.Info, text);
 		}
 
+		/// <summary>
+		/// Writes a text log item with Notice priority to the log file.
+		/// </summary>
+		/// <param name="text">The text message.</param>
 		public static void Notice(string text)
 		{
 			Text(FieldLogPriority.Notice, text);
 		}
 
+		/// <summary>
+		/// Writes a text log item with Warning priority to the log file.
+		/// </summary>
+		/// <param name="text">The text message.</param>
 		public static void Warning(string text)
 		{
 			Text(FieldLogPriority.Warning, text);
 		}
 
+		/// <summary>
+		/// Writes a text log item with Error priority to the log file.
+		/// </summary>
+		/// <param name="text">The text message.</param>
 		public static void Error(string text)
 		{
 			Text(FieldLogPriority.Error, text);
 		}
 
+		/// <summary>
+		/// Writes a text log item with Critical priority to the log file.
+		/// </summary>
+		/// <param name="text">The text message.</param>
 		public static void Critical(string text)
 		{
 			Text(FieldLogPriority.Critical, text);
 		}
 
+		/// <summary>
+		/// Writes a text log item with Trace priority to the log file.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
 		public static void Trace(string text, string details)
 		{
 			Text(FieldLogPriority.Trace, text, details);
 		}
 
+		/// <summary>
+		/// Writes a text log item with Checkpoint priority to the log file.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
 		public static void Checkpoint(string text, string details)
 		{
 			Text(FieldLogPriority.Checkpoint, text, details);
 		}
 
+		/// <summary>
+		/// Writes a text log item with Info priority to the log file.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
 		public static void Info(string text, string details)
 		{
 			Text(FieldLogPriority.Info, text, details);
 		}
 
+		/// <summary>
+		/// Writes a text log item with Notice priority to the log file.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
 		public static void Notice(string text, string details)
 		{
 			Text(FieldLogPriority.Notice, text, details);
 		}
 
+		/// <summary>
+		/// Writes a text log item with Warning priority to the log file.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
 		public static void Warning(string text, string details)
 		{
 			Text(FieldLogPriority.Warning, text, details);
 		}
 
+		/// <summary>
+		/// Writes a text log item with Error priority to the log file.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
 		public static void Error(string text, string details)
 		{
 			Text(FieldLogPriority.Error, text, details);
 		}
 
+		/// <summary>
+		/// Writes a text log item with Critical priority to the log file.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
 		public static void Critical(string text, string details)
 		{
 			Text(FieldLogPriority.Critical, text, details);
@@ -605,36 +686,71 @@ namespace Unclassified.FieldLog
 
 		#region Data log methods for each priority
 
+		/// <summary>
+		/// Writes a data log item with Trace priority to the log file.
+		/// </summary>
+		/// <param name="name">The name of the data item.</param>
+		/// <param name="value">The value of the data item.</param>
 		public static void TraceData(string name, string value)
 		{
 			Data(FieldLogPriority.Trace, name, value);
 		}
 
+		/// <summary>
+		/// Writes a data log item with Checkpoint priority to the log file.
+		/// </summary>
+		/// <param name="name">The name of the data item.</param>
+		/// <param name="value">The value of the data item.</param>
 		public static void CheckpointData(string name, string value)
 		{
 			Data(FieldLogPriority.Checkpoint, name, value);
 		}
 
+		/// <summary>
+		/// Writes a data log item with Info priority to the log file.
+		/// </summary>
+		/// <param name="name">The name of the data item.</param>
+		/// <param name="value">The value of the data item.</param>
 		public static void InfoData(string name, string value)
 		{
 			Data(FieldLogPriority.Info, name, value);
 		}
 
+		/// <summary>
+		/// Writes a data log item with Notice priority to the log file.
+		/// </summary>
+		/// <param name="name">The name of the data item.</param>
+		/// <param name="value">The value of the data item.</param>
 		public static void NoticeData(string name, string value)
 		{
 			Data(FieldLogPriority.Notice, name, value);
 		}
 
+		/// <summary>
+		/// Writes a data log item with Warning priority to the log file.
+		/// </summary>
+		/// <param name="name">The name of the data item.</param>
+		/// <param name="value">The value of the data item.</param>
 		public static void WarningData(string name, string value)
 		{
 			Data(FieldLogPriority.Warning, name, value);
 		}
 
+		/// <summary>
+		/// Writes a data log item with Error priority to the log file.
+		/// </summary>
+		/// <param name="name">The name of the data item.</param>
+		/// <param name="value">The value of the data item.</param>
 		public static void ErrorData(string name, string value)
 		{
 			Data(FieldLogPriority.Error, name, value);
 		}
 
+		/// <summary>
+		/// Writes a data log item with Critical priority to the log file.
+		/// </summary>
+		/// <param name="name">The name of the data item.</param>
+		/// <param name="value">The value of the data item.</param>
 		public static void CriticalData(string name, string value)
 		{
 			Data(FieldLogPriority.Critical, name, value);
@@ -644,106 +760,211 @@ namespace Unclassified.FieldLog
 
 		#region Exception log methods for each priority
 
+		/// <summary>
+		/// Writes an exception log item with Trace priority to the log file.
+		/// </summary>
+		/// <param name="ex">The exception instance.</param>
 		public static void Trace(Exception ex)
 		{
 			Exception(FieldLogPriority.Trace, ex);
 		}
 
+		/// <summary>
+		/// Writes an exception log item with Checkpoint priority to the log file.
+		/// </summary>
+		/// <param name="ex">The exception instance.</param>
 		public static void Checkpoint(Exception ex)
 		{
 			Exception(FieldLogPriority.Checkpoint, ex);
 		}
 
+		/// <summary>
+		/// Writes an exception log item with Info priority to the log file.
+		/// </summary>
+		/// <param name="ex">The exception instance.</param>
 		public static void Info(Exception ex)
 		{
 			Exception(FieldLogPriority.Info, ex);
 		}
 
+		/// <summary>
+		/// Writes an exception log item with Notice priority to the log file.
+		/// </summary>
+		/// <param name="ex">The exception instance.</param>
 		public static void Notice(Exception ex)
 		{
 			Exception(FieldLogPriority.Notice, ex);
 		}
 
+		/// <summary>
+		/// Writes an exception log item with Warning priority to the log file.
+		/// </summary>
+		/// <param name="ex">The exception instance.</param>
 		public static void Warning(Exception ex)
 		{
 			Exception(FieldLogPriority.Warning, ex);
 		}
 
+		/// <summary>
+		/// Writes an exception log item with Error priority to the log file.
+		/// </summary>
+		/// <param name="ex">The exception instance.</param>
 		public static void Error(Exception ex)
 		{
 			Exception(FieldLogPriority.Error, ex);
 		}
 
+		/// <summary>
+		/// Writes an exception log item with Critical priority to the log file.
+		/// </summary>
+		/// <param name="ex">The exception instance.</param>
 		public static void Critical(Exception ex)
 		{
 			Exception(FieldLogPriority.Critical, ex);
 		}
 
+		/// <summary>
+		/// Writes an exception log item with Trace priority to the log file.
+		/// </summary>
+		/// <param name="ex">The exception instance.</param>
+		/// <param name="context">The context in which the exception has been thrown.</param>
 		public static void Trace(Exception ex, string context)
 		{
 			Exception(FieldLogPriority.Trace, ex, context);
 		}
 
+		/// <summary>
+		/// Writes an exception log item with Checkpoint priority to the log file.
+		/// </summary>
+		/// <param name="ex">The exception instance.</param>
+		/// <param name="context">The context in which the exception has been thrown.</param>
 		public static void Checkpoint(Exception ex, string context)
 		{
 			Exception(FieldLogPriority.Checkpoint, ex, context);
 		}
 
+		/// <summary>
+		/// Writes an exception log item with Info priority to the log file.
+		/// </summary>
+		/// <param name="ex">The exception instance.</param>
+		/// <param name="context">The context in which the exception has been thrown.</param>
 		public static void Info(Exception ex, string context)
 		{
 			Exception(FieldLogPriority.Info, ex, context);
 		}
 
+		/// <summary>
+		/// Writes an exception log item with Notice priority to the log file.
+		/// </summary>
+		/// <param name="ex">The exception instance.</param>
+		/// <param name="context">The context in which the exception has been thrown.</param>
 		public static void Notice(Exception ex, string context)
 		{
 			Exception(FieldLogPriority.Notice, ex, context);
 		}
 
+		/// <summary>
+		/// Writes an exception log item with Warning priority to the log file.
+		/// </summary>
+		/// <param name="ex">The exception instance.</param>
+		/// <param name="context">The context in which the exception has been thrown.</param>
 		public static void Warning(Exception ex, string context)
 		{
 			Exception(FieldLogPriority.Warning, ex, context);
 		}
 
+		/// <summary>
+		/// Writes an exception log item with Error priority to the log file.
+		/// </summary>
+		/// <param name="ex">The exception instance.</param>
+		/// <param name="context">The context in which the exception has been thrown.</param>
 		public static void Error(Exception ex, string context)
 		{
 			Exception(FieldLogPriority.Error, ex, context);
 		}
 
+		/// <summary>
+		/// Writes an exception log item with Critical priority to the log file.
+		/// </summary>
+		/// <param name="ex">The exception instance.</param>
+		/// <param name="context">The context in which the exception has been thrown.</param>
 		public static void Critical(Exception ex, string context)
 		{
 			Exception(FieldLogPriority.Critical, ex, context);
 		}
 
+		/// <summary>
+		/// Writes an exception log item with Trace priority to the log file.
+		/// </summary>
+		/// <param name="ex">The exception instance.</param>
+		/// <param name="context">The context in which the exception has been thrown.</param>
+		/// <param name="showUserDialog">true to show a user dialog about the application error.</param>
 		public static void Trace(Exception ex, string context, bool showUserDialog)
 		{
 			Exception(FieldLogPriority.Trace, ex, context, showUserDialog);
 		}
 
+		/// <summary>
+		/// Writes an exception log item with Checkpoint priority to the log file.
+		/// </summary>
+		/// <param name="ex">The exception instance.</param>
+		/// <param name="context">The context in which the exception has been thrown.</param>
+		/// <param name="showUserDialog">true to show a user dialog about the application error.</param>
 		public static void Checkpoint(Exception ex, string context, bool showUserDialog)
 		{
 			Exception(FieldLogPriority.Checkpoint, ex, context, showUserDialog);
 		}
 
+		/// <summary>
+		/// Writes an exception log item with Info priority to the log file.
+		/// </summary>
+		/// <param name="ex">The exception instance.</param>
+		/// <param name="context">The context in which the exception has been thrown.</param>
+		/// <param name="showUserDialog">true to show a user dialog about the application error.</param>
 		public static void Info(Exception ex, string context, bool showUserDialog)
 		{
 			Exception(FieldLogPriority.Info, ex, context, showUserDialog);
 		}
 
+		/// <summary>
+		/// Writes an exception log item with Notice priority to the log file.
+		/// </summary>
+		/// <param name="ex">The exception instance.</param>
+		/// <param name="context">The context in which the exception has been thrown.</param>
+		/// <param name="showUserDialog">true to show a user dialog about the application error.</param>
 		public static void Notice(Exception ex, string context, bool showUserDialog)
 		{
 			Exception(FieldLogPriority.Notice, ex, context, showUserDialog);
 		}
 
+		/// <summary>
+		/// Writes an exception log item with Warning priority to the log file.
+		/// </summary>
+		/// <param name="ex">The exception instance.</param>
+		/// <param name="context">The context in which the exception has been thrown.</param>
+		/// <param name="showUserDialog">true to show a user dialog about the application error.</param>
 		public static void Warning(Exception ex, string context, bool showUserDialog)
 		{
 			Exception(FieldLogPriority.Warning, ex, context, showUserDialog);
 		}
 
+		/// <summary>
+		/// Writes an exception log item with Error priority to the log file.
+		/// </summary>
+		/// <param name="ex">The exception instance.</param>
+		/// <param name="context">The context in which the exception has been thrown.</param>
+		/// <param name="showUserDialog">true to show a user dialog about the application error.</param>
 		public static void Error(Exception ex, string context, bool showUserDialog)
 		{
 			Exception(FieldLogPriority.Error, ex, context, showUserDialog);
 		}
 
+		/// <summary>
+		/// Writes an exception log item with Critical priority to the log file.
+		/// </summary>
+		/// <param name="ex">The exception instance.</param>
+		/// <param name="context">The context in which the exception has been thrown.</param>
+		/// <param name="showUserDialog">true to show a user dialog about the application error.</param>
 		public static void Critical(Exception ex, string context, bool showUserDialog)
 		{
 			Exception(FieldLogPriority.Critical, ex, context, showUserDialog);
@@ -753,31 +974,66 @@ namespace Unclassified.FieldLog
 
 		#region Log methods with variable priority for each item type
 
+		/// <summary>
+		/// Writes a text log item to the log file.
+		/// </summary>
+		/// <param name="priority">The priority of the log item.</param>
+		/// <param name="text">The text message.</param>
 		public static void Text(FieldLogPriority priority, string text)
 		{
 			Log(new FieldLogTextItem(priority, text));
 		}
 
+		/// <summary>
+		/// Writes a text log item to the log file.
+		/// </summary>
+		/// <param name="priority">The priority of the log item.</param>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
 		public static void Text(FieldLogPriority priority, string text, string details)
 		{
 			Log(new FieldLogTextItem(priority, text, details));
 		}
 
+		/// <summary>
+		/// Writes a data log item to the log file.
+		/// </summary>
+		/// <param name="priority">The priority of the log item.</param>
+		/// <param name="name">The name of the data item.</param>
+		/// <param name="value">The value of the data item.</param>
 		public static void Data(FieldLogPriority priority, string name, string value)
 		{
 			Log(new FieldLogDataItem(priority, name, value));
 		}
 
+		/// <summary>
+		/// Writes an exception log item to the log file.
+		/// </summary>
+		/// <param name="priority">The priority of the log item.</param>
+		/// <param name="ex">The exception instance.</param>
 		public static void Exception(FieldLogPriority priority, Exception ex)
 		{
 			Log(new FieldLogExceptionItem(priority, ex));
 		}
 
+		/// <summary>
+		/// Writes an exception log item to the log file.
+		/// </summary>
+		/// <param name="priority">The priority of the log item.</param>
+		/// <param name="ex">The exception instance.</param>
+		/// <param name="context">The context in which the exception has been thrown.</param>
 		public static void Exception(FieldLogPriority priority, Exception ex, string context)
 		{
 			Log(new FieldLogExceptionItem(priority, ex, context));
 		}
 
+		/// <summary>
+		/// Writes an exception log item to the log file.
+		/// </summary>
+		/// <param name="priority">The priority of the log item.</param>
+		/// <param name="ex">The exception instance.</param>
+		/// <param name="context">The context in which the exception has been thrown.</param>
+		/// <param name="showUserDialog">true to show a user dialog about the application error.</param>
 		public static void Exception(FieldLogPriority priority, Exception ex, string context, bool showUserDialog)
 		{
 			FieldLogExceptionItem item = new FieldLogExceptionItem(priority, ex, context);
@@ -792,18 +1048,31 @@ namespace Unclassified.FieldLog
 
 		#region Scope log methods
 
+		/// <summary>
+		/// Writes a scope entering log item to the log file.
+		/// </summary>
+		/// <param name="name">The scope name. Should be application-unique and hierarchical for easier analysis.</param>
 		public static void Enter(string name)
 		{
 			FL.ScopeLevel++;
 			Log(new FieldLogScopeItem(FieldLogScopeType.Enter, name));
 		}
 
+		/// <summary>
+		/// Writes a scope leaving log item to the log file.
+		/// </summary>
+		/// <param name="name">The scope name. Should be the same as the corresponding Enter scope name.</param>
 		public static void Leave(string name)
 		{
 			FL.ScopeLevel--;
 			Log(new FieldLogScopeItem(FieldLogScopeType.Leave, name));
 		}
 
+		/// <summary>
+		/// Writes a scope log item to the log file.
+		/// </summary>
+		/// <param name="type">The scope type.</param>
+		/// <param name="name">The scope name. Should be application-unique and hierarchical for easier analysis.</param>
 		public static void LogScope(FieldLogScopeType type, string name)
 		{
 			FieldLogScopeItem scopeItem = new FieldLogScopeItem(type, name);
@@ -844,6 +1113,10 @@ namespace Unclassified.FieldLog
 
 		#region General log method
 
+		/// <summary>
+		/// Writes a log item to the log file.
+		/// </summary>
+		/// <param name="item">The log item to write.</param>
 		public static void Log(FieldLogItem item)
 		{
 			//System.Diagnostics.Trace.WriteLine("FieldLog.Log: New item " + item.ToString());
@@ -1597,6 +1870,11 @@ namespace Unclassified.FieldLog
 			}
 		}
 
+		/// <summary>
+		/// Gets the version string of the current application from the
+		/// AssemblyInformationalVersionAttribute, AssemblyVersionAttribute or
+		/// AssemblyFileVersionAttribute value, or null if none is set.
+		/// </summary>
 		public static string AppVersion
 		{
 			get
@@ -1620,6 +1898,10 @@ namespace Unclassified.FieldLog
 			}
 		}
 
+		/// <summary>
+		/// Gets the name of the current application from the AssemblyProductAttribute or
+		/// AssemblyTitleAttribute value, or null if none is set.
+		/// </summary>
 		public static string AppName
 		{
 			get
@@ -1638,6 +1920,10 @@ namespace Unclassified.FieldLog
 			}
 		}
 
+		/// <summary>
+		/// Gets the description of the current application from the AssemblyDescriptionAttribute
+		/// value, or null if none is set.
+		/// </summary>
 		public static string AppDescription
 		{
 			get
@@ -1651,6 +1937,10 @@ namespace Unclassified.FieldLog
 			}
 		}
 
+		/// <summary>
+		/// Gets the copyright note of the current application from the AssemblyCopyrightAttribute
+		/// value, or null if none is set.
+		/// </summary>
 		public static string AppCopyright
 		{
 			get

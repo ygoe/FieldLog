@@ -4,11 +4,25 @@ Website: http://dev.unclassified.de/source/fieldlog
 
 FieldLog is a fast and comprehensive logging tool for .NET applications. It allows applications to write events, data and errors to managed and efficient log files. The logging methods are optimised for high performance multi-threaded operation and a single log method call takes as little as 3 microseconds on modern hardware. There's no comparison to OutputDebugString, Debug.WriteLine or appending to a file each time! This logging can be used in high-performance loops without noticeably slowing down the application.
 
-The general idea is to always leave debug logging enabled to be able to analyse it in case of an application failure. Traditional log systems can only append to log files but never delete old data. This leads to constantly increasing log size with the debug level enabled. FieldLog can manage its log files and only keep items of each priority for a specific time, then delete it to save space and remove unnecessary data. The low latency and good storage efficiency allow you to keep logging enabled. When an error occurs, all the relevant information is already here to be analysed. You don't need to instruct your users to enable logging by tinkering with hidden XML files and wait for the error to happen again. Instead, the user is guided through collecting the relevant logs and submitting them directly to the developer.
+ALWAYS-ON LOGGING
+
+The general idea is to always leave debug logging enabled to be able to analyse it in case of an application failure. Traditional log systems can only append to log files but never delete old data. This leads to constantly increasing log size with the debug level enabled. FieldLog can manage its log files and only keep items of each priority for a specific time, then delete it to save space and remove unnecessary data. The low latency and good storage efficiency allow you to keep logging enabled. When an error occurs, all the relevant information is already here to be analysed.
+
+You don't need to instruct your users to enable logging by tinkering with hidden XML files and wait for the error to happen again. Instead, the user is guided through collecting the relevant logs and submitting them directly to the developer.
+
+FILE COMPRESSION
 
 The log items are written in a binary format that minimises the amount of bytes per information and reuses any previous text strings for storage efficiency. If the same message string is logged over and over again, it will hardly increase the log size. The files are separated by log priority and a new file is started after a certain file size or time. If available, NTFS compression is used and considered in file size decisions. Old log items are automatically deleted. The maximum log size and keep time is configurable by an easy to understand and robust text file in the application directory.
 
-The log viewer, FieldLogViewer, loads a set of log files and displays the log items in a list. The user can select any item to view all the details like thread ID, additional exception data, stack traces or system environment data at that time. Items are colour-coded by their priority and icons display the type of event. A powerful filter editor allows you to quickly find the interesting events. The viewer can even keep reading at the end of the log files and show new log items as they are written by the running application. This allows a developer to monitor the application in real-time. The selected filter remains in effect. You can also use FieldLogViewer as a DebugOutputString listener and read limited debug output from other processes as well.
+LOG VIEWER
+
+The log viewer application, FieldLogViewer, loads a set of log files and displays the log items in a list. The user can select any item to view all the details like thread ID, additional exception data, stack traces or system environment data at that time. Items are colour-coded by their priority and icons display the type of event.
+
+A powerful filter editor allows you to quickly find the interesting events. The viewer can even keep reading at the end of the log files and show new log items as they are written by the running application. This allows a developer to monitor the application in real-time. The selected filter remains in effect.
+
+You can also use FieldLogViewer as a DebugOutputString listener (like Sysinternals' DbgView) and read limited debug output from other processes as well.
+
+SUBMIT TOOL
 
 An easy to use log sumit tool (not yet implemented) will guide the user through the process of selecting the relevant log files, packaging them for transport and choosing a suitable transport method. Sending an e-mail, using an HTTP or FTP server, sending with Bluetooth, and copying the package to a local directory are the planned transport methods. This tool can be started in response to an unhandled or unrecoverable application error so that the user is prompted with the right information and can submit trace logs while they're fresh.
 
@@ -29,6 +43,14 @@ BUILDING
 There is a number of entry scripts for the automated build process. These scripts are located in the "_scripts" directory and starting with "build". The scripts start the common build script with certain section names that are pretty much described by the file name. "build_all.cmd", for example, builds everything there is to build. "build_release.cmd" only builds the solution in the Release configuration and "build_release_setup.cmd" additionally creates a setup executable in the "Setup" directory. The assembly and setup version are determined from the currently checked out Git revision. The common build script is implemented in PowerShell and is smart enough to find all installed tools automatically.
 
 It is also possible to open the solution file in the repository's root directory with Visual Studio and work with it as usual. You probably need to unload the project "FieldLog.NET20" first to avoid compiler confusion. To create the setup executable, you need a current version of InnoSetup (use the Unicode Inno Setup QuickStart Pack download).
+
+THE NAME
+
+The name "FieldLog" was originally supposed to refer to "out in the field logging" which is where your applications run. It does everything it can to maintain itself out there and to provide the developer with all relevant information about any problems that might occur. The developer does not need to go where the application runs if they have sufficient remote support.
+
+Another interpretation might refer to the structured log items that distinguishes FieldLog from plain text log files that actually only store a single line of raw text about each event. Being able to access and understand each bit of information allows for filtering the data masses to actually see the interesting parts.
+
+The logo merges the capital letters F and L into a combined shape (which happens to look like an E), using different colours for the parts distinct from both letters and the shared part. The horizontal bars also depict "good" and "error" rows in a log list, which is basically what you can see with FieldLog.
 
 LICENCE
 

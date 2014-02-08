@@ -80,7 +80,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		private void OnCreateConditionGroup()
 		{
-			ConditionGroups.Add(new FilterConditionGroupViewModel(this));
+			FilterConditionGroupViewModel cg = new FilterConditionGroupViewModel(this);
+			cg.CreateConditionCommand.Execute();
+			ConditionGroups.Add(cg);
 		}
 
 		#endregion Commands

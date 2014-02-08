@@ -62,7 +62,19 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			foreach (string s in AppSettings.Instance.Filters)
 			{
 				FilterViewModel f = new FilterViewModel();
-				f.LoadFromString(s);
+				try
+				{
+					f.LoadFromString(s);
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show(
+						"A filter could not be restored from the settings.\n" + ex.Message,
+						"Error",
+						MessageBoxButton.OK,
+						MessageBoxImage.Warning);
+					continue;
+				}
 				Filters.Add(f);
 			}
 			FilterViewModel selectedFilterVM = Filters.FirstOrDefault(f => f.DisplayName == AppSettings.Instance.SelectedFilter);

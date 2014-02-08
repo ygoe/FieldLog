@@ -114,7 +114,6 @@
 																<Grid.ColumnDefinitions>
 																	<ColumnDefinition Width="Auto"/>
 																	<ColumnDefinition Width="Auto"/>
-																	<ColumnDefinition Width="Auto"/>
 																	<ColumnDefinition Width="*"/>
 																	<ColumnDefinition Width="Auto"/>
 																</Grid.ColumnDefinitions>
@@ -127,28 +126,22 @@
 																	SelectedValuePath="Value"
 																	Style="{StaticResource LightComboBoxStyle}"/>
 															
-																<CheckBox
-																	Grid.Column="1" Margin="4,0,0,0" VerticalAlignment="Center"
-																	Content="not"
-																	IsChecked="{Binding Negate}"/>
-
 																<ComboBox
-																	Grid.Column="2" Margin="4,0,0,0"
-																	Visibility="{Binding ComparisonVisibility}"
-																	ItemsSource="{Binding Source={ui:Enumeration {x:Type vm:FilterComparison}}}"
+																	Grid.Column="1" Margin="4,0,0,0"
+																	ItemsSource="{Binding AvailableComparisons}"
 																	DisplayMemberPath="Description"
 																	SelectedValue="{Binding Comparison}"
 																	SelectedValuePath="Value"
 																	Style="{StaticResource LightComboBoxStyle}"/>
 															
 																<TextBox
-																	Grid.Column="3" Margin="4,0,0,0"
+																	Grid.Column="2" Margin="4,0,0,0"
 																	Visibility="{Binding ValueTextVisibility}"
 																	Text="{Binding Value}"
 																	ui:TextBoxExtensions.UpdateDelay="500"/>
 
 																<ComboBox
-																	Grid.Column="3" Margin="4,0,0,0"
+																	Grid.Column="2" Margin="4,0,0,0"
 																	Visibility="{Binding ValueListVisibility}"
 																	ItemsSource="{Binding AvailableValues}"
 																	DisplayMemberPath="Description"
@@ -157,13 +150,13 @@
 																	Style="{StaticResource LightComboBoxStyle}"/>
 																
 																<TextBlock
-																	Grid.Column="3" Margin="8,0,0,0"
+																	Grid.Column="2" Margin="8,0,0,0"
 																	VerticalAlignment="Center"
 																	Visibility="{Binding ValueSetVisibility}"
 																	Text="set"/>
 
 																<Button
-																	Grid.Column="4" Margin="4,0,0,0" Padding="6,1"
+																	Grid.Column="3" Margin="4,0,0,0" Padding="6,1"
 																	Command="{Binding DeleteCommand}"
 																	Content="x"
 																	Style="{StaticResource LightButtonStyle}"/>

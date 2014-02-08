@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -75,8 +77,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					OnPropertyChanged(
 						"AvailableValues",
 						"Column",
-						"ComparisonVisibility",
+						"AvailableComparisons",
 						"ValueTextVisibility", "ValueListVisibility", "ValueSetVisibility");
+					// Set value to an acceptable default
 					switch (column)
 					{
 						case FilterColumn.Type:
@@ -89,19 +92,14 @@ namespace Unclassified.FieldLogViewer.ViewModel
 							Value = FilterScopeType.Enter.ToString();
 							break;
 					}
-					OnFilterChanged(true);
-				}
-			}
-		}
-
-		private bool negate;
-		public bool Negate
-		{
-			get { return negate; }
-			set
-			{
-				if (CheckUpdate(value, ref negate, "Negate"))
-				{
+					// Check whether the selected comparison is still valid
+					if (AvailableComparisons != null)
+					{
+						if (!AvailableComparisons.Any(c => c.Value == Comparison))
+						{
+							Comparison = AvailableComparisons.First().Value;
+						}
+					}
 					OnFilterChanged(true);
 				}
 			}
@@ -133,45 +131,40 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
-		public object AvailableValues
+		public IEnumerable<EnumerationExtension.EnumerationMember> AvailableValues
 		{
 			get
 			{
 				switch (column)
 				{
 					case FilterColumn.Type:
-						return new EnumerationExtension(typeof(FilterItemType), true).ProvideValue(null);
+						return new EnumerationExtension(typeof(FilterItemType), true).ProvideTypedValue();
 					case FilterColumn.Priority:
-						return new EnumerationExtension(typeof(FilterPriority), true).ProvideValue(null);
+						return new EnumerationExtension(typeof(FilterPriority), true).ProvideTypedValue();
 					case FilterColumn.ScopeType:
-						return new EnumerationExtension(typeof(FilterScopeType), true).ProvideValue(null);
+						return new EnumerationExtension(typeof(FilterScopeType), true).ProvideTypedValue();
 					default:
 						return null;
 				}
 			}
 		}
 
-		public Visibility ComparisonVisibility
+		public IEnumerable<EnumerationExtension<FilterComparison>.EnumerationMember> AvailableComparisons
 		{
 			get
 			{
-				switch (Column)
+				switch (column)
 				{
-					case FilterColumn.Time:
-					case FilterColumn.Priority:
-					case FilterColumn.SessionId:
-					case FilterColumn.ThreadId:
 					case FilterColumn.AnyText:
+					case FilterColumn.SessionId:
 					case FilterColumn.TextText:
 					case FilterColumn.TextDetails:
 					case FilterColumn.DataName:
 					case FilterColumn.DataValue:
 					case FilterColumn.ExceptionType:
 					case FilterColumn.ExceptionMessage:
-					case FilterColumn.ExceptionCode:
 					case FilterColumn.ExceptionData:
 					case FilterColumn.ExceptionContext:
-					case FilterColumn.ScopeLevel:
 					case FilterColumn.ScopeName:
 					case FilterColumn.EnvironmentCultureName:
 					case FilterColumn.EnvironmentCurrentDirectory:
@@ -179,13 +172,33 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					case FilterColumn.EnvironmentUserName:
 					case FilterColumn.EnvironmentCommandLine:
 					case FilterColumn.EnvironmentAppVersion:
+						return new EnumerationExtension<FilterComparison>(typeof(UseForStringColumnAttribute)).ProvideTypedValue();
+
+					case FilterColumn.Type:
+					case FilterColumn.ScopeType:
+						return new EnumerationExtension<FilterComparison>(typeof(UseForEnumColumnAttribute)).ProvideTypedValue();
+
+					case FilterColumn.Time:
+						return new EnumerationExtension<FilterComparison>(typeof(UseForTimeColumnAttribute)).ProvideTypedValue();
+
+					case FilterColumn.Priority:
+					case FilterColumn.ThreadId:
+					case FilterColumn.ExceptionCode:
+					case FilterColumn.ScopeLevel:
 					case FilterColumn.EnvironmentProcessMemory:
 					case FilterColumn.EnvironmentPeakProcessMemory:
 					case FilterColumn.EnvironmentTotalMemory:
 					case FilterColumn.EnvironmentAvailableMemory:
-						return Visibility.Visible;
+						return new EnumerationExtension<FilterComparison>(typeof(UseForNumberColumnAttribute)).ProvideTypedValue();
+
+					case FilterColumn.ScopeIsBackgroundThread:
+					case FilterColumn.ScopeIsPoolThread:
+					case FilterColumn.EnvironmentIsShuttingDown:
+					case FilterColumn.EnvironmentIsInteractive:
+						return new EnumerationExtension<FilterComparison>(typeof(UseForBoolColumnAttribute)).ProvideTypedValue();
+
 					default:
-						return Visibility.Collapsed;
+						return null;
 				}
 			}
 		}
@@ -267,13 +280,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		public void LoadFromString(string data)
 		{
-			string[] chunks = data.Split(new char[] { ',' }, 5);
+			string[] chunks = data.Split(new char[] { ',' }, 4);
 			// chunk[0] is a control field already parsed along the way down here
 			enableFilterChangedEvent = false;
 			Column = (FilterColumn) Enum.Parse(typeof(FilterColumn), chunks[1]);
-			Negate = chunks[2] == "not";
-			Comparison = (FilterComparison) Enum.Parse(typeof(FilterComparison), chunks[3]);
-			Value = chunks[4];
+			Comparison = (FilterComparison) Enum.Parse(typeof(FilterComparison), chunks[2]);
+			Value = chunks[3];
 			enableFilterChangedEvent = true;
 		}
 
@@ -281,8 +293,6 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.Append(Column.ToString());
-			sb.Append(",");
-			sb.Append(Negate ? "not" : "");
 			sb.Append(",");
 			sb.Append(Comparison.ToString());
 			sb.Append(",");
@@ -323,11 +333,28 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			FieldLogExceptionItemViewModel exItem = null;
 			FieldLogScopeItemViewModel scopeItem = null;
 
+			// Negation must be handled after all field comparisons are done because the negation
+			// may need logical parentheses around the rest of the expression. All type-specific
+			// compare methods below will ignore the special negated comparison and act as if its
+			// corresponding non-negated comparison was set.
+			bool negate = false;
+			switch (Comparison)
+			{
+				case FilterComparison.NotContains:
+				case FilterComparison.NotEndsWith:
+				case FilterComparison.NotEquals:
+				case FilterComparison.NotRegex:
+				case FilterComparison.NotSet:
+				case FilterComparison.NotStartsWith:
+					negate = true;
+					break;
+			}
+
 			bool result = false;   // Default for wrong type
 			switch (Column)
 			{
 				case FilterColumn.Type:
-					result = CompareType(item);
+					result = CompareItemType(item);
 					break;
 				case FilterColumn.Time:
 					result = CompareTime(item.Time);
@@ -559,7 +586,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					break;
 			}
 
-			if (Negate)
+			if (negate)
 				return !result;
 			else
 				return result;
@@ -567,25 +594,126 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		private bool CompareTime(DateTime time)
 		{
-			Match m = Regex.Match(Value.Trim(), "^([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})[-:.T ]([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2}).([0-9]{1,6})$");
-			// TODO
-
 			DateTime filterTime;
-			if (DateTime.TryParse(Value, out filterTime))
+			Match m;
+			switch (Comparison)
 			{
-				switch (Comparison)
-				{
-					case FilterComparison.Equals:
-						// TODO
-						break;
-				}
-				// TODO
-				return false;
-			}
-			else
-			{
-				// TODO: Report error
-				return false;
+				case FilterComparison.LessThan:
+					if (DateTime.TryParse(Value, out filterTime))
+					{
+						return time < filterTime;
+					}
+					// User typed in an invalid int number.
+					return false;
+				case FilterComparison.LessOrEqual:
+					if (DateTime.TryParse(Value, out filterTime))
+					{
+						return time <= filterTime;
+					}
+					// User typed in an invalid int number.
+					return false;
+				case FilterComparison.GreaterThan:
+					if (DateTime.TryParse(Value, out filterTime))
+					{
+						return time > filterTime;
+					}
+					// User typed in an invalid int number.
+					return false;
+				case FilterComparison.GreaterOrEqual:
+					if (DateTime.TryParse(Value, out filterTime))
+					{
+						return time >= filterTime;
+					}
+					// User typed in an invalid int number.
+					return false;
+				case FilterComparison.InYear:
+					m = Regex.Match((Value ?? "").Trim(), "^([0-9]{4})");
+					if (m.Success)
+					{
+						return time.Year == int.Parse(m.Groups[1].Value);
+					}
+					// User typed in an invalid partial time.
+					return false;
+				case FilterComparison.InMonth:
+					m = Regex.Match((Value ?? "").Trim(), "^([0-9]{4})-([0-9]{2})");
+					if (m.Success)
+					{
+						return time.Year == int.Parse(m.Groups[1].Value) &&
+							time.Month == int.Parse(m.Groups[2].Value);
+					}
+					else
+					{
+						// Try month in any year
+						m = Regex.Match((Value ?? "").Trim(), "^([0-9]{2})");
+						if (m.Success)
+						{
+							return time.Month == int.Parse(m.Groups[1].Value);
+						}
+					}
+					// User typed in an invalid partial time.
+					return false;
+				case FilterComparison.InDay:
+					m = Regex.Match((Value ?? "").Trim(), "^([0-9]{4})-([0-9]{2})-([0-9]{2})");
+					if (m.Success)
+					{
+						return time.Year == int.Parse(m.Groups[1].Value) &&
+							time.Month == int.Parse(m.Groups[2].Value) &&
+							time.Day == int.Parse(m.Groups[3].Value);
+					}
+					else
+					{
+						// Try day in any month and year
+						m = Regex.Match((Value ?? "").Trim(), "^([0-9]{2})");
+						if (m.Success)
+						{
+							return time.Day == int.Parse(m.Groups[1].Value);
+						}
+					}
+					// User typed in an invalid partial time.
+					return false;
+				case FilterComparison.InHour:
+					m = Regex.Match((Value ?? "").Trim(), "^([0-9]{4})-([0-9]{2})-([0-9]{2})[T ]([0-9]{2})");
+					if (m.Success)
+					{
+						return time.Year == int.Parse(m.Groups[1].Value) &&
+							time.Month == int.Parse(m.Groups[2].Value) &&
+							time.Day == int.Parse(m.Groups[3].Value) &&
+							time.Hour == int.Parse(m.Groups[4].Value);
+					}
+					else
+					{
+						// Try hour in any day
+						m = Regex.Match((Value ?? "").Trim(), "^([0-9]{2})");
+						if (m.Success)
+						{
+							return time.Hour == int.Parse(m.Groups[1].Value);
+						}
+					}
+					// User typed in an invalid partial time.
+					return false;
+				case FilterComparison.InMinute:
+					m = Regex.Match((Value ?? "").Trim(), "^([0-9]{4})-([0-9]{2})-([0-9]{2})[T ]([0-9]{2}):([0-9]{2})");
+					if (m.Success)
+					{
+						return time.Year == int.Parse(m.Groups[1].Value) &&
+							time.Month == int.Parse(m.Groups[2].Value) &&
+							time.Day == int.Parse(m.Groups[3].Value) &&
+							time.Hour == int.Parse(m.Groups[4].Value) &&
+							time.Minute == int.Parse(m.Groups[5].Value);
+					}
+					else
+					{
+						// Try minute in any hour
+						m = Regex.Match((Value ?? "").Trim(), "^([0-9]{2})");
+						if (m.Success)
+						{
+							return time.Minute == int.Parse(m.Groups[1].Value);
+						}
+					}
+					// User typed in an invalid partial time.
+					return false;
+				default:
+					throw new Exception("Invalid comparison for time column: " + Comparison);
 			}
 		}
 
@@ -597,6 +725,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				switch (Comparison)
 				{
 					case FilterComparison.Equals:
+					case FilterComparison.NotEquals:
 						return prio == filterPrio;
 					case FilterComparison.GreaterOrEqual:
 						return prio >= filterPrio;
@@ -607,18 +736,16 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					case FilterComparison.LessThan:
 						return prio < filterPrio;
 					default:
-						// TODO: Report error
-						return false;
+						throw new Exception("Invalid comparison for Priority column: " + Comparison);
 				}
 			}
 			else
 			{
-				// TODO: Report error
-				return false;
+				throw new Exception("Invalid value for Priority column: " + Value);
 			}
 		}
 
-		private bool CompareType(FieldLogItemViewModel item)
+		private bool CompareItemType(FieldLogItemViewModel item)
 		{
 			FilterItemType filterType;
 			if (Enum.TryParse(Value, out filterType))
@@ -626,6 +753,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				switch (Comparison)
 				{
 					case FilterComparison.Equals:
+					case FilterComparison.NotEquals:
 						switch (filterType)
 						{
 							case FilterItemType.Any:
@@ -642,14 +770,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						}
 						return false;
 					default:
-						// TODO: Report error
-						return false;
+						throw new Exception("Invalid comparison for ItemType column: " + Comparison);
 				}
 			}
 			else
 			{
-				// TODO: Report error
-				return false;
+				throw new Exception("Invalid value for ItemType column: " + Value);
 			}
 		}
 
@@ -661,16 +787,15 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				switch (Comparison)
 				{
 					case FilterComparison.Equals:
+					case FilterComparison.NotEquals:
 						return scopeType == filterScopeType;
 					default:
-						// TODO: Report error
-						return false;
+						throw new Exception("Invalid comparison for ScopeType column: " + Comparison);
 				}
 			}
 			else
 			{
-				// TODO: Report error
-				return false;
+				throw new Exception("Invalid value for ScopeType column: " + Value);
 			}
 		}
 
@@ -679,13 +804,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			switch (Comparison)
 			{
 				case FilterComparison.Equals:
+				case FilterComparison.NotEquals:
 					return (str ?? "") == (Value ?? "");
-				case FilterComparison.Contains:
-					return str != null && str.Contains(Value ?? "");
-				case FilterComparison.StartsWith:
-					return str != null && str.StartsWith(Value ?? "");
-				case FilterComparison.EndsWith:
-					return str != null && str.EndsWith(Value ?? "");
 				case FilterComparison.GreaterOrEqual:
 					return str != null && str.CompareTo(Value ?? "") >= 0;
 				case FilterComparison.GreaterThan:
@@ -694,11 +814,20 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					return str != null && str.CompareTo(Value ?? "") <= 0;
 				case FilterComparison.LessThan:
 					return str != null && str.CompareTo(Value ?? "") < 0;
+				case FilterComparison.Contains:
+				case FilterComparison.NotContains:
+					return str != null && str.Contains(Value ?? "");
+				case FilterComparison.StartsWith:
+				case FilterComparison.NotStartsWith:
+					return str != null && str.StartsWith(Value ?? "");
+				case FilterComparison.EndsWith:
+				case FilterComparison.NotEndsWith:
+					return str != null && str.EndsWith(Value ?? "");
 				case FilterComparison.Regex:
+				case FilterComparison.NotRegex:
 					return Regex.IsMatch(str ?? "", Value ?? "");
 				default:
-					// TODO: Report error
-					return false;
+					throw new Exception("Invalid comparison for string column: " + Comparison);
 			}
 		}
 
@@ -710,6 +839,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				switch (Comparison)
 				{
 					case FilterComparison.Equals:
+					case FilterComparison.NotEquals:
 						return i == filterInt;
 					case FilterComparison.GreaterOrEqual:
 						return i >= filterInt;
@@ -720,13 +850,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					case FilterComparison.LessThan:
 						return i < filterInt;
 					default:
-						// TODO: Report error
-						return false;
+						throw new Exception("Invalid comparison for int column: " + Comparison);
 				}
 			}
 			else
 			{
-				// TODO: Report error
+				// User typed in an invalid int number.
 				return false;
 			}
 		}
@@ -739,6 +868,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				switch (Comparison)
 				{
 					case FilterComparison.Equals:
+					case FilterComparison.NotEquals:
 						return l == filterLong;
 					case FilterComparison.GreaterOrEqual:
 						return l >= filterLong;
@@ -749,13 +879,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					case FilterComparison.LessThan:
 						return l < filterLong;
 					default:
-						// TODO: Report error
-						return false;
+						throw new Exception("Invalid comparison for long column: " + Comparison);
 				}
 			}
 			else
 			{
-				// TODO: Report error
+				// User typed in an invalid long number.
 				return false;
 			}
 		}
@@ -820,7 +949,6 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			FilterConditionViewModel newCond = new FilterConditionViewModel(newParent);
 			newCond.Column = this.Column;
-			newCond.Negate = this.Negate;
 			newCond.Comparison = this.Comparison;
 			newCond.Value = this.Value;
 			return newCond;
@@ -828,6 +956,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		#endregion Duplicate
 	}
+
+	#region Filter definition enums
 
 	enum FilterColumn
 	{
@@ -905,24 +1035,69 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 	enum FilterComparison
 	{
+		[UseForEnumColumn, UseForNumberColumn, UseForStringColumn]
 		[Description("=")]
 		Equals,
-		[Description("contains")]
-		Contains,
-		[Description("starts with")]
-		StartsWith,
-		[Description("ends with")]
-		EndsWith,
+		[UseForEnumColumn, UseForNumberColumn, UseForStringColumn]
+		[Description("≠")]
+		NotEquals,
+		[UseForTimeColumn]
+		[Description("is in year")]
+		InYear,
+		[UseForTimeColumn]
+		[Description("is in month")]
+		InMonth,
+		[UseForTimeColumn]
+		[Description("is in day")]
+		InDay,
+		[UseForTimeColumn]
+		[Description("is in hour")]
+		InHour,
+		[UseForTimeColumn]
+		[Description("is in minute")]
+		InMinute,
+		[UseForNumberColumn, UseForStringColumn, UseForTimeColumn]
 		[Description("<")]
 		LessThan,
+		[UseForNumberColumn, UseForStringColumn, UseForTimeColumn]
 		[Description("≤")]
 		LessOrEqual,
-		[Description(">")]
-		GreaterThan,
+		[UseForNumberColumn, UseForStringColumn, UseForTimeColumn]
 		[Description("≥")]
 		GreaterOrEqual,
-		[Description("regex")]
-		Regex
+		[UseForNumberColumn, UseForStringColumn, UseForTimeColumn]
+		[Description(">")]
+		GreaterThan,
+		[UseForStringColumn]
+		[Description("contains")]
+		Contains,
+		[UseForStringColumn]
+		[Description("does not contain")]
+		NotContains,
+		[UseForStringColumn]
+		[Description("starts with")]
+		StartsWith,
+		[UseForStringColumn]
+		[Description("does not start with")]
+		NotStartsWith,
+		[UseForStringColumn]
+		[Description("ends with")]
+		EndsWith,
+		[UseForStringColumn]
+		[Description("does not end with")]
+		NotEndsWith,
+		[UseForStringColumn]
+		[Description("matches regex")]
+		Regex,
+		[UseForStringColumn]
+		[Description("does not match regex")]
+		NotRegex,
+		[UseForBoolColumn]
+		[Description("is set")]
+		Set,
+		[UseForBoolColumn]
+		[Description("is not set")]
+		NotSet,
 	}
 
 	enum FilterItemType
@@ -937,6 +1112,10 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		Exception,
 		//[Description("Exception (with inner exceptions)")]
 		//ExceptionRecursive,
+		// Removed because this is a value for the ItemType field and it affects how other fields
+		// of exception items shall be compared (recursing into inner exceptions or not). There's
+		// additional logic required to make one field comparison dependent of another condition
+		// value.
 		[Description("Scope")]
 		Scope
 	}
@@ -974,4 +1153,30 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		[Description("LogShutdown")]
 		LogShutdown
 	}
+
+	#endregion Filter definition enums
+
+	#region Filter comparison usage attributes
+
+	class UseForEnumColumnAttribute : Attribute
+	{
+	}
+
+	class UseForStringColumnAttribute : Attribute
+	{
+	}
+
+	class UseForNumberColumnAttribute : Attribute
+	{
+	}
+
+	class UseForBoolColumnAttribute : Attribute
+	{
+	}
+
+	class UseForTimeColumnAttribute : Attribute
+	{
+	}
+
+	#endregion Filter comparison usage attributes
 }

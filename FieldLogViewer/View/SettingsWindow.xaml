@@ -46,17 +46,17 @@
 						Text="{Binding SelectedFilter.DisplayName, Mode=TwoWay}" SelectionChanged="ComboBox_SelectionChanged" />
 					
 					<Button
-						Grid.Row="0" Grid.Column="2" Margin="4,0,0,0" Padding="6,1"
+						Grid.Row="0" Grid.Column="2" Margin="6,0,0,0" Padding="6,1"
 						Command="{Binding CreateFilterCommand}"
 						Content="Create"/>
 
 					<Button
-						Grid.Row="0" Grid.Column="3" Margin="4,0,0,0" Padding="6,1"
+						Grid.Row="0" Grid.Column="3" Margin="6,0,0,0" Padding="6,1"
 						Command="{Binding DuplicateFilterCommand}"
 						Content="Duplicate"/>
 
 					<Button
-						Grid.Row="0" Grid.Column="4" Margin="4,0,0,0" Padding="6,1"
+						Grid.Row="0" Grid.Column="4" Margin="6,0,0,0" Padding="6,1"
 						Command="{Binding DeleteFilterCommand}"
 						Content="Delete"/>
 
@@ -69,13 +69,9 @@
 								<RowDefinition Height="Auto"/>
 								<RowDefinition Height="Auto"/>
 							</Grid.RowDefinitions>
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="Auto"/>
-								<ColumnDefinition Width="*"/>
-							</Grid.ColumnDefinitions>
 
 							<ItemsControl
-								Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+								Grid.Row="0"
 								ItemsSource="{Binding SelectedFilter.ConditionGroups}">
 								<ItemsControl.ItemTemplate>
 									<DataTemplate DataType="vm:FilterConditionGroupViewModel">
@@ -87,104 +83,131 @@
 											<Grid.ColumnDefinitions>
 												<ColumnDefinition Width="Auto"/>
 												<ColumnDefinition Width="Auto"/>
+												<ColumnDefinition Width="Auto"/>
 												<ColumnDefinition Width="*"/>
 											</Grid.ColumnDefinitions>
-									
-											<TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" VerticalAlignment="Center" Text="OR" Visibility="{Binding OrLabelVisibility}"/>
-									
+
+											<CheckBox
+												Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
+												VerticalAlignment="Center"
+												IsChecked="{Binding IsEnabled}"/>
+
+											<ComboBox
+												Grid.Row="0" Grid.RowSpan="2" Grid.Column="1"
+												Margin="4,0,0,0" VerticalAlignment="Center"
+												ItemsSource="{Binding GroupTypes}"
+												DisplayMemberPath="DisplayName"
+												SelectedIndex="{Binding GroupTypeIndex}"
+												Style="{StaticResource LightComboBoxStyle}"
+												Opacity="{Binding Opacity}"/>
+
 											<Border
-												Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Grid.ColumnSpan="2"
+												Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" Grid.ColumnSpan="2"
 												Margin="4,0,0,0"
-												Background="{Binding Background}"/>
+												Background="{Binding Background}"
+												Opacity="{Binding Opacity}"/>
 											
 											<ItemsControl
-												Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="6,2,2,0"
-												ItemsSource="{Binding Conditions}">
+												Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" Margin="6,2,2,0"
+												ItemsSource="{Binding Conditions}"
+												Opacity="{Binding Opacity}">
 												<ItemsControl.ItemTemplate>
 													<DataTemplate DataType="vm:FilterConditionViewModel">
 														<Grid Margin="{Binding Margin}">
 															<Grid.ColumnDefinitions>
 																<ColumnDefinition Width="Auto"/>
+																<ColumnDefinition Width="Auto"/>
+																<ColumnDefinition Width="Auto"/>
+																<ColumnDefinition Width="Auto"/>
 																<ColumnDefinition Width="*"/>
+																<ColumnDefinition Width="Auto"/>
 															</Grid.ColumnDefinitions>
-									
-															<TextBlock Grid.Column="0" VerticalAlignment="Center" Text="AND" Visibility="{Binding AndLabelVisibility}"/>
+
+															<CheckBox
+																Grid.Column="0" VerticalAlignment="Center"
+																IsChecked="{Binding IsEnabled}"/>
+
+															<TextBlock
+																Grid.Column="1" Margin="4,0,0,0" VerticalAlignment="Center"
+																Text="AND"
+																Visibility="{Binding AndLabelVisibility}"
+																Opacity="{Binding Opacity}"/>
 													
-															<Grid Grid.Column="1" Margin="4,0,0,0">
-																<Grid.ColumnDefinitions>
-																	<ColumnDefinition Width="Auto"/>
-																	<ColumnDefinition Width="Auto"/>
-																	<ColumnDefinition Width="*"/>
-																	<ColumnDefinition Width="Auto"/>
-																</Grid.ColumnDefinitions>
+															<ComboBox
+																Grid.Column="2" Margin="4,0,0,0"
+																ItemsSource="{Binding Source={ui:Enumeration {x:Type vm:FilterColumn}}}"
+																DisplayMemberPath="Description"
+																SelectedValue="{Binding Column}"
+																SelectedValuePath="Value"
+																Style="{StaticResource LightComboBoxStyle}"
+																Opacity="{Binding Opacity}"/>
 															
-																<ComboBox
-																	Grid.Column="0"
-																	ItemsSource="{Binding Source={ui:Enumeration {x:Type vm:FilterColumn}}}"
-																	DisplayMemberPath="Description"
-																	SelectedValue="{Binding Column}"
-																	SelectedValuePath="Value"
-																	Style="{StaticResource LightComboBoxStyle}"/>
+															<ComboBox
+																Grid.Column="3" Margin="4,0,0,0"
+																ItemsSource="{Binding AvailableComparisons}"
+																DisplayMemberPath="Description"
+																SelectedValue="{Binding Comparison}"
+																SelectedValuePath="Value"
+																Style="{StaticResource LightComboBoxStyle}"
+																Opacity="{Binding Opacity}"/>
 															
-																<ComboBox
-																	Grid.Column="1" Margin="4,0,0,0"
-																	ItemsSource="{Binding AvailableComparisons}"
-																	DisplayMemberPath="Description"
-																	SelectedValue="{Binding Comparison}"
-																	SelectedValuePath="Value"
-																	Style="{StaticResource LightComboBoxStyle}"/>
-															
-																<TextBox
-																	Grid.Column="2" Margin="4,0,0,0"
-																	Visibility="{Binding ValueTextVisibility}"
-																	Text="{Binding Value}"
-																	ui:TextBoxExtensions.UpdateDelay="500"/>
+															<TextBox
+																Grid.Column="4" Margin="4,0,0,0"
+																Visibility="{Binding ValueTextVisibility}"
+																Text="{Binding Value}"
+																ui:TextBoxExtensions.UpdateDelay="500"
+																Opacity="{Binding Opacity}"/>
 
-																<ComboBox
-																	Grid.Column="2" Margin="4,0,0,0"
-																	Visibility="{Binding ValueListVisibility}"
-																	ItemsSource="{Binding AvailableValues}"
-																	DisplayMemberPath="Description"
-																	SelectedValue="{Binding Value}"
-																	SelectedValuePath="Value"
-																	Style="{StaticResource LightComboBoxStyle}"/>
+															<ComboBox
+																Grid.Column="4" Margin="4,0,0,0"
+																Visibility="{Binding ValueListVisibility}"
+																ItemsSource="{Binding AvailableValues}"
+																DisplayMemberPath="Description"
+																SelectedValue="{Binding Value}"
+																SelectedValuePath="Value"
+																Style="{StaticResource LightComboBoxStyle}"
+																Opacity="{Binding Opacity}"/>
 																
-																<TextBlock
-																	Grid.Column="2" Margin="8,0,0,0"
-																	VerticalAlignment="Center"
-																	Visibility="{Binding ValueSetVisibility}"
-																	Text="set"/>
-
-																<Button
-																	Grid.Column="3" Margin="4,0,0,0" Padding="6,1"
-																	Command="{Binding DeleteCommand}"
-																	Content="x"
-																	Style="{StaticResource LightButtonStyle}"/>
-															</Grid>
+															<Button
+																Grid.Column="5" Margin="4,0,0,0" Padding="6,1"
+																Command="{Binding DeleteCommand}"
+																Content="x"
+																Style="{StaticResource LightButtonStyle}"/>
 														</Grid>
 													</DataTemplate>
 												</ItemsControl.ItemTemplate>
 											</ItemsControl>
 
-											<TextBlock Grid.Row="1" Grid.Column="1" Margin="6,4,0,2" VerticalAlignment="Center" Opacity="0.4" Text="AND"/>
+											<!--TextBlock
+												Grid.Row="1" Grid.Column="2" Margin="23,4,0,2"
+												VerticalAlignment="Center"
+												Foreground="#66000000"
+												Text="AND"
+												Opacity="{Binding Opacity}"/-->
 
 											<Button
-												Grid.Row="1" Grid.Column="2" Margin="4,4,2,2" Padding="5,1" HorizontalAlignment="Left"
+												Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Margin="6,4,2,2" Padding="5,1" HorizontalAlignment="Left"
 												Command="{Binding CreateConditionCommand}"
-												Content="+"
-												Style="{StaticResource LightButtonStyle}"/>
+												Content="Add condition"
+												Style="{StaticResource LightButtonStyle}"
+												Opacity="{Binding Opacity}"/>
 										</Grid>
 									</DataTemplate>
 								</ItemsControl.ItemTemplate>
 							</ItemsControl>
 
-							<TextBlock Grid.Row="1" Grid.Column="0" Margin="0,4,0,0" VerticalAlignment="Center" Opacity="0.4" Text="OR"/>
-
-							<Button
-								Grid.Row="1" Grid.Column="1" Margin="4,4,0,0" Padding="5,1" HorizontalAlignment="Left"
-								Command="{Binding SelectedFilter.CreateConditionGroupCommand}"
-								Content="+"
-								Style="{StaticResource LightButtonStyle}"/>
+							<StackPanel Grid.Row="1" Margin="0,6,0,0" HorizontalAlignment="Left" Orientation="Horizontal">
+								<Button
+									Padding="5,1"
+									Command="{Binding SelectedFilter.CreateConditionGroupCommand}"
+									Content="Add group"
+									Style="{StaticResource LightButtonStyle}"/>
+								<Button
+									Margin="6,0,0,0" Padding="5,1"
+									Command="{Binding SelectedFilter.ReorderCommand}"
+									Content="Reorder"
+									Style="{StaticResource LightButtonStyle}"/>
+							</StackPanel>
 						</Grid>
 					</ScrollViewer>
 				</Grid>

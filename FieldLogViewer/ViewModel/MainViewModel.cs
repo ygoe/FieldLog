@@ -349,7 +349,11 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			{
 				RefreshLogItemsFilterView();
 			}
-			AppSettings.Instance.Filters = Filters.Where(f => !f.AcceptAll).Select(f => f.SaveToString()).ToArray();
+			AppSettings.Instance.Filters = Filters
+				.Where(f => !f.AcceptAll)
+				.Select(f => f.SaveToString())
+				.Where(s => !string.IsNullOrEmpty(s))
+				.ToArray();
 		}
 
 		private void RefreshLogItemsFilterView()

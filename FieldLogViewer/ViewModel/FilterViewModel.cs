@@ -43,15 +43,16 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		#region Event handlers
 
 		private bool isLoading;
+		private bool isReordering;
 
 		private void ConditionGroups_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
 			if (ConditionGroups.Count > 0)
 			{
 				UpdateFirstStatus();
-				OnFilterChanged(true);
+				OnFilterChanged(!isReordering);
 			}
-			else if (!isLoading)
+			else if (!isLoading && !isReordering)
 			{
 				Dispatcher.CurrentDispatcher.BeginInvoke((Action) OnCreateConditionGroup, DispatcherPriority.Normal);
 			}
@@ -72,10 +73,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		#region Commands
 
 		public DelegateCommand CreateConditionGroupCommand { get; private set; }
+		public DelegateCommand ReorderCommand { get; private set; }
 
 		private void InitializeCommands()
 		{
 			CreateConditionGroupCommand = new DelegateCommand(OnCreateConditionGroup);
+			ReorderCommand = new DelegateCommand(OnReorder);
 		}
 
 		private void OnCreateConditionGroup()
@@ -83,6 +86,36 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			FilterConditionGroupViewModel cg = new FilterConditionGroupViewModel(this);
 			cg.CreateConditionCommand.Execute();
 			ConditionGroups.Add(cg);
+		}
+
+		private void OnReorder()
+		{
+			isReordering = true;
+
+			ConditionGroups.ForEachSafe(grp =>
+			{
+				if (!grp.IsExclude)
+				{
+					if (ConditionGroups.Before(grp).Any(cg => cg.IsExclude))
+					{
+						ConditionGroups.Remove(grp);
+						int count = ConditionGroups.Count(cg => !cg.IsExclude);
+						ConditionGroups.Insert(count, grp);
+					}
+				}
+				else // grp.IsExclude
+				{
+					if (ConditionGroups.After(grp).Any(cg => !cg.IsExclude))
+					{
+						ConditionGroups.Remove(grp);
+						ConditionGroups.Add(grp);
+					}
+				}
+			});
+
+			ConditionGroups.ForEach(cg => cg.ReorderCommand.Execute());
+
+			isReordering = false;
 		}
 
 		#endregion Commands
@@ -112,9 +145,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public void LoadFromString(string data)
 		{
 			isLoading = true;
+			
 			ConditionGroups.Clear();
 			IEnumerable<string> lines = data.Split('\n').Select(s => s.Trim('\r'));
 			List<string> lineBuffer = new List<string>();
+			bool lineBufferIsExclude = false;
+			bool lineBufferIsEnabled = true;
 			bool haveName = false;
 			foreach (string line in lines)
 			{
@@ -126,27 +162,42 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				}
 				else
 				{
-					if (lineBuffer.Count > 0 && line.StartsWith("or,"))
+					string[] chunks = line.Split(new char[] { ',' }, 3);
+					if (chunks[0] == "or" || chunks[0] == "and not")
 					{
-						// Load buffer
-						FilterConditionGroupViewModel grp = new FilterConditionGroupViewModel(this);
-						grp.LoadFromString(lineBuffer);
-						ConditionGroups.Add(grp);
-						lineBuffer.Clear();
+						// New condition group starts
+						if (lineBuffer.Count > 0)
+						{
+							// Create condition group from buffer of previous lines
+							FilterConditionGroupViewModel grp = new FilterConditionGroupViewModel(this);
+							grp.LoadFromString(lineBuffer);
+							grp.IsExclude = lineBufferIsExclude;
+							grp.IsEnabled = lineBufferIsEnabled;
+							ConditionGroups.Add(grp);
+							lineBuffer.Clear();
+						}
+						// Remember type for the upcoming condition group
+						lineBufferIsExclude = chunks[0] == "and not";
+						lineBufferIsEnabled = chunks[1] == "on";
 					}
 					// Save line to buffer
 					lineBuffer.Add(line);
 				}
 			}
-			// Load buffer
+			// Create last condition group from buffer of previous lines
 			FilterConditionGroupViewModel grp2 = new FilterConditionGroupViewModel(this);
 			grp2.LoadFromString(lineBuffer);
+			grp2.IsExclude = lineBufferIsExclude;
+			grp2.IsEnabled = lineBufferIsEnabled;
 			ConditionGroups.Add(grp2);
+			
 			isLoading = false;
 		}
 
 		public string SaveToString()
 		{
+			if (!ConditionGroups.Any()) return null;   // Intermediate state, should not be saved
+			
 			return DisplayName + Environment.NewLine +
 				ConditionGroups.Select(c => c.SaveToString()).Aggregate((a, b) => a + Environment.NewLine + b);
 		}
@@ -196,9 +247,18 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		/// <returns></returns>
 		public bool IsMatch(FieldLogItemViewModel item)
 		{
+			// Don't even start thinking if this is the "Show all" filter.
 			if (AcceptAll) return true;
-			
-			return ConditionGroups.Any(c => c.IsMatch(item));
+
+			// Do not consider condition groups that are either disabled entirely or that do not
+			// contain any condition that is enabled.
+			var ActiveConditionGroups = ConditionGroups.Where(cg => cg.IsEnabled && cg.Conditions.Any(c => c.IsEnabled));
+
+			// The item matches if it matches any non-excluding condition group or there are no
+			// non-excluding condition groups at all, and only if it does not match any excluding
+			// condition group.
+			return ActiveConditionGroups.Where(cg => !cg.IsExclude).AnyOrTrue(c => c.IsMatch(item)) &&
+				!ActiveConditionGroups.Where(cg => cg.IsExclude).Any(c => c.IsMatch(item));
 		}
 
 		#endregion Filter logic

@@ -28,11 +28,15 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			Conditions = new ObservableCollection<FilterConditionViewModel>();
 
 			InitializeCommands();
+
+			isEnabled = true;
 		}
 
 		#endregion Constructor
 
 		#region Event handlers
+
+		private bool isReordering;
 
 		private void Conditions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
@@ -54,9 +58,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			if (Conditions.Count > 0)
 			{
 				UpdateFirstStatus();
-				OnFilterChanged(true);
+				if (!isReordering)
+				{
+					OnFilterChanged(true);
+				}
 			}
-			else
+			else if (!isReordering)
 			{
 				parentFilter.ConditionGroups.Remove(this);
 			}
@@ -75,38 +82,48 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		private void condition_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			IsInconsistent = false;
-
 			FilterItemType itemType = FilterItemType.Any;
-			bool itemTypeSet = false;
-			foreach (var c in Conditions.Where(c => c.Column == FilterColumn.Type))
-			{
-				if (itemTypeSet)
-				{
-					IsInconsistent = true;
-					return;
-				}
-				if (!Enum.TryParse(c.Value, out itemType)) return;   // Half updated
-			}
 
-			foreach (var c in Conditions.Where(c => c.Column != FilterColumn.Type))
+			// Check the conditions twice because some columns cannot set an item type but only
+			// check against one. This is only one group so it cannot interfer with another
+			// check-only group. But the conditions must be checked twice so that these check-only
+			// columns are certainly also evaluated after all other columns. A smart ordering of
+			// the conditions would do as well, but that's more work and not necessary right now.
+			foreach (var c in Conditions.Union(Conditions))
 			{
 				switch (c.Column)
 				{
-					case FilterColumn.TextText:
-					case FilterColumn.TextDetails:
-						if (itemType != FilterItemType.Text)
+					case FilterColumn.Type:
+						FilterItemType condItemType;
+						if (!Enum.TryParse(c.Value, out condItemType)) return;   // Half updated
+						if (itemType != condItemType &&
+							itemType != FilterItemType.Any &&
+							condItemType != FilterItemType.Any)
 						{
 							IsInconsistent = true;
 							return;
 						}
+						itemType = condItemType;
+						break;
+					case FilterColumn.TextText:
+					case FilterColumn.TextDetails:
+						if (itemType != FilterItemType.Text &&
+							itemType != FilterItemType.Any)
+						{
+							IsInconsistent = true;
+							return;
+						}
+						itemType = FilterItemType.Text;
 						break;
 					case FilterColumn.DataName:
 					case FilterColumn.DataValue:
-						if (itemType != FilterItemType.Data)
+						if (itemType != FilterItemType.Data &&
+							itemType != FilterItemType.Any)
 						{
 							IsInconsistent = true;
 							return;
 						}
+						itemType = FilterItemType.Data;
 						break;
 					case FilterColumn.ExceptionType:
 					case FilterColumn.ExceptionMessage:
@@ -114,22 +131,26 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					case FilterColumn.ExceptionData:
 					case FilterColumn.ExceptionContext:
 						if (itemType != FilterItemType.Exception /*&&
-							itemType != FilterItemType.ExceptionRecursive*/)
+							itemType != FilterItemType.ExceptionRecursive*/ &&
+							itemType != FilterItemType.Any)
 						{
 							IsInconsistent = true;
 							return;
 						}
+						itemType = FilterItemType.Exception;
 						break;
 					case FilterColumn.ScopeType:
 					case FilterColumn.ScopeLevel:
 					case FilterColumn.ScopeName:
 					case FilterColumn.ScopeIsBackgroundThread:
 					case FilterColumn.ScopeIsPoolThread:
-						if (itemType != FilterItemType.Scope)
+						if (itemType != FilterItemType.Scope &&
+							itemType != FilterItemType.Any)
 						{
 							IsInconsistent = true;
 							return;
 						}
+						itemType = FilterItemType.Scope;
 						break;
 					case FilterColumn.EnvironmentCultureName:
 					case FilterColumn.EnvironmentIsShuttingDown:
@@ -145,11 +166,13 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					case FilterColumn.EnvironmentAvailableMemory:
 						if (itemType != FilterItemType.Exception /*&&
 							itemType != FilterItemType.ExceptionRecursive*/ &&
-							itemType != FilterItemType.Scope)
+							itemType != FilterItemType.Scope &&
+							itemType != FilterItemType.Any)
 						{
 							IsInconsistent = true;
 							return;
 						}
+						// Cannot set an item type because two types are allowed
 						break;
 				}
 			}
@@ -160,15 +183,28 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		#region Commands
 
 		public DelegateCommand CreateConditionCommand { get; private set; }
+		public DelegateCommand ReorderCommand { get; private set; }
 
 		private void InitializeCommands()
 		{
 			CreateConditionCommand = new DelegateCommand(OnCreateCondition);
+			ReorderCommand = new DelegateCommand(OnReorder);
 		}
 
 		private void OnCreateCondition()
 		{
 			this.Conditions.Add(new FilterConditionViewModel(this));
+		}
+
+		private void OnReorder()
+		{
+			isReordering = true;
+
+			Conditions.Sort(c => c.Column);
+			
+			isReordering = false;
+
+			OnFilterChanged(false);
 		}
 
 		#endregion Commands
@@ -193,7 +229,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public bool IsFirst
 		{
 			get { return isFirst; }
-			set { CheckUpdate(value, ref isFirst, "IsFirst", "Margin", "OrLabelVisibility"); }
+			set { CheckUpdate(value, ref isFirst, "IsFirst", "Margin", "GroupTypes"); }
 		}
 
 		public Thickness Margin
@@ -204,6 +240,52 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public Visibility OrLabelVisibility
 		{
 			get { return IsFirst ? Visibility.Hidden : Visibility.Visible; }
+		}
+
+		private bool isExclude;
+		public bool IsExclude
+		{
+			get { return isExclude; }
+			set
+			{
+				if (CheckUpdate(value, ref isExclude, "IsExclude", "GroupTypeIndex"))
+				{
+					OnFilterChanged(true);
+				}
+			}
+		}
+
+		public IEnumerable<ViewModelBase> GroupTypes
+		{
+			get
+			{
+				yield return new ViewModelBase() { DisplayName = "Include" };
+				yield return new ViewModelBase() { DisplayName = "Exclude" };
+			}
+		}
+
+		public int GroupTypeIndex
+		{
+			get { return isExclude ? 1 : 0; }
+			set { IsExclude = value == 1; }
+		}
+
+		private bool isEnabled;
+		public bool IsEnabled
+		{
+			get { return isEnabled; }
+			set
+			{
+				if (CheckUpdate(value, ref isEnabled, "IsEnabled", "Opacity"))
+				{
+					OnFilterChanged(true);
+				}
+			}
+		}
+
+		public double Opacity
+		{
+			get { return IsEnabled ? 1.0 : 0.4; }
 		}
 
 		private bool isInconsistent;
@@ -240,12 +322,21 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			{
 				if (i == 0)
 				{
-					sb.Append("or,");
+					if (IsExclude)
+					{
+						sb.Append("and not,");
+					}
+					else
+					{
+						sb.Append("or,");
+					}
+					sb.Append(IsEnabled ? "on" : "off");
+					sb.Append(",");
 				}
 				else
 				{
 					sb.AppendLine();
-					sb.Append("and,");
+					sb.Append("and,,");
 				}
 				sb.Append(Conditions[i].SaveToString());
 			}
@@ -273,7 +364,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		/// <returns></returns>
 		public bool IsMatch(FieldLogItemViewModel item)
 		{
-			return Conditions.All(c => c.IsMatch(item));
+			return Conditions.Where(c => c.IsEnabled).All(c => c.IsMatch(item));
 		}
 
 		#endregion Filter logic

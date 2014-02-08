@@ -228,43 +228,47 @@
 				</ListBox.Resources>
 			</ListBox>
 
-			<ContentControl
-				Name="ItemDetails"
+			<Border
+				Name="ItemDetailsBorder"
 				Grid.Column="1"
-				Focusable="False"
+				BorderThickness="1,0,0,0" BorderBrush="#40000000"
 				Visibility="{Binding ItemDetailsVisibility}">
-				<ContentControl.Content>
-					<MultiBinding Converter="{StaticResource listItemsConverter}">
-						<!-- The list to observe must be the very first binding (index 0) for the converter to work -->
-						<Binding Path="SelectedItems" ElementName="LogItemsList" Mode="OneWay"/>
-						<Binding Path="SelectedItems.Count" ElementName="LogItemsList" Mode="OneWay"/>
-						<Binding Path="Items.Count" ElementName="LogItemsList" Mode="OneWay"/>
-						<Binding Path="SelectionDummy" Mode="OneWay"/>
-					</MultiBinding>
-				</ContentControl.Content>
+				<ContentControl
+					Name="ItemDetails"
+					Focusable="False">
+					<ContentControl.Content>
+						<MultiBinding Converter="{StaticResource listItemsConverter}">
+							<!-- The list to observe must be the very first binding (index 0) for the converter to work -->
+							<Binding Path="SelectedItems" ElementName="LogItemsList" Mode="OneWay"/>
+							<Binding Path="SelectedItems.Count" ElementName="LogItemsList" Mode="OneWay"/>
+							<Binding Path="Items.Count" ElementName="LogItemsList" Mode="OneWay"/>
+							<Binding Path="SelectionDummy" Mode="OneWay"/>
+						</MultiBinding>
+					</ContentControl.Content>
 
-				<ContentControl.Resources>
-					<DataTemplate DataType="{x:Type vm:DetailsMessageViewModel}">
-						<v:DetailsMessage/>
-					</DataTemplate>
+					<ContentControl.Resources>
+						<DataTemplate DataType="{x:Type vm:DetailsMessageViewModel}">
+							<v:DetailsMessage/>
+						</DataTemplate>
 
-					<DataTemplate DataType="{x:Type vm:FieldLogTextItemViewModel}">
-						<v:FieldLogTextItemView/>
-					</DataTemplate>
+						<DataTemplate DataType="{x:Type vm:FieldLogTextItemViewModel}">
+							<v:FieldLogTextItemView/>
+						</DataTemplate>
 
-					<DataTemplate DataType="{x:Type vm:FieldLogDataItemViewModel}">
-						<v:FieldLogDataItemView/>
-					</DataTemplate>
+						<DataTemplate DataType="{x:Type vm:FieldLogDataItemViewModel}">
+							<v:FieldLogDataItemView/>
+						</DataTemplate>
 
-					<DataTemplate DataType="{x:Type vm:FieldLogExceptionItemViewModel}">
-						<v:FieldLogExceptionItemView/>
-					</DataTemplate>
+						<DataTemplate DataType="{x:Type vm:FieldLogExceptionItemViewModel}">
+							<v:FieldLogExceptionItemView/>
+						</DataTemplate>
 
-					<DataTemplate DataType="{x:Type vm:FieldLogScopeItemViewModel}">
-						<v:FieldLogScopeItemView/>
-					</DataTemplate>
-				</ContentControl.Resources>
-			</ContentControl>
+						<DataTemplate DataType="{x:Type vm:FieldLogScopeItemViewModel}">
+							<v:FieldLogScopeItemView/>
+						</DataTemplate>
+					</ContentControl.Resources>
+				</ContentControl>
+			</Border>
 			
 			<TextBlock
 				Grid.Column="0" Grid.ColumnSpan="2"

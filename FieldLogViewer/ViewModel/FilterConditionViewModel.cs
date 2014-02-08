@@ -26,7 +26,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 			InitializeCommands();
 
-			Value = "";
+			value = "";
+			isEnabled = true;
 		}
 
 		#endregion Constructor
@@ -78,7 +79,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						"AvailableValues",
 						"Column",
 						"AvailableComparisons",
-						"ValueTextVisibility", "ValueListVisibility", "ValueSetVisibility");
+						"ValueTextVisibility", "ValueListVisibility");
 					// Set value to an acceptable default
 					switch (column)
 					{
@@ -257,21 +258,22 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
-		public Visibility ValueSetVisibility
+		private bool isEnabled;
+		public bool IsEnabled
 		{
-			get
+			get { return isEnabled; }
+			set
 			{
-				switch (Column)
+				if (CheckUpdate(value, ref isEnabled, "IsEnabled", "Opacity"))
 				{
-					case FilterColumn.ScopeIsBackgroundThread:
-					case FilterColumn.ScopeIsPoolThread:
-					case FilterColumn.EnvironmentIsShuttingDown:
-					case FilterColumn.EnvironmentIsInteractive:
-						return Visibility.Visible;
-					default:
-						return Visibility.Hidden;
+					OnFilterChanged(true);
 				}
 			}
+		}
+
+		public double Opacity
+		{
+			get { return IsEnabled ? 1.0 : 0.4; }
 		}
 
 		#endregion Data properties
@@ -280,18 +282,21 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		public void LoadFromString(string data)
 		{
-			string[] chunks = data.Split(new char[] { ',' }, 4);
-			// chunk[0] is a control field already parsed along the way down here
+			string[] chunks = data.Split(new char[] { ',' }, 6);
+			// chunk[0] and chunk[1] are control fields already parsed along the way down here
 			enableFilterChangedEvent = false;
-			Column = (FilterColumn) Enum.Parse(typeof(FilterColumn), chunks[1]);
-			Comparison = (FilterComparison) Enum.Parse(typeof(FilterComparison), chunks[2]);
-			Value = chunks[3];
+			IsEnabled = chunks[2] == "on";
+			Column = (FilterColumn) Enum.Parse(typeof(FilterColumn), chunks[3]);
+			Comparison = (FilterComparison) Enum.Parse(typeof(FilterComparison), chunks[4]);
+			Value = chunks[5];
 			enableFilterChangedEvent = true;
 		}
 
 		public string SaveToString()
 		{
 			StringBuilder sb = new StringBuilder();
+			sb.Append(IsEnabled ? "on" : "off");
+			sb.Append(",");
 			sb.Append(Column.ToString());
 			sb.Append(",");
 			sb.Append(Comparison.ToString());
@@ -741,7 +746,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 			else
 			{
-				throw new Exception("Invalid value for Priority column: " + Value);
+				// Invalid value for Priority column
+				return false;
 			}
 		}
 
@@ -775,7 +781,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 			else
 			{
-				throw new Exception("Invalid value for ItemType column: " + Value);
+				// Invalid value for ItemType column
+				return false;
 			}
 		}
 
@@ -795,7 +802,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 			else
 			{
-				throw new Exception("Invalid value for ScopeType column: " + Value);
+				// Invalid value for ScopeType column
+				return false;
 			}
 		}
 

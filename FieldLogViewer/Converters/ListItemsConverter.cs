@@ -21,12 +21,18 @@ namespace Unclassified.FieldLogViewer.Converters
 
 			if (itemsCount == 0)
 			{
-				return new DetailsMessageViewModel("msg.nothing available", "msg.nothing available.desc", "ArrowUp");
+				return new DetailsMessageViewModel(
+					"Nothing available",
+					"Currently no log items are available. Either load a log file, wait for new log items to be written or adjust your filter to see existing log items."
+					/*, "ArrowUp"*/);
 			}
 
 			if (selectedItems.Count == 0)
 			{
-				return new DetailsMessageViewModel("msg.nothing selected", "msg.nothing selected.desc", "ArrowLeft");
+				return new DetailsMessageViewModel(
+					"Nothing selected",
+					"Select a log item from the list to display it."
+					/*, "ArrowLeft"*/);
 			}
 
 			if (selectedItems.Count == 1)
@@ -43,13 +49,18 @@ namespace Unclassified.FieldLogViewer.Converters
 				}
 				else if (item.GetType() != firstType)
 				{
-					return new DetailsMessageViewModel("Inconsistent selection", "Multiple items of different types are selected. Only elements of the same type can be displayed and edited concurrently.", "Flash");
+					return new DetailsMessageViewModel(
+						"Inconsistent selection",
+						"Multiple items of different types are selected. Only elements of the same type can be displayed and edited concurrently.",
+						"Flash");
 				}
 			}
 
-			if (firstType == typeof(FieldLogItemViewModel))
+			if (firstType.IsSubclassOf(typeof(FieldLogItemViewModel)))
 			{
-				return new DetailsMessageViewModel(selectedItems.Count + " log items selected");
+				return new DetailsMessageViewModel(
+					selectedItems.Count + " items selected",
+					"Multiple log items are selected. An aggregated view of log items is not yet available.");
 				//TextKeyViewModel[] nodes = new TextKeyViewModel[items.Count];
 				//for (int i = 0; i < items.Count; i++)
 				//{

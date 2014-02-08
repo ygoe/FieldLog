@@ -110,16 +110,18 @@ namespace Unclassified.FieldLogViewer.View
 					// Window is now wider, move list and details in a row
 					MainLayout.RowDefinitions[1].Height = new GridLength(0);
 					MainLayout.ColumnDefinitions[1].Width = new GridLength(1, GridUnitType.Star);
-					Grid.SetRow(ItemDetails, 0);
-					Grid.SetColumn(ItemDetails, 1);
+					Grid.SetRow(ItemDetailsBorder, 0);
+					Grid.SetColumn(ItemDetailsBorder, 1);
+					ItemDetailsBorder.BorderThickness = new Thickness(1, 0, 0, 0);
 				}
 				else if (ratio < threshold && prevRatio >= threshold)
 				{
 					// Window is now taller, move list and details in a column
 					MainLayout.RowDefinitions[1].Height = new GridLength(1, GridUnitType.Star);
 					MainLayout.ColumnDefinitions[1].Width = new GridLength(0);
-					Grid.SetRow(ItemDetails, 1);
-					Grid.SetColumn(ItemDetails, 0);
+					Grid.SetRow(ItemDetailsBorder, 1);
+					Grid.SetColumn(ItemDetailsBorder, 0);
+					ItemDetailsBorder.BorderThickness = new Thickness(0, 1, 0, 0);
 				}
 
 				prevRatio = ratio;

@@ -26,8 +26,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		private void InitializeCommands()
 		{
 			CreateFilterCommand = new DelegateCommand(OnCreateFilter);
-			DuplicateFilterCommand = new DelegateCommand(OnDuplicateFilter);
-			DeleteFilterCommand = new DelegateCommand(OnDeleteFilter);
+			DuplicateFilterCommand = new DelegateCommand(OnDuplicateFilter, CanDuplicateFilter);
+			DeleteFilterCommand = new DelegateCommand(OnDeleteFilter, CanDeleteFilter);
 		}
 
 		private void OnCreateFilter()
@@ -37,11 +37,21 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			MainViewModel.Instance.SelectedFilter = newFilter;
 		}
 
+		private bool CanDuplicateFilter()
+		{
+			return !SelectedFilter.AcceptAll;
+		}
+
 		private void OnDuplicateFilter()
 		{
 			var newFilter = SelectedFilter.GetDuplicate();
 			MainViewModel.Instance.Filters.Add(newFilter);
 			MainViewModel.Instance.SelectedFilter = newFilter;
+		}
+
+		private bool CanDeleteFilter()
+		{
+			return !SelectedFilter.AcceptAll;
 		}
 
 		private void OnDeleteFilter()
@@ -70,10 +80,16 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public FilterViewModel SelectedFilter
 		{
 			get { return selectedFilter; }
-			set { CheckUpdate(value, ref selectedFilter, "SelectedFilter"); }
+			set
+			{
+				if (CheckUpdate(value, ref selectedFilter, "SelectedFilter"))
+				{
+					DuplicateFilterCommand.RaiseCanExecuteChanged();
+					DeleteFilterCommand.RaiseCanExecuteChanged();
+				}
+			}
 		}
 
 		#endregion Data properties
-
 	}
 }

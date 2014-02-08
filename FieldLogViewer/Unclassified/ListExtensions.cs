@@ -103,6 +103,22 @@ namespace Unclassified
 			}
 		}
 
+		/// <summary>
+		/// Determines whether any element of a sequence satisfies a condition. If the sequence is
+		/// empty, this method returns true (in contrast to the framework's Any method which
+		/// returns false in that case).
+		/// </summary>
+		/// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
+		/// <param name="source">The sequence whose elements to apply the predicate to.</param>
+		/// <param name="predicate">A function to test each element for a condition.</param>
+		/// <returns>true if any elements in the source sequence pass the test in the specified predicate or if the
+		/// source sequence is empty; otherwise, false.</returns>
+		public static bool AnyOrTrue<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate)
+		{
+			if (!source.Any()) return true;
+			return source.Any(predicate);
+		}
+
 		#endregion Default list
 
 		#region SingleOrDefault replacement
@@ -136,6 +152,34 @@ namespace Unclassified
 		#endregion SingleOrDefault replacement
 
 		#region Sorted collections
+
+		public static IEnumerable<T> Before<T>(this IEnumerable<T> source, T searchItem)
+		{
+			foreach (T item in source)
+			{
+				if (item.Equals(searchItem))
+				{
+					yield break;
+				}
+				yield return item;
+			}
+		}
+
+		public static IEnumerable<T> After<T>(this IEnumerable<T> source, T searchItem)
+		{
+			bool found = false;
+			foreach (T item in source)
+			{
+				if (found)
+				{
+					yield return item;
+				}
+				if (item.Equals(searchItem))
+				{
+					found = true;
+				}
+			}
+		}
 
 		/// <summary>
 		/// Inserts an item to a list, sorted by the specified comparison delegate.

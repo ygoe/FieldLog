@@ -13,7 +13,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 	/// <summary>
 	/// Provides common properties and methods supporting view model classes.
 	/// </summary>
-	abstract class ViewModelBase : INotifyPropertyChanged
+	internal class ViewModelBase : INotifyPropertyChanged
 	{
 		#region Common view properties
 

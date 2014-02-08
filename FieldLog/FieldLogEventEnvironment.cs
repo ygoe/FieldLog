@@ -42,7 +42,7 @@ namespace Unclassified.FieldLog
 				0 +
 				1 +
 				0 +
-				8 + 8 + 8 + 8;
+				8 + 8 + 8 + 8 + 8;
 		}
 
 		#endregion Static members
@@ -164,6 +164,10 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		public string ClrVersion { get; private set; }
 		/// <summary>
+		/// Gets the UTC offset of the local time zone.
+		/// </summary>
+		public TimeSpan LocalTimeZoneOffset { get; private set; }
+		/// <summary>
 		/// Gets the private memory currently used by this process in bytes.
 		/// </summary>
 		public long ProcessMemory { get; private set; }
@@ -179,8 +183,6 @@ namespace Unclassified.FieldLog
 		/// Gets the amount of available memory on the computer in bytes.
 		/// </summary>
 		public long AvailableMemory { get; private set; }
-
-		// TODO: Add local time zone offset
 
 		#endregion Data properties
 
@@ -244,6 +246,7 @@ namespace Unclassified.FieldLog
 			//env.IsProcess64Bit = Environment.Is64BitProcess;   // .NET 4 only
 			env.IsProcess64Bit = IntPtr.Size == 8;
 			env.ClrVersion = Environment.Version.ToString();
+			env.LocalTimeZoneOffset = DateTimeOffset.Now.Offset;
 			env.ProcessMemory = OSInfo.GetProcessPrivateMemory();
 			env.PeakProcessMemory = OSInfo.GetProcessPeakMemory();
 			env.TotalMemory = OSInfo.GetTotalMemorySize();
@@ -271,7 +274,7 @@ namespace Unclassified.FieldLog
 				(env.AppVersion != null ? env.AppVersion.Length * 2 : 0) +
 				1 +
 				(env.ClrVersion != null ? env.ClrVersion.Length * 2 : 0) +
-				8 + 8 + 8 + 8;
+				8 + 8 + 8 + 8 + 8;
 			return env;
 		}
 
@@ -307,6 +310,7 @@ namespace Unclassified.FieldLog
 			writer.AddBuffer(CommandLine);
 			writer.AddBuffer(AppVersion);
 			writer.AddBuffer(ClrVersion);
+			writer.AddBuffer((int) LocalTimeZoneOffset.TotalMinutes);
 			writer.AddBuffer(ProcessMemory);
 			writer.AddBuffer(PeakProcessMemory);
 			writer.AddBuffer(TotalMemory);
@@ -351,6 +355,7 @@ namespace Unclassified.FieldLog
 			env.CommandLine = reader.ReadString();
 			env.AppVersion = reader.ReadString();
 			env.ClrVersion = reader.ReadString();
+			env.LocalTimeZoneOffset = TimeSpan.FromMinutes(reader.ReadInt32());
 			env.ProcessMemory = reader.ReadInt64();
 			env.PeakProcessMemory = reader.ReadInt64();
 			env.TotalMemory = reader.ReadInt64();

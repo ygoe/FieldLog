@@ -61,7 +61,10 @@ namespace Unclassified.FieldLog
 			{
 				Task.Factory.StartNew(() =>
 				{
-					WaitHandle.WaitAll(prioReadSignals.Values.ToArray());
+					if (prioReadSignals.Count > 0)
+					{
+						WaitHandle.WaitAll(prioReadSignals.Values.ToArray());
+					}
 					readWaitHandle.Set();
 				});
 			}

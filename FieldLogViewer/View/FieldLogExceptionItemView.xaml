@@ -49,6 +49,7 @@
 					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
 				</Grid.RowDefinitions>
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="100"/>
@@ -148,18 +149,21 @@
 				<TextBlock Grid.Row="27" Grid.Column="0" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="IsProcess64Bit:"/>
 				<TextBox Grid.Row="27" Grid.Column="1" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="{Binding EnvironmentData.IsProcess64Bit, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
+				<TextBlock Grid.Row="28" Grid.Column="0" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="LocalTimeZone:"/>
+				<TextBox Grid.Row="28" Grid.Column="1" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="{Binding EnvironmentData.LocalTimeZoneOffset, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
 				<!-- I18N: Use Tx.Number instead of "N0" format -->
-				<TextBlock Grid.Row="28" Grid.Column="0" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="ProcessMemory:"/>
-				<TextBox Grid.Row="28" Grid.Column="1" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="{Binding EnvironmentData.ProcessMemory, Mode=OneWay, StringFormat='N0'}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+				<TextBlock Grid.Row="29" Grid.Column="0" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="ProcessMemory:"/>
+				<TextBox Grid.Row="29" Grid.Column="1" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="{Binding EnvironmentData.ProcessMemory, Mode=OneWay, StringFormat='N0'}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
-				<TextBlock Grid.Row="29" Grid.Column="0" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="PeakProcessMem:"/>
-				<TextBox Grid.Row="29" Grid.Column="1" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="{Binding EnvironmentData.PeakProcessMemory, Mode=OneWay, StringFormat='N0'}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+				<TextBlock Grid.Row="30" Grid.Column="0" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="PeakProcessMem:"/>
+				<TextBox Grid.Row="30" Grid.Column="1" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="{Binding EnvironmentData.PeakProcessMemory, Mode=OneWay, StringFormat='N0'}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
-				<TextBlock Grid.Row="30" Grid.Column="0" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="TotalMemory:"/>
-				<TextBox Grid.Row="30" Grid.Column="1" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="{Binding EnvironmentData.TotalMemory, Mode=OneWay, StringFormat='N0'}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+				<TextBlock Grid.Row="31" Grid.Column="0" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="TotalMemory:"/>
+				<TextBox Grid.Row="31" Grid.Column="1" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="{Binding EnvironmentData.TotalMemory, Mode=OneWay, StringFormat='N0'}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
-				<TextBlock Grid.Row="31" Grid.Column="0" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="AvailableMemory:"/>
-				<TextBox Grid.Row="31" Grid.Column="1" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="{Binding EnvironmentData.AvailableMemory, Mode=OneWay, StringFormat='N0'}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+				<TextBlock Grid.Row="32" Grid.Column="0" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="AvailableMemory:"/>
+				<TextBox Grid.Row="32" Grid.Column="1" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="{Binding EnvironmentData.AvailableMemory, Mode=OneWay, StringFormat='N0'}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 			</Grid>
 		</ScrollViewer>
 	</Grid>

@@ -32,8 +32,8 @@ namespace ConsoleDemo
 			for (int i = 1; i <= 50; i++)
 			{
 				if (i > 1)
-					//Thread.Sleep(rnd.Next(1000) + 500);
-					Thread.Sleep(rnd.Next(20));
+					Thread.Sleep(rnd.Next(1000) + 500);
+					//Thread.Sleep(rnd.Next(20));
 
 				switch (rnd.Next(14))
 				{

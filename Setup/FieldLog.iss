@@ -66,7 +66,7 @@ WelcomeFontSize=12
 [Messages]
 WelcomeLabel1=%n%n%nWelcome to the FieldLog setup wizard
 WelcomeLabel2=FieldLog is a fast and comprehensive logging tool for .NET applications. It is designed for high-performance, storage-efficient, always-on logging and comes with a useful log viewer application.%n%nVersion: {#RevId}
-ClickNext=Click Next to continue installing FieldLogViewer, documentation and the FieldLog library, or Cancel to exit the setup.
+ClickNext=Click Next to continue installing FieldLogViewer, documentation, the FieldLog library and source code, or Cancel to exit the setup.
 FinishedHeadingLabel=%n%n%n%n%nFieldLog is now installed.
 FinishedLabelNoIcons=
 FinishedLabel=The application may be launched by selecting the installed start menu icon.
@@ -74,7 +74,7 @@ ClickFinish=Click Finish to exit the setup.
 
 de.WelcomeLabel1=%n%n%nWillkommen zum FieldLog-Setup-Assistenten
 de.WelcomeLabel2=FieldLog ist ein schnelles und umfassendes Logging-Werkzeug für .NET-Anwendungen. Es ist für hohe Performance, geringen Speicherplatzbedarf und ständig aktiviertes Logging konzipiert und bringt eine nützliche Log-Betrachter-Anwendung mit.%n%nVersion: {#RevId}
-de.ClickNext=Klicken Sie auf Weiter, um den FieldLogViewer, die Dokumentation und die FieldLog-Bibliothek zu installieren, oder auf Abbrechen zum Beenden des Setups.
+de.ClickNext=Klicken Sie auf Weiter, um den FieldLogViewer, die Dokumentation und die FieldLog-Bibliothek mit Quelltext zu installieren, oder auf Abbrechen zum Beenden des Setups.
 de.FinishedHeadingLabel=%n%n%n%n%nFieldLog ist jetzt installiert.
 de.FinishedLabelNoIcons=
 de.FinishedLabel=Die Anwendung kann über die installierte Startmenü-Verknüpfung gestartet werden.
@@ -85,11 +85,13 @@ Upgrade=&Upgrade
 UpdatedHeadingLabel=%n%n%n%n%nFieldLog was upgraded.
 Task_VSTool=Register as External Tool in Visual Studio (2010/2012/2013)
 NgenMessage=Optimising application performance (this may take a moment)
+DowngradeUninstall=You are trying to install an older version than is currently installed on the system. The newer version must first be uninstalled. Would you like to do that now?
 
 de.Upgrade=&Aktualisieren
 de.UpdatedHeadingLabel=%n%n%n%n%nFieldLog wurde aktualisiert.
 de.Task_VSTool=In Visual Studio (2010/2012/2013) als Externes Tool eintragen
 de.NgenMessage=Anwendungs-Performance optimieren (kann einen Moment dauern)
+de.DowngradeUninstall=Sie versuchen, eine ältere Version zu installieren, als bereits im System installiert ist. Die neuere Version muss zuerst deinstalliert werden. Möchten Sie das jetzt tun?
 
 [Tasks]
 ;Name: VSTool; Description: "{cm:Task_VSTool}"
@@ -107,6 +109,18 @@ Source: "..\FieldLog\bin\Release\FieldLog.dll"; DestDir: "{app}\FieldLog assembl
 Source: "..\FieldLog\bin\Release\FieldLog.xml"; DestDir: "{app}\FieldLog assembly (.NET 4.0)"; Flags: ignoreversion
 Source: "..\FieldLog\bin\ReleaseNET20\FieldLog.dll"; DestDir: "{app}\FieldLog assembly (.NET 2.0)"; Flags: ignoreversion
 Source: "..\FieldLog\bin\ReleaseNET20\FieldLog.xml"; DestDir: "{app}\FieldLog assembly (.NET 2.0)"; Flags: ignoreversion
+
+; FieldLog source code
+Source: "..\FieldLog\Enums.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
+Source: "..\FieldLog\Exceptions.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
+Source: "..\FieldLog\FieldLogEventEnvironment.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
+Source: "..\FieldLog\FieldLogFileEnumerator.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
+Source: "..\FieldLog\FieldLogFileGroupReader.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
+Source: "..\FieldLog\FieldLogFileReader.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
+Source: "..\FieldLog\FieldLogFileWriter.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
+Source: "..\FieldLog\FL.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
+Source: "..\FieldLog\LogItems.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
+Source: "..\FieldLog\OSInfo.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
 
 [Registry]
 ; Register .fl file name extension
@@ -127,6 +141,7 @@ Name: "{group}\FieldLogViewer"; Filename: "{app}\FieldLogViewer.exe"; IconFilena
 Name: "{group}\FieldLog website"; Filename: "http://dev.unclassified.de/source/fieldlog"
 Name: "{group}\FieldLog assembly (.NET 4.0)"; Filename: "{app}\FieldLog assembly (.NET 4.0)\"
 Name: "{group}\FieldLog assembly (.NET 2.0)"; Filename: "{app}\FieldLog assembly (.NET 2.0)\"
+Name: "{group}\FieldLog source code"; Filename: "{app}\FieldLog source code\"
 
 [Run]
 ;Filename: {app}\FieldLogViewer.exe; WorkingDir: {app}; Flags: nowait postinstall
@@ -152,18 +167,65 @@ begin
 		RegQueryStringValue(HKCU, UninstallKey, 'UninstallString', Value)) and (Value <> '');
 end;
 
-function InitializeSetup(): boolean;
+function GetQuietUninstallString: String;
+var
+	Value: string;
+	UninstallKey: string;
 begin
-	//init windows version
-	initwinversion();
+	UninstallKey := 'Software\Microsoft\Windows\CurrentVersion\Uninstall\' +
+		ExpandConstant('{#SetupSetting("AppId")}') + '_is1';
+	if not RegQueryStringValue(HKLM, UninstallKey, 'QuietUninstallString', Value) then
+		RegQueryStringValue(HKCU, UninstallKey, 'QuietUninstallString', Value);
+	Result := Value;
+end;
 
-	msi31('3.1');
+function GetInstalledVersion: String;
+var
+	Value: string;
+	UninstallKey: string;
+begin
+	UninstallKey := 'Software\Microsoft\Windows\CurrentVersion\Uninstall\' +
+		ExpandConstant('{#SetupSetting("AppId")}') + '_is1';
+	if not RegQueryStringValue(HKLM, UninstallKey, 'DisplayVersion', Value) then
+		RegQueryStringValue(HKCU, UninstallKey, 'DisplayVersion', Value);
+	Result := Value;
+end;
 
-	// if no .netfx 4.0 is found, install the client (smallest)
-	if (not netfxinstalled(NetFx40Client, '') and not netfxinstalled(NetFx40Full, '')) then
-		dotnetfx40client();
-
+function InitializeSetup(): boolean;
+var
+	ResultCode: Integer;
+begin
 	Result := true;
+
+	// Check for downgrade
+	if IsUpgrade then
+	begin
+		if '{#ShortRevId}' < GetInstalledVersion then
+		begin
+			if MsgBox(ExpandConstant('{cm:DowngradeUninstall}'), mbConfirmation, MB_YESNO) = IDYES then
+			begin
+				Exec('>', GetQuietUninstallString, '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
+			end;
+
+			// Check again
+			if '{#ShortRevId}' < GetInstalledVersion then
+			begin
+				Result := false;
+			end;
+		end;
+	end;
+	
+	if Result then
+	begin
+		//init windows version
+		initwinversion();
+
+		msi31('3.1');
+
+		// if no .netfx 4.0 is found, install the client (smallest)
+		if (not netfxinstalled(NetFx40Client, '') and not netfxinstalled(NetFx40Full, '')) then
+			dotnetfx40client();
+	end;
 end;
 
 procedure RegRenameStringValue(const RootKey: Integer; const SubKeyName, ValueName, NewValueName: String);

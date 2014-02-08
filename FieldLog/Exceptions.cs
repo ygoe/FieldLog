@@ -56,7 +56,7 @@ namespace Unclassified.FieldLog
 			StringBuilder dataSb = new StringBuilder();
 			if (ex.Data != null)
 				foreach (DictionaryEntry x in ex.Data)
-					dataSb.Append("Data." + x.Key + (x.Value != null ? " (" + x.Value.GetType().Name + "): " + x.Value.ToString() : ": null") + "\n");
+					dataSb.Append("Data[" + x.Key + "]" + (x.Value != null ? " (" + x.Value.GetType().Name + "): " + x.Value.ToString() : ": null") + "\n");
 
 			// Find more properties through reflection
 			PropertyInfo[] props = ex.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -76,7 +76,7 @@ namespace Unclassified.FieldLog
 				try
 				{
 					object value = prop.GetValue(ex, null);   // Indexed properties are not supported here!
-					dataSb.Append("Property." + prop.Name);
+					dataSb.Append(prop.Name);
 					if (value != null)
 					{
 						dataSb.Append(" (" + value.GetType().Name + "): " + Convert.ToString(value, CultureInfo.InvariantCulture));

@@ -200,6 +200,8 @@ namespace Unclassified.FieldLog
 			stopwatch.Start();
 			startTime = DateTime.UtcNow;
 
+			LogFirstChanceExceptions = true;
+
 			// Read or reset log configuration from file
 			ReadLogConfiguration();
 
@@ -308,10 +310,20 @@ namespace Unclassified.FieldLog
 		}
 
 		/// <summary>
+		/// Gets or sets a value indicating whether FirstChanceException events shall be logged.
+		/// </summary>
+		public static bool LogFirstChanceExceptions { get; set; }
+
+		/// <summary>
 		/// Gets a value indicating whether the current application is a console application.
 		/// </summary>
 		public static bool IsConsoleApp { get; private set; }
-		
+
+		/// <summary>
+		/// Gets a value indicating whether the log queue has been shut down.
+		/// </summary>
+		public static bool IsShutdown { get { return isShutdown; } }
+
 		/// <summary>Gets or sets the application error user dialog title.</summary>
 		public static string AppErrorDialogTitle { get; set; }
 		/// <summary>Gets or sets the application error user dialog intro for GUI applications if the application can be continued.</summary>
@@ -360,9 +372,8 @@ namespace Unclassified.FieldLog
 			// Log first-chance exceptions, also from try/catch blocks
 			AppDomain.CurrentDomain.FirstChanceException += delegate(object sender, System.Runtime.ExceptionServices.FirstChanceExceptionEventArgs e)
 			{
-				// TODO: This may lead to crashes at WMI requests, so it's disabled for now.
-				//       Testcase: Inspect FieldLogViewer with Snoop while debugging.
-				//FL.Trace(e.Exception, "AppDomain.FirstChanceException");
+				if (LogFirstChanceExceptions && !isShutdown)
+					FL.Trace(e.Exception, "AppDomain.FirstChanceException");
 			};
 
 			System.Threading.Tasks.TaskScheduler.UnobservedTaskException += delegate(object sender, System.Threading.Tasks.UnobservedTaskExceptionEventArgs e)
@@ -1137,6 +1148,44 @@ namespace Unclassified.FieldLog
 		}
 
 		#endregion General log method
+
+		#region Scope helpers
+
+		/// <summary>
+		/// Returns a new FieldLogScope item that implements IDisposable and can be used to log
+		/// scopes with the <c>using</c> statement.
+		/// </summary>
+		/// <param name="name">The scope name.</param>
+		/// <returns></returns>
+		public static FieldLogScope NewScope(string name)
+		{
+			return new FieldLogScope(name);
+		}
+
+		/// <summary>
+		/// Returns a new FieldLogScope item that implements IDisposable and can be used to log
+		/// scopes with the <c>using</c> statement. The calling method name is used as scope name.
+		/// </summary>
+		/// <returns></returns>
+		public static FieldLogScope NewScope()
+		{
+			StackFrame sf = new StackFrame(1, false);
+			string name = sf.GetMethod().Name;
+			return new FieldLogScope(name);
+		}
+
+		/// <summary>
+		/// Returns a new FieldLogThreadScope item that implements IDisposable and can be used to
+		/// log thread scopes with the <c>using</c> statement.
+		/// </summary>
+		/// <param name="name">The thread scope name.</param>
+		/// <returns></returns>
+		public static FieldLogThreadScope NewThreadScope(string name)
+		{
+			return new FieldLogThreadScope(name);
+		}
+
+		#endregion Scope helpers
 
 		#region Item buffer methods
 

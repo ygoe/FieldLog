@@ -32,8 +32,8 @@ namespace ConsoleDemo
 			for (int i = 1; i <= 50; i++)
 			{
 				if (i > 1)
-					Thread.Sleep(rnd.Next(1000) + 500);
-					//Thread.Sleep(rnd.Next(20));
+					//Thread.Sleep(rnd.Next(1000) + 500);
+					Thread.Sleep(rnd.Next(20));
 
 				switch (rnd.Next(14))
 				{
@@ -95,15 +95,15 @@ namespace ConsoleDemo
 			//Console.WriteLine("Logging a handled exception...");
 			//FL.Exception(FieldLogPriority.Error, new InvalidOperationException("You can't do that!"), null, true);
 
-			//Console.WriteLine("Throwing an unhandled exception...");
-			//throw new ApplicationException("Test exception message",
-			//    new ApplicationException("An inner message 1",
-			//        new ApplicationException("An inner message 2")));
+			Console.WriteLine("Throwing an unhandled exception...");
+			throw new ApplicationException("Test exception message",
+				new ApplicationException("An inner message 1",
+					new ApplicationException("An inner message 2")));
 		}
 
 		private static void ThrowException1()
 		{
-			using (new FieldLogScope("ThrowException1"))
+			using (FL.NewScope())
 			{
 				ThrowException1a();
 			}
@@ -111,7 +111,7 @@ namespace ConsoleDemo
 
 		private static void ThrowException1a()
 		{
-			using (new FieldLogScope("ThrowException1a"))
+			using (FL.NewScope())
 			{
 				ThrowException1b();
 			}
@@ -119,7 +119,7 @@ namespace ConsoleDemo
 
 		private static void ThrowException1b()
 		{
-			using (new FieldLogScope("ThrowException1b"))
+			using (FL.NewScope())
 			{
 				throw new InvalidOperationException(
 					"You can't do that!",

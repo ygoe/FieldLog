@@ -166,7 +166,7 @@
 				<TextBlock Grid.Row="30" Grid.Column="0" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="ProcessMemory:"/>
 				<TextBox Grid.Row="30" Grid.Column="1" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="{Binding EnvironmentData.ProcessMemory, Mode=OneWay, StringFormat='N0'}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
-				<TextBlock Grid.Row="31" Grid.Column="0" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="PeakProcessMemory:"/>
+				<TextBlock Grid.Row="31" Grid.Column="0" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="PeakProcessMem:"/>
 				<TextBox Grid.Row="31" Grid.Column="1" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="{Binding EnvironmentData.PeakProcessMemory, Mode=OneWay, StringFormat='N0'}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
 				<TextBlock Grid.Row="32" Grid.Column="0" Margin="0,0,0,0" Visibility="{Binding EnvVisibility}" Text="TotalMemory:"/>

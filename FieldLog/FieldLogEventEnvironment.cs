@@ -12,6 +12,43 @@ namespace Unclassified.FieldLog
 	/// </summary>
 	public class FieldLogEventEnvironment
 	{
+		#region Static members
+
+		/// <summary>Contains the empty environment object.</summary>
+		public static readonly FieldLogEventEnvironment Empty;
+
+		static FieldLogEventEnvironment()
+		{
+			Empty = new FieldLogEventEnvironment();
+			Empty.Size = 4 + 4 + 4 + 4 +
+				0 +
+				1 + 4 + 4 +
+				0 +
+				1 +
+				0 +
+				8 +
+				0 +
+				0 +
+				0 +
+				1 +
+				0 +
+				0 +
+				4 +
+				0 +
+				0 +
+				1 +
+				0 +
+				0 +
+				0 +
+				1 +
+				0 +
+				8 + 8 + 8 + 8;
+		}
+
+		#endregion Static members
+
+		#region Data properties
+
 		/// <summary>Approximate data size of this data structure. Used for buffer size estimation.</summary>
 		public int Size { get; protected set; }
 
@@ -145,9 +182,17 @@ namespace Unclassified.FieldLog
 
 		// TODO: Add local time zone offset
 
+		#endregion Data properties
+
+		#region Constructor
+
 		private FieldLogEventEnvironment()
 		{
 		}
+
+		#endregion Constructor
+
+		#region Static Current method
 
 		/// <summary>
 		/// Gets a new instance of the FieldLogEventEnvironment class that contains information
@@ -229,6 +274,10 @@ namespace Unclassified.FieldLog
 				8 + 8 + 8 + 8;
 			return env;
 		}
+
+		#endregion Static Current method
+
+		#region Log file reading/writing
 
 		/// <summary>
 		/// Writes the FieldLogEventEnvironment data to a log file writer.
@@ -315,5 +364,7 @@ namespace Unclassified.FieldLog
 			env.IsProcess64Bit = (flags & 16) != 0;
 			return env;
 		}
+
+		#endregion Log file reading/writing
 	}
 }

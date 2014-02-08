@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Unclassified.FieldLog;
+using System.Windows;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
@@ -32,5 +33,18 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		}
 
 		public string TypeImageSource { get { return "/Images/ExceptionItem_14.png"; } }
+
+		public Visibility EnvVisibility
+		{
+			get
+			{
+				// There's no hard indicator to know whether environment data is available in an
+				// exception item. We just check for some values that should always be set.
+				return EnvironmentData.ClrType != null ||
+					EnvironmentData.CurrentDirectory != null ||
+					EnvironmentData.ExecutablePath != null ?
+					Visibility.Visible : Visibility.Collapsed;
+			}
+		}
 	}
 }

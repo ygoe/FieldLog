@@ -355,7 +355,22 @@ namespace Unclassified.FieldLog
 		{
 			Exception = new FieldLogException(ex);
 			Context = context;
-			EnvironmentData = FieldLogEventEnvironment.Current();
+
+			bool includeEnvironment = true;
+			if (context == "AppDomain.FirstChanceException")
+			{
+				// This may lead to crashes at WMI requests, so it's disabled for now.
+				// Testcase: Inspect FieldLogViewer with Snoop while debugging.
+				includeEnvironment = false;
+			}
+			if (includeEnvironment)
+			{
+				EnvironmentData = FieldLogEventEnvironment.Current();
+			}
+			else
+			{
+				EnvironmentData = FieldLogEventEnvironment.Empty;
+			}
 
 			Size += Exception.Size +
 				(Context != null ? Context.Length * 2 : 0) +
@@ -559,9 +574,10 @@ namespace Unclassified.FieldLog
 	public class FieldLogScope : IDisposable
 	{
 		private string name;
+		private bool isDisposed;
 
 		/// <summary>
-		/// Initialises a new instance of the FieldLogScope class.
+		/// Initialises a new instance of the FieldLogScope class and logs the scope beginning.
 		/// </summary>
 		/// <param name="name">The scope name.</param>
 		public FieldLogScope(string name)
@@ -575,8 +591,12 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		public void Dispose()
 		{
-			FL.Leave(name);
-			GC.SuppressFinalize(this);
+			if (!isDisposed)
+			{
+				isDisposed = true;
+				FL.Leave(name);
+				GC.SuppressFinalize(this);
+			}
 		}
 
 		/// <summary>
@@ -584,8 +604,11 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		~FieldLogScope()
 		{
-			FL.Error("FieldLogScope.Dispose was not called! Scope levels before this item may be wrong.", "Name = " + name);
-			Dispose();
+			if (!FL.IsShutdown)
+			{
+				FL.Error("FieldLogScope.Dispose was not called! Scope levels before this item may be wrong.", "Name = " + name);
+				Dispose();
+			}
 		}
 	}
 
@@ -595,9 +618,11 @@ namespace Unclassified.FieldLog
 	public class FieldLogThreadScope : IDisposable
 	{
 		private string name;
+		private bool isDisposed;
 
 		/// <summary>
-		/// Initialises a new instance of the FieldLogThreadScope class.
+		/// Initialises a new instance of the FieldLogThreadScope class and logs the thread scope
+		/// beginning.
 		/// </summary>
 		/// <param name="name">The thread scope name.</param>
 		public FieldLogThreadScope(string name)
@@ -611,8 +636,12 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		public void Dispose()
 		{
-			FL.LogScope(FieldLogScopeType.ThreadEnd, name);
-			GC.SuppressFinalize(this);
+			if (!isDisposed)
+			{
+				isDisposed = true;
+				FL.LogScope(FieldLogScopeType.ThreadEnd, name);
+				GC.SuppressFinalize(this);
+			}
 		}
 
 		/// <summary>
@@ -620,8 +649,11 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		~FieldLogThreadScope()
 		{
-			FL.Error("FieldLogThreadScope.Dispose was not called! Scope levels before this item may be wrong.", "Name = " + name);
-			Dispose();
+			if (!FL.IsShutdown)
+			{
+				FL.Error("FieldLogThreadScope.Dispose was not called! Scope levels before this item may be wrong.", "Name = " + name);
+				Dispose();
+			}
 		}
 	}
 

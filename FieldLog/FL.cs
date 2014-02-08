@@ -17,8 +17,52 @@ namespace Unclassified.FieldLog
 	{
 		#region Native interop
 
+		/// <summary>
+		/// Defines values returned by the GetFileType function.
+		/// </summary>
+		private enum FileType : uint
+		{
+			/// <summary>The specified file is a character file, typically an LPT device or a console.</summary>
+			FileTypeChar = 0x0002,
+			/// <summary>The specified file is a disk file.</summary>
+			FileTypeDisk = 0x0001,
+			/// <summary>The specified file is a socket, a named pipe, or an anonymous pipe.</summary>
+			FileTypePipe = 0x0003,
+			/// <summary>Unused.</summary>
+			FileTypeRemote = 0x8000,
+			/// <summary>Either the type of the specified file is unknown, or the function failed.</summary>
+			FileTypeUnknown = 0x0000,
+		}
+
+		/// <summary>
+		/// Defines standard device handles for the GetStdHandle function.
+		/// </summary>
+		private enum StdHandle : int
+		{
+			/// <summary>The standard input device. Initially, this is the console input buffer, CONIN$.</summary>
+			Input = -10,
+			/// <summary>The standard output device. Initially, this is the active console screen buffer, CONOUT$.</summary>
+			Output = -11,
+			/// <summary>The standard error device. Initially, this is the active console screen buffer, CONOUT$.</summary>
+			Error = -12,
+		}
+
+		/// <summary>
+		/// Retrieves the file type of the specified file.
+		/// </summary>
+		/// <param name="hFile">A handle to the file.</param>
+		/// <returns></returns>
+		[DllImport("kernel32.dll")]
+		private static extern FileType GetFileType(IntPtr hFile);
+
+		/// <summary>
+		/// Retrieves a handle to the specified standard device (standard input, standard output,
+		/// or standard error).
+		/// </summary>
+		/// <param name="nStdHandle">The standard device.</param>
+		/// <returns></returns>
 		[DllImport("kernel32.dll", SetLastError = true)]
-		private static extern IntPtr GetConsoleWindow();
+		private static extern IntPtr GetStdHandle(StdHandle nStdHandle);
 
 		#endregion Native interop
 
@@ -214,7 +258,10 @@ namespace Unclassified.FieldLog
 
 			SessionId = Guid.NewGuid();
 
-			IsConsoleApp = GetConsoleWindow() != IntPtr.Zero;
+			IsInteractiveConsoleApp = Environment.UserInteractive &&
+				GetFileType(GetStdHandle(StdHandle.Input)) == FileType.FileTypeChar &&
+				GetFileType(GetStdHandle(StdHandle.Output)) == FileType.FileTypeChar &&
+				GetFileType(GetStdHandle(StdHandle.Error)) == FileType.FileTypeChar;
 
 			// Application error dialog localisation, default to English
 			AppErrorDialogTitle = "Application error";
@@ -315,9 +362,10 @@ namespace Unclassified.FieldLog
 		public static bool LogFirstChanceExceptions { get; set; }
 
 		/// <summary>
-		/// Gets a value indicating whether the current application is a console application.
+		/// Gets a value indicating whether the current application has an interactive console and
+		/// is able to interact with the user through it.
 		/// </summary>
-		public static bool IsConsoleApp { get; private set; }
+		public static bool IsInteractiveConsoleApp { get; private set; }
 
 		/// <summary>
 		/// Gets a value indicating whether the log queue has been shut down.
@@ -419,11 +467,20 @@ namespace Unclassified.FieldLog
 #if DEBUG
 			System.Diagnostics.Trace.Write(exItem.Exception.Exception.ToString());
 #endif
-			
+
+			if (!Environment.UserInteractive)
+			{
+				// There is no user who could read the message or even decide whether to continue
+				// or not. Just exit here.
+				Shutdown();
+				Environment.Exit(1);
+				return;
+			}
+
 			string msg;
 			if (allowContinue)
 			{
-				if (IsConsoleApp)
+				if (IsInteractiveConsoleApp)
 				{
 					msg = AppErrorDialogContinuableConsole;
 				}
@@ -459,13 +516,19 @@ namespace Unclassified.FieldLog
 
 			// TODO: Offer starting external log submit tool
 
-			if (IsConsoleApp)
+			if (IsInteractiveConsoleApp)
 			{
 				ConsoleColor foreColor = Console.ForegroundColor;
 				ConsoleColor backColor = Console.BackgroundColor;
 
 				Console.BackgroundColor = ConsoleColor.Black;
 				Console.ForegroundColor = ConsoleColor.Red;
+				string appName = AppName;
+				if (!string.IsNullOrEmpty(appName))
+				{
+					Console.Error.Write(appName);
+					Console.Error.Write(" - ");
+				}
 				Console.Error.WriteLine(AppErrorDialogTitle);
 				Console.Error.WriteLine(msg);
 
@@ -501,9 +564,16 @@ namespace Unclassified.FieldLog
 			}
 			else if (allowContinue)
 			{
+				string title = AppErrorDialogTitle;
+				string appName = AppName;
+				if (!string.IsNullOrEmpty(appName))
+				{
+					title = appName + " – " + title;
+				}
+
 				if (System.Windows.Forms.MessageBox.Show(
 					msg,
-					AppErrorDialogTitle,
+					title,
 					System.Windows.Forms.MessageBoxButtons.OKCancel,
 					System.Windows.Forms.MessageBoxIcon.Error) == System.Windows.Forms.DialogResult.Cancel)
 				{

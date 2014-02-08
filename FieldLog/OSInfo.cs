@@ -3,6 +3,8 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security;
+using System.Security.Principal;
 using Microsoft.Win32;
 
 namespace Unclassified.FieldLog
@@ -1045,24 +1047,24 @@ namespace Unclassified.FieldLog
 
 		#endregion Static constructor
 
-		#region Public static methods
+		#region Windows account methods
 
 		/// <summary>
-		/// Checks whether the logged on Windows user is member of the specified Windows group.
+		/// Determines whether the logged on Windows user is member of the specified Windows group.
 		/// </summary>
 		/// <param name="groupName">Group name (format: "Domain\Group")</param>
 		/// <returns>true, if the user is member of the group, false otherwise.</returns>
 		public static bool IsCurrentUserInWindowsGroup(string groupName)
 		{
 			// Based on: http://www.mycsharp.de/wbb2/thread.php?threadid=36895
-			System.Security.Principal.WindowsIdentity identity = System.Security.Principal.WindowsIdentity.GetCurrent();
+			WindowsIdentity identity = WindowsIdentity.GetCurrent();
 			if (!identity.IsAuthenticated)
 			{
-				throw new System.Security.SecurityException("The current Windows user is not authenticated.");
+				throw new SecurityException("The current Windows user is not authenticated.");
 			}
 			try
 			{
-				System.Security.Principal.WindowsPrincipal principal = new System.Security.Principal.WindowsPrincipal(identity);
+				WindowsPrincipal principal = new WindowsPrincipal(identity);
 				return principal.IsInRole(groupName);
 			}
 			catch (SystemException)
@@ -1072,6 +1074,81 @@ namespace Unclassified.FieldLog
 				return false;
 			}
 		}
+
+		/// <summary>
+		/// Determines whether the logged on Windows user is member of the specified Windows group.
+		/// </summary>
+		/// <param name="wellKnownSidType">A value of the set of commonly used security identifiers (SIDs).</param>
+		/// <returns>true, if the user is member of the group, false otherwise.</returns>
+		public static bool IsCurrentUserInWindowsGroup(WellKnownSidType wellKnownSidType)
+		{
+			WindowsIdentity identity = WindowsIdentity.GetCurrent();
+			if (!identity.IsAuthenticated)
+			{
+				throw new SecurityException("The current Windows user is not authenticated.");
+			}
+			try
+			{
+				SecurityIdentifier sid = new SecurityIdentifier(wellKnownSidType, null);
+				WindowsPrincipal principal = new WindowsPrincipal(identity);
+				return principal.IsInRole(sid);
+			}
+			catch (SystemException)
+			{
+				// The group is not found. If the group is not created then the user cannot be
+				// member of the group so just return false.
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Determines whether the logged on Windows user is a local administrator.
+		/// </summary>
+		/// <returns></returns>
+		public static bool IsCurrentUserLocalAdministrator()
+		{
+			return IsCurrentUserInWindowsGroup(WellKnownSidType.BuiltinAdministratorsSid);
+		}
+
+		/// <summary>
+		/// Determines whether the logged on Windows user is a domain administrator.
+		/// </summary>
+		/// <returns></returns>
+		public static bool IsCurrentUserDomainAdministrator()
+		{
+			return IsCurrentUserInWindowsGroup(WellKnownSidType.AccountDomainAdminsSid);
+		}
+
+		/// <summary>
+		/// Determines whether the logged on Windows user is the local system account.
+		/// </summary>
+		/// <returns></returns>
+		public static bool IsCurrentUserLocalSystem()
+		{
+			return IsCurrentUserInWindowsGroup(WellKnownSidType.LocalSystemSid);
+		}
+
+		/// <summary>
+		/// Determines whether the logged on Windows user is the local service account.
+		/// </summary>
+		/// <returns></returns>
+		public static bool IsCurrentUserLocalService()
+		{
+			return IsCurrentUserInWindowsGroup(WellKnownSidType.LocalServiceSid);
+		}
+
+		/// <summary>
+		/// Determines whether the logged on Windows user is the network service account.
+		/// </summary>
+		/// <returns></returns>
+		public static bool IsCurrentUserNetworkService()
+		{
+			return IsCurrentUserInWindowsGroup(WellKnownSidType.NetworkServiceSid);
+		}
+
+		#endregion Windows account methods
+
+		#region Memory usage methods
 
 		/// <summary>
 		/// Gets the private memory currently used by this process in bytes.
@@ -1117,7 +1194,7 @@ namespace Unclassified.FieldLog
 			return mem;
 		}
 
-		#endregion Public static methods
+		#endregion Memory usage methods
 
 		#region Private helper methods
 

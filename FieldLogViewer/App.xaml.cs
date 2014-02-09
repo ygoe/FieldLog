@@ -7,10 +7,10 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
-using Unclassified.FieldLogViewer.View;
-using Unclassified.FieldLogViewer.ViewModel;
 using Unclassified;
 using Unclassified.FieldLog;
+using Unclassified.FieldLogViewer.View;
+using Unclassified.FieldLogViewer.ViewModel;
 
 namespace Unclassified.FieldLogViewer
 {
@@ -68,7 +68,11 @@ namespace Unclassified.FieldLogViewer
 
 			if (e.Args.Length > 0)
 			{
-				viewModel.OpenFiles(e.Args[0]);
+				string prefix = viewModel.GetPrefixFromPath(e.Args[0]);
+				if (prefix != null)
+				{
+					viewModel.OpenFiles(prefix);
+				}
 			}
 
 			// Show the main window

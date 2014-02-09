@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FieldLog.NET20", "FieldLog\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmoothListTest", "SmoothListTest\SmoothListTest.csproj", "{5CF89D75-00AF-4ECA-BF49-69219330D933}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogBenchmark", "LogBenchmark\LogBenchmark.csproj", "{A58A3F11-E46D-4440-B1C5-217E2906A76B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,6 +60,14 @@ Global
 		{5CF89D75-00AF-4ECA-BF49-69219330D933}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5CF89D75-00AF-4ECA-BF49-69219330D933}.Release|x86.ActiveCfg = Release|x86
 		{5CF89D75-00AF-4ECA-BF49-69219330D933}.Release|x86.Build.0 = Release|x86
+		{A58A3F11-E46D-4440-B1C5-217E2906A76B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A58A3F11-E46D-4440-B1C5-217E2906A76B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A58A3F11-E46D-4440-B1C5-217E2906A76B}.Debug|x86.ActiveCfg = Debug|x86
+		{A58A3F11-E46D-4440-B1C5-217E2906A76B}.Debug|x86.Build.0 = Debug|x86
+		{A58A3F11-E46D-4440-B1C5-217E2906A76B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A58A3F11-E46D-4440-B1C5-217E2906A76B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A58A3F11-E46D-4440-B1C5-217E2906A76B}.Release|x86.ActiveCfg = Release|x86
+		{A58A3F11-E46D-4440-B1C5-217E2906A76B}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

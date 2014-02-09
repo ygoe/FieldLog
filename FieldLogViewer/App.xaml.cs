@@ -73,6 +73,10 @@ namespace Unclassified.FieldLogViewer
 				{
 					viewModel.OpenFiles(prefix);
 				}
+				else
+				{
+					viewModel.OpenFiles(e.Args[0]);
+				}
 			}
 
 			// Show the main window

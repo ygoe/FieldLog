@@ -824,16 +824,16 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					return str != null && str.CompareTo(Value ?? "") < 0;
 				case FilterComparison.Contains:
 				case FilterComparison.NotContains:
-					return str != null && str.Contains(Value ?? "");
+					return str != null && str.ToLower().Contains((Value ?? "").ToLower());
 				case FilterComparison.StartsWith:
 				case FilterComparison.NotStartsWith:
-					return str != null && str.StartsWith(Value ?? "");
+					return str != null && str.ToLower().StartsWith((Value ?? "").ToLower());
 				case FilterComparison.EndsWith:
 				case FilterComparison.NotEndsWith:
-					return str != null && str.EndsWith(Value ?? "");
+					return str != null && str.ToLower().EndsWith((Value ?? "").ToLower());
 				case FilterComparison.Regex:
 				case FilterComparison.NotRegex:
-					return Regex.IsMatch(str ?? "", Value ?? "");
+					return Regex.IsMatch(str ?? "", Value ?? "", RegexOptions.IgnoreCase);
 				default:
 					throw new Exception("Invalid comparison for string column: " + Comparison);
 			}

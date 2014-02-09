@@ -40,7 +40,7 @@
 					<ComboBox
 						Grid.Row="0" Grid.Column="1" Margin="4,0,0,0"
 						IsEditable="True" IsTextSearchEnabled="False"
-						ItemsSource="{Binding Filters}"
+						ItemsSource="{Binding SortedFilters}"
 						SelectedItem="{Binding SelectedFilter}"
 						DisplayMemberPath="DisplayName"
 						Text="{Binding SelectedFilter.DisplayName, Mode=TwoWay}" SelectionChanged="ComboBox_SelectionChanged" />

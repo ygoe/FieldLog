@@ -1,14 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
 using Unclassified.UI;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
 	class SettingsViewModel : ViewModelBase
 	{
+		#region Constructor
+
 		public SettingsViewModel()
 		{
 			InitializeCommands();
@@ -16,6 +17,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			MainViewModel.Instance.LinkProperty(vm => vm.SelectedFilter, v => SelectedFilter = v);
 			this.LinkProperty(vm => vm.SelectedFilter, v => MainViewModel.Instance.SelectedFilter = v);
 		}
+
+		#endregion Constructor
 
 		#region Commands
 
@@ -39,7 +42,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		private bool CanDuplicateFilter()
 		{
-			return !SelectedFilter.AcceptAll;
+			return SelectedFilter != null && !SelectedFilter.AcceptAll;
 		}
 
 		private void OnDuplicateFilter()
@@ -51,7 +54,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		private bool CanDeleteFilter()
 		{
-			return !SelectedFilter.AcceptAll;
+			return SelectedFilter != null && !SelectedFilter.AcceptAll;
 		}
 
 		private void OnDeleteFilter()
@@ -74,6 +77,11 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public ObservableCollection<FilterViewModel> Filters
 		{
 			get { return MainViewModel.Instance.Filters; }
+		}
+
+		public ICollectionView SortedFilters
+		{
+			get { return MainViewModel.Instance.SortedFilters; }
 		}
 
 		private FilterViewModel selectedFilter;

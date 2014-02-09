@@ -47,7 +47,7 @@
 			<TextBlock Margin="4,0,4,0" VerticalAlignment="Center" Text="Filter:"/>
 			<ComboBox
 				Width="150"
-				ItemsSource="{Binding Filters}"
+				ItemsSource="{Binding SortedFilters}"
 				SelectedItem="{Binding SelectedFilter}"
 				DisplayMemberPath="DisplayName"/>
 			<TextBlock Margin="4,0,4,0" VerticalAlignment="Center">

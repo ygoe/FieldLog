@@ -33,7 +33,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 			if (AcceptAll)
 			{
-				fixedDisplayName = "Show all";
+				fixedDisplayName = "(Show all)";
 				DisplayName = fixedDisplayName;
 			}
 		}

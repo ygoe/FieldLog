@@ -27,6 +27,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		#region Private data
 
 		private ObservableCollection<LogItemViewModelBase> logItems = new ObservableCollection<LogItemViewModelBase>();
+		private CollectionViewSource sortedFilters = new CollectionViewSource();
 		private CollectionViewSource filteredLogItems = new CollectionViewSource();
 		private FieldLogFileGroupReader logFileGroupReader;
 		private bool isLiveStopped = true;
@@ -48,6 +49,10 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				f => f.FilterChanged += LogItemsFilterChanged,
 				f => f.FilterChanged -= LogItemsFilterChanged);
 			Filters.Add(new FilterViewModel(true));
+			Filters.CollectionChanged += (s, e) =>
+			{
+				LogItemsFilterChanged(false);   // Trigger saving the new filter collection
+			};
 
 			foreach (string s in AppSettings.Instance.Filters)
 			{
@@ -76,6 +81,10 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			{
 				SelectedFilter = Filters[0];
 			}
+
+			sortedFilters.Source = Filters;
+			sortedFilters.SortDescriptions.Add(new SortDescription("AcceptAll", ListSortDirection.Descending));
+			sortedFilters.SortDescriptions.Add(new SortDescription("DisplayName", ListSortDirection.Ascending));
 
 			filteredLogItems.Source = logItems;
 			filteredLogItems.Filter += filteredLogItems_Filter;
@@ -229,6 +238,14 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		public ObservableCollection<FilterViewModel> Filters { get; private set; }
 
+		public ICollectionView SortedFilters
+		{
+			get
+			{
+				return sortedFilters.View;
+			}
+		}
+
 		private FilterViewModel selectedFilter;
 		public FilterViewModel SelectedFilter
 		{
@@ -307,8 +324,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		#endregion Data properties
 
-		//private List<LogItemViewModelBase> itemBuffer = new List<LogItemViewModelBase>();
-		//private bool bufferReady;
+		#region Log items filter
 
 		/// <summary>
 		/// Filter implementation for the collection view returned by FilteredLogItems.
@@ -335,6 +351,10 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		public void LogItemsFilterChanged(bool affectsItems)
 		{
+			if (sortedFilters.View != null)
+			{
+				sortedFilters.View.Refresh();
+			}
 			if (affectsItems)
 			{
 				RefreshLogItemsFilterView();
@@ -354,6 +374,10 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
+		#endregion Log items filter
+
+		#region Log file loading
+
 		/// <summary>
 		/// Gets the log file prefix from a full file path.
 		/// </summary>
@@ -368,6 +392,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 			return null;
 		}
+
+		//private List<LogItemViewModelBase> itemBuffer = new List<LogItemViewModelBase>();
+		//private bool bufferReady;
 
 		public Task OpenFiles(string basePath)
 		{
@@ -464,6 +491,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		//        System.Diagnostics.Trace.WriteLine("Inserted items from buffer");
 		//    }
 		//}
+
+		#endregion Log file loading
 
 		#region IViewCommandSource members
 

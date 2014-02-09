@@ -2,7 +2,7 @@ About FieldLog
 
 Website: http://dev.unclassified.de/source/fieldlog
 
-FieldLog is a fast and comprehensive logging tool for .NET applications. It allows applications to write events, data and errors to managed and efficient log files. The logging methods are optimised for high performance multi-threaded operation and a single log method call takes as little as 3 microseconds on modern hardware. There's no comparison to OutputDebugString, Debug.WriteLine or appending to a file each time! This logging can be used in high-performance loops without noticeably slowing down the application.
+FieldLog is a fast and comprehensive logging tool for .NET applications. It allows applications to write events, data and errors to managed and efficient log files. The logging methods are optimised for high performance multi-threaded operation and a single log method call takes as little as 1 microsecond on modern hardware. There's no comparison to OutputDebugString, Debug.WriteLine or appending to a file each time! This logging can be used in high-performance loops without noticeably slowing down the application.
 
 ALWAYS-ON LOGGING
 

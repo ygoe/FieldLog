@@ -138,8 +138,8 @@
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\SettingsViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
-    <Compile Include="View\DetailsMessage.xaml.cs">
-      <DependentUpon>DetailsMessage.xaml</DependentUpon>
+    <Compile Include="View\DetailsMessageView.xaml.cs">
+      <DependentUpon>DetailsMessageView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\FieldLogExceptionItemView.xaml.cs">
       <DependentUpon>FieldLogExceptionItemView.xaml</DependentUpon>
@@ -152,6 +152,9 @@
     </Compile>
     <Compile Include="View\FieldLogExceptionView.xaml.cs">
       <DependentUpon>FieldLogExceptionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\DebugMessageItemView.xaml.cs">
+      <DependentUpon>DebugMessageItemView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -175,7 +178,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="View\DetailsMessage.xaml">
+    <Page Include="View\DetailsMessageView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -192,6 +195,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="View\FieldLogExceptionView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\DebugMessageItemView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

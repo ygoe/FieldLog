@@ -248,7 +248,7 @@
 
 					<ContentControl.Resources>
 						<DataTemplate DataType="{x:Type vm:DetailsMessageViewModel}">
-							<v:DetailsMessage/>
+							<v:DetailsMessageView/>
 						</DataTemplate>
 
 						<DataTemplate DataType="{x:Type vm:FieldLogTextItemViewModel}">
@@ -265,6 +265,10 @@
 
 						<DataTemplate DataType="{x:Type vm:FieldLogScopeItemViewModel}">
 							<v:FieldLogScopeItemView/>
+						</DataTemplate>
+
+						<DataTemplate DataType="{x:Type vm:DebugMessageViewModel}">
+							<v:DebugMessageItemView/>
 						</DataTemplate>
 					</ContentControl.Resources>
 				</ContentControl>

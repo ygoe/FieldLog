@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Unclassified.FieldLog;
-using System.Windows.Media;
 using System.Windows;
+using System.Windows.Media;
+using Unclassified.FieldLog;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {

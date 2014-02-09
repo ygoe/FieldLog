@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Unclassified.FieldLog;
 using System.Threading;
+using System.Diagnostics;
 
 namespace ConsoleDemo
 {
@@ -86,6 +87,9 @@ namespace ConsoleDemo
 				}
 				if ((i % 100) == 0)
 					Console.WriteLine("    now at " + i);
+				
+				if ((i % 10) == 0)
+					Trace.WriteLine("FL ConsoleDemo now at item " + i);
 			}
 
 			FL.Info("Information item");

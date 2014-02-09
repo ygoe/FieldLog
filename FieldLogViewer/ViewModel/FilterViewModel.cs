@@ -241,11 +241,11 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		#region Filter logic
 
 		/// <summary>
-		/// Determines whether the specified log item matches any condition group of this filter.
+		/// Determines whether the specified item matches any condition group of this filter.
 		/// </summary>
-		/// <param name="item">The log item to evaluate.</param>
+		/// <param name="item">The item to evaluate.</param>
 		/// <returns></returns>
-		public bool IsMatch(FieldLogItemViewModel item)
+		public bool IsMatch(object item)
 		{
 			// Don't even start thinking if this is the "Show all" filter.
 			if (AcceptAll) return true;

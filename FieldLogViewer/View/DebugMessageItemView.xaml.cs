@@ -11,14 +11,32 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Unclassified.UI;
 
 namespace Unclassified.FieldLogViewer.View
 {
-	public partial class DetailsMessage : UserControl
+	public partial class DebugMessageItemView : UserControl
 	{
-		public DetailsMessage()
+		#region Static constructor
+
+		static DebugMessageItemView()
+		{
+			ViewCommandManager.SetupMetadata<DebugMessageItemView>();
+		}
+
+		#endregion Static constructor
+
+		#region Constructors
+
+		public DebugMessageItemView()
 		{
 			InitializeComponent();
 		}
+
+		#endregion Constructors
+
+		#region View commands
+
+		#endregion View commands
 	}
 }

@@ -95,7 +95,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				var itemVM = new DebugMessageViewModel(pid, text);
 
 				disp.BeginInvoke(
-					new Action<LogItemViewModelBase, Comparison<LogItemViewModelBase>>(logItems.InsertSorted),
+					new Action<LogItemViewModelBase, Comparison<LogItemViewModelBase>>(this.logItems.InsertSorted),
 					itemVM,
 					new Comparison<LogItemViewModelBase>((a, b) => a.CompareTo(b)));
 			};
@@ -331,21 +331,13 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		/// </summary>
 		private void filteredLogItems_Filter(object sender, FilterEventArgs e)
 		{
-			FieldLogItemViewModel li = e.Item as FieldLogItemViewModel;
-			if (li != null)
+			if (SelectedFilter != null)
 			{
-				if (SelectedFilter != null)
-				{
-					e.Accepted = SelectedFilter.IsMatch(li);
-				}
-				else
-				{
-					e.Accepted = true;
-				}
+				e.Accepted = SelectedFilter.IsMatch(e.Item);
 			}
 			else
 			{
-				e.Accepted = false;
+				e.Accepted = true;
 			}
 		}
 
@@ -417,7 +409,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				{
 					lock (localLogItemsLock)
 					{
-						logItems = new ObservableCollection<LogItemViewModelBase>(localLogItems);
+						this.logItems = new ObservableCollection<LogItemViewModelBase>(localLogItems);
 						localLogItems = null;
 					}
 					OnPropertyChanged("LogItems");

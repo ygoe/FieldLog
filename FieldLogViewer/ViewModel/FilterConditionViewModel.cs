@@ -327,16 +327,18 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		#region Filter logic
 
 		/// <summary>
-		/// Determines whether the specified log item matches this condition.
+		/// Determines whether the specified item matches this condition.
 		/// </summary>
-		/// <param name="item">The log item to evaluate.</param>
+		/// <param name="item">The item to evaluate.</param>
 		/// <returns></returns>
-		public bool IsMatch(FieldLogItemViewModel item)
+		public bool IsMatch(object item)
 		{
+			FieldLogItemViewModel flItem = null;
 			FieldLogTextItemViewModel textItem = null;
 			FieldLogDataItemViewModel dataItem = null;
 			FieldLogExceptionItemViewModel exItem = null;
 			FieldLogScopeItemViewModel scopeItem = null;
+			DebugMessageViewModel dbgMsg = null;
 
 			// Negation must be handled after all field comparisons are done because the negation
 			// may need logical parentheses around the rest of the expression. All type-specific
@@ -362,16 +364,29 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					result = CompareItemType(item);
 					break;
 				case FilterColumn.Time:
-					result = CompareTime(item.Time);
+					flItem = item as FieldLogItemViewModel;
+					if (flItem == null)
+						dbgMsg = item as DebugMessageViewModel;
+
+					if (flItem != null)
+						result = CompareTime(flItem.Time);
+					else if (dbgMsg != null)
+						result = CompareTime(dbgMsg.Time);
 					break;
 				case FilterColumn.Priority:
-					result = ComparePriority(item.Priority);
+					flItem = item as FieldLogItemViewModel;
+					if (flItem != null)
+						result = ComparePriority(flItem.Priority);
 					break;
 				case FilterColumn.SessionId:
-					result = CompareString(item.SessionId.ToString("D"));
+					flItem = item as FieldLogItemViewModel;
+					if (flItem != null)
+						result = CompareString(flItem.SessionId.ToString("D"));
 					break;
 				case FilterColumn.ThreadId:
-					result = CompareInt(item.ThreadId);
+					flItem = item as FieldLogItemViewModel;
+					if (flItem != null)
+						result = CompareInt(flItem.ThreadId);
 					break;
 				case FilterColumn.AnyText:
 					textItem = item as FieldLogTextItemViewModel;
@@ -381,7 +396,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						exItem = item as FieldLogExceptionItemViewModel;
 					if (exItem == null)
 						scopeItem = item as FieldLogScopeItemViewModel;
-					
+					if (scopeItem == null)
+						dbgMsg = item as DebugMessageViewModel;
+
 					if (textItem != null)
 						result = CompareString(textItem.Text) || CompareString(textItem.Details);
 					else if (dataItem != null)
@@ -393,12 +410,19 @@ namespace Unclassified.FieldLogViewer.ViewModel
 							CompareExceptionDataRecursive(exItem.Exception);
 					else if (scopeItem != null)
 						result = CompareString(scopeItem.Name);
+					else if (dbgMsg != null)
+						result = CompareString(dbgMsg.Message);
 					break;
 				
 				case FilterColumn.TextText:
 					textItem = item as FieldLogTextItemViewModel;
+					if (textItem == null)
+						dbgMsg = item as DebugMessageViewModel;
+
 					if (textItem != null)
 						result = CompareString(textItem.Text);
+					else if (dbgMsg != null)
+						result = CompareString(dbgMsg.Message);
 					break;
 				case FilterColumn.TextDetails:
 					textItem = item as FieldLogTextItemViewModel;
@@ -751,7 +775,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
-		private bool CompareItemType(FieldLogItemViewModel item)
+		private bool CompareItemType(object item)
 		{
 			FilterItemType filterType;
 			if (Enum.TryParse(Value, out filterType))
@@ -773,6 +797,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 								return item is FieldLogScopeItemViewModel;
 							case FilterItemType.Text:
 								return item is FieldLogTextItemViewModel;
+							case FilterItemType.DebugOutput:
+								return item is DebugMessageViewModel;
 						}
 						return false;
 					default:
@@ -1125,7 +1151,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		// additional logic required to make one field comparison dependent of another condition
 		// value.
 		[Description("Scope")]
-		Scope
+		Scope,
+		[Description("DebugOutputString")]
+		DebugOutput,
 	}
 
 	enum FilterPriority

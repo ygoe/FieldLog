@@ -106,6 +106,15 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						itemType = condItemType;
 						break;
 					case FilterColumn.TextText:
+						if (itemType != FilterItemType.Text &&
+							itemType != FilterItemType.DebugOutput &&
+							itemType != FilterItemType.Any)
+						{
+							IsInconsistent = true;
+							return;
+						}
+						itemType = FilterItemType.Text;   // NOTE: Could be DebugOutput as well, but that's unlikely
+						break;
 					case FilterColumn.TextDetails:
 						if (itemType != FilterItemType.Text &&
 							itemType != FilterItemType.Any)
@@ -357,12 +366,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		#region Filter logic
 
 		/// <summary>
-		/// Determines whether the specified log item matches all conditions of this condition
+		/// Determines whether the specified item matches all conditions of this condition
 		/// group.
 		/// </summary>
-		/// <param name="item">The log item to evaluate.</param>
+		/// <param name="item">The item to evaluate.</param>
 		/// <returns></returns>
-		public bool IsMatch(FieldLogItemViewModel item)
+		public bool IsMatch(object item)
 		{
 			return Conditions.Where(c => c.IsEnabled).All(c => c.IsMatch(item));
 		}

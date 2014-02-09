@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Unclassified.FieldLog;
+using System.Windows;
 using System.Windows.Media;
+using Unclassified.FieldLog;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
@@ -12,14 +13,14 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public DebugMessageViewModel(int pid, string text)
 		{
 			this.Time = FL.UtcNow;
-			this.ProcessID = pid;
+			this.ProcessId = pid;
 			this.Message = text;
 		}
 
-		public int ProcessID { get; private set; }
+		public int ProcessId { get; private set; }
 		public string Message { get; private set; }
-		public string TypeImageSource { get { return "/Images/Transparent_14.png"; } }
-		public string PrioImageSource { get { return "/Images/Windows_14.png"; } }
+		public string TypeImageSource { get { return "/Images/Windows_14.png"; } }
+		public string PrioImageSource { get { return "/Images/Transparent_14.png"; } }
 
 		public string SimpleMessage
 		{
@@ -33,7 +34,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			get
 			{
-				return Color.FromArgb(255, 255, 255, 255);
+				return Colors.Transparent;
 			}
 		}
 
@@ -47,7 +48,26 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				}
 				else
 				{
-					return new LinearGradientBrush(this.BackColor, this.BackColor.BlendWith(Color.FromArgb(255, 109, 173, 255), 0.25f), 0);
+					//Color highlight = Color.FromRgb(109, 173, 255);
+					Color highlight = Color.FromRgb(51, 153, 255);
+					LinearGradientBrush brush = new LinearGradientBrush(this.BackColor, highlight, new Point(34, 0), new Point(34.001, 0));
+					brush.MappingMode = BrushMappingMode.Absolute;
+					return brush;
+				}
+			}
+		}
+
+		public Brush Foreground
+		{
+			get
+			{
+				if (!this.isSelected)
+				{
+					return Brushes.Black;
+				}
+				else
+				{
+					return Brushes.White;
 				}
 			}
 		}
@@ -56,15 +76,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public bool IsSelected
 		{
 			get { return this.isSelected; }
-			set
-			{
-				if (value != this.isSelected)
-				{
-					this.isSelected = value;
-					OnPropertyChanged("IsSelected");
-					OnPropertyChanged("Background");
-				}
-			}
+			set { CheckUpdate(value, ref isSelected, "IsSelected", "Background", "Foreground"); }
 		}
 	}
 }

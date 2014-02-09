@@ -111,6 +111,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		public DelegateCommand LoadLogCommand { get; private set; }
 		public DelegateCommand StopLiveCommand { get; private set; }
+		public DelegateCommand ClearCommand { get; private set; }
 		public DelegateCommand LoadMapCommand { get; private set; }
 		public DelegateCommand SettingsCommand { get; private set; }
 
@@ -118,6 +119,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			LoadLogCommand = new DelegateCommand(OnLoadLog, CanLoadLog);
 			StopLiveCommand = new DelegateCommand(OnStopLive, CanStopLive);
+			ClearCommand = new DelegateCommand(OnClear, CanClear);
 			LoadMapCommand = new DelegateCommand(OnLoadMap);
 			SettingsCommand = new DelegateCommand(OnSettings);
 		}
@@ -126,6 +128,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			LoadLogCommand.RaiseCanExecuteChanged();
 			StopLiveCommand.RaiseCanExecuteChanged();
+			ClearCommand.RaiseCanExecuteChanged();
 			LoadMapCommand.RaiseCanExecuteChanged();
 			SettingsCommand.RaiseCanExecuteChanged();
 		}
@@ -165,6 +168,16 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				isLiveStopped = true;
 				StopLiveCommand.RaiseCanExecuteChanged();
 			}
+		}
+
+		private bool CanClear()
+		{
+			return !isLoadingFiles;
+		}
+
+		private void OnClear()
+		{
+			logItems.Clear();
 		}
 
 		private void OnLoadMap()
@@ -222,7 +235,36 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				}
 			}
 		}
-		
+
+		private bool isSoundEnabled;
+		public bool IsSoundEnabled
+		{
+			get
+			{
+				return isSoundEnabled;
+			}
+			set
+			{
+				if (CheckUpdate(value, ref isSoundEnabled, "IsSoundEnabled"))
+				{
+					// TODO: Save to settings? Load from settings?
+				}
+			}
+		}
+
+		public bool IsWindowOnTop
+		{
+			get
+			{
+				return MainWindow.Instance.Topmost;
+			}
+			set
+			{
+				MainWindow.Instance.Topmost = value;
+				// TODO: Save to settings? Load from settings? NotifyPropertyChanged?
+			}
+		}
+
 		public ObservableCollection<LogItemViewModelBase> LogItems
 		{
 			get { return this.logItems; }

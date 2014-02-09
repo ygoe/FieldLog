@@ -34,27 +34,48 @@
 		</Grid.ColumnDefinitions>
 
 		<ToolBar Grid.Row="0" ToolBarTray.IsLocked="True">
-			<Button Content="Load log" Command="{Binding LoadLogCommand}"/>
+			<Button Command="{Binding LoadLogCommand}" ToolTip="Load log">
+				<Image Source="/Images/folder_open.png"/>
+			</Button>
+			<Button Command="{Binding StopLiveCommand}" ToolTip="Stop live">
+				<Image Source="/Images/stop.png"/>
+			</Button>
+			<Button Command="{Binding ClearCommand}" ToolTip="Clear window content">
+				<Image Source="/Images/clearwindowcontent.png"/>
+			</Button>
 			<Separator/>
-			<Button Content="Stop live" Command="{Binding StopLiveCommand}"/>
+			<Button Command="{Binding LoadMapCommand}" ToolTip="Load map">
+				<Image Source="/Images/association.png"/>
+			</Button>
 			<Separator/>
-			<Button Content="Load map" Command="{Binding LoadMapCommand}"/>
+			<ToggleButton IsChecked="{Binding IsDebugMonitorActive}" ToolTip="Debug monitor">
+				<Image Source="/Images/event.png"/>
+			</ToggleButton>
 			<Separator/>
-			<ToggleButton Content="Debug monitor" IsChecked="{Binding IsDebugMonitorActive}"/>
+			<ToggleButton IsChecked="{Binding IsLiveScrollingEnabled}" ToolTip="Live scroll">
+				<Image Source="/Images/goto_bottom.png"/>
+			</ToggleButton>
+			<ToggleButton IsChecked="{Binding IsSoundEnabled}" ToolTip="Play sound on new item">
+				<Image Source="/Images/sound.png"/>
+			</ToggleButton>
+			<ToggleButton IsChecked="{Binding IsWindowOnTop}" ToolTip="Keep window on top">
+				<Image Source="/Images/pin.png"/>
+			</ToggleButton>
 			<Separator/>
-			<ToggleButton Content="Live scroll" IsChecked="{Binding IsLiveScrollingEnabled}"/>
-			<Separator/>
-			<TextBlock Margin="4,0,4,0" VerticalAlignment="Center" Text="Filter:"/>
+			<Image Source="/Images/filter.png"/>
 			<ComboBox
 				Width="150"
+				ToolTip="Select filter"
 				ItemsSource="{Binding SortedFilters}"
 				SelectedItem="{Binding SelectedFilter}"
 				DisplayMemberPath="DisplayName"/>
-			<TextBlock Margin="4,0,4,0" VerticalAlignment="Center">
+			<TextBlock Margin="4,0,4,0" VerticalAlignment="Center" MinWidth="50">
 				<Run Text="("/><Run Text="{Binding FilteredLogItems.Count, Mode=OneWay}"/><Run Text=")"/>
 			</TextBlock>
 			<Separator/>
-			<Button Content="Settings" Command="{Binding SettingsCommand}"/>
+			<Button Command="{Binding SettingsCommand}" ToolTip="Settings">
+				<Image Source="/Images/gear.png"/>
+			</Button>
 		</ToolBar>
 
 		<Border Grid.Row="1" BorderThickness="0,1,0,0" BorderBrush="#40000000"/>

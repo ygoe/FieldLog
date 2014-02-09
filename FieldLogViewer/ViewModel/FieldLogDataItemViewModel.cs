@@ -29,6 +29,6 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
-		public string TypeImageSource { get { return "/Images/DataItem2_14.png"; } }
+		public string TypeImageSource { get { return "/Images/DataItem_14.png"; } }
 	}
 }

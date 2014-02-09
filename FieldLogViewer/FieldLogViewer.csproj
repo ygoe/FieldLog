@@ -247,7 +247,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\DataItem2_14.png" />
     <Resource Include="Images\DataItem_14.png" />
     <Resource Include="Images\ExceptionItem_14.png" />
     <Resource Include="Images\TextItem_14.png" />
@@ -283,6 +282,45 @@
   <ItemGroup>
     <Resource Include="Images\FieldLog.ico" />
     <Resource Include="Images\FLDocument.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\folder_open.png" />
+    <Resource Include="Images\gear.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\filter.png" />
+    <Resource Include="Images\stop.png" />
+    <Resource Include="Images\timer.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\clearwindowcontent.png" />
+    <Resource Include="Images\goto_bottom.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\event.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\association.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\pin.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\sound.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Sounds\high.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\low.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\medium.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\ting.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

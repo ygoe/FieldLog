@@ -63,7 +63,7 @@ namespace Unclassified.FieldLogViewer.View
 			Height = AppSettings.Instance.Window.MainHeight;
 			WindowState = AppSettings.Instance.Window.MainIsMaximized ? WindowState.Maximized : WindowState.Normal;
 
-			newItemMediaPlayer.Open(new Uri(@"..\..\Sounds\Simple_Low.mp3", UriKind.Relative));
+			newItemMediaPlayer.Open(new Uri(@"Sounds\ting.mp3", UriKind.Relative));
 
 			logItemsScrollPixelDc = DelayedCall.Create(() => { logItemsHostPanel.ScrollToPixel = true; }, 600);
 		}
@@ -198,10 +198,13 @@ namespace Unclassified.FieldLogViewer.View
 				}
 
 				// Play sound on new item, with rate limiting
-				if (now > prevItemTime.AddSeconds(5))
+				if (MainViewModel.Instance.IsSoundEnabled)
 				{
-					newItemMediaPlayer.Position = TimeSpan.Zero;
-					//newItemMediaPlayer.Play();
+					if (now > prevItemTime.AddSeconds(1))
+					{
+						newItemMediaPlayer.Position = TimeSpan.Zero;
+						newItemMediaPlayer.Play();
+					}
 				}
 				
 				prevItemTime = DateTime.UtcNow;

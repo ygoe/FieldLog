@@ -103,6 +103,7 @@ Source: "..\FieldLogViewer\bin\Release\FieldLogViewer.exe"; DestDir: "{app}"; Fl
 Source: "..\FieldLogViewer\bin\Release\InTheHand.Net.Personal.dll"; DestDir: "{app}"; Flags: ignoreversion
 ;Source: "..\FieldLog Documentation.pdf"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\FieldLogViewer\bin\Release\FieldLog.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\FieldLogViewer\bin\Release\Sounds\*.mp3"; DestDir: "{app}\Sounds"; Flags: ignoreversion
 
 ; FieldLog assembly
 Source: "..\FieldLog\bin\Release\FieldLog.dll"; DestDir: "{app}\FieldLog assembly (.NET 4.0)"; Flags: ignoreversion

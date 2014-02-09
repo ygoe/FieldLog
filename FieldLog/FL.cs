@@ -239,10 +239,12 @@ namespace Unclassified.FieldLog
 		static FL()
 		{
 			// Link the high-precision stopwatch with the current time for later high-precision
-			// performance tracing timestamps
+			// performance tracing timestamps. Wait for DateTime.UtcNow to actually change to get
+			// a fresh and most-accurate time.
 			stopwatch = new Stopwatch();
+			DateTime t0 = DateTime.UtcNow;
+			while ((startTime = DateTime.UtcNow) == t0) { }
 			stopwatch.Start();
-			startTime = DateTime.UtcNow;
 
 			LogFirstChanceExceptions = true;
 

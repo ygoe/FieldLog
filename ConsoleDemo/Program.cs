@@ -88,8 +88,8 @@ namespace ConsoleDemo
 				if ((i % 100) == 0)
 					Console.WriteLine("    now at " + i);
 				
-				if ((i % 10) == 0)
-					Trace.WriteLine("FL ConsoleDemo now at item " + i);
+				//if ((i % 5) == 0)
+				//    Trace.WriteLine("FL ConsoleDemo now at item " + i);
 			}
 
 			FL.Info("Information item");

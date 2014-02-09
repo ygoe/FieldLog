@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Diagnostics;
-using Unclassified.FieldLog;
 using System.IO;
+using System.Linq;
 using System.Reflection;
-using System.Globalization;
-using System.Threading;
+using Unclassified.FieldLog;
 
 namespace LogBenchmark
 {

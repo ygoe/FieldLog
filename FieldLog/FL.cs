@@ -1694,7 +1694,6 @@ namespace Unclassified.FieldLog
 				usedWriters[writer] = true;
 
 				if (writer.Length > maxFileSize ||   // File is large enough
-					writer.Length > 1 * 1024 * 1024 * 1024 /* GiB */ ||   // File contents is getting nearer to the technical limit of 2 GiB
 					writer.CreatedTime.ToLocalTime().Date < DateTime.Today)   // File is from yesterday or older
 				{
 					// This file is now large or old enough, close it
@@ -1875,6 +1874,12 @@ namespace Unclassified.FieldLog
 									break;
 								case "maxfilesize":
 									maxFileSize = (int) ParseConfigNumber(value);
+									// Don't come near the technical limit of 2 GiB due to Int32 file addressing
+									const int maxMaxFileSize = 1 * 1024 * 1024 * 1024; /* GiB */
+									if (maxFileSize > maxMaxFileSize)
+									{
+										maxFileSize = maxMaxFileSize;
+									}
 									break;
 								case "maxtotalsize":
 									maxTotalSize = ParseConfigNumber(value);

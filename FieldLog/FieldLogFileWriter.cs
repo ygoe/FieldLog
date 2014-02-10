@@ -318,6 +318,11 @@ namespace Unclassified.FieldLog
 
 		#endregion Data buffer
 
+		#region Public methods
+
+		/// <summary>
+		/// Flushes the file stream.
+		/// </summary>
 		public void Flush()
 		{
 			fileStream.Flush();
@@ -343,6 +348,8 @@ namespace Unclassified.FieldLog
 			}
 			return (int) new FileInfo(fileName).Length;
 		}
+
+		#endregion Public methods
 
 		#region IDispose members
 

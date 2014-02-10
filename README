@@ -56,13 +56,19 @@ PERFORMANCE
 
 A benchmark application is included in the solution. It allows you to run your own tests. Here are the numbers I determined on a 2013 office PC, using minimum values of multiple benchmark runs.
 
-FieldLog text message              :     466 ns/call (Flushing 1 million items: 6352 ms)
-Synchronised StreamWriter.WriteLine:     841 ns/call (Flushing 1 million items:    2 ms)
-FieldLog scope helper              :     945 ns/call (Flushing 500000 items   : 4206 ms)
-Trace.WriteLine (no listener)      :    2990 ns/call
-FieldLog scope helper w/ reflection:    6404 ns/call (Flushing 500000 items   : 1607 ms)
+FieldLog text message              :     464 ns/call
+Synchronised StreamWriter.WriteLine:     841 ns/call
+FieldLog scope helper              :     945 ns/call
+Trace.WriteLine (no listener)      :    2852 ns/call
+FieldLog scope helper w/ reflection:    6404 ns/call
+Synchronised File.AppendAllText SSD:  110484 ns/call
 Trace.WriteLine (VS/DbgView)       :  272942 ns/call
-Synchronised File.AppendAllText    : 2232278 ns/call
+Synchronised File.AppendAllText HDD: 2232278 ns/call
+
+Flushing 1 million FieldLog text messages: 6352 ms / 7656 ms with NTFS compression
+Flushing 1 million StreamWriter.WriteLine:    2 ms
+Flushing 500000 FieldLog scope messages  : 4206 ms
+Flushing 500000 FieldLog scope messages  : 1607 ms (with reflection)
 
 The scope logging helper generates an Enter and a Leave message and takes about twice the time of writing a single text message. So you can calculate something around one microsecond for each logged method or other scope. Determining the method name through reflection takes a lot longer though and may not always be an option.
 

@@ -271,8 +271,6 @@ namespace LogBenchmark
 			// Disable backlog waiting for this benchmark, we'll measure the flush time separately
 			FL.WaitForItemsBacklog = false;
 
-			string scopeName = flScopeReflection ? null : "Scope name";
-
 			stopwatch.Start();
 
 			long percent = 0;
@@ -289,8 +287,17 @@ namespace LogBenchmark
 					}
 				}
 
-				using (FL.NewScope(scopeName))
+				if (flScopeReflection)
 				{
+					using (FL.NewScope())
+					{
+					}
+				}
+				else
+				{
+					using (FL.NewScope("Scope name"))
+					{
+					}
 				}
 			}
 			Console.CursorLeft = 0;

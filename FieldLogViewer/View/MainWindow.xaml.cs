@@ -280,6 +280,146 @@ namespace Unclassified.FieldLogViewer.View
 			}
 		}
 
+		private object savedScrollItem;
+		private int savedScrollOffset;
+		private object prevSelectedItem;
+		private int prevSelectedOffset;
+		private int prevOffset;
+
+		[ViewCommand]
+		public void SaveScrolling()
+		{
+			if (LogItemsList.ActualHeight > 0 &&
+				logItemsHostPanel.ItemHeight > 0)
+			{
+				bool selectionIsVisible;
+				int topVisibleIndex = (int) (logItemsScroll.VerticalOffset / logItemsHostPanel.ItemHeight);
+				int bottomVisibleIndex = (int) ((logItemsScroll.VerticalOffset + LogItemsList.ActualHeight) / logItemsHostPanel.ItemHeight);
+				if (LogItemsList.SelectedIndex > -1 &&
+					LogItemsList.SelectedIndex >= topVisibleIndex &&
+					LogItemsList.SelectedIndex <= bottomVisibleIndex)
+				{
+					// Selection is visible. Save selection index and offset.
+					savedScrollItem = LogItemsList.SelectedItem;
+					savedScrollOffset = LogItemsList.SelectedIndex * logItemsHostPanel.ItemHeight - (int) logItemsScroll.VerticalOffset;
+					selectionIsVisible = true;
+
+					// Remember selection in case it gets lost in the next filtered view
+					prevSelectedItem = savedScrollItem;
+					prevSelectedOffset = savedScrollOffset;
+				}
+				else
+				{
+					// Selection not visible. Save center visible item index and offset.
+					int centerVisibleIndex = (int) ((logItemsScroll.VerticalOffset + LogItemsList.ActualHeight / 2) / logItemsHostPanel.ItemHeight);
+					if (centerVisibleIndex < 0)
+						centerVisibleIndex = 0;
+					if (centerVisibleIndex >= LogItemsList.Items.Count)
+						centerVisibleIndex = LogItemsList.Items.Count;
+					savedScrollItem = LogItemsList.Items[centerVisibleIndex];
+					savedScrollOffset = centerVisibleIndex * logItemsHostPanel.ItemHeight - (int) logItemsScroll.VerticalOffset;
+					selectionIsVisible = false;
+				}
+
+				// If nothing was selected now:
+				// Compare current scrolling with when it was last restored
+				if (!selectionIsVisible &&
+					(int) logItemsScroll.VerticalOffset != prevOffset)
+				{
+					// Scroll was changed, forget previous selection
+					prevSelectedItem = null;
+				}
+			}
+			else
+			{
+				savedScrollItem = null;
+				savedScrollOffset = 0;
+			}
+		}
+
+		[ViewCommand]
+		public void RestoreScrolling()
+		{
+			int itemIndex;
+
+			if (savedScrollItem != null)
+			{
+				// We need the new scroll info anyway
+				logItemsHostPanel.UpdateLayout();
+
+				// First, try to bring back the previously selected item
+				if (prevSelectedItem != null)
+				{
+					itemIndex = LogItemsList.Items.IndexOf(prevSelectedItem);
+					if (itemIndex > -1)
+					{
+						// Bring the item exactly where it was before on the screen
+						int itemOffset = itemIndex * logItemsHostPanel.ItemHeight;
+						logItemsHostPanel.SetVerticalOffset(itemOffset - prevSelectedOffset);
+						LogItemsList.SelectedIndex = itemIndex;
+						return;
+					}
+					// else: The previously selected item is still not visible
+				}
+				
+				itemIndex = LogItemsList.Items.IndexOf(savedScrollItem);
+				if (itemIndex > -1)
+				{
+					// Bring the item exactly where it was before on the screen
+					int itemOffset = itemIndex * logItemsHostPanel.ItemHeight;
+					logItemsHostPanel.SetVerticalOffset(itemOffset - savedScrollOffset);
+				}
+				else
+				{
+					// The saved item is no longer visible. Search for item with nearest time.
+					DateTime targetTime = GetTimeOfItem(savedScrollItem);
+					object nearestItem = null;
+					long minTickDiff = long.MaxValue;
+					for (int i = 0; i < LogItemsList.Items.Count; i++)
+					{
+						object item = LogItemsList.Items[i];
+						DateTime itemTime = GetTimeOfItem(item);
+						long tickDiff = Math.Abs(itemTime.Ticks - targetTime.Ticks);
+						if (tickDiff < minTickDiff)
+						{
+							minTickDiff = tickDiff;
+							nearestItem = item;
+						}
+					}
+					if (nearestItem != null)
+					{
+						itemIndex = LogItemsList.Items.IndexOf(nearestItem);
+						if (itemIndex > -1)
+						{
+							int itemOffset = itemIndex * logItemsHostPanel.ItemHeight;
+							logItemsHostPanel.SetVerticalOffset(itemOffset - savedScrollOffset);
+						}
+					}
+
+					// Remember the current scoll offset. If it wasn't changed and the item is
+					// visible again, we can scroll directly to it and select it.
+					// Read from logItemsHostPanel instead of the ScrollViewer logItemsScroll
+					// because we've only just set the value there and need that current value.
+					prevOffset = (int) logItemsHostPanel.VerticalOffset;
+				}
+			}
+		}
+
+		private DateTime GetTimeOfItem(object item)
+		{
+			FieldLogItemViewModel flItem = item as FieldLogItemViewModel;
+			if (flItem != null)
+			{
+				return flItem.Time;
+			}
+			DebugMessageViewModel dbgItem = item as DebugMessageViewModel;
+			if (dbgItem != null)
+			{
+				return dbgItem.Time;
+			}
+			throw new ArgumentException("Unsupported item type.");   // Should never happen
+		}
+
 		#endregion View commands
 	}
 }

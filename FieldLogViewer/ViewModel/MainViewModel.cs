@@ -296,7 +296,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			{
 				if (CheckUpdate(value, ref selectedFilter, "SelectedFilter"))
 				{
+					ViewCommandManager.Invoke("SaveScrolling");
 					RefreshLogItemsFilterView();
+					ViewCommandManager.Invoke("RestoreScrolling");
 					if (selectedFilter != null)
 					{
 						AppSettings.Instance.SelectedFilter = selectedFilter.DisplayName;

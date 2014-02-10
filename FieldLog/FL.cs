@@ -76,7 +76,7 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Defines the maximum buffer size to keep.
 		/// </summary>
-		private const int maxBufferSize = 4096;
+		private const int maxBufferSize = 65535;
 
 		/// <summary>
 		/// Defines the log configuration file name extension.
@@ -181,11 +181,11 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Maximum size of any single log file. Only set when the send thread is stopped.
 		/// </summary>
-		private static int maxFileSize = 1 * 1024 * 1024 /* MiB */;
+		private static int maxFileSize;
 		/// <summary>
 		/// Maximum size of all log files together. Only set when the send thread is stopped.
 		/// </summary>
-		private static long maxTotalSize = 2L * 1024 * 1024 * 1024 /* GiB */;
+		private static long maxTotalSize;
 		/// <summary>
 		/// Minimum time to keep log items of each priority. Only set when the send thread is
 		/// stopped.
@@ -247,6 +247,7 @@ namespace Unclassified.FieldLog
 			stopwatch.Start();
 
 			LogFirstChanceExceptions = true;
+			WaitForItemsBacklog = true;
 
 			// Read or reset log configuration from file
 			ReadLogConfiguration();
@@ -332,6 +333,9 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Gets the high-precision UTC time.
 		/// </summary>
+		/// <remarks>
+		/// This call takes ~50 ns on 2013 hardware, DateTime.UtcNow takes ~20 ns.
+		/// </remarks>
 		public static DateTime UtcNow
 		{
 			get
@@ -368,6 +372,23 @@ namespace Unclassified.FieldLog
 		/// is able to interact with the user through it.
 		/// </summary>
 		public static bool IsInteractiveConsoleApp { get; private set; }
+
+		/// <summary>
+		/// Gets the backlog of items to be written to the log files.
+		/// </summary>
+		/// <remarks>
+		/// Not synchronised because it shouldn't be necessary for a single Int32 value and a single
+		/// wrong reading is not critical.
+		/// </remarks>
+		public static int WriteItemsBacklog { get; private set; }
+
+		/// <summary>
+		/// Gets or sets a value indicating whether a Log call should be delayed if there is a high
+		/// backlog of items to be written to the log files. This avoids item loss when flushing at
+		/// process shutdown but may lead to considerable delays in rare cases of high logging rate.
+		/// Default is true for safety.
+		/// </summary>
+		public static bool WaitForItemsBacklog { get; set; }
 
 		/// <summary>
 		/// Gets a value indicating whether the log queue has been shut down.
@@ -1276,7 +1297,8 @@ namespace Unclassified.FieldLog
 				if (currentBufferSize == 0) return;
 				// Get the current buffer and assign a new one
 				myBuffer = currentBuffer;
-				currentBuffer = new List<FieldLogItem>();
+				// Create new buffer large enough for the current number of items
+				currentBuffer = new List<FieldLogItem>(myBuffer.Count * 2);
 				currentBufferSize = 0;
 			}
 			// Clear the send timeout
@@ -1287,6 +1309,14 @@ namespace Unclassified.FieldLog
 				buffers.Enqueue(myBuffer);
 			}
 			newBufferEvent.Set();
+
+			if (WaitForItemsBacklog)
+			{
+				while (WriteItemsBacklog > 10000)
+				{
+					Thread.Sleep(10);
+				}
+			}
 		}
 
 		/// <summary>
@@ -1395,6 +1425,14 @@ namespace Unclassified.FieldLog
 					// This can be a valid path, or null if we know that no log files can be
 					// written. Don't try to write anywhere and don't discard any buffers until
 					// the log file path has been set by the application.
+					
+					int itemCount = 0;
+					foreach (List<FieldLogItem> buffer in buffersToSend)
+					{
+						itemCount += buffer.Count;
+					}
+					WriteItemsBacklog = itemCount;
+
 					foreach (List<FieldLogItem> buffer in buffersToSend)
 					{
 						AppendLogItemsToFile(buffer);
@@ -1609,8 +1647,8 @@ namespace Unclassified.FieldLog
 					string latestFileName = null;
 					foreach (string fileName in Directory.GetFiles(logDir, logFile + "-" + (int) logItem.Priority + "-*.fl"))
 					{
-						if (FieldLogFileWriter.GetCompressedFileSize(fileName) >= maxFileSize) continue;   // File is already large enough
 						FileInfo fi = new FileInfo(fileName);
+						if (fi.Length >= maxFileSize) continue;   // File is already large enough
 						if (fi.CreationTime.Date < DateTime.Today) continue;   // File is from yesterday or older
 						if (fi.CreationTimeUtc > latestFileTime)
 						{
@@ -1655,7 +1693,7 @@ namespace Unclassified.FieldLog
 				}
 				usedWriters[writer] = true;
 
-				if (writer.FileSize > maxFileSize ||   // File is large enough
+				if (writer.Length > maxFileSize ||   // File is large enough
 					writer.Length > 1 * 1024 * 1024 * 1024 /* GiB */ ||   // File contents is getting nearer to the technical limit of 2 GiB
 					writer.CreatedTime.ToLocalTime().Date < DateTime.Today)   // File is from yesterday or older
 				{
@@ -1671,10 +1709,6 @@ namespace Unclassified.FieldLog
 				//System.Diagnostics.Trace.WriteLine("FieldLog.AppendLogItemsToFile: Flush() " + Path.GetFileNameWithoutExtension(writer.FileName));
 				writer.Flush();
 			}
-
-			// Log files are closed in the Shutdown method. Should that method not be called for
-			// some reason, all data has been flushed to disk anyway (at least in .NET 4.0) for the
-			// LogViewer to read it. Files are then implicitly closed when the process ends.
 		}
 
 		/// <summary>
@@ -1896,7 +1930,9 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		private static void ResetLogConfiguration()
 		{
-			maxFileSize = 100 * 1024 /* KiB */;
+			// A file size of 150 KiB gives a good compromise of granularity and flush time in the
+			// benchmark.
+			maxFileSize = 150 * 1024 /* KiB */;
 			maxTotalSize = 200L * 1024 * 1024 /* MiB */;
 			priorityKeepTimes.Clear();
 			priorityKeepTimes[FieldLogPriority.Trace] = TimeSpan.FromHours(3);

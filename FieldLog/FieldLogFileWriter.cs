@@ -144,30 +144,6 @@ namespace Unclassified.FieldLog
 		public string FileName { get; private set; }
 
 		/// <summary>
-		/// Gets the file size on disk. Considers NTFS compression if available and used.
-		/// </summary>
-		public int FileSize
-		{
-			get
-			{
-				if (supportsGetCompressedFileSize)
-				{
-					try
-					{
-						uint highDword;
-						uint size = GetCompressedFileSizeW(FileName, out highDword);
-						return (int) size;
-					}
-					catch
-					{
-						supportsGetCompressedFileSize = false;
-					}
-				}
-				return (int) fileStream.Position;
-			}
-		}
-
-		/// <summary>
 		/// Gets the file contents size.
 		/// </summary>
 		public int Length
@@ -323,10 +299,17 @@ namespace Unclassified.FieldLog
 		internal void WriteBuffer()
 		{
 			int length = buffer.Count;
+			if (length > 268435455)   // 2^28 - 1
+			{
+				// The item is longer than the maximum length that can be stored.
+				// Drop the item to keep the log file readable.
+				buffer.Clear();
+				return;
+			}
 			byte[] bytes = BitConverter.GetBytes(length);
 			if (BitConverter.IsLittleEndian)
 				Array.Reverse(bytes);
-			bytes[0] = (byte) (bytes[0] & 0x0F | (itemType << 4));
+			bytes[0] |= (byte) (itemType << 4);
 			fileStream.Write(bytes, 0, bytes.Length);
 
 			fileStream.Write(buffer.ToArray(), 0, buffer.Count);
@@ -337,11 +320,7 @@ namespace Unclassified.FieldLog
 
 		public void Flush()
 		{
-#if !NET20
-			fileStream.Flush(true);
-#else
 			fileStream.Flush();
-#endif
 		}
 
 		/// <summary>

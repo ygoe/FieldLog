@@ -2,7 +2,7 @@ About FieldLog
 
 Website: http://dev.unclassified.de/source/fieldlog
 
-FieldLog is a fast and comprehensive logging tool for .NET applications. It allows applications to write events, data and errors to managed and efficient log files. The logging methods are optimised for high performance multi-threaded operation and a single log method call takes as little as 1 microsecond on modern hardware. There's no comparison to OutputDebugString, Debug.WriteLine or appending to a file each time! This logging can be used in high-performance loops without noticeably slowing down the application.
+FieldLog is a fast and comprehensive logging tool for .NET applications. It allows applications to write events, data and errors to managed and efficient log files. The logging methods are optimised for high performance multi-threaded operation and a single log method call takes as little as half a microsecond on modern hardware. There's no comparison to OutputDebugString, Debug.WriteLine or appending to a file each time! This logging can be used in high-performance loops without noticeably slowing down the application.
 
 ALWAYS-ON LOGGING
 
@@ -36,7 +36,7 @@ The solution and project files are created by Microsoft Visual Studio 2010 SP1. 
 
 The setup is built using InnoSetup. It requires the InnoSetup preprocessor which is included in the Inno Setup QuickStart Pack. Version 5.5 has been tested to work.
 
-The build script is implemented in PowerShell and has been tested with PowerShell 2.0. Version 3.0 should also work fine. Older versions may fail. The build script searches the registry and other available sources to find the .NET build tools, InnoSetup, Git and other required tools. It works on 32 and 64 bit systems (though it's only really been used on Windows 7 64 bit systems).
+The build script is implemented in PowerShell and has been tested with PowerShell 2.0 and 3.0. Older versions may fail. The build script searches the registry and other available sources to find the .NET build tools, InnoSetup, Git and other required tools. It works on 32 and 64 bit systems (though it's only really been used on Windows 7 64 bit systems).
 
 BUILDING
 
@@ -51,6 +51,22 @@ The name "FieldLog" was originally supposed to refer to "out in the field loggin
 Another interpretation might refer to the structured log items that distinguishes FieldLog from plain text log files that actually only store a single line of raw text about each event. Being able to access and understand each bit of information allows for filtering the data masses to actually see the interesting parts.
 
 The logo merges the capital letters F and L into a combined shape (which happens to look like an E), using different colours for the parts distinct from both letters and the shared part. The horizontal bars also depict "good" and "error" rows in a log list, which is basically what you can see with FieldLog.
+
+PERFORMANCE
+
+A benchmark application is included in the solution. It allows you to run your own tests. Here are the numbers I determined on a 2013 office PC, using minimum values of multiple benchmark runs.
+
+FieldLog text message              :     466 ns/call (Flushing 1 million items: 6352 ms)
+Synchronised StreamWriter.WriteLine:     841 ns/call (Flushing 1 million items:    2 ms)
+FieldLog scope helper              :     945 ns/call (Flushing 500000 items   : 4206 ms)
+Trace.WriteLine (no listener)      :    2990 ns/call
+FieldLog scope helper w/ reflection:    6404 ns/call (Flushing 500000 items   : 1607 ms)
+Trace.WriteLine (VS/DbgView)       :  272942 ns/call
+Synchronised File.AppendAllText    : 2232278 ns/call
+
+The scope logging helper generates an Enter and a Leave message and takes about twice the time of writing a single text message. So you can calculate something around one microsecond for each logged method or other scope. Determining the method name through reflection takes a lot longer though and may not always be an option.
+
+Flushing FieldLog items to the log files happens on a separate thread. That is why submitting the log messages is so fast. But if great amounts of log items are submitted in a very short time, like in this benchmark which actually doesn't do anything else, flushing can take a few seconds. The longer the logging methods take in advance, the more items have already been written and the less time the final flush takes. So these numbers are just informative but normally not relevant.
 
 LICENCE
 

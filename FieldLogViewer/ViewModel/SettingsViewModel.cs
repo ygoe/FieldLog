@@ -61,12 +61,13 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			if (MainViewModel.Instance.SelectedFilter != null)
 			{
-				MainViewModel.Instance.Filters.Remove(MainViewModel.Instance.SelectedFilter);
+				var filterToDelete = MainViewModel.Instance.SelectedFilter;
+				MainViewModel.Instance.SelectedFilter = MainViewModel.Instance.Filters[0];
+				MainViewModel.Instance.Filters.Remove(filterToDelete);
 				if (MainViewModel.Instance.Filters.Count == 0)
 				{
 					OnCreateFilter();
 				}
-				MainViewModel.Instance.SelectedFilter = MainViewModel.Instance.Filters[0];
 			}
 		}
 

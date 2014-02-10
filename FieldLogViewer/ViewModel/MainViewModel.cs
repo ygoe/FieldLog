@@ -51,7 +51,10 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			Filters.Add(new FilterViewModel(true));
 			Filters.CollectionChanged += (s, e) =>
 			{
-				LogItemsFilterChanged(false);   // Trigger saving the new filter collection
+				// Trigger saving the new filter collection.
+				// Wait a moment or the new filter will appear twice in the filter lists until
+				// something else has changed and we probably come here again. (Unsure why.)
+				TaskHelper.WhenLoaded(() => LogItemsFilterChanged(false));
 			};
 
 			foreach (string s in AppSettings.Instance.Filters)

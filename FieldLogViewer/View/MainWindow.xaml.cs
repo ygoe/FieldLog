@@ -315,9 +315,18 @@ namespace Unclassified.FieldLogViewer.View
 					if (centerVisibleIndex < 0)
 						centerVisibleIndex = 0;
 					if (centerVisibleIndex >= LogItemsList.Items.Count)
-						centerVisibleIndex = LogItemsList.Items.Count;
-					savedScrollItem = LogItemsList.Items[centerVisibleIndex];
-					savedScrollOffset = centerVisibleIndex * logItemsHostPanel.ItemHeight - (int) logItemsScroll.VerticalOffset;
+						centerVisibleIndex = LogItemsList.Items.Count - 1;
+					if (centerVisibleIndex != -1)
+					{
+						savedScrollItem = LogItemsList.Items[centerVisibleIndex];
+						savedScrollOffset = centerVisibleIndex * logItemsHostPanel.ItemHeight - (int) logItemsScroll.VerticalOffset;
+					}
+					else
+					{
+						// No item available, nothing to save
+						savedScrollItem = null;
+						savedScrollOffset = 0;
+					}
 					selectionIsVisible = false;
 				}
 
@@ -342,26 +351,33 @@ namespace Unclassified.FieldLogViewer.View
 		{
 			int itemIndex;
 
+			// We need the new scroll info anyway
+			logItemsHostPanel.UpdateLayout();
+
+			// First, try to bring back the previously selected item
+			if (prevSelectedItem != null)
+			{
+				itemIndex = LogItemsList.Items.IndexOf(prevSelectedItem);
+				if (itemIndex > -1)
+				{
+					// Bring the item exactly where it was before on the screen
+					int itemOffset = itemIndex * logItemsHostPanel.ItemHeight;
+					logItemsHostPanel.SetVerticalOffset(itemOffset - prevSelectedOffset);
+					LogItemsList.SelectedIndex = itemIndex;
+					return;
+				}
+				// else: The previously selected item is still not visible
+
+				if (savedScrollItem == null)
+				{
+					// No previous items were visible, at least try with the last valid selected item
+					savedScrollItem = prevSelectedItem;
+					savedScrollOffset = prevSelectedOffset;
+				}
+			}
+
 			if (savedScrollItem != null)
 			{
-				// We need the new scroll info anyway
-				logItemsHostPanel.UpdateLayout();
-
-				// First, try to bring back the previously selected item
-				if (prevSelectedItem != null)
-				{
-					itemIndex = LogItemsList.Items.IndexOf(prevSelectedItem);
-					if (itemIndex > -1)
-					{
-						// Bring the item exactly where it was before on the screen
-						int itemOffset = itemIndex * logItemsHostPanel.ItemHeight;
-						logItemsHostPanel.SetVerticalOffset(itemOffset - prevSelectedOffset);
-						LogItemsList.SelectedIndex = itemIndex;
-						return;
-					}
-					// else: The previously selected item is still not visible
-				}
-				
 				itemIndex = LogItemsList.Items.IndexOf(savedScrollItem);
 				if (itemIndex > -1)
 				{

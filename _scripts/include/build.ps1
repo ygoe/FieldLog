@@ -67,6 +67,13 @@ if (IsSelected("setup-release"))
 	}
 }
 
+# ---------- Install release setup ----------
+
+if (IsSelected("install"))
+{
+	Exec-File "Setup\FieldLogSetup-$revId.exe" "/silent" 1
+}
+
 # ---------------------------------------------------------------------------------
 
 End-BuildScript

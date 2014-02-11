@@ -224,6 +224,12 @@ function Sign-File($file, $keyFile, $password, $time)
 	$global:actions += $action
 }
 
+function Exec-File($file, $params, $time)
+{
+	$action = @{ action = "exec"; file = $file; params = $params; time = $time }
+	$global:actions += $action
+}
+
 function Do-Build-Solution($solution, $configuration, $buildPlatform, $progressAfter)
 {
 	Write-Host ""
@@ -517,6 +523,20 @@ function Do-Sign-File($file, $keyFile, $password, $progressAfter)
 	& ($toolsPath + "FlashConsoleWindow") -progress $progressAfter
 }
 
+function Do-Exec-File($file, $params, $progressAfter)
+{
+	Write-Host ""
+	Write-Host -ForegroundColor DarkCyan "Executing $file $params..."
+
+	& "$sourcePath\$file" $params
+	if (-not $?)
+	{
+		WaitError "Execution failed"
+		exit 1
+	}
+	& ($toolsPath + "FlashConsoleWindow") -progress $progressAfter
+}
+
 function Begin-BuildScript($projectTitle, $configParts, $batchMode = $false)
 {
 	$global:configParts = $configParts
@@ -572,6 +592,10 @@ function End-BuildScript()
 			"sign"
 			{
 				Do-Sign-File $action.file $action.keyFile $action.password $progressAfter
+			}
+			"exec"
+			{
+				Do-Exec-File $action.file $action.params $progressAfter
 			}
 		}
 		$timeSum += $action.time

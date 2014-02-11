@@ -12,6 +12,13 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		public int TimeUsec { get { return (int) ((this.Time.Ticks / 10) % 1000); } }
 
+		private int indentLevel;
+		public int IndentLevel
+		{
+			get { return indentLevel; }
+			set { CheckUpdate(value, ref indentLevel, "IndentLevel"); }
+		}
+
 		public virtual int CompareTo(LogItemViewModelBase other)
 		{
 			// First compare the items by time

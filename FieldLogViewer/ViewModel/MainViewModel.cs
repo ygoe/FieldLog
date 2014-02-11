@@ -364,6 +364,20 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
+		private int indentSize = 15;
+		public int IndentSize
+		{
+			get { return indentSize; }
+			set { CheckUpdate(value, ref indentSize, "IndentSize"); }
+		}
+
+		private bool highlightSameThread = true;
+		public bool HighlightSameThread
+		{
+			get { return highlightSameThread; }
+			set { CheckUpdate(value, ref highlightSameThread, "HighlightSameThread"); }
+		}
+
 		public int SelectionDummy
 		{
 			get { return 0; }
@@ -449,16 +463,55 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			List<LogItemViewModelBase> localLogItems = new List<LogItemViewModelBase>();
 			object localLogItemsLock = new object();
 
+			System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss.fff") + " OpenFiles - 1");
 			return Task.Factory.StartNew(() =>
 			{
 				EventWaitHandle readWaitHandle = new AutoResetEvent(false);
 				readWaitHandle.WaitAction(() => disp.Invoke((Action) delegate
 				{
+					System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss.fff") + " OpenFiles - 2");
+					// Lock the local list so that no item loaded directly afterwards will get lost
+					// while we're still preparing the loaded items list to be pushed to the UI
 					lock (localLogItemsLock)
 					{
+						// Apply scope-based indenting to all items now
+						Dictionary<int, int> threadLevels = new Dictionary<int, int>();
+						foreach (var item in localLogItems)
+						{
+							FieldLogScopeItemViewModel scope = item as FieldLogScopeItemViewModel;
+							if (scope != null)
+							{
+								threadLevels[scope.ThreadId] = scope.Level;
+								if (scope.Type == FieldLogScopeType.Enter)
+								{
+									scope.IndentLevel = scope.Level - 1;
+								}
+								else
+								{
+									scope.IndentLevel = scope.Level;
+								}
+							}
+							else
+							{
+								FieldLogItemViewModel flItem = item as FieldLogItemViewModel;
+								if (flItem != null)
+								{
+									int level;
+									if (threadLevels.TryGetValue(flItem.ThreadId, out level))
+									{
+										flItem.IndentLevel = level;
+									}
+								}
+							}
+						}
+						
+						// Publish loaded items to the UI
 						this.logItems = new ObservableCollection<LogItemViewModelBase>(localLogItems);
 						localLogItems = null;
 					}
+					// Notify the UI to make it show the new list of items.
+					// From now on, newly loaded items are added one by one to the collection that
+					// is already bound to the UI, so the new items will become visible.
 					OnPropertyChanged("LogItems");
 					IsLoadingFiles = false;
 					ViewCommandManager.InvokeLoaded("FinishedReadingFiles");

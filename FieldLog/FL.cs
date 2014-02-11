@@ -1441,6 +1441,10 @@ namespace Unclassified.FieldLog
 
 					// Delete outdated files
 					PurgeAllFiles();
+
+					// Clear the backlog counter after the work to avoid dead-locks while waiting
+					// for it
+					WriteItemsBacklog = 0;
 				}
 			}
 		}

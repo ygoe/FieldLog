@@ -187,13 +187,14 @@ namespace Unclassified
 		/// <typeparam name="T">Type of the list items.</typeparam>
 		/// <param name="list">The list to insert the new item to.</param>
 		/// <param name="vm">New item to insert into the list.</param>
-		public static void InsertSorted<T>(this IList<T> list, T vm, Comparison<T> comparison)
+		/// <returns>The index of the inserted item in the list.</returns>
+		public static int InsertSorted<T>(this IList<T> list, T vm, Comparison<T> comparison)
 		{
 			if (list.Count == 0)
 			{
 				// Easy...
 				list.Add((T) vm);
-				return;
+				return list.Count - 1;
 			}
 
 			// Do a binary search in the collection to find the best match position
@@ -238,6 +239,7 @@ namespace Unclassified
 			}
 
 			list.Insert(index, (T) vm);
+			return index;
 		}
 
 		/// <summary>

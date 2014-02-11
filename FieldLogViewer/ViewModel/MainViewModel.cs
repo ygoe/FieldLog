@@ -98,9 +98,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				var itemVM = new DebugMessageViewModel(pid, text);
 
 				disp.BeginInvoke(
-					new Action<LogItemViewModelBase, Comparison<LogItemViewModelBase>>(this.logItems.InsertSorted),
-					itemVM,
-					new Comparison<LogItemViewModelBase>((a, b) => a.CompareTo(b)));
+					new Action<LogItemViewModelBase>(this.InsertNewLogItem),
+					itemVM);
 			};
 		}
 
@@ -453,9 +452,6 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			return null;
 		}
 
-		//private List<LogItemViewModelBase> itemBuffer = new List<LogItemViewModelBase>();
-		//private bool bufferReady;
-
 		public Task OpenFiles(string basePath)
 		{
 			ViewCommandManager.InvokeLoaded("StartedReadingFiles");
@@ -533,16 +529,6 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					FieldLogItemViewModel itemVM = FieldLogItemViewModel.Create(item);
 					if (itemVM == null) break;   // Cannot happen actually
 
-					//lock (itemBuffer)
-					//{
-					//    itemBuffer.Add(itemVM);
-					//    if (!bufferReady)
-					//    {
-					//        disp.BeginInvoke(new Action(InsertBuffer));
-					//    }
-					//    bufferReady = true;
-					//}
-
 					var scopeItem = item as FieldLogScopeItem;
 					if (scopeItem != null)
 					{
@@ -567,29 +553,80 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						else
 						{
 							disp.BeginInvoke(
-								new Action<LogItemViewModelBase, Comparison<LogItemViewModelBase>>(this.logItems.InsertSorted),
-								itemVM,
-								new Comparison<LogItemViewModelBase>((a, b) => a.CompareTo(b)));
+								new Action<LogItemViewModelBase>(this.InsertNewLogItem),
+								itemVM);
 						}
 					}
 				}
 			});
 		}
 
-		//private void InsertBuffer()
-		//{
-		//    lock (itemBuffer)
-		//    {
-		//        foreach (var itemVM in itemBuffer)
-		//        {
-		//            logItems.InsertSorted(itemVM, new Comparison<LogItemViewModelBase>((a, b) => a.CompareTo(b)));
-		//            //logItems.Add(itemVM);
-		//        }
-		//        itemBuffer.Clear();
-		//        bufferReady = false;
-		//        System.Diagnostics.Trace.WriteLine("Inserted items from buffer");
-		//    }
-		//}
+		private void InsertNewLogItem(LogItemViewModelBase item)
+		{
+			int newIndex = logItems.InsertSorted(item, (a, b) => a.CompareTo(b));
+
+			// IndentLevel is only supported for FieldLog items
+			FieldLogItemViewModel flItem = item as FieldLogItemViewModel;
+			if (flItem != null)
+			{
+				FieldLogScopeItemViewModel scope = item as FieldLogScopeItemViewModel;
+				if (scope != null)
+				{
+					// Use new IndentLevel from Scope item
+					if (scope.Type == FieldLogScopeType.Enter)
+					{
+						scope.IndentLevel = scope.Level - 1;
+					}
+					else
+					{
+						scope.IndentLevel = scope.Level;
+					}
+				}
+				else
+				{
+					// Use IndentLevel of the previous item in the same session & thread
+					int prevIndex = newIndex - 1;
+					while (prevIndex >= 0)
+					{
+						FieldLogItemViewModel prevFlItem = logItems[prevIndex] as FieldLogItemViewModel;
+						if (prevFlItem != null &&
+							prevFlItem.SessionId == flItem.SessionId &&
+							prevFlItem.ThreadId == flItem.ThreadId)
+						{
+							FieldLogScopeItemViewModel prevScope = prevFlItem as FieldLogScopeItemViewModel;
+							if (prevScope != null)
+							{
+								item.IndentLevel = prevScope.Level;
+							}
+							else
+							{
+								item.IndentLevel = prevFlItem.IndentLevel;
+							}
+							break;
+						}
+						prevIndex--;
+					}
+				}
+			
+				// Update all items after the inserted item
+				for (int index = newIndex + 1; index < logItems.Count; index++)
+				{
+					FieldLogItemViewModel nextFlItem = logItems[index] as FieldLogItemViewModel;
+					if (nextFlItem != null &&
+						nextFlItem.SessionId == flItem.SessionId &&
+						nextFlItem.ThreadId == flItem.ThreadId)
+					{
+						FieldLogScopeItemViewModel nextScope = nextFlItem as FieldLogScopeItemViewModel;
+						if (nextScope != null)
+						{
+							// The next Scope item already had a reference level, stop here
+							break;
+						}
+						nextFlItem.IndentLevel = flItem.IndentLevel;
+					}
+				}
+			}
+		}
 
 		#endregion Log file loading
 

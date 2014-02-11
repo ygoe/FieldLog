@@ -104,6 +104,7 @@
     <Compile Include="AppSettings.cs" />
     <Compile Include="Converters\IndentLevelToWidthConverter.cs" />
     <Compile Include="Converters\ListItemsConverter.cs" />
+    <Compile Include="Converters\RelativeTimeConverter.cs" />
     <Compile Include="Converters\SameThreadBrushConverter.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Unclassified\DebugMonitor.cs" />

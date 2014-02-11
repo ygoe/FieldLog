@@ -378,6 +378,13 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			set { CheckUpdate(value, ref highlightSameThread, "HighlightSameThread"); }
 		}
 
+		private bool showRelativeTime;
+		public bool ShowRelativeTime
+		{
+			get { return showRelativeTime; }
+			set { CheckUpdate(value, ref showRelativeTime, "ShowRelativeTime"); }
+		}
+
 		public int SelectionDummy
 		{
 			get { return 0; }

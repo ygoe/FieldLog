@@ -10,8 +10,6 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public int EventCounter { get; set; }
 		public DateTime Time { get; set; }
 
-		public int TimeUsec { get { return (int) ((this.Time.Ticks / 10) % 1000); } }
-
 		private int indentLevel;
 		public int IndentLevel
 		{

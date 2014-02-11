@@ -24,7 +24,10 @@ namespace Unclassified.FieldLogViewer.Converters
 					DateTime selectedTime = (DateTime) values[1];
 
 					TimeSpan diff = itemTime - selectedTime;
-					string minus = "";
+					// U+2009 Thin space, U+200A Hair space
+					// Keep a hyphen's width in spaces to avoid jumping content while scrolling
+					// the negative times out of view.
+					string minus = "\u2009\u200A\u200A";
 					if (diff.Ticks < 0)
 					{
 						minus = "-";

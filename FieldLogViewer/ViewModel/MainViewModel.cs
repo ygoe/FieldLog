@@ -363,7 +363,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
-		private int indentSize = 15;
+		private int indentSize = 12;
 		public int IndentSize
 		{
 			get { return indentSize; }
@@ -466,13 +466,11 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			List<LogItemViewModelBase> localLogItems = new List<LogItemViewModelBase>();
 			object localLogItemsLock = new object();
 
-			System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss.fff") + " OpenFiles - 1");
 			return Task.Factory.StartNew(() =>
 			{
 				EventWaitHandle readWaitHandle = new AutoResetEvent(false);
 				readWaitHandle.WaitAction(() => disp.Invoke((Action) delegate
 				{
-					System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("HH:mm:ss.fff") + " OpenFiles - 2");
 					// Lock the local list so that no item loaded directly afterwards will get lost
 					// while we're still preparing the loaded items list to be pushed to the UI
 					lock (localLogItemsLock)

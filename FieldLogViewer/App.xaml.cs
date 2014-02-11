@@ -61,6 +61,17 @@ namespace Unclassified.FieldLogViewer
 
 			FL.AcceptLogFileBasePath();
 
+			// Make some more worker threads for the ThreadPool. We need around 10 threads for
+			// reading a set of log files, and since some of them may be waiting for a long time,
+			// blocking other files from reading, this is sometimes a bottleneck. Depending on what
+			// files we have and what exactly is in them. ThreadPool will create a new worker
+			// thread on demand only every 0.5 second which results in 1-2 seconds delay on loading
+			// certain log file sets.
+			// Source: http://stackoverflow.com/a/6000891/143684
+			int workerThreads, ioThreads;
+			ThreadPool.GetMinThreads(out workerThreads, out ioThreads);
+			ThreadPool.SetMinThreads(20, ioThreads);
+
 			// Create main window and view model
 			var view = new MainWindow();
 			var viewModel = new MainViewModel();

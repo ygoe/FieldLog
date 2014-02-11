@@ -65,8 +65,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				switch (this.Type)
 				{
 					case FieldLogScopeType.Enter:
+						return "└  " + Name;
 					case FieldLogScopeType.Leave:
-						return TypeTitle + ": " + Name;
+						return "┌  " + Name;
 
 					case FieldLogScopeType.ThreadStart:
 					case FieldLogScopeType.ThreadEnd:

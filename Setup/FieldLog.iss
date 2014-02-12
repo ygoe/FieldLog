@@ -159,6 +159,7 @@ Filename: {win}\Microsoft.NET\Framework\v4.0.30319\ngen.exe; Parameters: uninsta
 Type: files; Name: "{userappdata}\Unclassified\FieldLog\FieldLogViewer.conf"
 Type: dirifempty; Name: "{userappdata}\Unclassified\FieldLog"
 Type: dirifempty; Name: "{userappdata}\Unclassified"
+Type: files; Name: "{app}\log\FieldLogViewer-*.fl"
 
 [Code]
 function IsUpgrade: Boolean;

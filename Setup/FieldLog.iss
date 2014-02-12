@@ -50,6 +50,7 @@ InternalCompressLevel=max
 VersionInfoVersion=1.0
 VersionInfoCompany=Yves Goergen
 VersionInfoDescription=FieldLog Setup
+ArchitecturesInstallIn64BitMode=x64
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"

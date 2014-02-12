@@ -97,6 +97,7 @@ namespace Unclassified.FieldLogViewer
 			AddPropertyHandler("IsLiveScrollingEnabled");
 			AddPropertyHandler("IsSoundEnabled");
 			AddPropertyHandler("IsWindowOnTop");
+			AddPropertyHandler("IndentSize");
 			AddPropertyHandler("Filters");
 			AddPropertyHandler("SelectedFilter");
 		}
@@ -158,6 +159,15 @@ namespace Unclassified.FieldLogViewer
 		{
 			get { return GetBool("IsWindowOnTop"); }
 			set { Set("IsWindowOnTop", value); }
+		}
+
+		/// <summary>
+		/// Gets or sets the scope item indenting size in pixels.
+		/// </summary>
+		public int IndentSize
+		{
+			get { return GetInt("IndentSize", 12); }
+			set { Set("IndentSize", value); }
 		}
 
 		/// <summary>

@@ -51,6 +51,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			this.BindProperty(vm => vm.IsLiveScrollingEnabled, AppSettings.Instance, s => s.IsLiveScrollingEnabled);
 			this.BindProperty(vm => vm.IsSoundEnabled, AppSettings.Instance, s => s.IsSoundEnabled);
 			this.BindProperty(vm => vm.IsWindowOnTop, AppSettings.Instance, s => s.IsWindowOnTop);
+			this.BindProperty(vm => vm.IndentSize, AppSettings.Instance, s => s.IndentSize);
 			
 			Filters = new ObservableCollection<FilterViewModel>();
 			Filters.ForNewOld(
@@ -123,6 +124,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public DelegateCommand StopLiveCommand { get; private set; }
 		public DelegateCommand ClearCommand { get; private set; }
 		public DelegateCommand LoadMapCommand { get; private set; }
+		public DelegateCommand DecreaseIndentSizeCommand { get; private set; }
+		public DelegateCommand IncreaseIndentSizeCommand { get; private set; }
 		public DelegateCommand SettingsCommand { get; private set; }
 
 		private void InitializeCommands()
@@ -131,6 +134,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			StopLiveCommand = new DelegateCommand(OnStopLive, CanStopLive);
 			ClearCommand = new DelegateCommand(OnClear, CanClear);
 			LoadMapCommand = new DelegateCommand(OnLoadMap);
+			DecreaseIndentSizeCommand = new DelegateCommand(OnDecreaseIndentSize, CanDecreaseIndentSize);
+			IncreaseIndentSizeCommand = new DelegateCommand(OnIncreaseIndentSize, CanIncreaseIndentSize);
 			SettingsCommand = new DelegateCommand(OnSettings);
 		}
 
@@ -192,6 +197,26 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		private void OnLoadMap()
 		{
+		}
+
+		private bool CanDecreaseIndentSize()
+		{
+			return IndentSize > 2;
+		}
+
+		private void OnDecreaseIndentSize()
+		{
+			IndentSize -= 2;
+		}
+
+		private bool CanIncreaseIndentSize()
+		{
+			return IndentSize < 32;
+		}
+
+		private void OnIncreaseIndentSize()
+		{
+			IndentSize += 2;
 		}
 
 		private void OnSettings()
@@ -374,11 +399,18 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
-		private int indentSize = 12;
+		private int indentSize;
 		public int IndentSize
 		{
 			get { return indentSize; }
-			set { CheckUpdate(value, ref indentSize, "IndentSize"); }
+			set
+			{
+				if (CheckUpdate(value, ref indentSize, "IndentSize"))
+				{
+					DecreaseIndentSizeCommand.RaiseCanExecuteChanged();
+					IncreaseIndentSizeCommand.RaiseCanExecuteChanged();
+				}
+			}
 		}
 
 		private bool highlightSameThread = true;

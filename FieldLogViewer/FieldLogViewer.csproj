@@ -312,6 +312,8 @@
     <Resource Include="Images\sound.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Images\indent_minus.png" />
+    <Resource Include="Images\indent_plus.png" />
     <Content Include="Sounds\high.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

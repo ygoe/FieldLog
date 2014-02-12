@@ -69,6 +69,13 @@
 				<Image Source="/Images/pin.png"/>
 			</ToggleButton>
 			<Separator/>
+			<Button Command="{Binding DecreaseIndentSizeCommand}" ToolTip="Decrease indent size">
+				<Image Source="/Images/indent_minus.png"/>
+			</Button>
+			<Button Command="{Binding IncreaseIndentSizeCommand}" ToolTip="Increase indent size">
+				<Image Source="/Images/indent_plus.png"/>
+			</Button>
+			<Separator/>
 			<Image Source="/Images/filter.png"/>
 			<ComboBox
 				Width="150"

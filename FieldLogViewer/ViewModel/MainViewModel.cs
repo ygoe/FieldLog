@@ -456,6 +456,18 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		public Task OpenFiles(string basePath)
 		{
+			if (basePath == null) throw new ArgumentNullException("basePath");
+			if (basePath.Equals(FL.LogFileBasePath, StringComparison.InvariantCultureIgnoreCase))
+			{
+				MessageBox.Show(
+					"You cannot open the log file that this instance of FieldLogViewer is currently writing to.\n\n" +
+						"Trying to read the messages that may be generated while reading messages leads to a locking situation.",
+					"Error",
+					MessageBoxButton.OK,
+					MessageBoxImage.Warning);
+				return null;
+			}
+			
 			ViewCommandManager.InvokeLoaded("StartedReadingFiles");
 			IsLoadingFiles = true;
 

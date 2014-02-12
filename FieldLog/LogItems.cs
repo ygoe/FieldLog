@@ -245,12 +245,19 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		/// <param name="priority">The priority of the new log item.</param>
 		/// <param name="name">The name of the data item. Can be an arbitrary string that is useful for the logging purpose.</param>
-		/// <param name="value">The value of the data item. Must be converted to a string, line breaks are allowed for structuring.</param>
-		public FieldLogDataItem(FieldLogPriority priority, string name, string value)
+		/// <param name="value">The value of the data item. Will be converted to a string. Line breaks are allowed for structuring.</param>
+		public FieldLogDataItem(FieldLogPriority priority, string name, object value)
 			: base(priority)
 		{
 			Name = name;
-			Value = value;
+			if (value == null)
+			{
+				Value = "";
+			}
+			else
+			{
+				Value = value.ToString();
+			}
 
 			Size += (Name != null ? Name.Length * 2 : 0) +
 				(Value != null ? Value.Length * 2 : 0);

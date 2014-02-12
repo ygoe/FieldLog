@@ -24,6 +24,8 @@ namespace Unclassified.FieldLogViewer
 		[STAThread]
 		public static void Main()
 		{
+			FL.AcceptLogFileBasePath();
+
 			App app = new App();
 			app.InitializeComponent();
 			app.Run();
@@ -58,8 +60,6 @@ namespace Unclassified.FieldLogViewer
 		protected override void OnStartup(StartupEventArgs e)
 		{
 			base.OnStartup(e);
-
-			FL.AcceptLogFileBasePath();
 
 			// Make some more worker threads for the ThreadPool. We need around 10 threads for
 			// reading a set of log files, and since some of them may be waiting for a long time,

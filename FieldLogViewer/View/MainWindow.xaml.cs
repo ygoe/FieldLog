@@ -148,6 +148,10 @@ namespace Unclassified.FieldLogViewer.View
 			}
 		}
 
+		#endregion Window event handlers
+
+		#region Control event handlers
+
 		private void SmoothVirtualizingPanel_Loaded(object sender, RoutedEventArgs e)
 		{
 			logItemsHostPanel = sender as SmoothVirtualizingPanel;
@@ -219,6 +223,9 @@ namespace Unclassified.FieldLogViewer.View
 				if (VisualTreeHelper.GetChildrenCount(LogItemsList) == 0)
 					return;
 
+				logItemsScroll = null;
+				logItemsScrollMediator = null;
+
 				var border = VisualTreeHelper.GetChild(LogItemsList, 0) as Decorator;
 				if (border != null)
 				{
@@ -253,7 +260,7 @@ namespace Unclassified.FieldLogViewer.View
 			}
 		}
 
-		#endregion Window event handlers
+		#endregion Control event handlers
 
 		#region View commands
 

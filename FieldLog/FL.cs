@@ -795,7 +795,7 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		/// <param name="name">The name of the data item.</param>
 		/// <param name="value">The value of the data item.</param>
-		public static void TraceData(string name, string value)
+		public static void TraceData(string name, object value)
 		{
 			Data(FieldLogPriority.Trace, name, value);
 		}
@@ -805,7 +805,7 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		/// <param name="name">The name of the data item.</param>
 		/// <param name="value">The value of the data item.</param>
-		public static void CheckpointData(string name, string value)
+		public static void CheckpointData(string name, object value)
 		{
 			Data(FieldLogPriority.Checkpoint, name, value);
 		}
@@ -815,7 +815,7 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		/// <param name="name">The name of the data item.</param>
 		/// <param name="value">The value of the data item.</param>
-		public static void InfoData(string name, string value)
+		public static void InfoData(string name, object value)
 		{
 			Data(FieldLogPriority.Info, name, value);
 		}
@@ -825,7 +825,7 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		/// <param name="name">The name of the data item.</param>
 		/// <param name="value">The value of the data item.</param>
-		public static void NoticeData(string name, string value)
+		public static void NoticeData(string name, object value)
 		{
 			Data(FieldLogPriority.Notice, name, value);
 		}
@@ -835,7 +835,7 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		/// <param name="name">The name of the data item.</param>
 		/// <param name="value">The value of the data item.</param>
-		public static void WarningData(string name, string value)
+		public static void WarningData(string name, object value)
 		{
 			Data(FieldLogPriority.Warning, name, value);
 		}
@@ -845,7 +845,7 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		/// <param name="name">The name of the data item.</param>
 		/// <param name="value">The value of the data item.</param>
-		public static void ErrorData(string name, string value)
+		public static void ErrorData(string name, object value)
 		{
 			Data(FieldLogPriority.Error, name, value);
 		}
@@ -855,7 +855,7 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		/// <param name="name">The name of the data item.</param>
 		/// <param name="value">The value of the data item.</param>
-		public static void CriticalData(string name, string value)
+		public static void CriticalData(string name, object value)
 		{
 			Data(FieldLogPriority.Critical, name, value);
 		}
@@ -1105,7 +1105,7 @@ namespace Unclassified.FieldLog
 		/// <param name="priority">The priority of the log item.</param>
 		/// <param name="name">The name of the data item.</param>
 		/// <param name="value">The value of the data item.</param>
-		public static void Data(FieldLogPriority priority, string name, string value)
+		public static void Data(FieldLogPriority priority, string name, object value)
 		{
 			Log(new FieldLogDataItem(priority, name, value));
 		}

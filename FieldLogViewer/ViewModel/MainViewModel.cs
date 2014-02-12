@@ -201,12 +201,16 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		private bool CanDecreaseIndentSize()
 		{
-			return IndentSize > 2;
+			return IndentSize > 4;
 		}
 
 		private void OnDecreaseIndentSize()
 		{
-			IndentSize -= 2;
+			IndentSize -= 4;
+			if (IndentSize < 4)
+			{
+				IndentSize = 4;
+			}
 		}
 
 		private bool CanIncreaseIndentSize()
@@ -216,7 +220,11 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		private void OnIncreaseIndentSize()
 		{
-			IndentSize += 2;
+			IndentSize += 4;
+			if (IndentSize > 32)
+			{
+				IndentSize = 32;
+			}
 		}
 
 		private void OnSettings()

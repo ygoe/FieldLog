@@ -5,6 +5,7 @@ using System.Text;
 using Unclassified.FieldLog;
 using System.Threading;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace ConsoleDemo
 {
@@ -36,7 +37,7 @@ namespace ConsoleDemo
 					Thread.Sleep(rnd.Next(1000) + 500);
 					//Thread.Sleep(rnd.Next(20));
 
-				switch (rnd.Next(14))
+				switch (rnd.Next(16))
 				{
 					case 0:
 					case 1:
@@ -84,6 +85,10 @@ namespace ConsoleDemo
 					case 13:
 						FL.TraceData("varName", rnd.Next(10000).ToString());
 						break;
+					case 14:
+					case 15:
+						Task.Factory.StartNew(DoSomeMaths);
+						break;
 				}
 				if ((i % 100) == 0)
 					Console.WriteLine("    now at " + i);
@@ -103,6 +108,18 @@ namespace ConsoleDemo
 			throw new ApplicationException("Test exception message",
 				new ApplicationException("An inner message 1",
 					new ApplicationException("An inner message 2")));
+		}
+
+		private static void DoSomeMaths()
+		{
+			using (FL.NewScope())
+			{
+				for (int i = 1; i <= 20; i++)
+				{
+					FL.TraceData("i", i);
+					Thread.Sleep(312);
+				}
+			}
 		}
 
 		private static void ThrowException1()

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -29,6 +30,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		private ObservableCollection<LogItemViewModelBase> logItems = new ObservableCollection<LogItemViewModelBase>();
 		private CollectionViewSource sortedFilters = new CollectionViewSource();
 		private CollectionViewSource filteredLogItems = new CollectionViewSource();
+		private string loadedBasePath;
 		private FieldLogFileGroupReader logFileGroupReader;
 		private bool isLiveStopped = true;
 
@@ -42,7 +44,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 			InitializeCommands();
 
-			this.DisplayName = "FieldLogViewer";
+			UpdateWindowTitle();
 
 			Filters = new ObservableCollection<FilterViewModel>();
 			Filters.ForNewOld(
@@ -466,6 +468,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			List<LogItemViewModelBase> localLogItems = new List<LogItemViewModelBase>();
 			object localLogItemsLock = new object();
 
+			loadedBasePath = basePath;
+			UpdateWindowTitle();
+
 			return Task.Factory.StartNew(() =>
 			{
 				EventWaitHandle readWaitHandle = new AutoResetEvent(false);
@@ -515,6 +520,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					// is already bound to the UI, so the new items will become visible.
 					OnPropertyChanged("LogItems");
 					IsLoadingFiles = false;
+					UpdateWindowTitle();
 					ViewCommandManager.InvokeLoaded("FinishedReadingFiles");
 				}));
 				
@@ -627,6 +633,29 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		}
 
 		#endregion Log file loading
+
+		#region Other methods
+
+		private void UpdateWindowTitle()
+		{
+			string prefix = Path.GetFileName(loadedBasePath);
+			string dir = Path.GetDirectoryName(loadedBasePath);
+
+			if (IsLoadingFiles)
+			{
+				DisplayName = "Loading " + prefix + " in " + dir + "… – FieldLogViewer";
+			}
+			else if (loadedBasePath != null)
+			{
+				DisplayName = prefix + " in " + dir + " – FieldLogViewer";
+			}
+			else
+			{
+				DisplayName = "FieldLogViewer";
+			}
+		}
+
+		#endregion Other methods
 
 		#region IViewCommandSource members
 

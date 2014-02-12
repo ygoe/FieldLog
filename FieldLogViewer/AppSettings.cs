@@ -92,6 +92,11 @@ namespace Unclassified.FieldLogViewer
 		{
 			Window = new WindowSettingsView(this);
 
+			AddPropertyHandler("IsDebugMonitorActive");
+			AddPropertyHandler("ShowRelativeTime");
+			AddPropertyHandler("IsLiveScrollingEnabled");
+			AddPropertyHandler("IsSoundEnabled");
+			AddPropertyHandler("IsWindowOnTop");
 			AddPropertyHandler("Filters");
 			AddPropertyHandler("SelectedFilter");
 		}
@@ -108,6 +113,52 @@ namespace Unclassified.FieldLogViewer
 		#endregion View properties
 
 		#region Data properties
+
+		/// <summary>
+		/// Gets or sets a value indicating whether the DebugOutputString monitor is active.
+		/// </summary>
+		public bool IsDebugMonitorActive
+		{
+			get { return GetBool("IsDebugMonitorActive"); }
+			set { Set("IsDebugMonitorActive", value); }
+		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether the relative time of each item is shown in the
+		/// log items list.
+		/// </summary>
+		public bool ShowRelativeTime
+		{
+			get { return GetBool("ShowRelativeTime"); }
+			set { Set("ShowRelativeTime", value); }
+		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether the log items list scrolls to new items.
+		/// </summary>
+		public bool IsLiveScrollingEnabled
+		{
+			get { return GetBool("IsLiveScrollingEnabled", true); }
+			set { Set("IsLiveScrollingEnabled", value); }
+		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether a sound is played on new items.
+		/// </summary>
+		public bool IsSoundEnabled
+		{
+			get { return GetBool("IsSoundEnabled"); }
+			set { Set("IsSoundEnabled", value); }
+		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether the main window is always on top.
+		/// </summary>
+		public bool IsWindowOnTop
+		{
+			get { return GetBool("IsWindowOnTop"); }
+			set { Set("IsWindowOnTop", value); }
+		}
 
 		/// <summary>
 		/// Gets or sets the filter definitions.

@@ -46,6 +46,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 			UpdateWindowTitle();
 
+			this.BindProperty(vm => vm.IsDebugMonitorActive, AppSettings.Instance, s => s.IsDebugMonitorActive);
+			this.BindProperty(vm => vm.ShowRelativeTime, AppSettings.Instance, s => s.ShowRelativeTime);
+			this.BindProperty(vm => vm.IsLiveScrollingEnabled, AppSettings.Instance, s => s.IsLiveScrollingEnabled);
+			this.BindProperty(vm => vm.IsSoundEnabled, AppSettings.Instance, s => s.IsSoundEnabled);
+			this.BindProperty(vm => vm.IsWindowOnTop, AppSettings.Instance, s => s.IsWindowOnTop);
+			
 			Filters = new ObservableCollection<FilterViewModel>();
 			Filters.ForNewOld(
 				f => f.FilterChanged += LogItemsFilterChanged,
@@ -221,7 +227,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
-		private bool isLiveScrollingEnabled = true;
+		private bool isLiveScrollingEnabled;
 		public bool IsLiveScrollingEnabled
 		{
 			get
@@ -264,8 +270,11 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 			set
 			{
-				MainWindow.Instance.Topmost = value;
-				// TODO: Save to settings? Load from settings? NotifyPropertyChanged?
+				if (value != MainWindow.Instance.Topmost)
+				{
+					MainWindow.Instance.Topmost = value;
+					OnPropertyChanged("IsWindowOnTop");
+				}
 			}
 		}
 

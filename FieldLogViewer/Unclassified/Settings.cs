@@ -222,7 +222,7 @@ namespace Unclassified
 
 					object oldValue = null;
 					if (store.ContainsKey(key)) oldValue = store[key];
-					if (oldValue == newValue) return;
+					if (newValue.Equals(oldValue)) return;
 					store[key] = newValue;
 					InvokeHandlers(key, oldValue, newValue);
 

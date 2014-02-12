@@ -1475,6 +1475,7 @@ namespace Unclassified.FieldLog
 
 				customLogFileBasePath = path;
 				customLogFileBasePathSet = true;
+				TestLogPaths();
 			}
 		}
 
@@ -1491,6 +1492,7 @@ namespace Unclassified.FieldLog
 			lock (customLogPathLock)
 			{
 				customLogFileBasePathSet = true;
+				TestLogPaths();
 			}
 		}
 

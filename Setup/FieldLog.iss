@@ -124,6 +124,9 @@ Source: "..\FieldLog\FL.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignor
 Source: "..\FieldLog\LogItems.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
 Source: "..\FieldLog\OSInfo.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
 
+[Dirs]
+Name: "{app}\log"; Permissions: users-modify
+
 [Registry]
 ; Register .fl file name extension
 Root: HKCR; Subkey: ".fl"; ValueType: string; ValueName: ""; ValueData: "FieldLogFile"; Flags: uninsdeletevalue 

@@ -161,6 +161,11 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		private static bool logFileBasePathSet;
 		/// <summary>
+		/// Application-defined custom log file prefix. Used for all log directories tested in the
+		/// default strategy, but not when customLogFileBasePath is set.
+		/// </summary>
+		private static string customLogFilePrefix;
+		/// <summary>
 		/// Application-defined custom log file base path. If set, this is tried first.
 		/// </summary>
 		private static string customLogFileBasePath;
@@ -1461,6 +1466,25 @@ namespace Unclassified.FieldLog
 		#region File writing
 
 		/// <summary>
+		/// Sets an application-defined prefix for the log files. The default is the file name of
+		/// the entry assembly without its extension. This method must be called before
+		/// SetCustomLogFileBasePath or AcceptLogFileBasePath.
+		/// </summary>
+		/// <param name="prefix">The new log file name prefix.</param>
+		public static void SetCustomLogFilePrefix(string prefix)
+		{
+			if (prefix == null) throw new ArgumentNullException("prefix");
+
+			lock (customLogPathLock)
+			{
+				if (customLogFileBasePathSet)
+					throw new InvalidOperationException("The custom log file path has already been set.");
+
+				customLogFilePrefix = prefix;
+			}
+		}
+
+		/// <summary>
 		/// Sets an application-defined base path for writing log files to.
 		/// </summary>
 		/// <param name="path">Log file base path. This is an absolute path to a directory and a file name prefix.</param>
@@ -1513,6 +1537,10 @@ namespace Unclassified.FieldLog
 
 			string execPath = Assembly.GetEntryAssembly().Location;
 			string execFile = Path.GetFileNameWithoutExtension(execPath);
+			if (customLogFilePrefix != null)
+			{
+				execFile = customLogFilePrefix;
+			}
 			int i = 1;
 			while (true)
 			{

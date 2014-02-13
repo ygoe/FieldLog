@@ -92,6 +92,7 @@ namespace Unclassified.FieldLogViewer
 		{
 			Window = new WindowSettingsView(this);
 
+			AddPropertyHandler("LastAppVersion");
 			AddPropertyHandler("IsDebugMonitorActive");
 			AddPropertyHandler("ShowRelativeTime");
 			AddPropertyHandler("IsLiveScrollingEnabled");
@@ -115,6 +116,15 @@ namespace Unclassified.FieldLogViewer
 		#endregion View properties
 
 		#region Data properties
+
+		/// <summary>
+		/// Gets or sets the version of the application.
+		/// </summary>
+		public string LastAppVersion
+		{
+			get { return GetString("LastAppVersion"); }
+			set { Set("LastAppVersion", value); }
+		}
 
 		/// <summary>
 		/// Gets or sets a value indicating whether the DebugOutputString monitor is active.

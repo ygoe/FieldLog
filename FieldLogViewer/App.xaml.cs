@@ -46,9 +46,6 @@ namespace Unclassified.FieldLogViewer
 		/// </summary>
 		public App()
 		{
-			// Initialise the settings system
-			AppSettings.InitializeInstance();
-
 			// Make sure the settings are properly saved in the end
 			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 		}
@@ -60,6 +57,14 @@ namespace Unclassified.FieldLogViewer
 		protected override void OnStartup(StartupEventArgs e)
 		{
 			base.OnStartup(e);
+
+			// Initialise the settings system
+			AppSettings.InitializeInstance();
+
+			// Remember the version of the application.
+			// If we need to react on settings changes from previous application versions, here is
+			// the place to check the version currently in the settings, before it's overwritten.
+			AppSettings.Instance.LastAppVersion = FL.AppVersion;
 
 			// Make some more worker threads for the ThreadPool. We need around 10 threads for
 			// reading a set of log files, and since some of them may be waiting for a long time,

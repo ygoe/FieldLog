@@ -517,7 +517,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				return null;
 			}
 			
-			ViewCommandManager.InvokeLoaded("StartedReadingFiles");
+			ViewCommandManager.Invoke("StartedReadingFiles");
 			IsLoadingFiles = true;
 
 			this.logItems.Clear();

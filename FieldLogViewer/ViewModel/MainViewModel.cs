@@ -582,7 +582,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					OnPropertyChanged("LogItems");
 					IsLoadingFiles = false;
 					UpdateWindowTitle();
-					ViewCommandManager.InvokeLoaded("FinishedReadingFiles");
+					ViewCommandManager.Invoke("FinishedReadingFiles");
 				}));
 				
 				logFileGroupReader = new FieldLogFileGroupReader(basePath, readWaitHandle);

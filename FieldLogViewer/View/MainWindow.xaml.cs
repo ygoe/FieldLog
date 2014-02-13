@@ -273,8 +273,10 @@ namespace Unclassified.FieldLogViewer.View
 		[ViewCommand]
 		public void FinishedReadingFiles()
 		{
-			logItemsSmoothScrollActive = true;
+			logItemsHostPanel.UpdateLayout();
+
 			ScrollToEnd();
+			logItemsSmoothScrollActive = true;
 		}
 
 		[ViewCommand]

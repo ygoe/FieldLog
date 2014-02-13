@@ -525,7 +525,14 @@ namespace Unclassified.FieldLog
 			}
 			msg += "\n";
 
-			if (logFileBasePath != null)
+			// Wait max. 1 second for the log file path to be set
+			int pathRetry = 20;
+			while (LogFileBasePath == null && logFileBasePathSet == false && pathRetry-- > 0)
+			{
+				Thread.Sleep(50);
+			}
+			
+			if (LogFileBasePath != null)
 			{
 				msg += string.Format(AppErrorDialogLogPath, logFileBasePath + "*.fl");
 			}

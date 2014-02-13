@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Unclassified.FieldLog
 {
@@ -35,25 +34,44 @@ namespace Unclassified.FieldLog
 		/// A FileSystemWatcher is set up to add new files as they are created.
 		/// </summary>
 		/// <param name="basePath">The path and file prefix of the log files to read.</param>
+		/// <param name="singleFile">true to load a single file only. <paramref name="basePath"/>
+		/// must be a full file name then.</param>
 		/// <param name="readWaitHandle">The wait handle that will be signalled after all files
 		/// have been read to the end and if the last reader is now going to wait for further data
 		/// to be appended to the file.</param>
-		public FieldLogFileGroupReader(string basePath, EventWaitHandle readWaitHandle = null)
+		public FieldLogFileGroupReader(string basePath, bool singleFile = false, EventWaitHandle readWaitHandle = null)
 		{
-			// Start file system watcher to detect new files
-			string logDir = Path.GetDirectoryName(basePath);
-			string logFile = Path.GetFileName(basePath);
-			fsw = new FileSystemWatcher(logDir, logFile + "-*.fl");
-			fsw.NotifyFilter = NotifyFilters.FileName;
-			fsw.Created += fsw_Created;
-			fsw.EnableRaisingEvents = true;
-
-			// Find all log files for every priority
 			var prioValues = Enum.GetValues(typeof(FieldLogPriority));
 			readTasks = new Task<bool>[prioValues.Length];
-			foreach (FieldLogPriority prio in prioValues)
+
+			if (!singleFile)
 			{
-				FindLogFiles(basePath, prio);
+				// Start file system watcher to detect new files
+				string logDir = Path.GetDirectoryName(basePath);
+				string logFile = Path.GetFileName(basePath);
+				fsw = new FileSystemWatcher(logDir, logFile + "-*.fl");
+				fsw.NotifyFilter = NotifyFilters.FileName;
+				fsw.Created += fsw_Created;
+				fsw.EnableRaisingEvents = true;
+
+				// Find all log files for every priority
+				foreach (FieldLogPriority prio in prioValues)
+				{
+					FindLogFiles(basePath, prio);
+				}
+			}
+			else
+			{
+				Match m = Regex.Match(basePath, @"-([0-9])-[0-9]{18}\.fl");
+				if (m.Success)
+				{
+					FieldLogPriority prio = (FieldLogPriority) int.Parse(m.Groups[1].Value);
+					AddNewReader(prio, basePath, false);
+				}
+				else
+				{
+					throw new ArgumentException("The file name cannot be analysed.");
+				}
 			}
 
 			// Wait for all priorities to be read to the end, then signal one event
@@ -153,7 +171,8 @@ namespace Unclassified.FieldLog
 			// Must be within a lock(readerLock)!
 
 			// Reject the new file if it's already in the queue (delayed FSW event after active scan)
-			if (readers[prio] != null &&
+			if (readers.ContainsKey(prio) &&
+				readers[prio] != null &&
 				readers[prio].ContainsFile(fileName))
 			{
 				// This file is already current or queued
@@ -172,7 +191,7 @@ namespace Unclassified.FieldLog
 				reader.ReadWaitHandle = h;
 			}
 
-			if (readers[prio] == null)
+			if (!readers.ContainsKey(prio) || readers[prio] == null)
 			{
 				// This is the first file of this priority
 				readers[prio] = new FieldLogFileEnumerator(reader);
@@ -264,8 +283,11 @@ namespace Unclassified.FieldLog
 							// The reader was requested to close.
 							// Close all current enumerators, which then close all readers and
 							// everything should tidy up itself...
-							fsw.EnableRaisingEvents = false;
-							fsw.Dispose();
+							if (fsw != null)
+							{
+								fsw.EnableRaisingEvents = false;
+								fsw.Dispose();
+							}
 							foreach (var reader in readers.Values)
 							{
 								if (reader != null)

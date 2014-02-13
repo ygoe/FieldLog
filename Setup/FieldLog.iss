@@ -87,12 +87,14 @@ UpdatedHeadingLabel=%n%n%n%n%nFieldLog was upgraded.
 Task_VSTool=Register as External Tool in Visual Studio (2010/2012/2013)
 NgenMessage=Optimising application performance (this may take a moment)
 DowngradeUninstall=You are trying to install an older version than is currently installed on the system. The newer version must first be uninstalled. Would you like to do that now?
+OpenSingleFileCommand=Open single file
 
 de.Upgrade=&Aktualisieren
 de.UpdatedHeadingLabel=%n%n%n%n%nFieldLog wurde aktualisiert.
 de.Task_VSTool=In Visual Studio (2010/2012/2013) als Externes Tool eintragen
 de.NgenMessage=Anwendungs-Performance optimieren (kann einen Moment dauern)
 de.DowngradeUninstall=Sie versuchen, eine ältere Version zu installieren, als bereits im System installiert ist. Die neuere Version muss zuerst deinstalliert werden. Möchten Sie das jetzt tun?
+de.OpenSingleFileCommand=Einzelne Datei öffnen
 
 [Tasks]
 ;Name: VSTool; Description: "{cm:Task_VSTool}"
@@ -133,6 +135,8 @@ Root: HKCR; Subkey: ".fl"; ValueType: string; ValueName: ""; ValueData: "FieldLo
 Root: HKCR; Subkey: "FieldLogFile"; ValueType: string; ValueName: ""; ValueData: "FieldLog file"; Flags: uninsdeletekey
 Root: HKCR; Subkey: "FieldLogFile\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\FieldLogViewer.exe,1"
 Root: HKCR; Subkey: "FieldLogFile\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\FieldLogViewer.exe"" ""%1"""
+Root: HKCR; Subkey: "FieldLogFile\shell\opensingle"; ValueType: string; ValueName: ""; ValueData: "{cm:OpenSingleFileCommand}"
+Root: HKCR; Subkey: "FieldLogFile\shell\opensingle\command"; ValueType: string; ValueName: ""; ValueData: """{app}\FieldLogViewer.exe"" /s ""%1"""
 
 ; Add to .fl "Open with" menu
 Root: HKCR; Subkey: ".fl\OpenWithList\FieldLogViewer.exe"; ValueType: string; ValueName: ""; ValueData: ""; Flags: uninsdeletekey

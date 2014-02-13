@@ -503,7 +503,13 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			return null;
 		}
 
-		public Task OpenFiles(string basePath)
+		/// <summary>
+		/// Opens the specified log files into the view.
+		/// </summary>
+		/// <param name="basePath">The base path of the log files to load.</param>
+		/// <param name="singleFile">true to load a single file only. <paramref name="basePath"/> must be a full file name then.</param>
+		/// <returns></returns>
+		public Task OpenFiles(string basePath, bool singleFile = false)
 		{
 			if (basePath == null) throw new ArgumentNullException("basePath");
 			if (basePath.Equals(FL.LogFileBasePath, StringComparison.InvariantCultureIgnoreCase))
@@ -584,8 +590,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					UpdateWindowTitle();
 					ViewCommandManager.Invoke("FinishedReadingFiles");
 				}));
-				
-				logFileGroupReader = new FieldLogFileGroupReader(basePath, readWaitHandle);
+
+				logFileGroupReader = new FieldLogFileGroupReader(basePath, singleFile, readWaitHandle);
 				List<FieldLogScopeItem> seenScopeItems = new List<FieldLogScopeItem>();
 				while (true)
 				{

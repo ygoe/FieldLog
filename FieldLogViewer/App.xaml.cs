@@ -79,14 +79,36 @@ namespace Unclassified.FieldLogViewer
 
 			if (e.Args.Length > 0)
 			{
-				string prefix = viewModel.GetPrefixFromPath(e.Args[0]);
-				if (prefix != null)
+				bool singleFile = false;
+				string fileName = e.Args[0];
+				if (fileName == "/s")
 				{
-					viewModel.OpenFiles(prefix);
+					if (e.Args.Length > 1)
+					{
+						singleFile = true;
+						fileName = e.Args[1];
+					}
+					else
+					{
+						fileName = null;
+					}
 				}
-				else
+
+				if (!string.IsNullOrWhiteSpace(fileName))
 				{
-					viewModel.OpenFiles(e.Args[0]);
+					string prefix = fileName;
+					if (!singleFile)
+					{
+						prefix = viewModel.GetPrefixFromPath(fileName);
+					}
+					if (prefix != null)
+					{
+						viewModel.OpenFiles(prefix, singleFile);
+					}
+					else
+					{
+						viewModel.OpenFiles(fileName, singleFile);
+					}
 				}
 			}
 

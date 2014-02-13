@@ -95,6 +95,7 @@ namespace Unclassified.FieldLogViewer
 			AddPropertyHandler("IsDebugMonitorActive");
 			AddPropertyHandler("ShowRelativeTime");
 			AddPropertyHandler("IsLiveScrollingEnabled");
+			AddPropertyHandler("IsFlashingEnabled");
 			AddPropertyHandler("IsSoundEnabled");
 			AddPropertyHandler("IsWindowOnTop");
 			AddPropertyHandler("IndentSize");
@@ -150,6 +151,15 @@ namespace Unclassified.FieldLogViewer
 		{
 			get { return GetBool("IsSoundEnabled"); }
 			set { Set("IsSoundEnabled", value); }
+		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether the window should flash on new items.
+		/// </summary>
+		public bool IsFlashingEnabled
+		{
+			get { return GetBool("IsFlashingEnabled", true); }
+			set { Set("IsFlashingEnabled", value); }
 		}
 
 		/// <summary>

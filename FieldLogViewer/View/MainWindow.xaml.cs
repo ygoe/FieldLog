@@ -45,6 +45,7 @@ namespace Unclassified.FieldLogViewer.View
 		private MediaPlayer newItemMediaPlayer = new MediaPlayer();
 		private SmoothVirtualizingPanel logItemsHostPanel;
 		private DelayedCall logItemsScrollPixelDc;
+		private bool isFlashing;
 
 		#endregion Private data
 
@@ -198,6 +199,22 @@ namespace Unclassified.FieldLogViewer.View
 						{
 							logItemsScroll.ScrollToEnd();
 						}
+					}
+				}
+
+				if (MainViewModel.Instance.IsFlashingEnabled)
+				{
+					if (!this.IsActive)
+					{
+						if (!isFlashing)
+						{
+							this.Flash();
+							isFlashing = true;
+						}
+					}
+					else
+					{
+						isFlashing = false;
 					}
 				}
 

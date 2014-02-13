@@ -8,7 +8,7 @@ using System.Windows.Interop;
 
 namespace Unclassified.UI
 {
-	// Source: http://stackoverflow.com/a/6024229/143684
+	// Based on: http://stackoverflow.com/a/6024229/143684
 	public static class WindowExtensions
 	{
 		[DllImport("user32.dll")]
@@ -19,7 +19,19 @@ namespace Unclassified.UI
 		private static extern bool SetWindowPos(IntPtr hwnd, IntPtr hwndInsertAfter, int x, int y, int width, int height, uint flags);
 		[DllImport("user32.dll")]
 		private static extern IntPtr SendMessage(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam);
+		[DllImport("user32.dll")]
+		static extern bool FlashWindowEx(ref FLASHWINFO pwfi);
 
+		[StructLayout(LayoutKind.Sequential)]
+		public struct FLASHWINFO
+		{
+			public UInt32 cbSize;
+			public IntPtr hwnd;
+			public UInt32 dwFlags;
+			public UInt32 uCount;
+			public UInt32 dwTimeout;
+		}
+	
 		private const int GWL_EXSTYLE = -20;
 		private const int WS_EX_DLGMODALFRAME = 0x0001;
 		private const int SWP_NOSIZE = 0x0001;
@@ -35,6 +47,20 @@ namespace Unclassified.UI
 		private const uint DS_SETFONT = 0x40;
 		private const uint DS_MODALFRAME = 0x80;
 		private const uint WM_SETICON = 0x0080;
+
+		//Stop flashing. The system restores the window to its original state.
+		public const UInt32 FLASHW_STOP = 0;
+		//Flash the window caption.
+		public const UInt32 FLASHW_CAPTION = 1;
+		//Flash the taskbar button.
+		public const UInt32 FLASHW_TRAY = 2;
+		//Flash both the window caption and taskbar button.
+		//This is equivalent to setting the FLASHW_CAPTION | FLASHW_TRAY flags.
+		public const UInt32 FLASHW_ALL = 3;
+		//Flash continuously, until the FLASHW_STOP flag is set.
+		public const UInt32 FLASHW_TIMER = 4;
+		//Flash continuously until the window comes to the foreground.
+		public const UInt32 FLASHW_TIMERNOFG = 12;
 
 		public static void HideIcon(this Window w)
 		{
@@ -72,6 +98,18 @@ namespace Unclassified.UI
 			IntPtr hwnd = new WindowInteropHelper(w).Handle;
 			SetWindowLong(hwnd, GWL_STYLE,
 				GetWindowLong(hwnd, GWL_STYLE) & ~(WS_MAXIMIZEBOX | WS_MINIMIZEBOX));
+		}
+
+		public static bool Flash(this Window w)
+		{
+			IntPtr hWnd = new WindowInteropHelper(w).Handle;
+			FLASHWINFO fInfo = new FLASHWINFO();
+			fInfo.cbSize = Convert.ToUInt32(Marshal.SizeOf(fInfo));
+			fInfo.hwnd = hWnd;
+			fInfo.dwFlags = FLASHW_TIMER | FLASHW_TRAY;
+			fInfo.uCount = 3;
+			fInfo.dwTimeout = 0;
+			return FlashWindowEx(ref fInfo);
 		}
 	}
 }

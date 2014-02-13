@@ -49,6 +49,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			this.BindProperty(vm => vm.IsDebugMonitorActive, AppSettings.Instance, s => s.IsDebugMonitorActive);
 			this.BindProperty(vm => vm.ShowRelativeTime, AppSettings.Instance, s => s.ShowRelativeTime);
 			this.BindProperty(vm => vm.IsLiveScrollingEnabled, AppSettings.Instance, s => s.IsLiveScrollingEnabled);
+			this.BindProperty(vm => vm.IsFlashingEnabled, AppSettings.Instance, s => s.IsFlashingEnabled);
 			this.BindProperty(vm => vm.IsSoundEnabled, AppSettings.Instance, s => s.IsSoundEnabled);
 			this.BindProperty(vm => vm.IsWindowOnTop, AppSettings.Instance, s => s.IsWindowOnTop);
 			this.BindProperty(vm => vm.IndentSize, AppSettings.Instance, s => s.IndentSize);
@@ -242,10 +243,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		public bool IsDebugMonitorActive
 		{
-			get
-			{
-				return DebugMonitor.IsActive;
-			}
+			get { return DebugMonitor.IsActive; }
 			set
 			{
 				if (value)
@@ -263,10 +261,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		private bool isLiveScrollingEnabled;
 		public bool IsLiveScrollingEnabled
 		{
-			get
-			{
-				return isLiveScrollingEnabled;
-			}
+			get { return isLiveScrollingEnabled; }
 			set
 			{
 				if (CheckUpdate(value, ref isLiveScrollingEnabled, "IsLiveScrollingEnabled"))
@@ -282,17 +277,15 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		private bool isSoundEnabled;
 		public bool IsSoundEnabled
 		{
-			get
-			{
-				return isSoundEnabled;
-			}
-			set
-			{
-				if (CheckUpdate(value, ref isSoundEnabled, "IsSoundEnabled"))
-				{
-					// TODO: Save to settings? Load from settings?
-				}
-			}
+			get { return isSoundEnabled; }
+			set { CheckUpdate(value, ref isSoundEnabled, "IsSoundEnabled"); }
+		}
+
+		private bool isFlashingEnabled;
+		public bool IsFlashingEnabled
+		{
+			get { return isFlashingEnabled; }
+			set { CheckUpdate(value, ref isFlashingEnabled, "IsFlashingEnabled"); }
 		}
 
 		public bool IsWindowOnTop
@@ -318,20 +311,14 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		public ICollectionView FilteredLogItems
 		{
-			get
-			{
-				return filteredLogItems.View;
-			}
+			get { return filteredLogItems.View; }
 		}
 
 		public ObservableCollection<FilterViewModel> Filters { get; private set; }
 
 		public ICollectionView SortedFilters
 		{
-			get
-			{
-				return sortedFilters.View;
-			}
+			get { return sortedFilters.View; }
 		}
 
 		private FilterViewModel selectedFilter;

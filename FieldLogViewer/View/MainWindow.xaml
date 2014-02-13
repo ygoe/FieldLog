@@ -47,7 +47,7 @@
 				<Image Source="/Images/clearwindowcontent.png"/>
 			</Button>
 			<Separator/>
-			<Button Command="{Binding LoadMapCommand}" ToolTip="Load map">
+			<Button Command="{Binding LoadMapCommand}" ToolTip="Load obfuscation map">
 				<Image Source="/Images/association.png"/>
 			</Button>
 			<Separator/>
@@ -64,6 +64,9 @@
 			</ToggleButton>
 			<ToggleButton IsChecked="{Binding IsSoundEnabled}" ToolTip="Play sound on new item">
 				<Image Source="/Images/sound.png"/>
+			</ToggleButton>
+			<ToggleButton IsChecked="{Binding IsFlashingEnabled}" ToolTip="Flash window on new item">
+				<Image Source="/Images/flash.png"/>
 			</ToggleButton>
 			<ToggleButton IsChecked="{Binding IsWindowOnTop}" ToolTip="Keep window on top">
 				<Image Source="/Images/pin.png"/>

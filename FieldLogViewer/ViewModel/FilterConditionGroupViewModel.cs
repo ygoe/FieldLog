@@ -383,7 +383,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public FilterConditionGroupViewModel GetDuplicate(FilterViewModel newParent)
 		{
 			FilterConditionGroupViewModel newGroup = new FilterConditionGroupViewModel(newParent);
-			newGroup.Conditions = new ObservableCollection<FilterConditionViewModel>(Conditions.Select(c => c.GetDuplicate(newGroup)));
+			newGroup.Conditions = new ObservableCollection<FilterConditionViewModel>(this.Conditions.Select(c => c.GetDuplicate(newGroup)));
+			newGroup.IsExclude = this.IsExclude;
+			newGroup.IsEnabled = this.IsEnabled;
 			return newGroup;
 		}
 

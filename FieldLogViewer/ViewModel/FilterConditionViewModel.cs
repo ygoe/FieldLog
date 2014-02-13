@@ -985,6 +985,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			newCond.Column = this.Column;
 			newCond.Comparison = this.Comparison;
 			newCond.Value = this.Value;
+			newCond.IsEnabled = this.IsEnabled;
 			return newCond;
 		}
 

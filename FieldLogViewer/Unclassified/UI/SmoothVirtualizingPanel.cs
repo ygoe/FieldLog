@@ -24,6 +24,13 @@
 // * Only supports FIXED height items, take a close look at how the panel is created and how
 //   ItemHeight must be specified
 //
+// Bugs fixed and lessons learned along the way:
+// * Don't call UpdateScrollInfo in MeasureOverride. The size in MeasureOverride and
+//   ArrangeOverride may differ. UpdateScrollInfo causes an InvalidateMeasure on each size change.
+//   This leads to an infinite layout loop, causing all sorts of GUI weirdness, at unlucky window
+//   sizes (this time every 4th pixel width).
+//   See also http://stackoverflow.com/q/21740995/143684
+//
 // Resources used to build this:
 // * Dr. WPF's GREAT guide to how WPF layout works
 //   http://drwpf.com/blog/itemscontrol-a-to-z/
@@ -238,7 +245,6 @@ namespace Unclassified.UI
 			// Our children should be as wide as we are but as tall as item height.
 
 			Size childSize = GetChildSize(availableSize);
-			UpdateScrollInfo(availableSize);
 
 			ItemsControl itemsControl = ItemsControl.GetItemsOwner(this);
 			int itemCount = itemsControl.HasItems ? itemsControl.Items.Count : 0;

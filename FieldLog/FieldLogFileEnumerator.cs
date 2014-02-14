@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Unclassified.FieldLog
 {
@@ -8,6 +10,11 @@ namespace Unclassified.FieldLog
 	/// </summary>
 	public class FieldLogFileEnumerator : IEnumerator<FieldLogItem>
 	{
+		/// <summary>
+		/// Occurs when there was a problem reading a log file.
+		/// </summary>
+		public event ErrorEventHandler Error;
+
 		private FieldLogFileReader reader;
 		private FieldLogFileReader firstReader;
 		private FieldLogItem item;
@@ -63,21 +70,38 @@ namespace Unclassified.FieldLog
 		/// false if the enumerator has passed the end of the collection.</returns>
 		public bool MoveNext()
 		{
-			item = reader.ReadLogItem();
-			if (item == null && reader.IsClosing)
+			FieldLogFileReader nextReader = null;
+			do
 			{
-				// Close event must have been set
-				Dispose();
-				return false;
-			}
-			FieldLogFileReader nextReader = reader.NextReader;
-			while (item == null && nextReader != null)
-			{
-				reader = nextReader;
-				reader.Reset();
-				item = reader.ReadLogItem();
+				if (nextReader != null)
+				{
+					reader = nextReader;
+					reader.Reset();
+				}
+
+				try
+				{
+					item = reader.ReadLogItem();
+				}
+				catch (Exception ex)
+				{
+					FL.Error(ex, "Reading item from log file");
+					OnError(ex);
+					// Skip the rest of the current file and continue with the next one if
+					// available. If this is the last file and WaitMode is set, this priority will
+					// not be monitored anymore.
+					item = null;
+				}
+				
+				if (item == null && reader.IsClosing)
+				{
+					// Close event must have been set
+					Dispose();
+					return false;
+				}
 				nextReader = reader.NextReader;
 			}
+			while (item == null && nextReader != null);
 			return item != null;
 		}
 
@@ -147,6 +171,19 @@ namespace Unclassified.FieldLog
 				r = r.NextReader;
 			}
 			return false;
+		}
+
+		/// <summary>
+		/// Raises the Error event.
+		/// </summary>
+		/// <param name="ex">An Exception that represents the error that occurred.</param>
+		protected void OnError(Exception ex)
+		{
+			ErrorEventHandler handler = Error;
+			if (handler != null)
+			{
+				handler(this, new ErrorEventArgs(ex));
+			}
 		}
 	}
 }

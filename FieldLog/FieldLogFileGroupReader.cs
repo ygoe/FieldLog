@@ -17,6 +17,11 @@ namespace Unclassified.FieldLog
 	/// </remarks>
 	public class FieldLogFileGroupReader
 	{
+		/// <summary>
+		/// Occurs when there was a problem reading a log file.
+		/// </summary>
+		public event ErrorEventHandler Error;
+
 		private FileSystemWatcher fsw;
 
 		private Dictionary<FieldLogPriority, FieldLogFileEnumerator> readers = new Dictionary<FieldLogPriority, FieldLogFileEnumerator>();
@@ -195,6 +200,7 @@ namespace Unclassified.FieldLog
 			{
 				// This is the first file of this priority
 				readers[prio] = new FieldLogFileEnumerator(reader);
+				readers[prio].Error += FieldLogFileEnumerator_Error;
 				readTasks[(int) prio] = Task<bool>.Factory.StartNew(readers[prio].MoveNext);
 			}
 			else
@@ -205,6 +211,15 @@ namespace Unclassified.FieldLog
 
 			// Signal the blocking ReadLogItem method that there's a new reader now
 			newFileEvent.Set();
+		}
+
+		private void FieldLogFileEnumerator_Error(object sender, ErrorEventArgs e)
+		{
+			ErrorEventHandler handler = Error;
+			if (handler != null)
+			{
+				handler(sender, e);
+			}
 		}
 
 		/// <summary>

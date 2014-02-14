@@ -292,59 +292,68 @@ namespace Unclassified.FieldLog
 		{
 			byte[] bytes;
 			FieldLogItemType type;
-			int length;
+			int pos = -1, length;
 
-			do
+			try
 			{
-				// Remember the log item start position in the file
-				int pos = (int) fileStream.Position;
-				bool localWaitMode = WaitMode;
-				if (!localWaitMode && pos == fileStream.Length)
+				do
 				{
-					return null;
-				}
-				// Read the item type and length
-				bytes = ReadBytes(4);
-				if (bytes == null)
-				{
-					if (closeEvent.WaitOne(0))
+					// Remember the log item start position in the file
+					pos = (int) fileStream.Position;
+					bool localWaitMode = WaitMode;
+					if (!localWaitMode && pos == fileStream.Length)
 					{
-						// Close was requested
-						isClosing = true;
-						WaitMode = false;
 						return null;
 					}
-					if (!WaitMode && localWaitMode)
+					// Read the item type and length
+					bytes = ReadBytes(4);
+					if (bytes == null)
 					{
-						// Follow-up file has been noticed
-						return null;
+						if (closeEvent.WaitOne(0))
+						{
+							// Close was requested
+							isClosing = true;
+							WaitMode = false;
+							return null;
+						}
+						if (!WaitMode && localWaitMode)
+						{
+							// Follow-up file has been noticed
+							return null;
+						}
+						if (!localWaitMode)
+						{
+							throw new Exception("Unexpected end of file.");
+						}
 					}
-					if (!localWaitMode)
-					{
-						throw new Exception("Unexpected end of file.");
-					}
-				}
-				// Parse type and length data
-				type = (FieldLogItemType) ((bytes[0] & 0xF0) >> 4);
-				bytes[0] = (byte) (bytes[0] & 0x0F);
-				if (BitConverter.IsLittleEndian)
-					Array.Reverse(bytes);
-				length = BitConverter.ToInt32(bytes, 0);
+					// Parse type and length data
+					type = (FieldLogItemType) ((bytes[0] & 0xF0) >> 4);
+					bytes[0] = (byte) (bytes[0] & 0x0F);
+					if (BitConverter.IsLittleEndian)
+						Array.Reverse(bytes);
+					length = BitConverter.ToInt32(bytes, 0);
 
-				// Check whether this is a text item
-				if (type == FieldLogItemType.StringData)
-				{
-					// Read the item and add it to the text cache
-					byte[] stringBytes = ReadBytes(length);
-					// Parse the text data
-					string str = Encoding.UTF8.GetString(stringBytes);
-					// Add text to the cache
-					textCache[pos] = str;
+					// Check whether this is a text item
+					if (type == FieldLogItemType.StringData)
+					{
+						// Read the item and add it to the text cache
+						byte[] stringBytes = ReadBytes(length);
+						// Parse the text data
+						string str = Encoding.UTF8.GetString(stringBytes);
+						// Add text to the cache
+						textCache[pos] = str;
+					}
 				}
+				while (type == FieldLogItemType.StringData);
+
+				return FieldLogItem.Read(this, type);
 			}
-			while (type == FieldLogItemType.StringData);
-
-			return FieldLogItem.Read(this, type);
+			catch (Exception ex)
+			{
+				throw new Exception(
+					"Error reading from the log file \"" + FileName + "\" at position " + fileStream.Position + " (starting at " + pos + "). " + ex.Message,
+					ex);
+			}
 		}
 
 #if !NET20
@@ -365,7 +374,16 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		public void Reset()
 		{
-			fileStream.Seek(startPosition, SeekOrigin.Begin);
+			try
+			{
+				fileStream.Seek(startPosition, SeekOrigin.Begin);
+			}
+			catch (Exception ex)
+			{
+				throw new Exception(
+					"Error seeking the log file \"" + FileName + "\" to position " + startPosition + ". " + ex.Message,
+					ex);
+			}
 		}
 
 		/// <summary>

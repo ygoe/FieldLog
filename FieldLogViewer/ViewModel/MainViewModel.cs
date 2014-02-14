@@ -11,6 +11,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Threading;
 using Microsoft.Win32;
+using TaskDialogInterop;
 using Unclassified.FieldLog;
 using Unclassified.FieldLogViewer.View;
 using Unclassified.UI;
@@ -27,6 +28,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		#region Private data
 
+		private Dispatcher dispatcher;
 		private ObservableCollection<LogItemViewModelBase> logItems = new ObservableCollection<LogItemViewModelBase>();
 		private CollectionViewSource sortedFilters = new CollectionViewSource();
 		private CollectionViewSource filteredLogItems = new CollectionViewSource();
@@ -41,6 +43,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public MainViewModel()
 		{
 			Instance = this;
+			dispatcher = Dispatcher.CurrentDispatcher;
 
 			InitializeCommands();
 
@@ -110,12 +113,11 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			filteredLogItems.Source = logItems;
 			filteredLogItems.Filter += filteredLogItems_Filter;
 
-			Dispatcher disp = Dispatcher.CurrentDispatcher;
 			DebugMonitor.MessageReceived += (pid, text) =>
 			{
 				var itemVM = new DebugMessageViewModel(pid, text);
 
-				disp.BeginInvoke(
+				dispatcher.BeginInvoke(
 					new Action<LogItemViewModelBase>(this.InsertNewLogItem),
 					itemVM);
 			};
@@ -181,7 +183,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		private bool CanStopLive()
 		{
-			return !isLoadingFiles && !isLiveStopped;
+			return !isLiveStopped;
 		}
 
 		private void OnStopLive()
@@ -522,7 +524,6 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			IsLoadingFiles = true;
 
 			this.logItems.Clear();
-			Dispatcher disp = Dispatcher.CurrentDispatcher;
 
 			isLiveStopped = false;
 			StopLiveCommand.RaiseCanExecuteChanged();
@@ -536,7 +537,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			return Task.Factory.StartNew(() =>
 			{
 				EventWaitHandle readWaitHandle = new AutoResetEvent(false);
-				readWaitHandle.WaitAction(() => disp.Invoke((Action) delegate
+				readWaitHandle.WaitAction(() => dispatcher.Invoke((Action) delegate
 				{
 					// Lock the local list so that no item loaded directly afterwards will get lost
 					// while we're still preparing the loaded items list to be pushed to the UI
@@ -605,11 +606,17 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				}));
 
 				logFileGroupReader = new FieldLogFileGroupReader(basePath, singleFile, readWaitHandle);
+				logFileGroupReader.Error += logFileGroupReader_Error;
 				List<FieldLogScopeItem> seenScopeItems = new List<FieldLogScopeItem>();
 				while (true)
 				{
 					FieldLogItem item = logFileGroupReader.ReadLogItem();
-					if (item == null) break;
+					if (item == null)
+					{
+						// Signal the UI that this is it, no more items are coming.
+						readWaitHandle.Set();
+						break;
+					}
 					FieldLogItemViewModel itemVM = FieldLogItemViewModel.Create(item);
 					if (itemVM == null) break;   // Cannot happen actually
 
@@ -636,13 +643,40 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						}
 						else
 						{
-							disp.BeginInvoke(
+							dispatcher.BeginInvoke(
 								new Action<LogItemViewModelBase>(this.InsertNewLogItem),
 								itemVM);
 						}
 					}
 				}
 			});
+		}
+
+		private void logFileGroupReader_Error(object sender, ErrorEventArgs e)
+		{
+			if (!dispatcher.CheckAccess())
+			{
+				dispatcher.BeginInvoke(
+					new ErrorEventHandler(logFileGroupReader_Error),
+					sender,
+					e);
+			}
+			else
+			{
+				TaskDialogResult result = TaskDialog.Show(
+					owner: MainWindow.Instance,
+					allowDialogCancellation: true,
+					title: "FieldLogViewer",
+					mainInstruction: "An error occured while reading the log files.",
+					content: "For details, including the exact problem and the offending file name and position, please open FieldLogViewer's log file from " +
+						FL.LogFileBasePath + ".\n\n" +
+						"If you continue reading, the loaded items may be incomplete or may not appear until you click the Stop button.",
+					customButtons: new string[] { "Continue &reading", "&Cancel" });
+				if (result.CustomButtonResult != 0)
+				{
+					OnStopLive();
+				}
+			}
 		}
 
 		private void InsertNewLogItem(LogItemViewModelBase item)

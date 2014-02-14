@@ -81,110 +81,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		private void condition_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			IsInconsistent = false;
-			FilterItemType itemType = FilterItemType.Any;
-
-			// Check the conditions twice because some columns cannot set an item type but only
-			// check against one. This is only one group so it cannot interfer with another
-			// check-only group. But the conditions must be checked twice so that these check-only
-			// columns are certainly also evaluated after all other columns. A smart ordering of
-			// the conditions would do as well, but that's more work and not necessary right now.
-			foreach (var c in Conditions.Union(Conditions))
-			{
-				switch (c.Column)
-				{
-					case FilterColumn.Type:
-						FilterItemType condItemType;
-						if (!Enum.TryParse(c.Value, out condItemType)) return;   // Half updated
-						if (itemType != condItemType &&
-							itemType != FilterItemType.Any &&
-							condItemType != FilterItemType.Any)
-						{
-							IsInconsistent = true;
-							return;
-						}
-						itemType = condItemType;
-						break;
-					case FilterColumn.TextText:
-						if (itemType != FilterItemType.Text &&
-							itemType != FilterItemType.DebugOutput &&
-							itemType != FilterItemType.Any)
-						{
-							IsInconsistent = true;
-							return;
-						}
-						itemType = FilterItemType.Text;   // NOTE: Could be DebugOutput as well, but that's unlikely
-						break;
-					case FilterColumn.TextDetails:
-						if (itemType != FilterItemType.Text &&
-							itemType != FilterItemType.Any)
-						{
-							IsInconsistent = true;
-							return;
-						}
-						itemType = FilterItemType.Text;
-						break;
-					case FilterColumn.DataName:
-					case FilterColumn.DataValue:
-						if (itemType != FilterItemType.Data &&
-							itemType != FilterItemType.Any)
-						{
-							IsInconsistent = true;
-							return;
-						}
-						itemType = FilterItemType.Data;
-						break;
-					case FilterColumn.ExceptionType:
-					case FilterColumn.ExceptionMessage:
-					case FilterColumn.ExceptionCode:
-					case FilterColumn.ExceptionData:
-					case FilterColumn.ExceptionContext:
-						if (itemType != FilterItemType.Exception /*&&
-							itemType != FilterItemType.ExceptionRecursive*/ &&
-							itemType != FilterItemType.Any)
-						{
-							IsInconsistent = true;
-							return;
-						}
-						itemType = FilterItemType.Exception;
-						break;
-					case FilterColumn.ScopeType:
-					case FilterColumn.ScopeLevel:
-					case FilterColumn.ScopeName:
-					case FilterColumn.ScopeIsBackgroundThread:
-					case FilterColumn.ScopeIsPoolThread:
-						if (itemType != FilterItemType.Scope &&
-							itemType != FilterItemType.Any)
-						{
-							IsInconsistent = true;
-							return;
-						}
-						itemType = FilterItemType.Scope;
-						break;
-					case FilterColumn.EnvironmentCultureName:
-					case FilterColumn.EnvironmentIsShuttingDown:
-					case FilterColumn.EnvironmentCurrentDirectory:
-					case FilterColumn.EnvironmentEnvironmentVariables:
-					case FilterColumn.EnvironmentUserName:
-					case FilterColumn.EnvironmentIsInteractive:
-					case FilterColumn.EnvironmentCommandLine:
-					case FilterColumn.EnvironmentAppVersion:
-					case FilterColumn.EnvironmentProcessMemory:
-					case FilterColumn.EnvironmentPeakProcessMemory:
-					case FilterColumn.EnvironmentTotalMemory:
-					case FilterColumn.EnvironmentAvailableMemory:
-						if (itemType != FilterItemType.Exception /*&&
-							itemType != FilterItemType.ExceptionRecursive*/ &&
-							itemType != FilterItemType.Scope &&
-							itemType != FilterItemType.Any)
-						{
-							IsInconsistent = true;
-							return;
-						}
-						// Cannot set an item type because two types are allowed
-						break;
-				}
-			}
+			CheckConditionsConsistency();
 		}
 
 		#endregion Event handlers
@@ -322,6 +219,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				cond.LoadFromString(line);
 				Conditions.Add(cond);
 			}
+			CheckConditionsConsistency();
 		}
 
 		public string SaveToString()
@@ -390,5 +288,130 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		}
 
 		#endregion Duplicate
+
+		#region Consistency checking
+
+		private void CheckConditionsConsistency()
+		{
+			IsInconsistent = false;
+			FilterItemType itemType = FilterItemType.Any;
+
+			// Check the conditions twice because some columns cannot set an item type but only
+			// check against one. This is only one group so it cannot interfer with another
+			// check-only group. But the conditions must be checked twice so that these check-only
+			// columns are certainly also evaluated after all other columns. A smart ordering of
+			// the conditions would do as well, but that's more work and not necessary right now.
+			foreach (var c in Conditions.Concat(Conditions))
+			{
+				switch (c.Column)
+				{
+					case FilterColumn.Type:
+						FilterItemType condItemType;
+						if (!Enum.TryParse(c.Value, out condItemType)) return;   // Half updated
+						if (itemType != condItemType &&
+							itemType != FilterItemType.Any &&
+							condItemType != FilterItemType.Any)
+						{
+							IsInconsistent = true;
+							return;
+						}
+						itemType = condItemType;
+						break;
+					case FilterColumn.TextText:
+						if (itemType != FilterItemType.Text &&
+							itemType != FilterItemType.DebugOutput &&
+							itemType != FilterItemType.Any)
+						{
+							IsInconsistent = true;
+							return;
+						}
+						itemType = FilterItemType.Text;   // NOTE: Could be DebugOutput as well, but that's unlikely
+						break;
+					case FilterColumn.TextDetails:
+						if (itemType != FilterItemType.Text &&
+							itemType != FilterItemType.Any)
+						{
+							IsInconsistent = true;
+							return;
+						}
+						itemType = FilterItemType.Text;
+						break;
+					case FilterColumn.DataName:
+					case FilterColumn.DataValue:
+						if (itemType != FilterItemType.Data &&
+							itemType != FilterItemType.Any)
+						{
+							IsInconsistent = true;
+							return;
+						}
+						itemType = FilterItemType.Data;
+						break;
+					case FilterColumn.ExceptionType:
+					case FilterColumn.ExceptionMessage:
+					case FilterColumn.ExceptionCode:
+					case FilterColumn.ExceptionData:
+					case FilterColumn.ExceptionContext:
+						if (itemType != FilterItemType.Exception /*&&
+							itemType != FilterItemType.ExceptionRecursive*/ &&
+							itemType != FilterItemType.Any)
+						{
+							IsInconsistent = true;
+							return;
+						}
+						itemType = FilterItemType.Exception;
+						break;
+					case FilterColumn.ScopeType:
+					case FilterColumn.ScopeLevel:
+					case FilterColumn.ScopeName:
+					case FilterColumn.ScopeIsBackgroundThread:
+					case FilterColumn.ScopeIsPoolThread:
+						if (itemType != FilterItemType.Scope &&
+							itemType != FilterItemType.Any)
+						{
+							IsInconsistent = true;
+							return;
+						}
+						itemType = FilterItemType.Scope;
+						break;
+					case FilterColumn.EnvironmentHostName:
+					case FilterColumn.EnvironmentUserName:
+					case FilterColumn.EnvironmentIsInteractive:
+					case FilterColumn.EnvironmentAppVersion:
+					case FilterColumn.EnvironmentCommandLine:
+						if (itemType != FilterItemType.Text &&
+							itemType != FilterItemType.Data &&
+							itemType != FilterItemType.Exception /*&&
+							itemType != FilterItemType.ExceptionRecursive*/ &&
+							itemType != FilterItemType.Scope &&
+							itemType != FilterItemType.Any)
+						{
+							IsInconsistent = true;
+							return;
+						}
+						// Cannot set an item type because multiple types are allowed
+						break;
+					case FilterColumn.EnvironmentCultureName:
+					case FilterColumn.EnvironmentIsShuttingDown:
+					case FilterColumn.EnvironmentCurrentDirectory:
+					case FilterColumn.EnvironmentEnvironmentVariables:
+					case FilterColumn.EnvironmentProcessMemory:
+					case FilterColumn.EnvironmentPeakProcessMemory:
+					case FilterColumn.EnvironmentTotalMemory:
+					case FilterColumn.EnvironmentAvailableMemory:
+						if (itemType != FilterItemType.Exception /*&&
+							itemType != FilterItemType.ExceptionRecursive*/ &&
+							itemType != FilterItemType.Scope &&
+							itemType != FilterItemType.Any)
+						{
+							IsInconsistent = true;
+							return;
+						}
+						// Cannot set an item type because two types are allowed
+						break;
+				}
+			}
+		}
+
+		#endregion Consistency checking
 	}
 }

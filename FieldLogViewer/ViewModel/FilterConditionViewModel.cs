@@ -392,11 +392,11 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					textItem = item as FieldLogTextItemViewModel;
 					if (textItem == null)
 						dataItem = item as FieldLogDataItemViewModel;
-					if (dataItem == null)
+					if (textItem == null && dataItem == null)
 						exItem = item as FieldLogExceptionItemViewModel;
-					if (exItem == null)
+					if (textItem == null && dataItem == null && exItem == null)
 						scopeItem = item as FieldLogScopeItemViewModel;
-					if (scopeItem == null)
+					if (textItem == null && dataItem == null && exItem == null && scopeItem == null)
 						dbgMsg = item as DebugMessageViewModel;
 
 					if (textItem != null)
@@ -407,9 +407,33 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						result = CompareString(exItem.Context) ||
 							CompareExceptionTypeRecursive(exItem.Exception) ||
 							CompareExceptionMessageRecursive(exItem.Exception) ||
-							CompareExceptionDataRecursive(exItem.Exception);
+							CompareExceptionDataRecursive(exItem.Exception) ||
+							!FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData) &&
+								(CompareString(exItem.EnvironmentData.AppCompatLayer) ||
+								CompareString(exItem.EnvironmentData.AppVersion) ||
+								CompareString(exItem.EnvironmentData.CommandLine) ||
+								CompareString(exItem.EnvironmentData.CultureName) ||
+								CompareString(exItem.EnvironmentData.CurrentDirectory) ||
+								CompareString(exItem.EnvironmentData.EnvironmentVariables) ||
+								CompareString(exItem.EnvironmentData.ExecutablePath) ||
+								CompareString(exItem.EnvironmentData.HostName) ||
+								CompareString(exItem.EnvironmentData.OSLanguage) ||
+								CompareString(exItem.EnvironmentData.OSProductName) ||
+								CompareString(exItem.EnvironmentData.UserName));
 					else if (scopeItem != null)
-						result = CompareString(scopeItem.Name);
+						result = CompareString(scopeItem.Name) ||
+							!FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData) &&
+								(CompareString(scopeItem.EnvironmentData.AppCompatLayer) ||
+								CompareString(scopeItem.EnvironmentData.AppVersion) ||
+								CompareString(scopeItem.EnvironmentData.CommandLine) ||
+								CompareString(scopeItem.EnvironmentData.CultureName) ||
+								CompareString(scopeItem.EnvironmentData.CurrentDirectory) ||
+								CompareString(scopeItem.EnvironmentData.EnvironmentVariables) ||
+								CompareString(scopeItem.EnvironmentData.ExecutablePath) ||
+								CompareString(scopeItem.EnvironmentData.HostName) ||
+								CompareString(scopeItem.EnvironmentData.OSLanguage) ||
+								CompareString(scopeItem.EnvironmentData.OSProductName) ||
+								CompareString(scopeItem.EnvironmentData.UserName));
 					else if (dbgMsg != null)
 						result = CompareString(dbgMsg.Message);
 					break;
@@ -498,9 +522,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					if (exItem == null)
 						scopeItem = item as FieldLogScopeItemViewModel;
 
-					if (exItem != null)
+					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
 						result = CompareString(exItem.EnvironmentData.CultureName);
-					else if (scopeItem != null && scopeItem.Type == FieldLogScopeType.LogStart)
+					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
 						result = CompareString(scopeItem.EnvironmentData.CultureName);
 					break;
 				case FilterColumn.EnvironmentIsShuttingDown:
@@ -508,9 +532,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					if (exItem == null)
 						scopeItem = item as FieldLogScopeItemViewModel;
 
-					if (exItem != null)
+					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
 						result = exItem.EnvironmentData.IsShuttingDown;
-					else if (scopeItem != null && scopeItem.Type == FieldLogScopeType.LogStart)
+					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
 						result = scopeItem.EnvironmentData.IsShuttingDown;
 					break;
 				case FilterColumn.EnvironmentCurrentDirectory:
@@ -518,9 +542,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					if (exItem == null)
 						scopeItem = item as FieldLogScopeItemViewModel;
 
-					if (exItem != null)
+					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
 						result = CompareString(exItem.EnvironmentData.CurrentDirectory);
-					else if (scopeItem != null && scopeItem.Type == FieldLogScopeType.LogStart)
+					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
 						result = CompareString(scopeItem.EnvironmentData.CurrentDirectory);
 					break;
 				case FilterColumn.EnvironmentEnvironmentVariables:
@@ -528,49 +552,94 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					if (exItem == null)
 						scopeItem = item as FieldLogScopeItemViewModel;
 
-					if (exItem != null)
+					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
 						result = CompareString(exItem.EnvironmentData.EnvironmentVariables);
-					else if (scopeItem != null && scopeItem.Type == FieldLogScopeType.LogStart)
+					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
 						result = CompareString(scopeItem.EnvironmentData.EnvironmentVariables);
+					break;
+				case FilterColumn.EnvironmentHostName:
+					exItem = item as FieldLogExceptionItemViewModel;
+					if (exItem == null)
+						scopeItem = item as FieldLogScopeItemViewModel;
+					if ((exItem == null || FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData)) &&
+						(scopeItem == null || FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData)))
+					{
+						flItem = item as FieldLogItemViewModel;
+						if (flItem != null)
+							scopeItem = flItem.LastLogStartItem;
+					}
+
+					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
+						result = CompareString(exItem.EnvironmentData.HostName);
+					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
+						result = CompareString(scopeItem.EnvironmentData.HostName);
 					break;
 				case FilterColumn.EnvironmentUserName:
 					exItem = item as FieldLogExceptionItemViewModel;
 					if (exItem == null)
 						scopeItem = item as FieldLogScopeItemViewModel;
+					if ((exItem == null || FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData)) &&
+						(scopeItem == null || FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData)))
+					{
+						flItem = item as FieldLogItemViewModel;
+						if (flItem != null)
+							scopeItem = flItem.LastLogStartItem;
+					}
 
-					if (exItem != null)
+					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
 						result = CompareString(exItem.EnvironmentData.UserName);
-					else if (scopeItem != null && scopeItem.Type == FieldLogScopeType.LogStart)
+					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
 						result = CompareString(scopeItem.EnvironmentData.UserName);
 					break;
 				case FilterColumn.EnvironmentIsInteractive:
 					exItem = item as FieldLogExceptionItemViewModel;
 					if (exItem == null)
 						scopeItem = item as FieldLogScopeItemViewModel;
+					if ((exItem == null || FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData)) &&
+						(scopeItem == null || FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData)))
+					{
+						flItem = item as FieldLogItemViewModel;
+						if (flItem != null)
+							scopeItem = flItem.LastLogStartItem;
+					}
 
-					if (exItem != null)
+					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
 						result = exItem.EnvironmentData.IsInteractive;
-					else if (scopeItem != null && scopeItem.Type == FieldLogScopeType.LogStart)
+					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
 						result = scopeItem.EnvironmentData.IsInteractive;
 					break;
 				case FilterColumn.EnvironmentCommandLine:
 					exItem = item as FieldLogExceptionItemViewModel;
 					if (exItem == null)
 						scopeItem = item as FieldLogScopeItemViewModel;
+					if ((exItem == null || FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData)) &&
+						(scopeItem == null || FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData)))
+					{
+						flItem = item as FieldLogItemViewModel;
+						if (flItem != null)
+							scopeItem = flItem.LastLogStartItem;
+					}
 
-					if (exItem != null)
+					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
 						result = CompareString(exItem.EnvironmentData.CommandLine);
-					else if (scopeItem != null && scopeItem.Type == FieldLogScopeType.LogStart)
+					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
 						result = CompareString(scopeItem.EnvironmentData.CommandLine);
 					break;
 				case FilterColumn.EnvironmentAppVersion:
 					exItem = item as FieldLogExceptionItemViewModel;
 					if (exItem == null)
 						scopeItem = item as FieldLogScopeItemViewModel;
+					if ((exItem == null || FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData)) &&
+						(scopeItem == null || FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData)))
+					{
+						flItem = item as FieldLogItemViewModel;
+						if (flItem != null)
+							scopeItem = flItem.LastLogStartItem;
+					}
 
-					if (exItem != null)
+					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
 						result = CompareString(exItem.EnvironmentData.AppVersion);
-					else if (scopeItem != null && scopeItem.Type == FieldLogScopeType.LogStart)
+					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
 						result = CompareString(scopeItem.EnvironmentData.AppVersion);
 					break;
 				case FilterColumn.EnvironmentProcessMemory:
@@ -578,9 +647,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					if (exItem == null)
 						scopeItem = item as FieldLogScopeItemViewModel;
 
-					if (exItem != null)
+					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
 						result = CompareLong(exItem.EnvironmentData.ProcessMemory);
-					else if (scopeItem != null && scopeItem.Type == FieldLogScopeType.LogStart)
+					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
 						result = CompareLong(scopeItem.EnvironmentData.ProcessMemory);
 					break;
 				case FilterColumn.EnvironmentPeakProcessMemory:
@@ -588,9 +657,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					if (exItem == null)
 						scopeItem = item as FieldLogScopeItemViewModel;
 
-					if (exItem != null)
+					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
 						result = CompareLong(exItem.EnvironmentData.PeakProcessMemory);
-					else if (scopeItem != null && scopeItem.Type == FieldLogScopeType.LogStart)
+					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
 						result = CompareLong(scopeItem.EnvironmentData.PeakProcessMemory);
 					break;
 				case FilterColumn.EnvironmentTotalMemory:
@@ -598,9 +667,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					if (exItem == null)
 						scopeItem = item as FieldLogScopeItemViewModel;
 
-					if (exItem != null)
+					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
 						result = CompareLong(exItem.EnvironmentData.TotalMemory);
-					else if (scopeItem != null && scopeItem.Type == FieldLogScopeType.LogStart)
+					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
 						result = CompareLong(scopeItem.EnvironmentData.TotalMemory);
 					break;
 				case FilterColumn.EnvironmentAvailableMemory:
@@ -608,9 +677,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					if (exItem == null)
 						scopeItem = item as FieldLogScopeItemViewModel;
 
-					if (exItem != null)
+					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
 						result = CompareLong(exItem.EnvironmentData.AvailableMemory);
-					else if (scopeItem != null && scopeItem.Type == FieldLogScopeType.LogStart)
+					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
 						result = CompareLong(scopeItem.EnvironmentData.AvailableMemory);
 					break;
 			}
@@ -1050,6 +1119,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		EnvironmentCurrentDirectory,
 		[Description("Env: Environment variables")]
 		EnvironmentEnvironmentVariables,
+		[Description("Env: Host name")]
+		EnvironmentHostName,
 		[Description("Env: User name")]
 		EnvironmentUserName,
 		[Description("Env: Interactive")]

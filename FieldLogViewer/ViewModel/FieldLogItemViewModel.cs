@@ -55,6 +55,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public int ThreadId { get { return this.Item.ThreadId; } }
 		public string LogItemSourceFileName { get { return this.Item.LogItemSourceFileName; } }
 
+		public FieldLogScopeItemViewModel LastLogStartItem { get; set; }
+
 		public string EventCounterAndSourceFile
 		{
 			get { return EventCounter + " in " + System.IO.Path.GetFileName(LogItemSourceFileName); }

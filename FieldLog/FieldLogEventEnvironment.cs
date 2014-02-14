@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using System.Threading;
-using System.Collections.Generic;
 
 namespace Unclassified.FieldLog
 {
@@ -43,6 +43,16 @@ namespace Unclassified.FieldLog
 				1 +
 				0 +
 				8 + 8 + 8 + 8 + 8;
+		}
+
+		/// <summary>
+		/// Indicates whether the specified environment variable is null or an Empty environment.
+		/// </summary>
+		/// <param name="value">The variable to test.</param>
+		/// <returns>true if the value parameter is null or an empty environment; otherwise, false.</returns>
+		public static bool IsNullOrEmpty(FieldLogEventEnvironment value)
+		{
+			return value == null || value == FieldLogEventEnvironment.Empty;
 		}
 
 		#endregion Static members
@@ -367,6 +377,11 @@ namespace Unclassified.FieldLog
 			env.IsShuttingDown = (flags & 4) != 0;
 			env.IsInteractive = (flags & 8) != 0;
 			env.IsProcess64Bit = (flags & 16) != 0;
+
+			// Check if the environment is actually empty
+			if (env.CpuCount == 0)
+				return FieldLogEventEnvironment.Empty;
+
 			return env;
 		}
 

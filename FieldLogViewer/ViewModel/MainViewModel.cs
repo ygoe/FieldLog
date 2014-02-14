@@ -544,6 +544,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					{
 						// Apply scope-based indenting to all items now
 						Dictionary<int, int> threadLevels = new Dictionary<int, int>();
+						Dictionary<Guid, FieldLogScopeItemViewModel> logStartItems = new Dictionary<Guid, FieldLogScopeItemViewModel>();
 						foreach (var item in localLogItems)
 						{
 							FieldLogScopeItemViewModel scope = item as FieldLogScopeItemViewModel;
@@ -558,6 +559,11 @@ namespace Unclassified.FieldLogViewer.ViewModel
 								{
 									scope.IndentLevel = scope.Level;
 								}
+
+								if (scope.Type == FieldLogScopeType.LogStart)
+								{
+									logStartItems[scope.SessionId] = scope;
+								}
 							}
 							else
 							{
@@ -569,6 +575,18 @@ namespace Unclassified.FieldLogViewer.ViewModel
 									{
 										flItem.IndentLevel = level;
 									}
+								}
+							}
+						}
+						foreach (var item in localLogItems)
+						{
+							FieldLogItemViewModel flItem = item as FieldLogItemViewModel;
+							if (flItem != null)
+							{
+								FieldLogScopeItemViewModel scope;
+								if (logStartItems.TryGetValue(flItem.SessionId, out scope))
+								{
+									flItem.LastLogStartItem = scope;
 								}
 							}
 						}
@@ -630,6 +648,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		private void InsertNewLogItem(LogItemViewModelBase item)
 		{
 			int newIndex = logItems.InsertSorted(item, (a, b) => a.CompareTo(b));
+			int prevIndex;
 
 			// IndentLevel is only supported for FieldLog items
 			FieldLogItemViewModel flItem = item as FieldLogItemViewModel;
@@ -651,7 +670,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				else
 				{
 					// Use IndentLevel of the previous item in the same session & thread
-					int prevIndex = newIndex - 1;
+					prevIndex = newIndex - 1;
 					while (prevIndex >= 0)
 					{
 						FieldLogItemViewModel prevFlItem = logItems[prevIndex] as FieldLogItemViewModel;
@@ -690,6 +709,20 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						}
 						nextFlItem.IndentLevel = flItem.IndentLevel;
 					}
+				}
+				
+				// Use LastLogStartItem of the previous item from the same session
+				prevIndex = newIndex - 1;
+				while (prevIndex >= 0)
+				{
+					FieldLogItemViewModel prevFlItem = logItems[prevIndex] as FieldLogItemViewModel;
+					if (prevFlItem != null &&
+						prevFlItem.SessionId == flItem.SessionId)
+					{
+						flItem.LastLogStartItem = prevFlItem.LastLogStartItem;
+						break;
+					}
+					prevIndex--;
 				}
 			}
 		}

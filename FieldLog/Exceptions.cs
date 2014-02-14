@@ -41,12 +41,26 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		/// <param name="ex">The Exception instance.</param>
 		public FieldLogException(Exception ex)
+			: this(ex, null)
+		{
+		}
+
+		/// <summary>
+		/// Initialises a new instance of the FieldLogException class.
+		/// </summary>
+		/// <param name="ex">The Exception instance.</param>
+		/// <param name="customStackTrace">A StackTrace that shall be logged instead of the StackTrace from the Exception instance.</param>
+		public FieldLogException(Exception ex, StackTrace customStackTrace)
 		{
 			Exception = ex;
 			
 			Type = ex.GetType().FullName;
 			Message = ex.Message.TrimEnd();
-			StackTrace stackTrace = new StackTrace(ex, true);
+			StackTrace stackTrace = customStackTrace;
+			if (stackTrace == null)
+			{
+				stackTrace = new StackTrace(ex, true);
+			}
 			StackFrames = new FieldLogStackFrame[stackTrace.FrameCount];
 			for (int i = 0; i < stackTrace.FrameCount; i++)
 			{

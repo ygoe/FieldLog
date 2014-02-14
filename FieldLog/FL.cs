@@ -449,7 +449,9 @@ namespace Unclassified.FieldLog
 			AppDomain.CurrentDomain.FirstChanceException += delegate(object sender, System.Runtime.ExceptionServices.FirstChanceExceptionEventArgs e)
 			{
 				if (LogFirstChanceExceptions && !isShutdown)
-					FL.Trace(e.Exception, "AppDomain.FirstChanceException");
+				{
+					FL.Exception(FieldLogPriority.Trace, e.Exception, "AppDomain.FirstChanceException", new StackTrace(1, true));
+				}
 			};
 
 			System.Threading.Tasks.TaskScheduler.UnobservedTaskException += delegate(object sender, System.Threading.Tasks.UnobservedTaskExceptionEventArgs e)
@@ -1141,6 +1143,18 @@ namespace Unclassified.FieldLog
 		public static void Exception(FieldLogPriority priority, Exception ex, string context)
 		{
 			Log(new FieldLogExceptionItem(priority, ex, context));
+		}
+
+		/// <summary>
+		/// Writes an exception log item to the log file.
+		/// </summary>
+		/// <param name="priority">The priority of the log item.</param>
+		/// <param name="ex">The exception instance.</param>
+		/// <param name="context">The context in which the exception has been thrown.</param>
+		/// <param name="customStackTrace">A StackTrace that shall be logged instead of the StackTrace from the Exception instance.</param>
+		public static void Exception(FieldLogPriority priority, Exception ex, string context, StackTrace customStackTrace)
+		{
+			Log(new FieldLogExceptionItem(priority, ex, context, customStackTrace));
 		}
 
 		/// <summary>

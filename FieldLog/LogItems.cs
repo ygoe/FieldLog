@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Diagnostics;
 
 namespace Unclassified.FieldLog
 {
@@ -325,7 +326,7 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		/// <param name="ex">The exception instance.</param>
 		public FieldLogExceptionItem(Exception ex)
-			: this(FieldLogPriority.Critical, ex, null)
+			: this(FieldLogPriority.Critical, ex, null, null)
 		{
 		}
 
@@ -336,7 +337,7 @@ namespace Unclassified.FieldLog
 		/// <param name="context">The context in which the exception has been thrown. Can be an
 		/// arbitrary string that is useful for the logging purpose.</param>
 		public FieldLogExceptionItem(Exception ex, string context)
-			: this(FieldLogPriority.Critical, ex, context)
+			: this(FieldLogPriority.Critical, ex, context, null)
 		{
 		}
 
@@ -346,7 +347,7 @@ namespace Unclassified.FieldLog
 		/// <param name="priority">The priority of the new log item.</param>
 		/// <param name="ex">The exception instance.</param>
 		public FieldLogExceptionItem(FieldLogPriority priority, Exception ex)
-			: this(priority, ex, null)
+			: this(priority, ex, null, null)
 		{
 		}
 
@@ -358,9 +359,22 @@ namespace Unclassified.FieldLog
 		/// <param name="context">The context in which the exception has been thrown. Can be an
 		/// arbitrary string that is useful for the logging purpose.</param>
 		public FieldLogExceptionItem(FieldLogPriority priority, Exception ex, string context)
+			: this(priority, ex, context, null)
+		{
+		}
+
+		/// <summary>
+		/// Initialises a new instance of the FieldLogExceptionItem class.
+		/// </summary>
+		/// <param name="priority">The priority of the new log item.</param>
+		/// <param name="ex">The exception instance.</param>
+		/// <param name="context">The context in which the exception has been thrown. Can be an
+		/// arbitrary string that is useful for the logging purpose.</param>
+		/// <param name="customStackTrace">A StackTrace that shall be logged instead of the StackTrace from the Exception instance.</param>
+		public FieldLogExceptionItem(FieldLogPriority priority, Exception ex, string context, StackTrace customStackTrace)
 			: base(priority)
 		{
-			Exception = new FieldLogException(ex);
+			Exception = new FieldLogException(ex, customStackTrace);
 			Context = context;
 
 			bool includeEnvironment = true;

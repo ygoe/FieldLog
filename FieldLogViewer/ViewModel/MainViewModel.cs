@@ -85,6 +85,14 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				}
 				Filters.Add(f);
 			}
+
+			// If no filter is defined, create some basic filters for a start
+			if (Filters.Count == 1)
+			{
+				// Only the "show all" filter is present
+				CreateBasicFilters();
+			}
+			
 			FilterViewModel selectedFilterVM = Filters.FirstOrDefault(f => f.DisplayName == AppSettings.Instance.SelectedFilter);
 			if (selectedFilterVM != null)
 			{
@@ -689,6 +697,98 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		#endregion Log file loading
 
 		#region Other methods
+
+		private void CreateBasicFilters()
+		{
+			FilterViewModel f;
+			FilterConditionGroupViewModel fcg;
+			FilterConditionViewModel fc;
+
+			f = new FilterViewModel();
+			f.DisplayName = "Errors and up";
+			fcg = new FilterConditionGroupViewModel(f);
+			fc = new FilterConditionViewModel(fcg);
+			fc.Column = FilterColumn.Priority;
+			fc.Comparison = FilterComparison.GreaterOrEqual;
+			fc.Value = FieldLogPriority.Error.ToString();
+			fcg.Conditions.Add(fc);
+			f.ConditionGroups.Add(fcg);
+			fcg = new FilterConditionGroupViewModel(f);
+			fc = new FilterConditionViewModel(fcg);
+			fc.Column = FilterColumn.AnyText;
+			fc.Comparison = FilterComparison.Contains;
+			fc.Value = "error";
+			fcg.Conditions.Add(fc);
+			fc = new FilterConditionViewModel(fcg);
+			fc.Column = FilterColumn.Priority;
+			fc.Comparison = FilterComparison.GreaterOrEqual;
+			fc.Value = FieldLogPriority.Info.ToString();
+			fcg.Conditions.Add(fc);
+			f.ConditionGroups.Add(fcg);
+			Filters.Add(f);
+
+			f = new FilterViewModel();
+			f.DisplayName = "Warnings and up";
+			fcg = new FilterConditionGroupViewModel(f);
+			fc = new FilterConditionViewModel(fcg);
+			fc.Column = FilterColumn.Priority;
+			fc.Comparison = FilterComparison.GreaterOrEqual;
+			fc.Value = FieldLogPriority.Warning.ToString();
+			fcg.Conditions.Add(fc);
+			f.ConditionGroups.Add(fcg);
+			fcg = new FilterConditionGroupViewModel(f);
+			fc = new FilterConditionViewModel(fcg);
+			fc.Column = FilterColumn.AnyText;
+			fc.Comparison = FilterComparison.Contains;
+			fc.Value = "warning";
+			fcg.Conditions.Add(fc);
+			fc = new FilterConditionViewModel(fcg);
+			fc.Column = FilterColumn.Priority;
+			fc.Comparison = FilterComparison.GreaterOrEqual;
+			fc.Value = FieldLogPriority.Info.ToString();
+			fcg.Conditions.Add(fc);
+			f.ConditionGroups.Add(fcg);
+			fcg = new FilterConditionGroupViewModel(f);
+			fc = new FilterConditionViewModel(fcg);
+			fc.Column = FilterColumn.AnyText;
+			fc.Comparison = FilterComparison.Contains;
+			fc.Value = "error";
+			fcg.Conditions.Add(fc);
+			fc = new FilterConditionViewModel(fcg);
+			fc.Column = FilterColumn.Priority;
+			fc.Comparison = FilterComparison.GreaterOrEqual;
+			fc.Value = FieldLogPriority.Info.ToString();
+			fcg.Conditions.Add(fc);
+			f.ConditionGroups.Add(fcg);
+			Filters.Add(f);
+
+			f = new FilterViewModel();
+			f.DisplayName = "Relevant exceptions";
+			fcg = new FilterConditionGroupViewModel(f);
+			fc = new FilterConditionViewModel(fcg);
+			fc.Column = FilterColumn.Type;
+			fc.Comparison = FilterComparison.Equals;
+			fc.Value = FieldLogItemType.Exception.ToString();
+			fcg.Conditions.Add(fc);
+			fc = new FilterConditionViewModel(fcg);
+			fc.Column = FilterColumn.ExceptionContext;
+			fc.Comparison = FilterComparison.NotEquals;
+			fc.Value = "AppDomain.FirstChanceException";
+			fcg.Conditions.Add(fc);
+			f.ConditionGroups.Add(fcg);
+			Filters.Add(f);
+
+			f = new FilterViewModel();
+			f.DisplayName = "No trace";
+			fcg = new FilterConditionGroupViewModel(f);
+			fc = new FilterConditionViewModel(fcg);
+			fc.Column = FilterColumn.Priority;
+			fc.Comparison = FilterComparison.GreaterOrEqual;
+			fc.Value = FieldLogPriority.Checkpoint.ToString();
+			fcg.Conditions.Add(fc);
+			f.ConditionGroups.Add(fcg);
+			Filters.Add(f);
+		}
 
 		private void UpdateWindowTitle()
 		{

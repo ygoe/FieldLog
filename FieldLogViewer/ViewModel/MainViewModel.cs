@@ -644,6 +644,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 					if (localLogItems != null)
 					{
+						if (!upgradedLock)
+						{
+							localLogItemsLock.EnterWriteLock();
+							upgradedLock = true;
+						}
+
 						localLogItems.InsertSorted(itemVM, new Comparison<LogItemViewModelBase>((a, b) => a.CompareTo(b)));
 
 						if ((localLogItems.Count % 1000) == 0)

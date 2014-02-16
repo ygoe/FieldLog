@@ -201,8 +201,7 @@ namespace Unclassified
 			// (an exact match will likely not exist yet)
 			int lower = 0;
 			int upper = list.Count - 1;
-			// Optimisation: For more than 100 list items, start searching more towards the end
-			int index = upper < 100 ? (lower + upper) / 2 : upper - 10;  // TODO: Measure any time savings!
+			int index = (lower + upper) / 2;
 			while (lower <= upper)
 			{
 				// As long as lower <= upper, index is valid and can be used for comparison

@@ -18,24 +18,31 @@ namespace ConsoleDemo
 			Console.WriteLine("FieldLog writer demo application");
 			Console.WriteLine();
 
-			//for (int i = 1; i <= 3; i++)
-			//{
-			//    if (i > 1)
-			//        Thread.Sleep(400);
+			//NormalActivity();
+			LoadTest();
+		}
 
-			//    Console.WriteLine("Writing a trace text message...");
-			//    FL.Checkpoint("Message test " + i);
-			//    //FL.Trace("Static text");
-			//    //FL.Trace("Static text");
-			//}
+		static void LoadTest()
+		{
+			Console.WriteLine("Load test pattern...");
 
-			Console.WriteLine("Writing lots of messages...");
+			for (int i = 1; i <= 10000; i++)
+			{
+				FL.Trace("Load test - " + i);
+				
+				if ((i % 10000) == 0)
+					Console.WriteLine("    now at " + i);
+			}
+		}
+
+		static void NormalActivity()
+		{
+			Console.WriteLine("Normal application activity pattern...");
 			Random rnd = new Random();
-			for (int i = 1; i <= 50; i++)
+			for (int i = 1; i <= 100; i++)
 			{
 				if (i > 1)
 					Thread.Sleep(rnd.Next(1000) + 500);
-					//Thread.Sleep(rnd.Next(20));
 
 				switch (rnd.Next(16))
 				{
@@ -114,10 +121,10 @@ namespace ConsoleDemo
 		{
 			using (FL.NewScope())
 			{
-				for (int i = 1; i <= 20; i++)
+				for (int i = 1; i <= 10; i++)
 				{
 					FL.TraceData("i", i);
-					Thread.Sleep(312);
+					//Thread.Sleep(312);
 				}
 			}
 		}

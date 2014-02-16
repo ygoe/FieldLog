@@ -67,12 +67,17 @@ namespace Unclassified
 		}
 
 		// TODO: Give a proper name and documentation
-		public static void WaitAction(this WaitHandle handle, Action action)
+		public static void WaitAction(this WaitHandle handle, Action action, Func<bool> repeatCondition = null)
 		{
 			Task.Factory.StartNew(() =>
 			{
-				handle.WaitOne();
-				action();
+				do
+				{
+					handle.WaitOne();
+					action();
+				}
+				while (repeatCondition != null && repeatCondition());
+				return;
 			});
 		}
 	}

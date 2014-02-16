@@ -541,12 +541,21 @@
 				</ContentControl>
 			</Border>
 			
-			<TextBlock
+			<StackPanel
 				Grid.Column="0" Grid.ColumnSpan="2"
 				VerticalAlignment="Center" HorizontalAlignment="Center"
-				Visibility="{Binding LoadingMsgVisibility}"
-				FontStyle="Italic"
-				Text="Loading log files, please wait..."/>
+				Visibility="{Binding LoadingMsgVisibility}">
+				<TextBlock FontStyle="Italic" TextAlignment="Center">
+					<Run Text="Loading log files, now at"/>
+					<Run Text="{Binding LoadedItemsCount}"/>
+					<Run Text="items, please wait..."/>
+				</TextBlock>
+				<TextBlock Margin="0,8,0,0" FontStyle="Italic" TextAlignment="Center">
+					<Run Text="Press the"/>
+					<Image Source="/Images/stop.png" Stretch="None" TextBlock.BaselineOffset="13"/>
+					<Run Text="button to cancel loading and show already loaded items."/>
+				</TextBlock>
+			</StackPanel>
 		</Grid>
 	</Grid>
 </Window>

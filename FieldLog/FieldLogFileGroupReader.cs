@@ -27,11 +27,11 @@ namespace Unclassified.FieldLog
 		private Dictionary<FieldLogPriority, FieldLogFileEnumerator> readers = new Dictionary<FieldLogPriority, FieldLogFileEnumerator>();
 		private Task<bool>[] readTasks;
 		private readonly object readerLock = new object();
-		private Task<bool> waitForNewFileTask;
+		private Task<bool> waitForNewFilePrioTask;
 		private Task<bool> closeTask;
-		private AutoResetEvent newFileEvent = new AutoResetEvent(false);
-		private AutoResetEvent closeEvent = new AutoResetEvent(false);
-		private Dictionary<FieldLogPriority, EventWaitHandle> prioReadSignals = new Dictionary<FieldLogPriority, EventWaitHandle>();
+		private AutoResetEvent newFilePrioEvent = new AutoResetEvent(false);
+		private ManualResetEvent closeEvent = new ManualResetEvent(false);
+		private Dictionary<FieldLogPriority, ManualResetEvent> prioReadSignals = new Dictionary<FieldLogPriority, ManualResetEvent>();
 
 		/// <summary>
 		/// Initialises a new instance of the FieldLogFileGroupReader class. This sets up log
@@ -82,27 +82,43 @@ namespace Unclassified.FieldLog
 			// Wait for all priorities to be read to the end, then signal one event
 			if (readWaitHandle != null)
 			{
-				Task.Factory.StartNew(() =>
-				{
-					if (prioReadSignals.Count > 0)
-					{
-						WaitHandle.WaitAll(prioReadSignals.Values.ToArray());
-					}
-					readWaitHandle.Set();
-				});
+				Task.Factory.StartNew(() => ReadWaitHandleTask(readWaitHandle));
 			}
 
-			waitForNewFileTask = Task.Factory.StartNew<bool>(WaitForNewFile);
+			waitForNewFilePrioTask = Task.Factory.StartNew<bool>(WaitForNewFilePrio);
 			closeTask = Task.Factory.StartNew<bool>(WaitForClose);
 		}
 
 		/// <summary>
-		/// Implements the task that waits for a new log file to be created.
+		/// Waits for all priority readers to wait, then sets the readWaitHandle event. Loops until
+		/// the closeEvent is set.
+		/// </summary>
+		/// <param name="readWaitHandle">The EventWaitHandle instance to set.</param>
+		private void ReadWaitHandleTask(EventWaitHandle readWaitHandle)
+		{
+			do
+			{
+				if (prioReadSignals.Count > 0)
+				{
+					WaitHandle.WaitAll(prioReadSignals.Values.ToArray());
+				}
+				readWaitHandle.Set();
+				// Wait a moment before setting this signal again because as long as all readers
+				// are waiting, WaitAll will return immediately and readWaitHandle will be set
+				// again and again. After the event has been set once, we don't need it right again
+				// so a little delay is fine.
+				Thread.Sleep(500);
+			}
+			while (!closeEvent.WaitOne(0));
+		}
+
+		/// <summary>
+		/// Implements the task that waits for a log file for a new priority to be created.
 		/// </summary>
 		/// <returns>The return value is not used.</returns>
-		private bool WaitForNewFile()
+		private bool WaitForNewFilePrio()
 		{
-			newFileEvent.WaitOne();
+			newFilePrioEvent.WaitOne();
 			return false;
 		}
 
@@ -170,10 +186,11 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		/// <param name="prio"></param>
 		/// <param name="fileName"></param>
-		/// <param name="fromFsw"></param>
+		/// <param name="fromFsw">Indicates whether the reader was created from a FileSystemWatcher event.</param>
 		private void AddNewReader(FieldLogPriority prio, string fileName, bool fromFsw)
 		{
 			// Must be within a lock(readerLock)!
+			FL.Trace("AddNewReader, prio=" + prio + ", fileName=" + Path.GetFileName(fileName) + ", fromFsw=" + fromFsw);
 
 			// Reject the new file if it's already in the queue (delayed FSW event after active scan)
 			if (readers.ContainsKey(prio) &&
@@ -181,20 +198,18 @@ namespace Unclassified.FieldLog
 				readers[prio].ContainsFile(fileName))
 			{
 				// This file is already current or queued
+				FL.Checkpoint("This file is already current or queued");
 				return;
 			}
 			
 			var reader = new FieldLogFileReader(fileName, true);
-			if (!fromFsw)
+			ManualResetEvent h;
+			if (!prioReadSignals.TryGetValue(prio, out h))
 			{
-				EventWaitHandle h;
-				if (!prioReadSignals.TryGetValue(prio, out h))
-				{
-					h = new AutoResetEvent(false);
-					prioReadSignals[prio] = h;
-				}
-				reader.ReadWaitHandle = h;
+				h = new ManualResetEvent(false);
+				prioReadSignals[prio] = h;
 			}
+			reader.ReadWaitHandle = h;
 
 			if (!readers.ContainsKey(prio) || readers[prio] == null)
 			{
@@ -202,15 +217,18 @@ namespace Unclassified.FieldLog
 				readers[prio] = new FieldLogFileEnumerator(reader);
 				readers[prio].Error += FieldLogFileEnumerator_Error;
 				readTasks[(int) prio] = Task<bool>.Factory.StartNew(readers[prio].MoveNext);
+
+				// Signal the blocking ReadLogItem method that there's a new reader now
+				newFilePrioEvent.Set();
 			}
 			else
 			{
 				// Chain the new reader after the last reader in the queue
-				readers[prio].LastReader.NextReader = reader;
-			}
+				readers[prio].Append(reader, fromFsw);
 
-			// Signal the blocking ReadLogItem method that there's a new reader now
-			newFileEvent.Set();
+				// TODO,DEBUG: What for?
+				newFilePrioEvent.Set();
+			}
 		}
 
 		private void FieldLogFileEnumerator_Error(object sender, ErrorEventArgs e)
@@ -237,8 +255,8 @@ namespace Unclassified.FieldLog
 				{
 					availableTasks = readTasks
 						.Where(t => t != null)
-						.Union(new Task<bool>[] { waitForNewFileTask })
-						.Union(new Task<bool>[] { closeTask })
+						.Concat(new Task<bool>[] { waitForNewFilePrioTask })
+						.Concat(new Task<bool>[] { closeTask })
 						.ToArray();
 				}
 				Task.WaitAny(availableTasks);
@@ -286,12 +304,13 @@ namespace Unclassified.FieldLog
 								}
 							}
 						}
-						if (availableTask == waitForNewFileTask)
+						if (availableTask == waitForNewFilePrioTask)
 						{
-							// A new file was added and the WaitAny was interrupted, to restart
-							// with the newly added reader.
+							// A file of a new priority was added and the WaitAny was interrupted,
+							// to restart with the newly added reader added to the list of
+							// available tasks.
 							// Recreate the signal task and continue.
-							waitForNewFileTask = Task<bool>.Factory.StartNew(WaitForNewFile);
+							waitForNewFilePrioTask = Task<bool>.Factory.StartNew(WaitForNewFilePrio);
 						}
 						if (availableTask == closeTask)
 						{

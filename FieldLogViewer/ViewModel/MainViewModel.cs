@@ -35,6 +35,23 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		private string loadedBasePath;
 		private FieldLogFileGroupReader logFileGroupReader;
 		private bool isLiveStopped = true;
+		private DateTime insertingItemsSince;
+		
+		/// <summary>
+		/// Buffer for all read items that are collected in the separate Task thread and then
+		/// pushed to the UI thread as a new ObservableCollection instance.
+		/// </summary>
+		private List<LogItemViewModelBase> localLogItems;
+		/// <summary>
+		/// Synchronises access to the localLogItems variable.
+		/// </summary>
+		private ReaderWriterLockSlim localLogItemsLock = new ReaderWriterLockSlim();
+		/// <summary>
+		/// The number of new log items queued for inserting in the UI thread. Must always be
+		/// accessed with the Interlocked class.
+		/// </summary>
+		private int queuedNewItemsCount;
+		private AutoResetEvent returnToLocalLogItemsList = new AutoResetEvent(false);
 
 		#endregion Private data
 
@@ -117,6 +134,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			{
 				var itemVM = new DebugMessageViewModel(pid, text);
 
+				Interlocked.Increment(ref queuedNewItemsCount);
 				dispatcher.BeginInvoke(
 					new Action<LogItemViewModelBase>(this.InsertNewLogItem),
 					itemVM);
@@ -380,6 +398,13 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
+		private int loadedItemsCount;
+		public int LoadedItemsCount
+		{
+			get { return loadedItemsCount; }
+			set { CheckUpdate(value, ref loadedItemsCount, "LoadedItemsCount"); }
+		}
+
 		public Visibility LogItemsVisibility
 		{
 			get
@@ -528,130 +553,134 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			isLiveStopped = false;
 			StopLiveCommand.RaiseCanExecuteChanged();
 
-			List<LogItemViewModelBase> localLogItems = new List<LogItemViewModelBase>();
-			object localLogItemsLock = new object();
+			// TODO: Does the current file group reader need to be closed first? And wait for the read task to return?
+
+			localLogItems = new List<LogItemViewModelBase>();
 
 			loadedBasePath = basePath;
 			UpdateWindowTitle();
 
-			return Task.Factory.StartNew(() =>
-			{
-				EventWaitHandle readWaitHandle = new AutoResetEvent(false);
-				readWaitHandle.WaitAction(() => dispatcher.Invoke((Action) delegate
-				{
-					// Lock the local list so that no item loaded directly afterwards will get lost
-					// while we're still preparing the loaded items list to be pushed to the UI
-					lock (localLogItemsLock)
-					{
-						// Apply scope-based indenting to all items now
-						Dictionary<int, int> threadLevels = new Dictionary<int, int>();
-						Dictionary<Guid, FieldLogScopeItemViewModel> logStartItems = new Dictionary<Guid, FieldLogScopeItemViewModel>();
-						foreach (var item in localLogItems)
-						{
-							FieldLogScopeItemViewModel scope = item as FieldLogScopeItemViewModel;
-							if (scope != null)
-							{
-								threadLevels[scope.ThreadId] = scope.Level;
-								if (scope.Type == FieldLogScopeType.Enter)
-								{
-									scope.IndentLevel = scope.Level - 1;
-								}
-								else
-								{
-									scope.IndentLevel = scope.Level;
-								}
-
-								if (scope.Type == FieldLogScopeType.LogStart)
-								{
-									logStartItems[scope.SessionId] = scope;
-								}
-							}
-							else
-							{
-								FieldLogItemViewModel flItem = item as FieldLogItemViewModel;
-								if (flItem != null)
-								{
-									int level;
-									if (threadLevels.TryGetValue(flItem.ThreadId, out level))
-									{
-										flItem.IndentLevel = level;
-									}
-								}
-							}
-						}
-						foreach (var item in localLogItems)
-						{
-							FieldLogItemViewModel flItem = item as FieldLogItemViewModel;
-							if (flItem != null)
-							{
-								FieldLogScopeItemViewModel scope;
-								if (logStartItems.TryGetValue(flItem.SessionId, out scope))
-								{
-									flItem.LastLogStartItem = scope;
-								}
-							}
-						}
-						
-						// Publish loaded items to the UI
-						this.logItems = new ObservableCollection<LogItemViewModelBase>(localLogItems);
-						localLogItems = null;
-					}
-					// Notify the UI to make it show the new list of items.
-					// From now on, newly loaded items are added one by one to the collection that
-					// is already bound to the UI, so the new items will become visible.
-					OnPropertyChanged("LogItems");
-					IsLoadingFiles = false;
-					UpdateWindowTitle();
-					ViewCommandManager.Invoke("FinishedReadingFiles");
-				}));
-
-				logFileGroupReader = new FieldLogFileGroupReader(basePath, singleFile, readWaitHandle);
-				logFileGroupReader.Error += logFileGroupReader_Error;
-				List<FieldLogScopeItem> seenScopeItems = new List<FieldLogScopeItem>();
-				while (true)
-				{
-					FieldLogItem item = logFileGroupReader.ReadLogItem();
-					if (item == null)
-					{
-						// Signal the UI that this is it, no more items are coming.
-						readWaitHandle.Set();
-						break;
-					}
-					FieldLogItemViewModel itemVM = FieldLogItemViewModel.Create(item);
-					if (itemVM == null) break;   // Cannot happen actually
-
-					var scopeItem = item as FieldLogScopeItem;
-					if (scopeItem != null)
-					{
-						if (scopeItem.IsRepeated)
-						{
-							// Find existing scope item
-							if (seenScopeItems.Any(si => si.SessionId == scopeItem.SessionId && si.EventCounter == scopeItem.EventCounter))
-							{
-								// Skip this item, we already have it from an earlier file
-								continue;
-							}
-						}
-						seenScopeItems.Add(scopeItem);
-					}
-
-					lock (localLogItemsLock)
-					{
-						if (localLogItems != null)
-						{
-							localLogItems.InsertSorted(itemVM, new Comparison<LogItemViewModelBase>((a, b) => a.CompareTo(b)));
-						}
-						else
-						{
-							dispatcher.BeginInvoke(
-								new Action<LogItemViewModelBase>(this.InsertNewLogItem),
-								itemVM);
-						}
-					}
-				}
-			});
+			// Start the log file reading in a worker thread
+			return Task.Factory.StartNew(() => ReadTask(basePath, singleFile));
 		}
 
+		/// <summary>
+		/// Opens and reads the specified log files and pushes back all log items to the UI thread.
+		/// This method is running in a worker thread.
+		/// </summary>
+		/// <param name="basePath">The base path of the log files to load.</param>
+		/// <param name="singleFile">true to load a single file only. <paramref name="basePath"/> must be a full file name then.</param>
+		private void ReadTask(string basePath, bool singleFile)
+		{
+			// Set current thread name to aid debugging
+			Thread.CurrentThread.Name = "MainViewModel.ReadTask";
+			
+			// Setup and connect the wait handle that is set when all data has been read and we're
+			// now waiting for more items to be written to the log files.
+			EventWaitHandle readWaitHandle = new AutoResetEvent(false);
+			readWaitHandle.WaitAction(
+				() => dispatcher.Invoke((Action) OnReadWaitHandle),
+				() => !isLiveStopped);
+
+			// Create the log file group reader and read each next item
+			logFileGroupReader = new FieldLogFileGroupReader(basePath, singleFile, readWaitHandle);
+			logFileGroupReader.Error += logFileGroupReader_Error;
+			List<FieldLogScopeItem> seenScopeItems = new List<FieldLogScopeItem>();
+			while (true)
+			{
+				FieldLogItem item = logFileGroupReader.ReadLogItem();
+				if (item == null)
+				{
+					// Signal the UI that this is it, no more items are coming. (Reader closed)
+					readWaitHandle.Set();
+					break;
+				}
+				FieldLogItemViewModel itemVM = FieldLogItemViewModel.Create(item);
+				if (itemVM == null) break;   // Cannot happen actually
+
+				var scopeItem = item as FieldLogScopeItem;
+				if (scopeItem != null)
+				{
+					if (scopeItem.IsRepeated)
+					{
+						// Find existing scope item
+						if (seenScopeItems.Any(si => si.SessionId == scopeItem.SessionId && si.EventCounter == scopeItem.EventCounter))
+						{
+							// Skip this item, we already have it from an earlier file
+							continue;
+						}
+					}
+					seenScopeItems.Add(scopeItem);
+				}
+
+				bool upgradedLock = false;
+				localLogItemsLock.EnterUpgradeableReadLock();
+				try
+				{
+					if (localLogItems == null)
+					{
+						if (returnToLocalLogItemsList.WaitOne(0))
+						{
+							FL.Trace("ReadTask: returnToLocalLogItemsList was set", "Waiting for the UI queue to clear before taking the list back.");
+
+							// Wait for all queued items to be processed by the UI thread so that
+							// the list is complete and no item is lost
+							while (queuedNewItemsCount > 0)
+							{
+								Thread.Sleep(20);
+							}
+							// Ensure the items list is current when the queued counter is seen zero
+							Thread.MemoryBarrier();
+
+							localLogItemsLock.EnterWriteLock();
+							upgradedLock = true;
+							
+							// Setup everything as if we were still reading an initial set of log
+							// files and the the read Task thread use its local buffer again.
+							localLogItems = new List<LogItemViewModelBase>(logItems);
+							FL.Trace("ReadTask: took back the list");
+						}
+					}
+
+					if (localLogItems != null)
+					{
+						localLogItems.InsertSorted(itemVM, new Comparison<LogItemViewModelBase>((a, b) => a.CompareTo(b)));
+
+						if ((localLogItems.Count % 1000) == 0)
+						{
+							int count = localLogItems.Count;
+							dispatcher.BeginInvoke(new Action(() => LoadedItemsCount = count));
+						}
+					}
+					else
+					{
+						// Don't push a new item to the UI thread if there are currently more than
+						// 50 items waiting to be processed.
+						while (queuedNewItemsCount > 50)
+						{
+							Thread.Sleep(20);
+						}
+						
+						Interlocked.Increment(ref queuedNewItemsCount);
+						dispatcher.BeginInvoke(
+							new Action<LogItemViewModelBase>(this.InsertNewLogItem),
+							itemVM);
+					}
+				}
+				finally
+				{
+					if (upgradedLock)
+						localLogItemsLock.ExitWriteLock();
+					localLogItemsLock.ExitUpgradeableReadLock();
+				}
+			}
+		}
+
+		/// <summary>
+		/// Handles an error while reading the log files.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void logFileGroupReader_Error(object sender, ErrorEventArgs e)
 		{
 			if (!dispatcher.CheckAccess())
@@ -679,6 +708,10 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
+		/// <summary>
+		/// Inserts a new log item from the read thread to the UI thread's items list.
+		/// </summary>
+		/// <param name="item">The new log item to insert.</param>
 		private void InsertNewLogItem(LogItemViewModelBase item)
 		{
 			int newIndex = logItems.InsertSorted(item, (a, b) => a.CompareTo(b));
@@ -759,6 +792,155 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					prevIndex--;
 				}
 			}
+
+			// Ensure the items list is current when the queued counter is decremented
+			Thread.MemoryBarrier();
+			Interlocked.Decrement(ref queuedNewItemsCount);
+
+			// Test whether the UI thread is locked because of reading too many log items at once
+			if (insertingItemsSince == DateTime.MinValue)
+			{
+				insertingItemsSince = DateTime.UtcNow;
+				Dispatcher.CurrentDispatcher.BeginInvoke(
+					new Action(() => insertingItemsSince = DateTime.MinValue),
+					DispatcherPriority.Background);
+			}
+			if (DateTime.UtcNow > insertingItemsSince.AddMilliseconds(500))
+			{
+				FL.Trace("InsertNewLogItem: UI thread blocked for 500 ms", "Setting returnToLocalLogItemsList event");
+
+				// Blocking the UI with inserting log items for 500 ms now.
+				// Tell the read thread to stop sending new items to the UI thread separately, wait
+				// for all items to be handled by the UI thread, and then take back the log items
+				// ObservableCollection to a local List for faster inserting of many items.
+				returnToLocalLogItemsList.Set();
+
+				// The following actione still need to be performed by the UI thread
+				ViewCommandManager.Invoke("StartedReadingFiles");
+				IsLoadingFiles = true;
+
+				isLiveStopped = false;
+				StopLiveCommand.RaiseCanExecuteChanged();
+
+				// Do not execute this block again as long as the UI thread is still blocked
+				insertingItemsSince = insertingItemsSince.AddDays(1000);
+			}
+		}
+
+		/// <summary>
+		/// Called when the read wait handle has been set. All data has been read and we're now
+		/// waiting for more items to be written to the log files. Until now, the read thread was
+		/// adding new items to a local List for better performance. Now, this List is copied to
+		/// an ObservableCollection, displayed and managed by the UI thread. From now on, new items
+		/// will be posted to the UI thread separately for inserting in the items list, calling the
+		/// InsertNewLogItem method.
+		/// </summary>
+		private void OnReadWaitHandle()
+		{
+			FL.Trace("OnReadWaitHandle");
+
+			if (returnToLocalLogItemsList.WaitOne(0))
+			{
+				FL.Trace("OnReadWaitHandle: returnToLocalLogItemsList was set", "Reverting UI state, not touching log items lists.");
+				
+				// The UI thread has been busy inserting queued new items and has detected a long
+				// blocking period. It has then decided to signal the read thread to go back to
+				// inserting more items into a local List instead of the main ObservableCollection.
+				// But the read thread has already finished reading existing items and has
+				// indicated this by calling this method. So it won't actually go back to the local
+				// items list because it doesn't currently have any new items to read. The UI
+				// thread is still waiting for the read thread to return the list to the UI. This
+				// needs to be resolved here.
+
+				// returnToLocalLogItemsList is already reset just by testing it (AutoResetEvent).
+				// logItems and localLogItems has not yet been touched, nothing to do with that.
+				// Revert other UI state:
+				IsLoadingFiles = false;
+				ViewCommandManager.Invoke("FinishedReadingFiles");
+				return;
+			}
+			
+			// Lock the local list so that no item loaded directly afterwards will get lost
+			// while we're still preparing the loaded items list to be pushed to the UI
+			localLogItemsLock.EnterReadLock();
+			try
+			{
+				if (localLogItems == null) return;   // Nothing to do, just waiting once again in normal monitor mode
+			}
+			finally
+			{
+				localLogItemsLock.ExitReadLock();
+			}
+			localLogItemsLock.EnterWriteLock();
+			try
+			{
+				// Check again because we have released the lock since the last check
+				if (localLogItems == null) return;   // Nothing to do, just waiting once again in normal monitor mode
+
+				// Apply scope-based indenting to all items now
+				Dictionary<int, int> threadLevels = new Dictionary<int, int>();
+				Dictionary<Guid, FieldLogScopeItemViewModel> logStartItems = new Dictionary<Guid, FieldLogScopeItemViewModel>();
+				foreach (var item in localLogItems)
+				{
+					FieldLogScopeItemViewModel scope = item as FieldLogScopeItemViewModel;
+					if (scope != null)
+					{
+						threadLevels[scope.ThreadId] = scope.Level;
+						if (scope.Type == FieldLogScopeType.Enter)
+						{
+							scope.IndentLevel = scope.Level - 1;
+						}
+						else
+						{
+							scope.IndentLevel = scope.Level;
+						}
+
+						if (scope.Type == FieldLogScopeType.LogStart)
+						{
+							logStartItems[scope.SessionId] = scope;
+						}
+					}
+					else
+					{
+						FieldLogItemViewModel flItem = item as FieldLogItemViewModel;
+						if (flItem != null)
+						{
+							int level;
+							if (threadLevels.TryGetValue(flItem.ThreadId, out level))
+							{
+								flItem.IndentLevel = level;
+							}
+						}
+					}
+				}
+				foreach (var item in localLogItems)
+				{
+					FieldLogItemViewModel flItem = item as FieldLogItemViewModel;
+					if (flItem != null)
+					{
+						FieldLogScopeItemViewModel scope;
+						if (logStartItems.TryGetValue(flItem.SessionId, out scope))
+						{
+							flItem.LastLogStartItem = scope;
+						}
+					}
+				}
+
+				// Publish loaded items to the UI
+				this.logItems = new ObservableCollection<LogItemViewModelBase>(localLogItems);
+				localLogItems = null;
+			}
+			finally
+			{
+				localLogItemsLock.ExitWriteLock();
+			}
+			// Notify the UI to make it show the new list of items.
+			// From now on, newly loaded items are added one by one to the collection that
+			// is already bound to the UI, so the new items will become visible.
+			OnPropertyChanged("LogItems");
+			IsLoadingFiles = false;
+			UpdateWindowTitle();
+			ViewCommandManager.Invoke("FinishedReadingFiles");
 		}
 
 		#endregion Log file loading

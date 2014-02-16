@@ -1,5 +1,5 @@
 ﻿#path=C:\path\to\prefix
-maxfilesize=50k
+maxfilesize=150k
 maxtotalsize=100m
 keeptrace=14d
 keepcheckpoint=14d

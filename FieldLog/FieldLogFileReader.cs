@@ -22,6 +22,7 @@ namespace Unclassified.FieldLog
 		private Dictionary<int, string> textCache = new Dictionary<int, string>();
 		private FileStream fileStream;
 		private long startPosition;
+		private int itemCount;
 		private bool waitMode;
 		private readonly object waitModeLock = new object();
 
@@ -107,6 +108,15 @@ namespace Unclassified.FieldLog
 		}
 
 		/// <summary>
+		/// Gets the number of items that have been read by this FieldLogFileReader instance since
+		/// it has been created or reset.
+		/// </summary>
+		public int ItemCount
+		{
+			get { return itemCount; }
+		}
+
+		/// <summary>
 		/// Gets or sets a follow-up reader to use when this file has been read till the end.
 		/// Setting a value for NextReader unsets WaitMode for this reader. This property is
 		/// thread-safe.
@@ -125,8 +135,6 @@ namespace Unclassified.FieldLog
 				lock (nextReaderLock)
 				{
 					nextReader = value;
-					// Unset wait mode for this reader, now that we know where to continue after this file
-					WaitMode = false;
 				}
 			}
 		}
@@ -147,7 +155,7 @@ namespace Unclassified.FieldLog
 		/// the end and if the reader is now going to wait for further data to be appended to the
 		/// file.
 		/// </summary>
-		public EventWaitHandle ReadWaitHandle { get; set; }
+		public ManualResetEvent ReadWaitHandle { get; set; }
 
 		#endregion Public properties
 
@@ -206,13 +214,20 @@ namespace Unclassified.FieldLog
 			while (true)
 			{
 				bytes = TryReadBytes(count);
-				if (bytes != null) return bytes;
+				if (bytes != null)
+				{
+					// Something has been read. There might be more. Reset the "waiting" signal
+					if (ReadWaitHandle != null)
+					{
+						ReadWaitHandle.Reset();
+					}
+					return bytes;
+				}
 				if (!WaitMode) return null;
 				// The file has been read until the current end, signal that
 				if (ReadWaitHandle != null)
 				{
 					ReadWaitHandle.Set();
-					ReadWaitHandle = null;
 				}
 				Thread.Sleep(readWaitMilliseconds);
 				if (!WaitMode || closeEvent.WaitOne(0)) return null;
@@ -346,6 +361,7 @@ namespace Unclassified.FieldLog
 				}
 				while (type == FieldLogItemType.StringData);
 
+				itemCount++;
 				return FieldLogItem.Read(this, type);
 			}
 			catch (Exception ex)
@@ -377,6 +393,7 @@ namespace Unclassified.FieldLog
 			try
 			{
 				fileStream.Seek(startPosition, SeekOrigin.Begin);
+				itemCount = 0;
 			}
 			catch (Exception ex)
 			{

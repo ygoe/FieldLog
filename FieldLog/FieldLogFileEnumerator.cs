@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Unclassified.FieldLog
 {
@@ -75,8 +77,9 @@ namespace Unclassified.FieldLog
 			{
 				if (nextReader != null)
 				{
+					FL.Trace(reader.ItemCount + " items read from " + Path.GetFileName(reader.FileName));
 					reader = nextReader;
-					reader.Reset();
+					FL.Trace("Switching to next reader " + Path.GetFileName(reader.FileName));
 				}
 
 				try
@@ -107,7 +110,9 @@ namespace Unclassified.FieldLog
 
 		/// <summary>
 		/// Sets the enumerator to its initial position, which is before the first log item of the
-		/// first log file.
+		/// first log file. WARNING: This function is not used yet and may not work as expected.
+		/// It is implemented as part of the IEnumerator interface and probably does not work
+		/// correctly regarding the WaitMode flag because it is re-reading from used readers.
 		/// </summary>
 		public void Reset()
 		{
@@ -116,15 +121,19 @@ namespace Unclassified.FieldLog
 		}
 
 		/// <summary>
-		/// Sets the close signal for the currently used log file reader. This may only have the
-		/// desired effect if WaitMode is set for this log file reader.
+		/// Sets the close signal for the currently used log file reader.
 		/// </summary>
 		public void Close()
 		{
-			if (reader != null)
+			reader.Close();
+			// Also close all other readers of this enumerator, just to be sure
+			FieldLogFileReader r = firstReader;
+			do
 			{
-				reader.Close();
+				r.Close();
+				r = r.NextReader;
 			}
+			while (r != null);
 		}
 
 		/// <summary>
@@ -171,6 +180,38 @@ namespace Unclassified.FieldLog
 				r = r.NextReader;
 			}
 			return false;
+		}
+
+		/// <summary>
+		/// Appends a new FieldLogFileReader at the end of this enumerator.
+		/// </summary>
+		/// <param name="newReader">The new reader to append.</param>
+		/// <param name="fromFsw">Indicates whether the reader was created from a FileSystemWatcher event.</param>
+		public void Append(FieldLogFileReader newReader, bool fromFsw)
+		{
+			FieldLogFileReader currentLastReader = LastReader;
+			currentLastReader.NextReader = newReader;
+			// Unset wait mode for this reader, now that we know where to continue after this file
+			if (fromFsw)
+			{
+				// The file is newly created. Take some time to actually start reading the previous
+				// file before switching to this one. Once the first item has been read from the
+				// file, more items will likely exist in the file, and the file is read until the
+				// end. Then it will still sit there waiting for more items until the rest of this
+				// delay has elapsed (which is not a big problem, if we get any items from that
+				// file at all).
+				Task.Factory.StartNew(() =>
+				{
+					Thread.Sleep(1000);
+					currentLastReader.WaitMode = false;
+				});
+			}
+			else
+			{
+				currentLastReader.WaitMode = false;
+			}
+			FL.Trace("Appending next reader", "this=" + Path.GetFileName(currentLastReader.FileName) + "\nNext=" + Path.GetFileName(newReader.FileName) +
+				"\nItems read from this=" + currentLastReader.ItemCount);
 		}
 
 		/// <summary>

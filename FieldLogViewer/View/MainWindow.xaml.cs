@@ -46,6 +46,7 @@ namespace Unclassified.FieldLogViewer.View
 		private SmoothVirtualizingPanel logItemsHostPanel;
 		private DelayedCall logItemsScrollPixelDc;
 		private bool isFlashing;
+		private bool isScrollAnimationPosted;
 
 		#endregion Private data
 
@@ -181,19 +182,24 @@ namespace Unclassified.FieldLogViewer.View
 						{
 							// Start the animation later when the layout has been updated and we
 							// know the maximum height to scroll to
-							Dispatcher.BeginInvoke(
-								(Action) delegate
-								{
-									logItemsScrollPixelDc.Reset();
-									logItemsHostPanel.ScrollToPixel = false;
+							if (!isScrollAnimationPosted)
+							{
+								Dispatcher.BeginInvoke(
+									(Action) delegate
+									{
+										isScrollAnimationPosted = false;
+										logItemsScrollPixelDc.Reset();
+										logItemsHostPanel.ScrollToPixel = false;
 
-									logItemsScrollMediator.AnimateEaseOut(
-										ScrollViewerOffsetMediator.VerticalOffsetProperty,
-										logItemsScroll.VerticalOffset,
-										logItemsScroll.ScrollableHeight,
-										TimeSpan.FromMilliseconds(500));
-								},
-								System.Windows.Threading.DispatcherPriority.Background);
+										logItemsScrollMediator.AnimateEaseOut(
+											ScrollViewerOffsetMediator.VerticalOffsetProperty,
+											logItemsScroll.VerticalOffset,
+											logItemsScroll.ScrollableHeight,
+											TimeSpan.FromMilliseconds(500));
+									},
+									System.Windows.Threading.DispatcherPriority.Background);
+								isScrollAnimationPosted = true;
+							}
 						}
 						else
 						{

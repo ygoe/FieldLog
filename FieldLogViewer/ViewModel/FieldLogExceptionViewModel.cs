@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Unclassified.FieldLog;
 using System.Windows;
+using Unclassified.FieldLog;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
@@ -30,6 +30,14 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public string Data { get { return this.Exception.Data; } }
 		public IEnumerable<FieldLogStackFrameViewModel> StackFrameVMs { get; private set; }
 		public IEnumerable<FieldLogExceptionViewModel> InnerExceptionVMs { get; private set; }
+
+		public string CodeStr
+		{
+			get
+			{
+				return Code + " (0x" + Code.ToString("X8") + ")";
+			}
+		}
 
 		public Visibility InnerExceptionsVisibility
 		{

@@ -63,7 +63,7 @@
 			</ItemsControl>
 
 			<TextBlock Grid.Row="3" Grid.Column="0" Margin="0,8,0,0" Text="Error code:"/>
-			<TextBox Grid.Row="3" Grid.Column="1" Margin="0,8,0,0" Text="{Binding Code, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+			<TextBox Grid.Row="3" Grid.Column="1" Margin="0,8,0,0" Text="{Binding CodeStr, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
 			<TextBlock Grid.Row="4" Grid.Column="0" Margin="0,0,0,0" Text="Other data:"/>
 			<TextBox Grid.Row="4" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Data, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>

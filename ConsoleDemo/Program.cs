@@ -26,7 +26,7 @@ namespace ConsoleDemo
 		{
 			Console.WriteLine("Load test pattern...");
 
-			for (int i = 1; i <= 10000; i++)
+			for (int i = 1; i <= 50000; i++)
 			{
 				FL.Trace("Load test - " + i);
 				

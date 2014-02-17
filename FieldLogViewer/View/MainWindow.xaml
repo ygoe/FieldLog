@@ -86,8 +86,12 @@
 				ItemsSource="{Binding SortedFilters}"
 				SelectedItem="{Binding SelectedFilter}"
 				DisplayMemberPath="DisplayName"/>
-			<TextBlock Margin="4,0,4,0" VerticalAlignment="Center" MinWidth="50">
-				<Run Text="("/><Run Text="{Binding FilteredLogItems.Count, Mode=OneWay}"/><Run Text=")"/>
+			<TextBlock Margin="4,0,0,0" VerticalAlignment="Center" TextAlignment="Right" MinWidth="45">
+				<Run Text="{Binding FilteredLogItems.Count, Mode=OneWay}"/>
+			</TextBlock>
+			<TextBlock Margin="0,0,0,0" VerticalAlignment="Center" Text="/"/>
+			<TextBlock Margin="0,0,4,0" VerticalAlignment="Center" TextAlignment="Right" MinWidth="45">
+				<Run Text="{Binding LoadedItemsCount, Mode=OneWay}"/>
 			</TextBlock>
 			<Separator/>
 			<Button Command="{Binding SettingsCommand}" ToolTip="Settings">
@@ -546,9 +550,7 @@
 				VerticalAlignment="Center" HorizontalAlignment="Center"
 				Visibility="{Binding LoadingMsgVisibility}">
 				<TextBlock FontStyle="Italic" TextAlignment="Center">
-					<Run Text="Loading log files, now at"/>
-					<Run Text="{Binding LoadedItemsCount}"/>
-					<Run Text="items, please wait..."/>
+					<Run Text="Loading log files, please wait..."/>
 				</TextBlock>
 				<TextBlock Margin="0,8,0,0" FontStyle="Italic" TextAlignment="Center">
 					<Run Text="Press the"/>

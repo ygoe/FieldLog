@@ -109,7 +109,11 @@ namespace Unclassified.UI
 				if (value != scrollToPixel)
 				{
 					scrollToPixel = value;
-					SetVerticalOffset(offset.Y);
+					if (scrollToPixel && offset.Y != Math.Round(offset.Y))
+					{
+						// Align to the pixel again
+						SetVerticalOffset(offset.Y);
+					}
 				}
 			}
 		}

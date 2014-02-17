@@ -165,49 +165,9 @@ namespace Unclassified.FieldLogViewer.View
 			{
 				DateTime now = DateTime.UtcNow;
 
-				// OLD: Used before we had the FinishedReadingFiles ViewCommand
-				//if (prevItemTime != DateTime.MinValue && now > prevItemTime.AddSeconds(1))
-				//{
-				//    logItemsSmoothScrollActive = true;
-				//}
+				CheckScrollToEnd();
 
-				FindLogItemsScroll();
-				if (logItemsScroll != null)
-				{
-					// Only scroll to the end if we're already near it and if the option is enabled
-					MainViewModel vm = DataContext as MainViewModel;
-					if (logItemsScrolledNearEnd && vm != null && vm.IsLiveScrollingEnabled)
-					{
-						if (logItemsSmoothScrollActive)
-						{
-							// Start the animation later when the layout has been updated and we
-							// know the maximum height to scroll to
-							if (!isScrollAnimationPosted)
-							{
-								Dispatcher.BeginInvoke(
-									(Action) delegate
-									{
-										isScrollAnimationPosted = false;
-										logItemsScrollPixelDc.Reset();
-										logItemsHostPanel.ScrollToPixel = false;
-
-										logItemsScrollMediator.AnimateEaseOut(
-											ScrollViewerOffsetMediator.VerticalOffsetProperty,
-											logItemsScroll.VerticalOffset,
-											logItemsScroll.ScrollableHeight,
-											TimeSpan.FromMilliseconds(500));
-									},
-									System.Windows.Threading.DispatcherPriority.Background);
-								isScrollAnimationPosted = true;
-							}
-						}
-						else
-						{
-							logItemsScroll.ScrollToEnd();
-						}
-					}
-				}
-
+				// Flash window on new item, if window is inactive and not yet flashing
 				if (MainViewModel.Instance.IsFlashingEnabled)
 				{
 					if (!this.IsActive)
@@ -238,6 +198,45 @@ namespace Unclassified.FieldLogViewer.View
 			}
 		}
 
+		private void CheckScrollToEnd()
+		{
+			FindLogItemsScroll();
+			if (logItemsScroll != null)
+			{
+				// Only scroll to the end if we're already near it and if the option is enabled
+				if (logItemsScrolledNearEnd && MainViewModel.Instance.IsLiveScrollingEnabled)
+				{
+					if (logItemsSmoothScrollActive)
+					{
+						// Start the animation later when the layout has been updated and we
+						// know the maximum height to scroll to
+						if (!isScrollAnimationPosted)
+						{
+							Dispatcher.BeginInvoke(
+								(Action) delegate
+								{
+									isScrollAnimationPosted = false;
+									logItemsScrollPixelDc.Reset();
+									logItemsHostPanel.ScrollToPixel = false;
+
+									logItemsScrollMediator.AnimateEaseOut(
+										ScrollViewerOffsetMediator.VerticalOffsetProperty,
+										logItemsScroll.VerticalOffset,
+										logItemsScroll.ScrollableHeight,
+										TimeSpan.FromMilliseconds(500));
+								},
+								System.Windows.Threading.DispatcherPriority.Input);
+							isScrollAnimationPosted = true;
+						}
+					}
+					else
+					{
+						logItemsScroll.ScrollToEnd();
+					}
+				}
+			}
+		}
+
 		private void FindLogItemsScroll()
 		{
 			if (logItemsScroll == null)
@@ -255,9 +254,6 @@ namespace Unclassified.FieldLogViewer.View
 					logItemsScroll = border.Child as ScrollViewer;
 					if (logItemsScroll != null)
 					{
-						// Enable smooth scrolling of partial item heights
-						//logItemsScroll.CanContentScroll = false;
-
 						logItemsScroll.ScrollChanged += logItemsScroll_ScrollChanged;
 
 						// Initialise scrolling mediator
@@ -297,9 +293,15 @@ namespace Unclassified.FieldLogViewer.View
 		public void FinishedReadingFiles()
 		{
 			logItemsHostPanel.UpdateLayout();
-
 			ScrollToEnd();
 			logItemsSmoothScrollActive = true;
+		}
+
+		[ViewCommand]
+		public void FinishedReadingFilesAgain()
+		{
+			logItemsSmoothScrollActive = true;
+			CheckScrollToEnd();
 		}
 
 		[ViewCommand]

@@ -26,6 +26,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 			InitializeCommands();
 
+			comparison = FilterComparison.Contains;
 			value = "";
 			isEnabled = true;
 		}

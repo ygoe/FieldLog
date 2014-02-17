@@ -36,6 +36,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		private FieldLogFileGroupReader logFileGroupReader;
 		private bool isLiveStopped = true;
 		private DateTime insertingItemsSince;
+		private Task readerTask;
 		
 		/// <summary>
 		/// Buffer for all read items that are collected in the separate Task thread and then
@@ -551,8 +552,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		/// </summary>
 		/// <param name="basePath">The base path of the log files to load.</param>
 		/// <param name="singleFile">true to load a single file only. <paramref name="basePath"/> must be a full file name then.</param>
-		/// <returns></returns>
-		public Task OpenFiles(string basePath, bool singleFile = false)
+		public void OpenFiles(string basePath, bool singleFile = false)
 		{
 			if (basePath == null) throw new ArgumentNullException("basePath");
 			if (basePath.Equals(FL.LogFileBasePath, StringComparison.InvariantCultureIgnoreCase))
@@ -563,9 +563,18 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					"Error",
 					MessageBoxButton.OK,
 					MessageBoxImage.Warning);
-				return null;
+				return;
 			}
-			
+
+			// First make sure any open reader is fully closed and won't send any new items anymore
+			OnStopLive();
+			if (readerTask != null)
+			{
+				readerTask.Wait();
+				// Also process any queued operations like OnReadWaiting...
+				TaskHelper.DoEvents();
+			}
+
 			ViewCommandManager.Invoke("StartedReadingFiles");
 			IsLoadingFiles = true;
 
@@ -574,15 +583,13 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			isLiveStopped = false;
 			StopLiveCommand.RaiseCanExecuteChanged();
 
-			// TODO: Does the current file group reader need to be closed first? And wait for the read task to return?
-
 			localLogItems = new List<LogItemViewModelBase>();
 
 			loadedBasePath = basePath;
 			UpdateWindowTitle();
 
 			// Start the log file reading in a worker thread
-			return Task.Factory.StartNew(() => ReadTask(basePath, singleFile));
+			readerTask = Task.Factory.StartNew(() => ReadTask(basePath, singleFile));
 		}
 
 		/// <summary>

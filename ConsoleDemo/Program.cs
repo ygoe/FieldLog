@@ -18,8 +18,8 @@ namespace ConsoleDemo
 			Console.WriteLine("FieldLog writer demo application");
 			Console.WriteLine();
 
-			//NormalActivity();
-			LoadTest();
+			NormalActivity();
+			//LoadTest();
 		}
 
 		static void LoadTest()

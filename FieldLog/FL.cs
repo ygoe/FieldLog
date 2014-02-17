@@ -1255,7 +1255,10 @@ namespace Unclassified.FieldLog
 			lock (currentBufferLock)
 			{
 				if (isShutdown)
-					throw new InvalidOperationException("New messages are not accepted because the log queue has been shut down.");
+				{
+					System.Diagnostics.Trace.WriteLine("FieldLog: New messages are not accepted because the log queue has been shut down.");
+					return;
+				}
 				eventCounter++;
 				item.EventCounter = eventCounter;
 				CheckAddBuffer(size);

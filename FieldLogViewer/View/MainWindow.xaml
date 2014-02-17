@@ -4,7 +4,7 @@
 	xmlns:c="clr-namespace:Unclassified.FieldLogViewer.Converters"
 	xmlns:my="clr-namespace:Unclassified.FieldLogViewer"
 	xmlns:f="clr-namespace:Unclassified.FieldLog;assembly=FieldLog"
-	xmlns:u="clr-namespace:Unclassified.UI"
+	xmlns:ui="clr-namespace:Unclassified.UI"
 	xmlns:v="clr-namespace:Unclassified.FieldLogViewer.View"
 	xmlns:vm="clr-namespace:Unclassified.FieldLogViewer.ViewModel"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -82,10 +82,16 @@
 			<Image Source="/Images/filter.png"/>
 			<ComboBox
 				Width="150"
+				Padding="0,1"
 				ToolTip="Select filter"
 				ItemsSource="{Binding SortedFilters}"
 				SelectedItem="{Binding SelectedFilter}"
 				DisplayMemberPath="DisplayName"/>
+			<TextBox
+				Width="150"
+				ToolTip="Search text within filtered items"
+				Text="{Binding AdhocSearchText}"
+				ui:TextBoxExtensions.UpdateDelay="500"/>
 			<TextBlock Margin="4,0,0,0" VerticalAlignment="Center" TextAlignment="Right" MinWidth="45">
 				<Run Text="{Binding FilteredLogItems.Count, Mode=OneWay}"/>
 			</TextBlock>
@@ -121,7 +127,7 @@
 				Visibility="{Binding LogItemsVisibility}">
 				<ListBox.ItemsPanel>
 					<ItemsPanelTemplate>
-						<u:SmoothVirtualizingPanel ItemHeight="18" Loaded="SmoothVirtualizingPanel_Loaded"/>
+						<ui:SmoothVirtualizingPanel ItemHeight="18" Loaded="SmoothVirtualizingPanel_Loaded"/>
 					</ItemsPanelTemplate>
 				</ListBox.ItemsPanel>
 				<ListBox.ItemContainerStyle>

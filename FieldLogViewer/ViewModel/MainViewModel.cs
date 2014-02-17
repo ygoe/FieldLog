@@ -37,6 +37,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		private bool isLiveStopped = true;
 		private DateTime insertingItemsSince;
 		private Task readerTask;
+		private FilterConditionViewModel adhocFilterCondition;
 		
 		/// <summary>
 		/// Buffer for all read items that are collected in the separate Task thread and then
@@ -373,6 +374,31 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
+		private string adhocSearchText;
+		public string AdhocSearchText
+		{
+			get { return adhocSearchText; }
+			set
+			{
+				if (CheckUpdate(value, ref adhocSearchText, "AdhocSearchText"))
+				{
+					if (!string.IsNullOrWhiteSpace(adhocSearchText))
+					{
+						adhocFilterCondition = new FilterConditionViewModel(null);
+						adhocFilterCondition.Value = adhocSearchText;
+					}
+					else
+					{
+						adhocFilterCondition = null;
+					}
+
+					ViewCommandManager.Invoke("SaveScrolling");
+					RefreshLogItemsFilterView();
+					ViewCommandManager.Invoke("RestoreScrolling");
+				}
+			}
+		}
+
 		private bool isLoadingFiles;
 		public bool IsLoadingFiles
 		{
@@ -495,7 +521,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			if (SelectedFilter != null)
 			{
-				e.Accepted = SelectedFilter.IsMatch(e.Item);
+				e.Accepted =
+					SelectedFilter.IsMatch(e.Item) &&
+					(adhocFilterCondition == null || adhocFilterCondition.IsMatch(e.Item));
 			}
 			else
 			{

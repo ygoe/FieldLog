@@ -317,7 +317,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		/// </summary>
 		public void OnFilterChanged(bool affectsItems)
 		{
-			if (enableFilterChangedEvent)
+			if (enableFilterChangedEvent && parentConditionGroup != null)
 			{
 				parentConditionGroup.OnFilterChanged(affectsItems);
 			}

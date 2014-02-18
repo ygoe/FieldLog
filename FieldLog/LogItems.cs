@@ -585,8 +585,6 @@ namespace Unclassified.FieldLog
 
 	#endregion Scope log item class
 
-	// TODO: Prepare time measurement by log items (not only temporarily in the log viewer) - with multiple intermediate times, with multiple timers
-
 	#region Scope helpers
 
 	/// <summary>

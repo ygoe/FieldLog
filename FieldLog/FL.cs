@@ -219,7 +219,11 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Locks access to custom time measurement data.
 		/// </summary>
+#if !NET20
 		private static ReaderWriterLockSlim customTimersLock = new ReaderWriterLockSlim();
+#else
+		private static object customTimersLock = new object();
+#endif
 
 		#endregion Private static data
 
@@ -1344,21 +1348,33 @@ namespace Unclassified.FieldLog
 		{
 			CustomTimerInfo cti;
 
+#if !NET20
 			customTimersLock.EnterReadLock();
+#else
+			Monitor.Enter(customTimersLock);
+#endif
 			try
 			{
 				customTimers.TryGetValue(key, out cti);
 			}
 			finally
 			{
+#if !NET20
 				customTimersLock.ExitReadLock();
+#else
+				Monitor.Exit(customTimersLock);
+#endif
 			}
 
 			if (cti == null)
 			{
 				// New key
 				// The write lock must be outside the read lock
+#if !NET20
 				customTimersLock.EnterWriteLock();
+#else
+				Monitor.Enter(customTimersLock);
+#endif
 				try
 				{
 					// Re-check because we have given up the lock shortly
@@ -1371,7 +1387,11 @@ namespace Unclassified.FieldLog
 				}
 				finally
 				{
+#if !NET20
 					customTimersLock.ExitWriteLock();
+#else
+					Monitor.Exit(customTimersLock);
+#endif
 				}
 			}
 
@@ -1388,7 +1408,11 @@ namespace Unclassified.FieldLog
 		{
 			CustomTimerInfo cti;
 
+#if !NET20
 			customTimersLock.EnterReadLock();
+#else
+			Monitor.Enter(customTimersLock);
+#endif
 			try
 			{
 				if (!customTimers.TryGetValue(key, out cti))
@@ -1398,7 +1422,11 @@ namespace Unclassified.FieldLog
 			}
 			finally
 			{
+#if !NET20
 				customTimersLock.ExitReadLock();
+#else
+				Monitor.Exit(customTimersLock);
+#endif
 			}
 
 			cti.Stop();
@@ -1412,7 +1440,11 @@ namespace Unclassified.FieldLog
 		{
 			CustomTimerInfo cti;
 
+#if !NET20
 			customTimersLock.EnterWriteLock();
+#else
+			Monitor.Enter(customTimersLock);
+#endif
 			try
 			{
 				if (customTimers.TryGetValue(key, out cti))
@@ -1423,7 +1455,11 @@ namespace Unclassified.FieldLog
 			}
 			finally
 			{
+#if !NET20
 				customTimersLock.ExitWriteLock();
+#else
+				Monitor.Exit(customTimersLock);
+#endif
 			}
 		}
 

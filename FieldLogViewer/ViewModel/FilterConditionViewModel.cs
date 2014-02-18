@@ -401,11 +401,16 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						dbgMsg = item as DebugMessageViewModel;
 
 					if (textItem != null)
-						result = CompareString(textItem.Text) || CompareString(textItem.Details);
+						result = CompareString(textItem.SessionId.ToString("D")) ||
+							CompareString(textItem.Text) ||
+							CompareString(textItem.Details);
 					else if (dataItem != null)
-						result = CompareString(dataItem.Name) || CompareString(dataItem.Value);
+						result = CompareString(dataItem.SessionId.ToString("D")) ||
+							CompareString(dataItem.Name) ||
+							CompareString(dataItem.Value);
 					else if (exItem != null)
-						result = CompareString(exItem.Context) ||
+						result = CompareString(exItem.SessionId.ToString("D")) ||
+							CompareString(exItem.Context) ||
 							CompareExceptionTypeRecursive(exItem.Exception) ||
 							CompareExceptionMessageRecursive(exItem.Exception) ||
 							CompareExceptionDataRecursive(exItem.Exception) ||
@@ -422,7 +427,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 								CompareString(exItem.EnvironmentData.OSProductName) ||
 								CompareString(exItem.EnvironmentData.UserName));
 					else if (scopeItem != null)
-						result = CompareString(scopeItem.Name) ||
+						result = CompareString(scopeItem.SessionId.ToString("D")) ||
+							CompareString(scopeItem.Name) ||
 							!FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData) &&
 								(CompareString(scopeItem.EnvironmentData.AppCompatLayer) ||
 								CompareString(scopeItem.EnvironmentData.AppVersion) ||

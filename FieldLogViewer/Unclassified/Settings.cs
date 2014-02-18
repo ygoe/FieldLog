@@ -228,7 +228,14 @@ namespace Unclassified
 
 					if (delayedSave != null && delayedSave.IsWaiting) delayedSave.Cancel();
 					if (delayedSave != null) delayedSave.Dispose();
-					delayedSave = DelayedCall.Start(Save, SaveDelay);
+					if (DelayedCall.SupportsSynchronization)
+					{
+						delayedSave = DelayedCall.Start(Save, SaveDelay);
+					}
+					else
+					{
+						delayedSave = DelayedCall.StartAsync(Save, SaveDelay);
+					}
 				}
 			}
 		}
@@ -277,7 +284,14 @@ namespace Unclassified
 
 					if (delayedSave != null && delayedSave.IsWaiting) delayedSave.Cancel();
 					if (delayedSave != null) delayedSave.Dispose();
-					delayedSave = DelayedCall.Start(Save, SaveDelay);
+					if (DelayedCall.SupportsSynchronization)
+					{
+						delayedSave = DelayedCall.Start(Save, SaveDelay);
+					}
+					else
+					{
+						delayedSave = DelayedCall.StartAsync(Save, SaveDelay);
+					}
 				}
 			}
 		}
@@ -300,7 +314,14 @@ namespace Unclassified
 					RemoveHandler(key, null);
 					if (delayedSave != null && delayedSave.IsWaiting) delayedSave.Cancel();
 					if (delayedSave != null) delayedSave.Dispose();
-					delayedSave = DelayedCall.Start(Save, SaveDelay);
+					if (DelayedCall.SupportsSynchronization)
+					{
+						delayedSave = DelayedCall.Start(Save, SaveDelay);
+					}
+					else
+					{
+						delayedSave = DelayedCall.StartAsync(Save, SaveDelay);
+					}
 				}
 			}
 		}
@@ -949,10 +970,8 @@ namespace Unclassified
 							using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider())
 							{
 								aes.Key = keyGenerator.GetBytes(aes.KeySize / 8);
-								byte[] iv = new byte[aes.BlockSize / 8];
-								fs.Read(iv, 0, iv.Length);
-								aes.IV = iv;
-
+								aes.IV = keyGenerator.GetBytes(aes.BlockSize / 8);
+								
 								using (CryptoStream cs = new CryptoStream(fs, aes.CreateDecryptor(), CryptoStreamMode.Read))
 								using (StreamReader sr = new StreamReader(cs))
 								{
@@ -1357,13 +1376,13 @@ namespace Unclassified
 					using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider())
 					{
 						aes.Key = keyGenerator.GetBytes(aes.KeySize / 8);
+						aes.IV = keyGenerator.GetBytes(aes.BlockSize / 8);
 
 						using (FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
 						using (CryptoStream cs = new CryptoStream(fs, aes.CreateEncryptor(), CryptoStreamMode.Write))
 						using (StreamWriter sw = new StreamWriter(cs, Encoding.UTF8))
 						{
 							fs.Write(salt, 0, salt.Length);
-							fs.Write(aes.IV, 0, aes.IV.Length);
 
 							XmlWriter writer = XmlWriter.Create(sw, xws);
 							xdoc.Save(writer);

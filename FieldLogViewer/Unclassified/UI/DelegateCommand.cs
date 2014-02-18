@@ -7,7 +7,7 @@ using System.Windows.Threading;
 namespace Unclassified.UI
 {
 	/// <summary>
-	/// Provides an <see cref="ICommand"/> implementation which relays the <see cref="Execute"/> and <see cref="CanExecute"/>
+	/// Provides an <see cref="ICommand"/> implementation which relays the Execute and CanExecute
 	/// method to the specified delegates.
 	/// </summary>
 	public class DelegateCommand : ICommand
@@ -115,7 +115,7 @@ namespace Unclassified.UI
 		/// <summary>
 		/// Defines the method that determines whether the command can execute in its current state.
 		/// </summary>
-		/// <param name="parameter">Data used by the command.  If the command does not require data to be passed, this object can be set to null.</param>
+		/// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null.</param>
 		/// <returns>
 		/// true if this command can be executed; otherwise, false.
 		/// </returns>
@@ -128,8 +128,8 @@ namespace Unclassified.UI
 		/// <summary>
 		/// Defines the method to be called when the command is invoked.
 		/// </summary>
-		/// <param name="parameter">Data used by the command.  If the command does not require data to be passed, this object can be set to null.</param>
-		/// <exception cref="InvalidOperationException">The <see cref="CanExecute"/> method returns <c>false.</c></exception>
+		/// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null.</param>
+		/// <exception cref="InvalidOperationException">The <see cref="CanExecute"/> method returns false.</exception>
 		[DebuggerStepThrough]
 		public void Execute(object parameter)
 		{
@@ -141,11 +141,20 @@ namespace Unclassified.UI
 			execute(parameter);
 		}
 
+		/// <summary>
+		/// Convenience method that invokes the command without parameters.
+		/// </summary>
+		/// <exception cref="InvalidOperationException">The <see cref="CanExecute"/> method returns false.</exception>
 		public void Execute()
 		{
 			Execute(null);
 		}
 
+		/// <summary>
+		/// Invokes the command if the <see cref="CanExecute"/> method returns true.
+		/// </summary>
+		/// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null.</param>
+		/// <returns>true if this command was executed; otherwise, false.</returns>
 		public bool TryExecute(object parameter)
 		{
 			if (CanExecute(parameter))
@@ -156,6 +165,10 @@ namespace Unclassified.UI
 			return false;
 		}
 
+		/// <summary>
+		/// Convenience method that invokes the command without parameters if the
+		/// <see cref="CanExecute"/> method returns true.
+		/// </summary>
 		public bool TryExecute()
 		{
 			return TryExecute(null);

@@ -104,6 +104,24 @@ namespace Unclassified
 		}
 
 		/// <summary>
+		/// Returns an empty sequence if the source is null.
+		/// </summary>
+		/// <typeparam name="T">The type of the elements of <paramref name="source"/>.</typeparam>
+		/// <param name="source">The source sequence.</param>
+		/// <returns></returns>
+		public static IEnumerable<T> EmptyIfNull<T>(this IEnumerable<T> source)
+		{
+			if (source == null)
+			{
+				return new T[0];
+			}
+			else
+			{
+				return source;
+			}
+		}
+
+		/// <summary>
 		/// Determines whether any element of a sequence satisfies a condition. If the sequence is
 		/// empty, this method returns true (in contrast to the framework's Any method which
 		/// returns false in that case).
@@ -153,11 +171,18 @@ namespace Unclassified
 
 		#region Sorted collections
 
-		public static IEnumerable<T> Before<T>(this IEnumerable<T> source, T searchItem)
+		/// <summary>
+		/// Returns all elements of a sequence that occur before the search item.
+		/// </summary>
+		/// <typeparam name="T">The type of the elements of <paramref name="source"/>.</typeparam>
+		/// <param name="source">The source sequence.</param>
+		/// <param name="search">The element to search.</param>
+		/// <returns></returns>
+		public static IEnumerable<T> Before<T>(this IEnumerable<T> source, T search)
 		{
 			foreach (T item in source)
 			{
-				if (item.Equals(searchItem))
+				if (item.Equals(search))
 				{
 					yield break;
 				}
@@ -165,7 +190,14 @@ namespace Unclassified
 			}
 		}
 
-		public static IEnumerable<T> After<T>(this IEnumerable<T> source, T searchItem)
+		/// <summary>
+		/// Returns all elements of a sequence that occur after the search item.
+		/// </summary>
+		/// <typeparam name="T">The type of the elements of <paramref name="source"/>.</typeparam>
+		/// <param name="source">The source sequence.</param>
+		/// <param name="search">The element to search.</param>
+		/// <returns></returns>
+		public static IEnumerable<T> After<T>(this IEnumerable<T> source, T search)
 		{
 			bool found = false;
 			foreach (T item in source)
@@ -174,7 +206,7 @@ namespace Unclassified
 				{
 					yield return item;
 				}
-				if (item.Equals(searchItem))
+				if (item.Equals(search))
 				{
 					found = true;
 				}
@@ -187,6 +219,7 @@ namespace Unclassified
 		/// <typeparam name="T">Type of the list items.</typeparam>
 		/// <param name="list">The list to insert the new item to.</param>
 		/// <param name="vm">New item to insert into the list.</param>
+		/// <param name="comparison">The comparison for sorting the items.</param>
 		/// <returns>The index of the inserted item in the list.</returns>
 		public static int InsertSorted<T>(this IList<T> list, T vm, Comparison<T> comparison)
 		{

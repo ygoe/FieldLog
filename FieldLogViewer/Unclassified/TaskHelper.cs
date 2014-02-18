@@ -66,7 +66,13 @@ namespace Unclassified
 			return null;
 		}
 
-		// TODO: Give a proper name and documentation
+		/// <summary>
+		/// Waits for the WaitHandle to become set and then invokes the Action.
+		/// </summary>
+		/// <param name="handle">The WaitHandle to wait on.</param>
+		/// <param name="action">The Action to invoke when <paramref name="handle"/> is set.</param>
+		/// <param name="repeatCondition">A function that determines whether to wait for the handle
+		/// again after invoking the action. If null, the waiting is not repeated.</param>
 		public static void WaitAction(this WaitHandle handle, Action action, Func<bool> repeatCondition = null)
 		{
 			Task.Factory.StartNew(() =>
@@ -77,7 +83,6 @@ namespace Unclassified
 					action();
 				}
 				while (repeatCondition != null && repeatCondition());
-				return;
 			});
 		}
 	}

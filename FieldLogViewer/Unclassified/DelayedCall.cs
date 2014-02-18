@@ -281,6 +281,18 @@ namespace Unclassified
 		}
 
 		/// <summary>
+		/// Gets a value indicating whether the synchronous DelayedCall methods can be used in the
+		/// current thread. If this property is false, the *Async methods must be used instead.
+		/// </summary>
+		public static bool SupportsSynchronization
+		{
+			get
+			{
+				return SynchronizationContext.Current != null;
+			}
+		}
+
+		/// <summary>
 		/// Prepares the DelayedCall instance.
 		/// </summary>
 		/// <param name="dc"></param>

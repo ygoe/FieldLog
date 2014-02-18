@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define WITH_NLOG
+
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -54,7 +56,12 @@ namespace LogBenchmark
 		/// </summary>
 		void Run()
 		{
+			Console.WriteLine("Log benchmark");
+			Console.WriteLine();
+
 			// Delete all files in the log directory
+			Console.WriteLine("Deleting old log files...");
+			Console.WriteLine();
 			string logPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "log");
 			if (Directory.Exists(logPath))
 			{
@@ -66,11 +73,11 @@ namespace LogBenchmark
 			
 			FL.AcceptLogFileBasePath();
 
+			// Wait a bit for the system to calm down from starting this program
+			System.Threading.Thread.Sleep(1000);
+
 			// For correct-in-context number formatting, if used
 			//Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
-
-			Console.WriteLine("Log benchmark");
-			Console.WriteLine();
 
 			RunEmptyLoop(100000000);
 			RunLock(100000000);
@@ -88,7 +95,7 @@ namespace LogBenchmark
 				PressEnterToContinue();
 			}
 
-			RunDebugOutputString(100000);
+			//RunDebugOutputString(100000);
 			PressEnterToContinue();
 
 			RunFileAppend(1000000);
@@ -96,7 +103,12 @@ namespace LogBenchmark
 
 			RunFileOpenAppend(2000);
 
-			Console.WriteLine("Press the Enter key to quit.");
+#if WITH_NLOG
+			PressEnterToContinue();
+			RunNLog(1000000);
+#endif
+
+			Console.WriteLine("Benchmark finished. Press the Enter key to quit.");
 			Console.ReadLine();
 		}
 
@@ -111,6 +123,8 @@ namespace LogBenchmark
 				Console.WriteLine("                                    ");
 				Console.CursorTop -= 2;
 			}
+
+			System.Threading.Thread.Sleep(1000);
 		}
 
 		void RunEmptyLoop(long iterations)
@@ -415,7 +429,10 @@ namespace LogBenchmark
 
 				lock (syncLock)
 				{
-					writer.Write(DateTime.UtcNow.ToString() + " ");
+					writer.Write(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.ffffff"));
+					writer.Write(" ");
+					writer.Write(System.Threading.Thread.CurrentThread.ManagedThreadId);
+					writer.Write(" ");
 					switch (messageType)
 					{
 						case 0:
@@ -490,13 +507,19 @@ namespace LogBenchmark
 					switch (messageType)
 					{
 						case 0:
-							File.AppendAllText(logFile, DateTime.UtcNow.ToString() + " Benchmark message - " + i + Environment.NewLine);
+							File.AppendAllText(logFile, DateTime.UtcNow.ToString() + " " +
+								System.Threading.Thread.CurrentThread.ManagedThreadId +
+								" Benchmark message - " + i + Environment.NewLine);
 							break;
 						case 1:
-							File.AppendAllText(logFile, DateTime.UtcNow.ToString() + " " + strings[i - 1] + Environment.NewLine);
+							File.AppendAllText(logFile, DateTime.UtcNow.ToString() + " " +
+								System.Threading.Thread.CurrentThread.ManagedThreadId + " " +
+								strings[i - 1] + Environment.NewLine);
 							break;
 						case 2:
-							File.AppendAllText(logFile, DateTime.UtcNow.ToString() + " Benchmark message" + Environment.NewLine);
+							File.AppendAllText(logFile, DateTime.UtcNow.ToString() + " " +
+								System.Threading.Thread.CurrentThread.ManagedThreadId +
+								" Benchmark message" + Environment.NewLine);
 							break;
 					}
 				}
@@ -514,5 +537,81 @@ namespace LogBenchmark
 
 			GC.Collect();
 		}
+
+#if WITH_NLOG
+		void RunNLog(long iterations)
+		{
+			Stopwatch stopwatch = new Stopwatch();
+
+			Console.WriteLine("Testing NLog messages...");
+
+			var config = new NLog.Config.LoggingConfiguration();
+			var fileTarget = new NLog.Targets.FileTarget();
+			fileTarget.FileName = @"log\nlog.txt";
+			fileTarget.Layout = "${date:format=yyyy-MM-dd.HH.mm.ss.ffffff} ${processid}/${threadid} ${level}: ${message}";
+			var asyncWrapper = new NLog.Targets.Wrappers.AsyncTargetWrapper(fileTarget, 1000, NLog.Targets.Wrappers.AsyncTargetWrapperOverflowAction.Grow);
+			//config.AddTarget("file", asyncWrapper);
+			var rule = new NLog.Config.LoggingRule("*", NLog.LogLevel.Trace, asyncWrapper);
+			config.LoggingRules.Add(rule);
+			NLog.LogManager.Configuration = config;
+			var logger = NLog.LogManager.GetLogger("Benchmark");
+
+			// Prepare strings to write because string concatenation also takes some time
+			string[] strings = new string[iterations];
+			for (long i = 1; i <= iterations; i++)
+			{
+				strings[i - 1] = "Benchmark message - " + i;
+			}
+
+			stopwatch.Start();
+
+			long percent = 0;
+			for (long i = 1; i <= iterations; i++)
+			{
+				if (showProgress)
+				{
+					long newPercent = i * 100 / iterations;
+					if (newPercent > percent)
+					{
+						percent = newPercent;
+						Console.CursorLeft = 0;
+						Console.Write("  " + percent.ToString("##0") + " %");
+					}
+				}
+
+				switch (messageType)
+				{
+					case 0:
+						logger.Trace("Benchmark message - " + i);
+						break;
+					case 1:
+						logger.Trace(strings[i - 1]);
+						break;
+					case 2:
+						logger.Trace("Benchmark message");
+						break;
+				}
+			}
+			Console.CursorLeft = 0;
+			Console.Write("          ");
+			Console.CursorLeft = 0;
+
+			stopwatch.Stop();
+
+			long nanoseconds = (long) Math.Round((decimal) stopwatch.ElapsedTicks / Stopwatch.Frequency * 1000000000 / iterations);
+			nanoseconds -= emptyLoopTime;
+			Console.WriteLine("  " + nanoseconds.ToString().PadLeft(8) + " ns/call");
+
+			// Make sure all log items are written, as long as we have the time to wait for it
+			Stopwatch flFlushStopwatch = new Stopwatch();
+			flFlushStopwatch.Start();
+			NLog.LogManager.Flush();
+			flFlushStopwatch.Stop();
+			Console.WriteLine("Flushing NLog to files took " + flFlushStopwatch.ElapsedMilliseconds + " ms");
+			Console.WriteLine();
+
+			GC.Collect();
+		}
+#endif
 	}
 }

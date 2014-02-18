@@ -56,23 +56,25 @@ PERFORMANCE
 
 A benchmark application is included in the solution. It allows you to run your own tests. Here are the numbers I determined on a 2013 office PC, using minimum values of multiple benchmark runs.
 
-FieldLog text message              :     464 ns/call
-Synchronised StreamWriter.WriteLine:     841 ns/call
-FieldLog scope helper              :     945 ns/call
+FieldLog text message              :     427 ns/call
+FieldLog scope helper              :     935 ns/call
+Synchronised StreamWriter.WriteLine:    1215 ns/call
 Trace.WriteLine (no listener)      :    2852 ns/call
-FieldLog scope helper w/ reflection:    6404 ns/call
+FieldLog scope helper w/ reflection:    5944 ns/call
+NLog 2.1 async file                :    6305 ns/call
 Synchronised File.AppendAllText SSD:  110484 ns/call
 Trace.WriteLine (VS/DbgView)       :  272942 ns/call
 Synchronised File.AppendAllText HDD: 2232278 ns/call
 
-Flushing 1 million FieldLog text messages: 6352 ms / 7656 ms with NTFS compression
+Flushing 1 million FieldLog text messages: 6352 ms / 7440 ms with NTFS compression
 Flushing 1 million StreamWriter.WriteLine:    2 ms
-Flushing 500000 FieldLog scope messages  : 4206 ms
+Flushing 500000 FieldLog scope messages  : 4130 ms
 Flushing 500000 FieldLog scope messages  : 1607 ms (with reflection)
+Flushing 1 million NLog messages         : 1950 ms
 
-The scope logging helper generates an Enter and a Leave message and takes about twice the time of writing a single text message. So you can calculate something around one microsecond for each logged method or other scope. Determining the method name through reflection takes a lot longer though and may not always be an option.
+The scope logging helper generates an Enter and a Leave message and takes about twice the time of writing a single text message. So you can calculate something around one microsecond for each logged method or other scope. Determining the method name through reflection takes considerably longer though and may not be an option in performance-critical loops.
 
-Flushing FieldLog items to the log files happens on a separate thread. That is why submitting the log messages is so fast. But if great amounts of log items are submitted in a very short time, like in this benchmark which actually doesn't do anything else, flushing can take a few seconds. The longer the logging methods take in advance, the more items have already been written and the less time the final flush takes. So these numbers are just informative but normally not relevant.
+Flushing FieldLog items to the log files happens on a separate thread. That is why submitting the log messages is so fast. But if large amounts of log items are submitted in a very short time, like in this benchmark which actually doesn't do anything else, flushing can take a moment to complete. The longer the logging methods take in advance, the more items have already been written and the less time the final flush takes. So these numbers are just informative but normally not relevant.
 
 LICENCE
 

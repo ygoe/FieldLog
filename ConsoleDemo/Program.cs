@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using Unclassified.FieldLog;
 using System.Threading;
-using System.Diagnostics;
 using System.Threading.Tasks;
+using Unclassified.FieldLog;
 
 namespace ConsoleDemo
 {
@@ -99,11 +99,22 @@ namespace ConsoleDemo
 				}
 				if ((i % 100) == 0)
 					Console.WriteLine("    now at " + i);
-				
-				//if ((i % 5) == 0)
-				//    Trace.WriteLine("FL ConsoleDemo now at item " + i);
+
+				if ((i % 5) == 0)
+					Trace.WriteLine("FL ConsoleDemo now at item " + i);
 			}
 
+			Thread.Sleep(1400);
+			FL.ClearTimer("DoSomeMaths");
+			Thread.Sleep(100);
+			using (FL.Timer("TimerTimer"))
+			{
+				var cti = FL.StartTimer("DoSomeMaths");
+				FL.StopTimer("DoSomeMaths");
+				//cti.Stop();
+			}
+			Thread.Sleep(1200);
+			
 			FL.Info("Information item");
 			FL.Notice("Notice item");
 			FL.Warning("Warning item");
@@ -120,11 +131,12 @@ namespace ConsoleDemo
 		private static void DoSomeMaths()
 		{
 			using (FL.NewScope())
+			using (FL.Timer("DoSomeMaths"))
 			{
 				for (int i = 1; i <= 10; i++)
 				{
 					FL.TraceData("i", i);
-					//Thread.Sleep(312);
+					Thread.Sleep(31);
 				}
 			}
 		}

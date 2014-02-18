@@ -83,6 +83,8 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		private const string logConfigExtension = ".flconfig";
 
+		internal const string EnsureJitTimerKey = "FieldLog.EnsureJit";
+
 		#endregion Constants
 
 		#region Delegates
@@ -210,6 +212,15 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		private static Dictionary<FieldLogPriority, FieldLogFileWriter> priorityLogWriters = new Dictionary<FieldLogPriority, FieldLogFileWriter>();
 
+		/// <summary>
+		/// Keeps all custom time measurement entries.
+		/// </summary>
+		private static Dictionary<string, CustomTimerInfo> customTimers = new Dictionary<string, CustomTimerInfo>();
+		/// <summary>
+		/// Locks access to custom time measurement data.
+		/// </summary>
+		private static ReaderWriterLockSlim customTimersLock = new ReaderWriterLockSlim();
+
 		#endregion Private static data
 
 		#region Internal static data
@@ -301,6 +312,12 @@ namespace Unclassified.FieldLog
 			{
 				RegisterAppErrorHandler();
 			}
+
+			// These methods are time-critical so call them once to ensure they're JITed when the
+			// application need them.
+			FL.StartTimer(EnsureJitTimerKey);
+			FL.StopTimer(EnsureJitTimerKey);
+			FL.ClearTimer(EnsureJitTimerKey);
 		}
 
 		/// <summary>
@@ -431,33 +448,40 @@ namespace Unclassified.FieldLog
 			// Reference: http://code.msdn.microsoft.com/Handling-Unhandled-47492d0b
 
 			// Handle UI thread exceptions
-			System.Windows.Forms.Application.ThreadException += delegate(object sender, System.Threading.ThreadExceptionEventArgs e)
-			{
-				FL.Critical(e.Exception, "WinForms.ThreadException", true);
-			};
+			System.Windows.Forms.Application.ThreadException +=
+				delegate(object sender, System.Threading.ThreadExceptionEventArgs e)
+				{
+					FL.Critical(e.Exception, "WinForms.ThreadException", true);
+				};
 			// Set the unhandled exception mode to force all Windows Forms errors to go through our handler
 			System.Windows.Forms.Application.SetUnhandledExceptionMode(System.Windows.Forms.UnhandledExceptionMode.CatchException);
 
 			// Handle non-UI thread exceptions
-			AppDomain.CurrentDomain.UnhandledException += delegate(object sender, UnhandledExceptionEventArgs e)
-			{
-				FL.Critical(e.ExceptionObject as Exception, "AppDomain.UnhandledException", true);
-			};
+			AppDomain.CurrentDomain.UnhandledException +=
+				delegate(object sender, UnhandledExceptionEventArgs e)
+				{
+					FL.Critical(e.ExceptionObject as Exception, "AppDomain.UnhandledException", true);
+				};
 
 #if !NET20
 			// Log first-chance exceptions, also from try/catch blocks
-			AppDomain.CurrentDomain.FirstChanceException += delegate(object sender, System.Runtime.ExceptionServices.FirstChanceExceptionEventArgs e)
-			{
-				if (LogFirstChanceExceptions && !isShutdown)
+			AppDomain.CurrentDomain.FirstChanceException +=
+				delegate(object sender, System.Runtime.ExceptionServices.FirstChanceExceptionEventArgs e)
 				{
-					FL.Exception(FieldLogPriority.Trace, e.Exception, "AppDomain.FirstChanceException", new StackTrace(1, true));
-				}
-			};
+					if (LogFirstChanceExceptions && !isShutdown)
+					{
+						FL.Exception(FieldLogPriority.Trace, e.Exception, "AppDomain.FirstChanceException", new StackTrace(1, true));
+					}
+				};
 
-			System.Threading.Tasks.TaskScheduler.UnobservedTaskException += delegate(object sender, System.Threading.Tasks.UnobservedTaskExceptionEventArgs e)
-			{
-				FL.Trace(e.Exception, "TaskScheduler.UnobservedTaskException");
-			};
+			// Log unhandled exceptions from within Tasks that are garbage-collected. Since GC
+			// happens rarely, this event may never be fired, which makes this handler somewhat
+			// useless. But in case we have a chance, we'll happily log the event.
+			System.Threading.Tasks.TaskScheduler.UnobservedTaskException +=
+				delegate(object sender, System.Threading.Tasks.UnobservedTaskExceptionEventArgs e)
+				{
+					FL.Trace(e.Exception, "TaskScheduler.UnobservedTaskException");
+				};
 #endif
 		}
 
@@ -1308,6 +1332,113 @@ namespace Unclassified.FieldLog
 		}
 
 		#endregion Scope helpers
+
+		#region Custom time measurement
+
+		/// <summary>
+		/// Starts a custom timer. If the key does not exist, a new timer is created.
+		/// </summary>
+		/// <param name="key">The custom timer key.</param>
+		/// <returns>An instance which can be used to call the Start and Stop methods without a further key lookup.</returns>
+		public static CustomTimerInfo StartTimer(string key)
+		{
+			CustomTimerInfo cti;
+
+			customTimersLock.EnterReadLock();
+			try
+			{
+				customTimers.TryGetValue(key, out cti);
+			}
+			finally
+			{
+				customTimersLock.ExitReadLock();
+			}
+
+			if (cti == null)
+			{
+				// New key
+				// The write lock must be outside the read lock
+				customTimersLock.EnterWriteLock();
+				try
+				{
+					// Re-check because we have given up the lock shortly
+					if (!customTimers.TryGetValue(key, out cti))
+					{
+						// Still a new key
+						cti = new CustomTimerInfo(key);
+						customTimers[key] = cti;
+					}
+				}
+				finally
+				{
+					customTimersLock.ExitWriteLock();
+				}
+			}
+
+			// Last call for most precise measurement of the intended code
+			cti.Start();
+			return cti;
+		}
+
+		/// <summary>
+		/// Stops a custom timer.
+		/// </summary>
+		/// <param name="key">The custom timer key.</param>
+		public static void StopTimer(string key)
+		{
+			CustomTimerInfo cti;
+
+			customTimersLock.EnterReadLock();
+			try
+			{
+				if (!customTimers.TryGetValue(key, out cti))
+				{
+					throw new KeyNotFoundException("The custom timer \"" + key + "\" does not exist.");
+				}
+			}
+			finally
+			{
+				customTimersLock.ExitReadLock();
+			}
+
+			cti.Stop();
+		}
+
+		/// <summary>
+		/// Stops a custom timer and removes it from the dictionary.
+		/// </summary>
+		/// <param name="key">The custom timer key.</param>
+		public static void ClearTimer(string key)
+		{
+			CustomTimerInfo cti;
+
+			customTimersLock.EnterWriteLock();
+			try
+			{
+				if (customTimers.TryGetValue(key, out cti))
+				{
+					cti.Stop();
+					customTimers.Remove(key);
+				}
+			}
+			finally
+			{
+				customTimersLock.ExitWriteLock();
+			}
+		}
+
+		/// <summary>
+		/// Returns a new CustomTimerScope item that implements IDisposable and can be used for
+		/// time measuring with the <c>using</c> statement.
+		/// </summary>
+		/// <param name="key">The custom timer key.</param>
+		/// <returns></returns>
+		public static CustomTimerScope Timer(string key)
+		{
+			return new CustomTimerScope(key);
+		}
+
+		#endregion Custom time measurement
 
 		#region Item buffer methods
 

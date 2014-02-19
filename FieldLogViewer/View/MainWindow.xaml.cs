@@ -470,6 +470,19 @@ namespace Unclassified.FieldLogViewer.View
 			throw new ArgumentException("Unsupported item type.");   // Should never happen
 		}
 
+		[ViewCommand]
+		public void UpdateDisplayTime()
+		{
+			if (LogItemsList.SelectedItems.Count == 1)
+			{
+				LogItemViewModelBase item = LogItemsList.SelectedItems[0] as LogItemViewModelBase;
+				if (item != null)
+				{
+					item.RaiseDisplayTimeChanged();
+				}
+			}
+		}
+
 		#endregion View commands
 	}
 }

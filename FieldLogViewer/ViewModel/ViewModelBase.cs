@@ -272,4 +272,33 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		#endregion INotifyPropertyChanged Member
 	}
+
+	internal class ValueViewModel<T> : ViewModelBase
+	{
+		public ValueViewModel(string displayName, T value)
+		{
+			if (value == null)
+				throw new ArgumentNullException("value");
+
+			DisplayName = displayName;
+			Value = value;
+		}
+
+		public T Value { get; private set; }
+
+		public override bool Equals(object obj)
+		{
+			ValueViewModel<T> other = obj as ValueViewModel<T>;
+			if (other != null)
+			{
+				return other.Value.Equals(this.Value);
+			}
+			return false;
+		}
+
+		public override int GetHashCode()
+		{
+			return Value.GetHashCode();
+		}
+	}
 }

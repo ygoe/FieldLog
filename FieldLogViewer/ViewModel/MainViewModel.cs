@@ -75,6 +75,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			this.BindProperty(vm => vm.IsSoundEnabled, AppSettings.Instance, s => s.IsSoundEnabled);
 			this.BindProperty(vm => vm.IsWindowOnTop, AppSettings.Instance, s => s.IsWindowOnTop);
 			this.BindProperty(vm => vm.IndentSize, AppSettings.Instance, s => s.IndentSize);
+			this.BindProperty(vm => vm.ItemTimeMode, AppSettings.Instance, s => s.ItemTimeMode);
 			
 			Filters = new ObservableCollection<FilterViewModel>();
 			Filters.ForNewOld(
@@ -515,6 +516,19 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			set { CheckUpdate(value, ref showRelativeTime, "ShowRelativeTime"); }
 		}
 
+		private ItemTimeType itemTimeMode;
+		public ItemTimeType ItemTimeMode
+		{
+			get { return itemTimeMode; }
+			set
+			{
+				if (CheckUpdate(value, ref itemTimeMode, "ItemTimeMode"))
+				{
+					RefreshLogItemsFilterView();
+				}
+			}
+		}
+
 		public int SelectionDummy
 		{
 			get { return 0; }
@@ -558,12 +572,13 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				.ToArray();
 		}
 
-		private void RefreshLogItemsFilterView()
+		public void RefreshLogItemsFilterView()
 		{
 			if (filteredLogItems.View != null)
 			{
 				filteredLogItems.View.Refresh();
 			}
+			ViewCommandManager.Invoke("UpdateDisplayTime");
 		}
 
 		#endregion Log items filter
@@ -796,6 +811,32 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 			LoadedItemsCount = logItems.Count;
 
+			// Check for new UtcOffset value
+			bool newUtcOffset = false;
+			FieldLogScopeItemViewModel scopeItem = item as FieldLogScopeItemViewModel;
+			if (scopeItem != null &&
+				scopeItem.Type == FieldLogScopeType.LogStart)
+			{
+				scopeItem.UtcOffset = (int) scopeItem.EnvironmentData.LocalTimeZoneOffset.TotalMinutes;
+				newUtcOffset = true;
+			}
+			else
+			{
+				FieldLogTextItemViewModel textItem = item as FieldLogTextItemViewModel;
+				if (textItem != null &&
+					textItem.Details != null &&
+					textItem.Details.StartsWith("\u0001UtcOffset="))
+				{
+					int i;
+					if (int.TryParse(textItem.Details.Substring(11), out i))
+					{
+						// Read changed UTC offset from the generated text log item
+						textItem.UtcOffset = i;
+						newUtcOffset = true;
+					}
+				}
+			}
+
 			// IndentLevel is only supported for FieldLog items
 			FieldLogItemViewModel flItem = item as FieldLogItemViewModel;
 			if (flItem != null)
@@ -857,7 +898,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					}
 				}
 				
-				// Use LastLogStartItem of the previous item from the same session
+				// Use LastLogStartItem and UtcOffset of the previous item from the same session
 				prevIndex = newIndex - 1;
 				while (prevIndex >= 0)
 				{
@@ -866,6 +907,10 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						prevFlItem.SessionId == flItem.SessionId)
 					{
 						flItem.LastLogStartItem = prevFlItem.LastLogStartItem;
+						if (!newUtcOffset)
+						{
+							flItem.UtcOffset = prevFlItem.UtcOffset;
+						}
 						break;
 					}
 					prevIndex--;
@@ -964,9 +1009,10 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 				FL.Trace("Copying localLogItems list to UI thread, " + localLogItems.Count + " items");
 
-				// Apply scope-based indenting to all items now
+				// Apply scope-based indenting and UtcOffset to all items now
 				Dictionary<int, int> threadLevels = new Dictionary<int, int>();
 				Dictionary<Guid, FieldLogScopeItemViewModel> logStartItems = new Dictionary<Guid, FieldLogScopeItemViewModel>();
+				int utcOffset = 0;
 				foreach (var item in localLogItems)
 				{
 					FieldLogScopeItemViewModel scope = item as FieldLogScopeItemViewModel;
@@ -985,10 +1031,25 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						if (scope.Type == FieldLogScopeType.LogStart)
 						{
 							logStartItems[scope.SessionId] = scope;
+							utcOffset = (int) scope.EnvironmentData.LocalTimeZoneOffset.TotalMinutes;
 						}
+						scope.UtcOffset = utcOffset;
 					}
 					else
 					{
+						FieldLogTextItemViewModel textItem = item as FieldLogTextItemViewModel;
+						if (textItem != null &&
+							textItem.Details != null &&
+							textItem.Details.StartsWith("\u0001UtcOffset="))
+						{
+							int i;
+							if (int.TryParse(textItem.Details.Substring(11), out i))
+							{
+								// Read changed UTC offset from the generated text log item
+								utcOffset = i;
+							}
+						}
+						
 						FieldLogItemViewModel flItem = item as FieldLogItemViewModel;
 						if (flItem != null)
 						{
@@ -997,6 +1058,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 							{
 								flItem.IndentLevel = level;
 							}
+							flItem.UtcOffset = utcOffset;
 						}
 					}
 				}

@@ -57,7 +57,7 @@
 				</Grid.ColumnDefinitions>
 
 				<TextBlock Grid.Row="0" Grid.Column="0" Text="Time:"/>
-				<TextBox Grid.Row="0" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Time, StringFormat='yyyy-MM-dd  HH:mm:ss.ffffff', Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+				<TextBox Grid.Row="0" Grid.Column="1" Margin="0,0,0,0" Text="{Binding DisplayTime, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
 				<TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,0,0" Text="Priority:"/>
 				<Grid Grid.Row="1" Grid.Column="1" Margin="1,0,0,0">

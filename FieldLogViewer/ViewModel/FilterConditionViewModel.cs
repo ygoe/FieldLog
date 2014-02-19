@@ -370,9 +370,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						dbgMsg = item as DebugMessageViewModel;
 
 					if (flItem != null)
-						result = CompareTime(flItem.Time);
+						result = CompareTime(flItem.Time, flItem.UtcOffset);
 					else if (dbgMsg != null)
-						result = CompareTime(dbgMsg.Time);
+						result = CompareTime(dbgMsg.Time, dbgMsg.UtcOffset);
 					break;
 				case FilterColumn.Priority:
 					flItem = item as FieldLogItemViewModel;
@@ -697,8 +697,18 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				return result;
 		}
 
-		private bool CompareTime(DateTime time)
+		private bool CompareTime(DateTime time, int utcOffset)
 		{
+			switch (MainViewModel.Instance.ItemTimeMode)
+			{
+				case ItemTimeType.Local:
+					time = time.ToLocalTime();
+					break;
+				case ItemTimeType.Remote:
+					time = time.AddMinutes(utcOffset);
+					break;
+			}
+
 			DateTime filterTime;
 			Match m;
 			switch (Comparison)

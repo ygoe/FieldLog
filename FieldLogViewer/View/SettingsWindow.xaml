@@ -16,9 +16,26 @@
 	Closed="Window_Closed">
 	
 	<Grid>
-		<TabControl Margin="10" SelectedIndex="1">
+		<TabControl Margin="10">
 			<TabItem Header="General">
-				
+				<Grid Margin="4">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto"/>
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="*"/>
+					</Grid.ColumnDefinitions>
+					
+					<TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Log item time zone:"/>
+					<ComboBox
+						Grid.Row="0" Grid.Column="1"
+						Margin="8,0,0,0" HorizontalAlignment="Left" Width="120"
+						ItemsSource="{Binding AvailableItemTimeModes}"
+						DisplayMemberPath="DisplayName"
+						SelectedValue="{Binding ItemTimeMode}"
+						SelectedValuePath="Value"/>
+				</Grid>
 			</TabItem>
 
 			<TabItem Header="Filters">

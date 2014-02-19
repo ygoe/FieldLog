@@ -89,9 +89,10 @@ namespace Unclassified.FieldLog
 						// TODO: Notify FieldLog about change and write a new environment log item for further analysis?
 
 						string msg = "Local time UTC offset changed from " +
-							hours.ToString("+0;-0;+0") + ":" + mins.ToString("00") + " to " +
-							newHours.ToString("+0;-0;+0") + ":" + newMins.ToString("00");
-						FL.Notice(msg);
+							hours.ToString("+00;-00;+00") + ":" + mins.ToString("00") + " to " +
+							newHours.ToString("+00;-00;+00") + ":" + newMins.ToString("00");
+						string details = "\u0001UtcOffset=" + newLocalOffset;
+						FL.Notice(msg, details);
 						Debug.WriteLine(msg);
 					}
 					nextOffsetCheck = DateTime.UtcNow.Ticks / 600000000 * 600000000 + 610000000;

@@ -9,12 +9,38 @@ namespace Unclassified.FieldLogViewer.ViewModel
 	{
 		public int EventCounter { get; set; }
 		public DateTime Time { get; set; }
+		public int UtcOffset { get; set; }
 
 		private int indentLevel;
 		public int IndentLevel
 		{
 			get { return indentLevel; }
 			set { CheckUpdate(value, ref indentLevel, "IndentLevel"); }
+		}
+
+		public string DisplayTime
+		{
+			get
+			{
+				switch (MainViewModel.Instance.ItemTimeMode)
+				{
+					case ItemTimeType.Utc:
+						return Time.ToString("yyyy-MM-dd  HH:mm:ss.ffffff") + "  UTC";
+					case ItemTimeType.Local:
+						return Time.ToLocalTime().ToString("yyyy-MM-dd  HH:mm:ss.ffffff");
+					case ItemTimeType.Remote:
+						int hours = UtcOffset / 60;
+						int mins = Math.Abs(UtcOffset) % 60;
+						return Time.AddMinutes(UtcOffset).ToString("yyyy-MM-dd  HH:mm:ss.ffffff") + "  " +
+							hours.ToString("+00;-00;+00") + ":" + mins.ToString("00");
+				}
+				return null;
+			}
+		}
+
+		public void RaiseDisplayTimeChanged()
+		{
+			OnPropertyChanged("DisplayTime");
 		}
 
 		public virtual int CompareTo(LogItemViewModelBase other)

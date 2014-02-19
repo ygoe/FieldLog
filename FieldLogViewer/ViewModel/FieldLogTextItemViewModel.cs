@@ -16,7 +16,16 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		public new FieldLogTextItem Item { get; private set; }
 		public string Text { get { return this.Item.Text; } }
-		public string Details { get { return this.Item.Details; } }
+		public string Details
+		{
+			get
+			{
+				// Don't show internal data in the GUI
+				if (this.Item.Details != null && this.Item.Details.StartsWith("\u0001"))
+					return null;
+				return this.Item.Details;
+			}
+		}
 
 		public string SimpleText
 		{

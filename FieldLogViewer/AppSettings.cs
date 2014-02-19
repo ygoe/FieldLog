@@ -102,6 +102,7 @@ namespace Unclassified.FieldLogViewer
 			AddPropertyHandler("IndentSize");
 			AddPropertyHandler("Filters");
 			AddPropertyHandler("SelectedFilter");
+			AddPropertyHandler("ItemTimeMode");
 		}
 
 		#endregion Constructors
@@ -206,6 +207,12 @@ namespace Unclassified.FieldLogViewer
 		{
 			get { return GetString("SelectedFilter"); }
 			set { Set("SelectedFilter", value); }
+		}
+
+		public ItemTimeType ItemTimeMode
+		{
+			get { return (ItemTimeType) GetInt("ItemTimeMode"); }
+			set { Set("ItemTimeMode", (int) value); }
 		}
 
 		#endregion Data properties
@@ -316,5 +323,12 @@ namespace Unclassified.FieldLogViewer
 		}
 
 		#endregion Data properties
+	}
+
+	public enum ItemTimeType
+	{
+		Utc,
+		Local,
+		Remote
 	}
 }

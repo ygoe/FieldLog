@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -14,8 +15,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			InitializeCommands();
 
-			MainViewModel.Instance.LinkProperty(vm => vm.SelectedFilter, v => SelectedFilter = v);
-			this.LinkProperty(vm => vm.SelectedFilter, v => MainViewModel.Instance.SelectedFilter = v);
+			this.BindProperty(vm => vm.ItemTimeMode, AppSettings.Instance, s => s.ItemTimeMode);
+
+			this.BindProperty(vm => vm.SelectedFilter, MainViewModel.Instance, vm => vm.SelectedFilter);
 		}
 
 		#endregion Constructor
@@ -74,6 +76,26 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		#endregion Commands
 
 		#region Data properties
+
+		private ItemTimeType itemTimeMode;
+		public ItemTimeType ItemTimeMode
+		{
+			get { return itemTimeMode; }
+			set { CheckUpdate(value, ref itemTimeMode, "ItemTimeMode"); }
+		}
+
+		public IEnumerable<ValueViewModel<ItemTimeType>> AvailableItemTimeModes
+		{
+			get
+			{
+				return new ValueViewModel<ItemTimeType>[]
+				{
+					new ValueViewModel<ItemTimeType>("UTC", ItemTimeType.Utc),
+					new ValueViewModel<ItemTimeType>("Local system", ItemTimeType.Local),
+					new ValueViewModel<ItemTimeType>("Remote system", ItemTimeType.Remote),
+				};
+			}
+		}
 
 		public ObservableCollection<FilterViewModel> Filters
 		{

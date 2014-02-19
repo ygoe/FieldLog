@@ -168,14 +168,21 @@
 									<Image Grid.Column="1" Source="{Binding PrioImageSource}" Width="14" Height="14"/>
 									<TextBlock
 										Grid.Column="2" Margin="6,0,0,0"
-										Text="{Binding Time, StringFormat='dd.MM.'}"
-										Visibility="{Binding DataContext.ShowRelativeTime, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}"/>
+										Visibility="{Binding DataContext.ShowRelativeTime, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}">
+										<TextBlock.Text>
+											<MultiBinding Converter="{StaticResource RelativeTimeConverter}">
+												<Binding Path="Time" Mode="OneWay"/>
+												<Binding Path="UtcOffset" Mode="OneWay"/>
+											</MultiBinding>
+										</TextBlock.Text>
+									</TextBlock>
 									<TextBlock Grid.Column="3" Margin="7,0,0,0" TextAlignment="Right">
 										<TextBlock.Text>
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}">
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
 												<Binding Path="DataContext.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
 									</TextBlock>
@@ -185,6 +192,7 @@
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
 												<Binding Path="DataContext.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
 									</TextBlock>
@@ -194,6 +202,7 @@
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
 												<Binding Path="DataContext.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
 									</TextBlock>
@@ -239,16 +248,22 @@
 									<Image Grid.Column="0" Source="{Binding TypeImageSource}" Width="14" Height="14"/>
 									<Image Grid.Column="1" Source="{Binding PrioImageSource}" Width="14" Height="14"/>
 									<TextBlock
-										Grid.Column="2"
-										Text="{Binding Time, StringFormat='dd.MM.'}"
-										Margin="6,0,0,0"
-										Visibility="{Binding DataContext.ShowRelativeTime, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}"/>
+										Grid.Column="2" Margin="6,0,0,0"
+										Visibility="{Binding DataContext.ShowRelativeTime, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}">
+										<TextBlock.Text>
+											<MultiBinding Converter="{StaticResource RelativeTimeConverter}">
+												<Binding Path="Time" Mode="OneWay"/>
+												<Binding Path="UtcOffset" Mode="OneWay"/>
+											</MultiBinding>
+										</TextBlock.Text>
+									</TextBlock>
 									<TextBlock Grid.Column="3" Margin="7,0,0,0" TextAlignment="Right">
 										<TextBlock.Text>
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}">
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
 												<Binding Path="DataContext.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
 									</TextBlock>
@@ -258,6 +273,7 @@
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
 												<Binding Path="DataContext.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
 									</TextBlock>
@@ -267,6 +283,7 @@
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
 												<Binding Path="DataContext.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
 									</TextBlock>
@@ -312,16 +329,22 @@
 									<Image Grid.Column="0" Source="{Binding TypeImageSource}" Width="14" Height="14"/>
 									<Image Grid.Column="1" Source="{Binding PrioImageSource}" Width="14" Height="14"/>
 									<TextBlock
-										Grid.Column="2"
-										Text="{Binding Time, StringFormat='dd.MM.'}"
-										Margin="6,0,0,0"
-										Visibility="{Binding DataContext.ShowRelativeTime, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}"/>
+										Grid.Column="2" Margin="6,0,0,0"
+										Visibility="{Binding DataContext.ShowRelativeTime, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}">
+										<TextBlock.Text>
+											<MultiBinding Converter="{StaticResource RelativeTimeConverter}">
+												<Binding Path="Time" Mode="OneWay"/>
+												<Binding Path="UtcOffset" Mode="OneWay"/>
+											</MultiBinding>
+										</TextBlock.Text>
+									</TextBlock>
 									<TextBlock Grid.Column="3" Margin="7,0,0,0" TextAlignment="Right">
 										<TextBlock.Text>
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}">
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
 												<Binding Path="DataContext.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
 									</TextBlock>
@@ -331,6 +354,7 @@
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
 												<Binding Path="DataContext.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
 									</TextBlock>
@@ -340,6 +364,7 @@
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
 												<Binding Path="DataContext.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
 									</TextBlock>
@@ -385,16 +410,22 @@
 									<Image Grid.Column="0" Source="{Binding TypeImageSource}" Width="14" Height="14"/>
 									<Image Grid.Column="1" Source="{Binding PrioImageSource}" Width="14" Height="14"/>
 									<TextBlock
-										Grid.Column="2"
-										Text="{Binding Time, StringFormat='dd.MM.'}"
-										Margin="6,0,0,0"
-										Visibility="{Binding DataContext.ShowRelativeTime, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}"/>
+										Grid.Column="2" Margin="6,0,0,0"
+										Visibility="{Binding DataContext.ShowRelativeTime, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}">
+										<TextBlock.Text>
+											<MultiBinding Converter="{StaticResource RelativeTimeConverter}">
+												<Binding Path="Time" Mode="OneWay"/>
+												<Binding Path="UtcOffset" Mode="OneWay"/>
+											</MultiBinding>
+										</TextBlock.Text>
+									</TextBlock>
 									<TextBlock Grid.Column="3" Margin="7,0,0,0" TextAlignment="Right">
 										<TextBlock.Text>
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}">
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
 												<Binding Path="DataContext.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
 									</TextBlock>
@@ -404,6 +435,7 @@
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
 												<Binding Path="DataContext.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
 									</TextBlock>
@@ -413,6 +445,7 @@
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
 												<Binding Path="DataContext.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
 									</TextBlock>
@@ -458,16 +491,22 @@
 									<Image Grid.Column="0" Source="{Binding TypeImageSource}" Width="14" Height="14"/>
 									<Image Grid.Column="1" Source="{Binding PrioImageSource}" Width="14" Height="14"/>
 									<TextBlock
-										Grid.Column="2"
-										Text="{Binding Time, StringFormat='dd.MM.'}"
-										Margin="6,0,0,0"
-										Visibility="{Binding DataContext.ShowRelativeTime, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}"/>
+										Grid.Column="2" Margin="6,0,0,0"
+										Visibility="{Binding DataContext.ShowRelativeTime, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}">
+										<TextBlock.Text>
+											<MultiBinding Converter="{StaticResource RelativeTimeConverter}">
+												<Binding Path="Time" Mode="OneWay"/>
+												<Binding Path="UtcOffset" Mode="OneWay"/>
+											</MultiBinding>
+										</TextBlock.Text>
+									</TextBlock>
 									<TextBlock Grid.Column="3" Margin="7,0,0,0" TextAlignment="Right">
 										<TextBlock.Text>
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}">
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
 												<Binding Path="DataContext.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
 									</TextBlock>
@@ -477,6 +516,7 @@
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
 												<Binding Path="DataContext.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
 									</TextBlock>
@@ -486,6 +526,7 @@
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
 												<Binding Path="DataContext.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
 									</TextBlock>

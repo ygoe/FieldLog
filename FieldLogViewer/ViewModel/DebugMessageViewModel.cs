@@ -13,6 +13,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public DebugMessageViewModel(int pid, string text)
 		{
 			this.Time = FL.UtcNow;
+			this.UtcOffset = (int) DateTimeOffset.Now.Offset.TotalMinutes;
 			this.ProcessId = pid;
 			this.Message = text;
 		}

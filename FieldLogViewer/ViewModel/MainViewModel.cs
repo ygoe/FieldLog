@@ -157,6 +157,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public DelegateCommand LoadMapCommand { get; private set; }
 		public DelegateCommand DecreaseIndentSizeCommand { get; private set; }
 		public DelegateCommand IncreaseIndentSizeCommand { get; private set; }
+		public DelegateCommand ClearSearchTextCommand { get; private set; }
 		public DelegateCommand SettingsCommand { get; private set; }
 
 		private void InitializeCommands()
@@ -167,6 +168,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			LoadMapCommand = new DelegateCommand(OnLoadMap);
 			DecreaseIndentSizeCommand = new DelegateCommand(OnDecreaseIndentSize, CanDecreaseIndentSize);
 			IncreaseIndentSizeCommand = new DelegateCommand(OnIncreaseIndentSize, CanIncreaseIndentSize);
+			ClearSearchTextCommand = new DelegateCommand(OnClearSearchText);
 			SettingsCommand = new DelegateCommand(OnSettings);
 		}
 
@@ -256,6 +258,14 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			{
 				IndentSize = 32;
 			}
+		}
+
+		private void OnClearSearchText()
+		{
+			// Defer until after Render to make it look faster
+			Dispatcher.CurrentDispatcher.BeginInvoke(
+				new Action(() => AdhocSearchText = ""),
+				DispatcherPriority.Background);
 		}
 
 		private void OnSettings()

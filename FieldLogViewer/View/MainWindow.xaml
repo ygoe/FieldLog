@@ -92,6 +92,7 @@
 				ToolTip="Search text within filtered items"
 				Text="{Binding AdhocSearchText}"
 				ui:TextBoxExtensions.UpdateDelay="500"/>
+			<Button Command="{Binding ClearSearchTextCommand}" Content="Õ" FontFamily="Wingdings" ToolTip="Clear search text"/>
 			<TextBlock Margin="4,0,0,0" VerticalAlignment="Center" TextAlignment="Right" MinWidth="45">
 				<Run Text="{Binding FilteredLogItems.Count, Mode=OneWay}"/>
 			</TextBlock>

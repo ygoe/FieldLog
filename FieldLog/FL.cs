@@ -219,10 +219,10 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Locks access to custom time measurement data.
 		/// </summary>
-#if !NET20
-		private static ReaderWriterLockSlim customTimersLock = new ReaderWriterLockSlim();
-#else
+#if NET20
 		private static object customTimersLock = new object();
+#else
+		private static ReaderWriterLockSlim customTimersLock = new ReaderWriterLockSlim();
 #endif
 
 		#endregion Private static data
@@ -258,13 +258,8 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		static FL()
 		{
-			// Link the high-precision stopwatch with the current time for later high-precision
-			// performance tracing timestamps. Wait for DateTime.UtcNow to actually change to get
-			// a fresh and most-accurate time.
-			stopwatch = new Stopwatch();
-			DateTime t0 = DateTime.UtcNow;
-			while ((startTime = DateTime.UtcNow) == t0) { }
-			stopwatch.Start();
+			CalibrateTime();
+			CheckTimeThread.Start();
 
 			LogFirstChanceExceptions = true;
 			WaitForItemsBacklog = true;
@@ -343,6 +338,29 @@ namespace Unclassified.FieldLog
 		}
 
 		#endregion Static constructor
+
+		#region Time
+
+		private static void CalibrateTime()
+		{
+			// Link the high-precision stopwatch with the current time for later high-precision
+			// performance tracing timestamps. Wait for DateTime.UtcNow to actually change to get
+			// a fresh and most-accurate time.
+			stopwatch = new Stopwatch();
+			DateTime t0 = DateTime.UtcNow;
+			while ((startTime = DateTime.UtcNow) == t0) { }
+			stopwatch.Start();
+		}
+
+		internal static void RebaseTime()
+		{
+			DateTime t0 = DateTime.UtcNow;
+			DateTime freshTime;
+			while ((freshTime = DateTime.UtcNow) == t0) { }
+			startTime = freshTime - stopwatch.Elapsed;
+		}
+
+		#endregion Time
 
 		#region Static properties
 
@@ -1348,10 +1366,10 @@ namespace Unclassified.FieldLog
 		{
 			CustomTimerInfo cti;
 
-#if !NET20
-			customTimersLock.EnterReadLock();
-#else
+#if NET20
 			Monitor.Enter(customTimersLock);
+#else
+			customTimersLock.EnterReadLock();
 #endif
 			try
 			{
@@ -1359,10 +1377,10 @@ namespace Unclassified.FieldLog
 			}
 			finally
 			{
-#if !NET20
-				customTimersLock.ExitReadLock();
-#else
+#if NET20
 				Monitor.Exit(customTimersLock);
+#else
+				customTimersLock.ExitReadLock();
 #endif
 			}
 
@@ -1370,10 +1388,10 @@ namespace Unclassified.FieldLog
 			{
 				// New key
 				// The write lock must be outside the read lock
-#if !NET20
-				customTimersLock.EnterWriteLock();
-#else
+#if NET20
 				Monitor.Enter(customTimersLock);
+#else
+				customTimersLock.EnterWriteLock();
 #endif
 				try
 				{
@@ -1387,10 +1405,10 @@ namespace Unclassified.FieldLog
 				}
 				finally
 				{
-#if !NET20
-					customTimersLock.ExitWriteLock();
-#else
+#if NET20
 					Monitor.Exit(customTimersLock);
+#else
+					customTimersLock.ExitWriteLock();
 #endif
 				}
 			}
@@ -1408,10 +1426,10 @@ namespace Unclassified.FieldLog
 		{
 			CustomTimerInfo cti;
 
-#if !NET20
-			customTimersLock.EnterReadLock();
-#else
+#if NET20
 			Monitor.Enter(customTimersLock);
+#else
+			customTimersLock.EnterReadLock();
 #endif
 			try
 			{
@@ -1422,10 +1440,10 @@ namespace Unclassified.FieldLog
 			}
 			finally
 			{
-#if !NET20
-				customTimersLock.ExitReadLock();
-#else
+#if NET20
 				Monitor.Exit(customTimersLock);
+#else
+				customTimersLock.ExitReadLock();
 #endif
 			}
 
@@ -1440,10 +1458,10 @@ namespace Unclassified.FieldLog
 		{
 			CustomTimerInfo cti;
 
-#if !NET20
-			customTimersLock.EnterWriteLock();
-#else
+#if NET20
 			Monitor.Enter(customTimersLock);
+#else
+			customTimersLock.EnterWriteLock();
 #endif
 			try
 			{
@@ -1455,10 +1473,10 @@ namespace Unclassified.FieldLog
 			}
 			finally
 			{
-#if !NET20
-				customTimersLock.ExitWriteLock();
-#else
+#if NET20
 				Monitor.Exit(customTimersLock);
+#else
+				customTimersLock.ExitWriteLock();
 #endif
 			}
 		}

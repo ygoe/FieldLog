@@ -115,6 +115,7 @@ Source: "..\FieldLog\bin\ReleaseNET20\FieldLog.dll"; DestDir: "{app}\FieldLog as
 Source: "..\FieldLog\bin\ReleaseNET20\FieldLog.xml"; DestDir: "{app}\FieldLog assembly (.NET 2.0)"; Flags: ignoreversion
 
 ; FieldLog source code
+Source: "..\FieldLog\CheckTimeThread.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
 Source: "..\FieldLog\CustomTimers.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
 Source: "..\FieldLog\Enums.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
 Source: "..\FieldLog\Exceptions.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion

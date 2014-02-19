@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+#if !NET20
 using System.Threading.Tasks;
+#endif
 
 namespace Unclassified.FieldLog
 {
@@ -200,11 +202,19 @@ namespace Unclassified.FieldLog
 				// end. Then it will still sit there waiting for more items until the rest of this
 				// delay has elapsed (which is not a big problem, if we get any items from that
 				// file at all).
+#if NET20
+				new Thread(() =>
+				{
+					Thread.Sleep(1000);
+					currentLastReader.WaitMode = false;
+				}).Start();
+#else
 				Task.Factory.StartNew(() =>
 				{
 					Thread.Sleep(1000);
 					currentLastReader.WaitMode = false;
 				});
+#endif
 			}
 			else
 			{

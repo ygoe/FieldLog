@@ -17,7 +17,7 @@ namespace Unclassified.FieldLog
 		#region Private data
 
 		private const string fileHeader = "FieldLog\x00";
-		private const int readWaitMilliseconds = 250;
+		private const int readWaitMilliseconds = 100;
 
 		private Dictionary<int, string> textCache = new Dictionary<int, string>();
 		private FileStream fileStream;

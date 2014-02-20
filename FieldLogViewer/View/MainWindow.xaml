@@ -137,6 +137,19 @@
 						<!-- OneWayToSource fixes issues with vistualisation, but off-screen items won't be notified
 						about deselection until they become visible again. -->
 						<Setter Property="Padding" Value="0"/>
+						<Setter Property="FocusVisualStyle">
+							<Setter.Value>
+								<Style>
+									<Setter Property="Control.Template">
+										<Setter.Value>
+											<ControlTemplate>
+												<Rectangle Margin="0,0,0,1" StrokeThickness="1" Stroke="Black" StrokeDashArray="0.5 1.5"/>
+											</ControlTemplate>
+										</Setter.Value>
+									</Setter>
+								</Style>
+							</Setter.Value>
+						</Setter>
 						<!--Setter Property="Foreground" Value="Black"/>
 						<Style.Triggers>
 							<Trigger Property="IsSelected" Value="True" >
@@ -145,6 +158,7 @@
 						</Style.Triggers-->
 						<Style.Resources>
 							<SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
+							<SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent"/>
 						</Style.Resources>
 					</Style>
 				</ListBox.ItemContainerStyle>

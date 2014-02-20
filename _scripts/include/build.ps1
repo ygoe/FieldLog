@@ -37,9 +37,14 @@ if (IsSelected("build-debug"))
 {
 	Build-Solution "FieldLog.sln" "Debug" "Any CPU" 6
 
+	if (IsSelected("sign-lib"))
+	{
+		Sign-File "FieldLog\bin\Debug\FieldLog.dll" "signkey.pfx" "@signkey.password" 1
+		Sign-File "FieldLog\bin\DebugNET20\FieldLog.dll" "signkey.pfx" "@signkey.password" 1
+	}
 	if (IsSelected("sign-app"))
 	{
-		Sign-File "FieldLog\bin\Debug\FieldLogViewer.exe" "signkey.pfx" "@signkey.password" 1
+		Sign-File "FieldLogViewer\bin\Debug\FieldLogViewer.exe" "signkey.pfx" "@signkey.password" 1
 	}
 }
 
@@ -49,6 +54,11 @@ if (IsSelected("build-release"))
 {
 	Build-Solution "FieldLog.sln" "Release" "Any CPU" 6
 
+	if (IsSelected("sign-lib"))
+	{
+		Sign-File "FieldLog\bin\Release\FieldLog.dll" "signkey.pfx" "@signkey.password" 1
+		Sign-File "FieldLog\bin\ReleaseNET20\FieldLog.dll" "signkey.pfx" "@signkey.password" 1
+	}
 	if (IsSelected("sign-app"))
 	{
 		Sign-File "FieldLogViewer\bin\Release\FieldLogViewer.exe" "signkey.pfx" "@signkey.password" 1

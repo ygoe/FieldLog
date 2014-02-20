@@ -86,14 +86,14 @@ Upgrade=&Upgrade
 UpdatedHeadingLabel=%n%n%n%n%nFieldLog was upgraded.
 Task_VSTool=Register as External Tool in Visual Studio (2010/2012/2013)
 NgenMessage=Optimising application performance (this may take a moment)
-DowngradeUninstall=You are trying to install an older version than is currently installed on the system. The newer version must first be uninstalled. Would you like to do that now?
+DowngradeUninstall=You are trying to install an older version than is currently installed on the system. The newer version must first be uninstalled. Would you like to do that now?%n%nPlease note than uninstallation also deletes the configuration file. If you want to keep it, you need to make a copy of it. It is located in the directory %AppData%\Unclassified\FieldLog.
 OpenSingleFileCommand=Open single file
 
 de.Upgrade=&Aktualisieren
 de.UpdatedHeadingLabel=%n%n%n%n%nFieldLog wurde aktualisiert.
 de.Task_VSTool=In Visual Studio (2010/2012/2013) als Externes Tool eintragen
 de.NgenMessage=Anwendungs-Performance optimieren (kann einen Moment dauern)
-de.DowngradeUninstall=Sie versuchen, eine ältere Version zu installieren, als bereits im System installiert ist. Die neuere Version muss zuerst deinstalliert werden. Möchten Sie das jetzt tun?
+de.DowngradeUninstall=Sie versuchen, eine ältere Version zu installieren, als bereits im System installiert ist. Die neuere Version muss zuerst deinstalliert werden. Möchten Sie das jetzt tun?%n%nBitte beachten Sie, dass bei der Deinstallation auch die Einstellungen gelöscht werden. Wenn Sie diese behalten möchten, müssen Sie sie sichern. Die Datei befindet sich im Verzeichnis %AppData%\Unclassified\FieldLog.
 de.OpenSingleFileCommand=Einzelne Datei öffnen
 
 [Tasks]

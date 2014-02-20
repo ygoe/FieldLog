@@ -272,8 +272,12 @@ namespace Unclassified.FieldLog
 		public FieldLogStackFrame(StackFrame stackFrame)
 		{
 			Module = stackFrame.GetMethod().DeclaringType.Module.FullyQualifiedName;
-			TypeName = stackFrame.GetMethod().DeclaringType.FullName;
+			TypeName = FormatTypeName(stackFrame.GetMethod().DeclaringType);
 			MethodName = stackFrame.GetMethod().Name;
+			if (stackFrame.GetMethod().IsGenericMethod)
+			{
+				MethodName += FormatGenericTypeList(stackFrame.GetMethod().GetGenericArguments());
+			}
 			
 			StringBuilder sigSb = new StringBuilder();
 			ParameterInfo[] parameters = stackFrame.GetMethod().GetParameters();
@@ -283,7 +287,7 @@ namespace Unclassified.FieldLog
 				{
 					sigSb.Append(", ");
 				}
-				sigSb.Append(parameters[i].ParameterType.FullName);
+				sigSb.Append(FormatTypeName(parameters[i].ParameterType));
 			}
 			MethodSignature = sigSb.ToString();
 
@@ -297,6 +301,68 @@ namespace Unclassified.FieldLog
 				(MethodSignature != null ? MethodSignature.Length * 2 : 0) +
 				(FileName != null ? FileName.Length * 2 : 0) +
 				4 + 4;
+		}
+
+		private string FormatTypeName(Type t)
+		{
+			if (t == typeof(bool)) return "bool";
+			if (t == typeof(byte)) return "byte";
+			if (t == typeof(sbyte)) return "sbyte";
+			if (t == typeof(char)) return "char";
+			if (t == typeof(decimal)) return "decimal";
+			if (t == typeof(double)) return "double";
+			if (t == typeof(float)) return "float";
+			if (t == typeof(int)) return "int";
+			if (t == typeof(uint)) return "uint";
+			if (t == typeof(long)) return "long";
+			if (t == typeof(ulong)) return "ulong";
+			if (t == typeof(object)) return "object";
+			if (t == typeof(short)) return "short";
+			if (t == typeof(ushort)) return "ushort";
+			if (t == typeof(string)) return "string";
+
+			if (t == typeof(bool?)) return "bool?";
+			if (t == typeof(byte?)) return "byte?";
+			if (t == typeof(sbyte?)) return "sbyte?";
+			if (t == typeof(char?)) return "char?";
+			if (t == typeof(decimal?)) return "decimal?";
+			if (t == typeof(double?)) return "double?";
+			if (t == typeof(float?)) return "float?";
+			if (t == typeof(int?)) return "int?";
+			if (t == typeof(uint?)) return "uint?";
+			if (t == typeof(long?)) return "long?";
+			if (t == typeof(ulong?)) return "ulong?";
+			if (t == typeof(short?)) return "short?";
+			if (t == typeof(ushort?)) return "ushort?";
+
+			StringBuilder sb = new StringBuilder();
+			if (!t.IsGenericParameter && !string.IsNullOrEmpty(t.Namespace))
+			{
+				sb.Append(t.Namespace);
+				sb.Append(".");
+			}
+			sb.Append(t.Name);
+			if (t.IsGenericType)
+			{
+				sb.Append(FormatGenericTypeList(t.GetGenericArguments()));
+			}
+			return sb.ToString();
+		}
+
+		private string FormatGenericTypeList(Type[] types)
+		{
+			if (types == null || types.Length == 0) return "";
+
+			StringBuilder sb = new StringBuilder();
+			sb.Append("<");
+			int i = 0;
+			foreach (Type gt in types)
+			{
+				if (i++ > 0) sb.Append(", ");
+				sb.Append(FormatTypeName(gt));
+			}
+			sb.Append(">");
+			return sb.ToString();
 		}
 
 		/// <summary>

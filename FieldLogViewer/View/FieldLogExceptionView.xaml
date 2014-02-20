@@ -52,11 +52,18 @@
 								<ColumnDefinition Width="*"/>
 							</Grid.ColumnDefinitions>
 
-							<TextBlock Grid.Row="0" Grid.Column="0" Text="•"/>
-							<TextBox Grid.Row="0" Grid.Column="1" Text="{Binding FullMethodName, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
-							<TextBox Grid.Row="1" Grid.Column="1" Text="{Binding FullSource, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"
-									 Opacity="0.5"
-									 Visibility="{Binding SourceVisibility}"/>
+							<TextBlock
+								Grid.Row="0" Grid.Column="0" Text="•"/>
+							<TextBox
+								Grid.Row="0" Grid.Column="1"
+								Text="{Binding FullMethodName, Mode=OneWay}"
+								Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+							<TextBox
+								Grid.Row="1" Grid.Column="1"
+								Text="{Binding FullSource, Mode=OneWay}"
+								Style="{StaticResource ReadOnlyTextBoxStyle}"
+								Foreground="Gray"
+								Visibility="{Binding SourceVisibility}"/>
 						</Grid>
 					</DataTemplate>
 				</ItemsControl.ItemTemplate>

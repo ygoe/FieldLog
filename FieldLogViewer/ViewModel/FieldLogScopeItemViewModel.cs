@@ -97,5 +97,42 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				return Type == FieldLogScopeType.LogStart ? Visibility.Visible : Visibility.Collapsed;
 			}
 		}
+
+		/// <summary>
+		/// Gets a new UtcOffset value from the log item.
+		/// </summary>
+		/// <param name="utcOffset">The new UtcOffset value from this log item instance.</param>
+		/// <returns>true if a new UtcOffset value was set; otherwise, false.</returns>
+		public override bool TryGetUtcOffsetData(out int utcOffset)
+		{
+			if (Type == FieldLogScopeType.LogStart)
+			{
+				utcOffset = (int) EnvironmentData.LocalTimeZoneOffset.TotalMinutes;
+				return true;
+			}
+			utcOffset = 0;
+			return false;
+		}
+
+		/// <summary>
+		/// Gets a new IndentLevel value from the log item.
+		/// </summary>
+		/// <param name="indentLevel">The new IndentLevel value from this log item instance.</param>
+		/// <returns>true if a new IndentLevel value was set; otherwise, false.</returns>
+		public override bool TryGetIndentLevelData(out int indentLevel)
+		{
+			if (Type == FieldLogScopeType.Enter)
+			{
+				indentLevel = Item.Level - 1;
+				return true;
+			}
+			if (Type == FieldLogScopeType.Leave)
+			{
+				indentLevel = Item.Level;
+				return true;
+			}
+			indentLevel = 0;
+			return false;
+		}
 	}
 }

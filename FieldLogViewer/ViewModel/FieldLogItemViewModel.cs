@@ -172,5 +172,27 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				}
 			}
 		}
+
+		/// <summary>
+		/// Gets a new UtcOffset value from the log item.
+		/// </summary>
+		/// <param name="utcOffset">The new UtcOffset value from this log item instance.</param>
+		/// <returns>true if a new UtcOffset value was set; otherwise, false.</returns>
+		public virtual bool TryGetUtcOffsetData(out int utcOffset)
+		{
+			utcOffset = 0;
+			return false;
+		}
+
+		/// <summary>
+		/// Gets a new IndentLevel value from the log item.
+		/// </summary>
+		/// <param name="indentLevel">The new IndentLevel value from this log item instance.</param>
+		/// <returns>true if a new IndentLevel value was set; otherwise, false.</returns>
+		public virtual bool TryGetIndentLevelData(out int indentLevel)
+		{
+			indentLevel = 0;
+			return false;
+		}
 	}
 }

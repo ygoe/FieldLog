@@ -36,5 +36,20 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		}
 
 		public string TypeImageSource { get { return "/Images/TextItem_14.png"; } }
+
+		/// <summary>
+		/// Gets a new UtcOffset value from the log item.
+		/// </summary>
+		/// <param name="utcOffset">The new UtcOffset value from this log item instance.</param>
+		/// <returns>true if a new UtcOffset value was set; otherwise, false.</returns>
+		public override bool TryGetUtcOffsetData(out int utcOffset)
+		{
+			if (Item.Details != null && Item.Details.StartsWith("\u0001UtcOffset="))
+			{
+				return int.TryParse(Item.Details.Substring(11), out utcOffset);
+			}
+			utcOffset = 0;
+			return false;
+		}
 	}
 }

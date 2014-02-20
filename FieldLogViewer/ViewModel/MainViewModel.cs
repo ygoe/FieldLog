@@ -811,48 +811,15 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 			LoadedItemsCount = logItems.Count;
 
-			// Check for new UtcOffset value
-			bool newUtcOffset = false;
-			FieldLogScopeItemViewModel scopeItem = item as FieldLogScopeItemViewModel;
-			if (scopeItem != null &&
-				scopeItem.Type == FieldLogScopeType.LogStart)
-			{
-				scopeItem.UtcOffset = (int) scopeItem.EnvironmentData.LocalTimeZoneOffset.TotalMinutes;
-				newUtcOffset = true;
-			}
-			else
-			{
-				FieldLogTextItemViewModel textItem = item as FieldLogTextItemViewModel;
-				if (textItem != null &&
-					textItem.Details != null &&
-					textItem.Details.StartsWith("\u0001UtcOffset="))
-				{
-					int i;
-					if (int.TryParse(textItem.Details.Substring(11), out i))
-					{
-						// Read changed UTC offset from the generated text log item
-						textItem.UtcOffset = i;
-						newUtcOffset = true;
-					}
-				}
-			}
-
-			// IndentLevel is only supported for FieldLog items
+			// LastLogStartItem, IndentLevel and UtcOffset source are only supported for FieldLog items
 			FieldLogItemViewModel flItem = item as FieldLogItemViewModel;
 			if (flItem != null)
 			{
-				FieldLogScopeItemViewModel scope = item as FieldLogScopeItemViewModel;
-				if (scope != null)
+				// Check for new IndentLevel value
+				int tryIndentLevel;
+				if (flItem.TryGetIndentLevelData(out tryIndentLevel))
 				{
-					// Use new IndentLevel from Scope item
-					if (scope.Type == FieldLogScopeType.Enter)
-					{
-						scope.IndentLevel = scope.Level - 1;
-					}
-					else
-					{
-						scope.IndentLevel = scope.Level;
-					}
+					flItem.IndentLevel = tryIndentLevel;
 				}
 				else
 				{
@@ -879,25 +846,15 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						prevIndex--;
 					}
 				}
-			
-				// Update all items after the inserted item
-				for (int index = newIndex + 1; index < logItems.Count; index++)
+
+				// Check for new UtcOffset value
+				int tryUtcOffset;
+				bool newUtcOffset = flItem.TryGetUtcOffsetData(out tryUtcOffset);
+				if (newUtcOffset)
 				{
-					FieldLogItemViewModel nextFlItem = logItems[index] as FieldLogItemViewModel;
-					if (nextFlItem != null &&
-						nextFlItem.SessionId == flItem.SessionId &&
-						nextFlItem.ThreadId == flItem.ThreadId)
-					{
-						FieldLogScopeItemViewModel nextScope = nextFlItem as FieldLogScopeItemViewModel;
-						if (nextScope != null)
-						{
-							// The next Scope item already had a reference level, stop here
-							break;
-						}
-						nextFlItem.IndentLevel = flItem.IndentLevel;
-					}
+					item.UtcOffset = tryUtcOffset;
 				}
-				
+
 				// Use LastLogStartItem and UtcOffset of the previous item from the same session
 				prevIndex = newIndex - 1;
 				while (prevIndex >= 0)
@@ -914,6 +871,46 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						break;
 					}
 					prevIndex--;
+				}
+
+				// Update all items after the inserted item
+				bool setIndentLevel = true;
+				bool setUtcOffset = true;
+				for (int index = newIndex + 1; index < logItems.Count; index++)
+				{
+					FieldLogItemViewModel nextFlItem = logItems[index] as FieldLogItemViewModel;
+					if (nextFlItem != null &&
+						nextFlItem.SessionId == flItem.SessionId)
+					{
+						if (nextFlItem.ThreadId == flItem.ThreadId)
+						{
+							// Same thread gets the IndentLevel value
+							if (nextFlItem.TryGetIndentLevelData(out tryIndentLevel))
+							{
+								// Next item has an IndentLevel value on its own, stop updating other items
+								setIndentLevel = false;
+							}
+							if (setIndentLevel)
+							{
+								// IndentLevel value should still be updated
+								nextFlItem.IndentLevel = flItem.IndentLevel;
+							}
+						}
+
+						// All same session also get LastLogStartItem and UtcOffset
+						nextFlItem.LastLogStartItem = flItem.LastLogStartItem;
+
+						if (nextFlItem.TryGetUtcOffsetData(out tryUtcOffset))
+						{
+							// Next item has a UtcOffset value on its own, stop updating other items
+							setUtcOffset = false;
+						}
+						if (setUtcOffset)
+						{
+							// UtcOffset value should still be updated
+							nextFlItem.UtcOffset = flItem.UtcOffset;
+						}
+					}
 				}
 			}
 
@@ -1015,62 +1012,49 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				int utcOffset = 0;
 				foreach (var item in localLogItems)
 				{
-					FieldLogScopeItemViewModel scope = item as FieldLogScopeItemViewModel;
-					if (scope != null)
+					FieldLogItemViewModel flItem = item as FieldLogItemViewModel;
+					if (flItem != null)
 					{
-						threadLevels[scope.ThreadId] = scope.Level;
-						if (scope.Type == FieldLogScopeType.Enter)
+						// Check for new UtcOffset value in this item
+						int tryUtcOffset;
+						if (flItem.TryGetUtcOffsetData(out tryUtcOffset))
 						{
-							scope.IndentLevel = scope.Level - 1;
+							utcOffset = tryUtcOffset;
 						}
-						else
-						{
-							scope.IndentLevel = scope.Level;
-						}
+						// Assign current UtcOffset value to each item
+						item.UtcOffset = utcOffset;
 
-						if (scope.Type == FieldLogScopeType.LogStart)
+						FieldLogScopeItemViewModel scope = item as FieldLogScopeItemViewModel;
+						if (scope != null)
 						{
-							logStartItems[scope.SessionId] = scope;
-							utcOffset = (int) scope.EnvironmentData.LocalTimeZoneOffset.TotalMinutes;
-						}
-						scope.UtcOffset = utcOffset;
-					}
-					else
-					{
-						FieldLogTextItemViewModel textItem = item as FieldLogTextItemViewModel;
-						if (textItem != null &&
-							textItem.Details != null &&
-							textItem.Details.StartsWith("\u0001UtcOffset="))
-						{
-							int i;
-							if (int.TryParse(textItem.Details.Substring(11), out i))
+							threadLevels[scope.ThreadId] = scope.Level;
+							if (scope.Type == FieldLogScopeType.Enter)
 							{
-								// Read changed UTC offset from the generated text log item
-								utcOffset = i;
+								scope.IndentLevel = scope.Level - 1;
+							}
+							else
+							{
+								scope.IndentLevel = scope.Level;
+							}
+
+							if (scope.Type == FieldLogScopeType.LogStart)
+							{
+								logStartItems[scope.SessionId] = scope;
 							}
 						}
-						
-						FieldLogItemViewModel flItem = item as FieldLogItemViewModel;
-						if (flItem != null)
+						else
 						{
 							int level;
 							if (threadLevels.TryGetValue(flItem.ThreadId, out level))
 							{
 								flItem.IndentLevel = level;
 							}
-							flItem.UtcOffset = utcOffset;
 						}
-					}
-				}
-				foreach (var item in localLogItems)
-				{
-					FieldLogItemViewModel flItem = item as FieldLogItemViewModel;
-					if (flItem != null)
-					{
-						FieldLogScopeItemViewModel scope;
-						if (logStartItems.TryGetValue(flItem.SessionId, out scope))
+
+						FieldLogScopeItemViewModel tryLastLogStartScope;
+						if (logStartItems.TryGetValue(flItem.SessionId, out tryLastLogStartScope))
 						{
-							flItem.LastLogStartItem = scope;
+							flItem.LastLogStartItem = tryLastLogStartScope;
 						}
 					}
 				}

@@ -28,7 +28,16 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			get
 			{
-				return this.Exception.Message == null ? "(null)" : this.Exception.Message.Trim().Replace("\r", "").Replace("\n", "↲");
+				string exType = this.Exception.Type;
+				int dotIndex = exType.LastIndexOf('.');
+				if (dotIndex > -1)
+					exType = exType.Substring(dotIndex + 1);
+				if (exType.EndsWith("Exception", StringComparison.InvariantCultureIgnoreCase) &&
+					!exType.Equals("Exception", StringComparison.InvariantCultureIgnoreCase))
+					exType = exType.Substring(0, exType.Length - "Exception".Length + 2);
+				
+				return exType + ": " +
+					(this.Exception.Message != null ? this.Exception.Message.Trim().Replace("\r", "").Replace("\n", "↲") : "");
 			}
 		}
 

@@ -10,31 +10,57 @@ namespace Unclassified.UI
 
 	// Source: http://stackoverflow.com/a/4398752/143684
 	// Extended as in: http://10rem.net/blog/2011/03/09/creating-a-custom-markup-extension-in-wpf-and-soon-silverlight
+	/// <summary>
+	/// Provides enumeration values in XAML.
+	/// </summary>
 	public class EnumerationExtension : MarkupExtension
 	{
 		private bool generateStringValue;
 
+		/// <summary>
+		/// Initialises a new instance of the EnumerationExtension class.
+		/// </summary>
 		public EnumerationExtension()
 		{
 		}
 
+		/// <summary>
+		/// Initialises a new instance of the EnumerationExtension class.
+		/// </summary>
+		/// <param name="enumType">The enumeration type.</param>
 		public EnumerationExtension(Type enumType)
 		{
 			EnumType = enumType;
 		}
 
+		/// <summary>
+		/// Initialises a new instance of the EnumerationExtension class.
+		/// </summary>
+		/// <param name="enumType">The enumeration type.</param>
+		/// <param name="requiredAttribute">The type of the attribute that the enumeration values must have set.</param>
 		public EnumerationExtension(Type enumType, Type requiredAttribute)
 		{
 			EnumType = enumType;
 			RequiredAttribute = requiredAttribute;
 		}
 
+		/// <summary>
+		/// Initialises a new instance of the EnumerationExtension class.
+		/// </summary>
+		/// <param name="enumType">The enumeration type.</param>
+		/// <param name="generateStringValue">true to generate string values of the enum members, false to generate typed enum values.</param>
 		public EnumerationExtension(Type enumType, bool generateStringValue)
 		{
 			EnumType = enumType;
 			this.generateStringValue = generateStringValue;
 		}
 
+		/// <summary>
+		/// Initialises a new instance of the EnumerationExtension class.
+		/// </summary>
+		/// <param name="enumType">The enumeration type.</param>
+		/// <param name="requiredAttribute">The type of the attribute that the enumeration values must have set.</param>
+		/// <param name="generateStringValue">true to generate string values of the enum members, false to generate typed enum values.</param>
 		public EnumerationExtension(Type enumType, Type requiredAttribute, bool generateStringValue)
 		{
 			EnumType = enumType;
@@ -43,6 +69,10 @@ namespace Unclassified.UI
 		}
 
 		private Type enumType;
+
+		/// <summary>
+		/// Gets or sets the enumeration type.
+		/// </summary>
 		[ConstructorArgument("enumType")]
 		public Type EnumType
 		{
@@ -63,9 +93,17 @@ namespace Unclassified.UI
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the type of the attribute that the enumeration values must have set.
+		/// </summary>
 		[ConstructorArgument("requiredAttribute")]
 		public Type RequiredAttribute { get; set; }
 
+		/// <summary>
+		/// Returns an object that is provided as the value of the target property for this markup extension.
+		/// </summary>
+		/// <param name="serviceProvider">Unused.</param>
+		/// <returns></returns>
 		public override object ProvideValue(IServiceProvider serviceProvider)
 		{
 			if (EnumType == null)
@@ -83,6 +121,10 @@ namespace Unclassified.UI
 				}).ToArray();
 		}
 
+		/// <summary>
+		/// Returns a sequence of typed values for this markup extension.
+		/// </summary>
+		/// <returns></returns>
 		public IEnumerable<EnumerationExtension.EnumerationMember> ProvideTypedValue()
 		{
 			return (EnumerationExtension.EnumerationMember[]) ProvideValue(null);
@@ -121,11 +163,26 @@ namespace Unclassified.UI
 			return descriptionAttribute != null ? descriptionAttribute.Description : enumValue.ToString();
 		}
 
+		/// <summary>
+		/// Defines a wrapper for an enumeration value and its description string.
+		/// </summary>
 		public class EnumerationMember
 		{
+			/// <summary>
+			/// Gets or sets the description for the enumeration value.
+			/// </summary>
 			public string Description { get; set; }
+
+			/// <summary>
+			/// Gets or sets the enumeration value.
+			/// </summary>
 			public object Value { get; set; }
 
+			/// <summary>
+			/// Determines whether the specified object is equal to the current object.
+			/// </summary>
+			/// <param name="obj">The object to compare with the current object.</param>
+			/// <returns></returns>
 			public override bool Equals(object obj)
 			{
 				EnumerationMember em = obj as EnumerationMember;
@@ -136,6 +193,10 @@ namespace Unclassified.UI
 				return false;
 			}
 
+			/// <summary>
+			/// Returns a hash value for the current object.
+			/// </summary>
+			/// <returns></returns>
 			public override int GetHashCode()
 			{
 				return Value.GetHashCode();
@@ -147,13 +208,24 @@ namespace Unclassified.UI
 
 	#region Generic class for use in code
 
+	/// <summary>
+	/// Provides typed enumeration values in XAML.
+	/// </summary>
+	/// <typeparam name="T">The enumeration type.</typeparam>
 	public class EnumerationExtension<T> : MarkupExtension
 	{
+		/// <summary>
+		/// Initialises a new instance of the EnumerationExtension class.
+		/// </summary>
 		public EnumerationExtension()
 		{
 			EnumType = typeof(T);
 		}
 
+		/// <summary>
+		/// Initialises a new instance of the EnumerationExtension class.
+		/// </summary>
+		/// <param name="requiredAttribute">The type of the attribute that the enumeration values must have set.</param>
 		public EnumerationExtension(Type requiredAttribute)
 		{
 			EnumType = typeof(T);
@@ -161,6 +233,10 @@ namespace Unclassified.UI
 		}
 
 		private Type enumType;
+
+		/// <summary>
+		/// Gets or sets the enumeration type.
+		/// </summary>
 		[ConstructorArgument("enumType")]
 		public Type EnumType
 		{
@@ -181,9 +257,17 @@ namespace Unclassified.UI
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the type of the attribute that the enumeration values must have set.
+		/// </summary>
 		[ConstructorArgument("requiredAttribute")]
 		public Type RequiredAttribute { get; set; }
 
+		/// <summary>
+		/// Returns an object that is provided as the value of the target property for this markup extension.
+		/// </summary>
+		/// <param name="serviceProvider">Unused.</param>
+		/// <returns></returns>
 		public override object ProvideValue(IServiceProvider serviceProvider)
 		{
 			if (EnumType == null)
@@ -201,6 +285,10 @@ namespace Unclassified.UI
 				}).ToArray();
 		}
 
+		/// <summary>
+		/// Returns a sequence of typed values for this markup extension.
+		/// </summary>
+		/// <returns></returns>
 		public IEnumerable<EnumerationExtension<T>.EnumerationMember> ProvideTypedValue()
 		{
 			return (EnumerationExtension<T>.EnumerationMember[]) ProvideValue(null);
@@ -239,11 +327,26 @@ namespace Unclassified.UI
 			return descriptionAttribute != null ? descriptionAttribute.Description : enumValue.ToString();
 		}
 
+		/// <summary>
+		/// Defines a wrapper for an enumeration value and its description string.
+		/// </summary>
 		public class EnumerationMember
 		{
+			/// <summary>
+			/// Gets or sets the description for the enumeration value.
+			/// </summary>
 			public string Description { get; set; }
+
+			/// <summary>
+			/// Gets or sets the enumeration value.
+			/// </summary>
 			public T Value { get; set; }
 
+			/// <summary>
+			/// Determines whether the specified object is equal to the current object.
+			/// </summary>
+			/// <param name="obj">The object to compare with the current object.</param>
+			/// <returns></returns>
 			public override bool Equals(object obj)
 			{
 				EnumerationMember em = obj as EnumerationMember;
@@ -254,6 +357,10 @@ namespace Unclassified.UI
 				return false;
 			}
 
+			/// <summary>
+			/// Returns a hash value for the current object.
+			/// </summary>
+			/// <returns></returns>
 			public override int GetHashCode()
 			{
 				return Value.GetHashCode();

@@ -271,16 +271,18 @@ namespace Unclassified.FieldLog
 		/// <param name="stackFrame">The StackFrame instance.</param>
 		public FieldLogStackFrame(StackFrame stackFrame)
 		{
-			Module = stackFrame.GetMethod().DeclaringType.Module.FullyQualifiedName;
-			TypeName = FormatTypeName(stackFrame.GetMethod().DeclaringType);
-			MethodName = stackFrame.GetMethod().Name;
-			if (stackFrame.GetMethod().IsGenericMethod)
+			MethodBase method = stackFrame.GetMethod();
+
+			Module = method.DeclaringType.Module.FullyQualifiedName;
+			TypeName = FormatTypeName(method.DeclaringType);
+			MethodName = method.Name;
+			if (method.IsGenericMethod)
 			{
-				MethodName += FormatGenericTypeList(stackFrame.GetMethod().GetGenericArguments());
+				MethodName += FormatGenericTypeList(method.GetGenericArguments());
 			}
 			
 			StringBuilder sigSb = new StringBuilder();
-			ParameterInfo[] parameters = stackFrame.GetMethod().GetParameters();
+			ParameterInfo[] parameters = method.GetParameters();
 			for (int i = 0; i < parameters.Length; i++)
 			{
 				if (i > 0)
@@ -336,10 +338,18 @@ namespace Unclassified.FieldLog
 			if (t == typeof(ushort?)) return "ushort?";
 
 			StringBuilder sb = new StringBuilder();
-			if (!t.IsGenericParameter && !string.IsNullOrEmpty(t.Namespace))
+			if (!t.IsGenericParameter)
 			{
-				sb.Append(t.Namespace);
-				sb.Append(".");
+				if (!string.IsNullOrEmpty(t.Namespace))
+				{
+					sb.Append(t.Namespace);
+					sb.Append(".");
+				}
+				if (t.IsNested)
+				{
+					sb.Append(t.DeclaringType.Name);
+					sb.Append("+");
+				}
 			}
 			sb.Append(t.Name);
 			if (t.IsGenericType)

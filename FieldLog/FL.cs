@@ -326,6 +326,12 @@ namespace Unclassified.FieldLog
 			FL.StartTimer(EnsureJitTimerKey);
 			FL.StopTimer(EnsureJitTimerKey);
 			FL.ClearTimer(EnsureJitTimerKey);
+			using (FL.Timer(EnsureJitTimerKey))
+			{
+			}
+			using (FL.Timer(EnsureJitTimerKey, true))
+			{
+			}
 		}
 
 		/// <summary>
@@ -1432,7 +1438,8 @@ namespace Unclassified.FieldLog
 		/// Stops a custom timer.
 		/// </summary>
 		/// <param name="key">The custom timer key.</param>
-		public static void StopTimer(string key)
+		/// <param name="writeNow">true to write the timer value immediately, false for the normal delay.</param>
+		public static void StopTimer(string key, bool writeNow = false)
 		{
 			CustomTimerInfo cti;
 
@@ -1457,7 +1464,7 @@ namespace Unclassified.FieldLog
 #endif
 			}
 
-			cti.Stop();
+			cti.Stop(writeNow);
 		}
 
 		/// <summary>
@@ -1496,10 +1503,11 @@ namespace Unclassified.FieldLog
 		/// time measuring with the <c>using</c> statement.
 		/// </summary>
 		/// <param name="key">The custom timer key.</param>
+		/// <param name="writeImmediately">true to write the timer value immediately when stopping, false for the normal delay.</param>
 		/// <returns></returns>
-		public static CustomTimerScope Timer(string key)
+		public static CustomTimerScope Timer(string key, bool writeImmediately = false)
 		{
-			return new CustomTimerScope(key);
+			return new CustomTimerScope(key, writeImmediately);
 		}
 
 		#endregion Custom time measurement

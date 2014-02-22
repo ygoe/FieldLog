@@ -7,6 +7,9 @@ namespace Unclassified.FieldLog
 	/// <summary>
 	/// Provides methods for custom time measuring and deferred logging of the results.
 	/// </summary>
+	/// <remarks>
+	/// Tests have shown that measurements are good for time spans from 1 microsecond (10 ticks) on.
+	/// </remarks>
 	public class CustomTimerInfo
 	{
 		/// <summary>
@@ -51,7 +54,11 @@ namespace Unclassified.FieldLog
 
 				// Fetch the data in the lock region
 				localCounter = counter;
-				ticks = stopwatch.Elapsed.Ticks;
+				// Subtract 4 ticks per measurement, determined by tests
+				long correction = localCounter * 4;
+				ticks = stopwatch.Elapsed.Ticks - correction;
+				if (ticks < 0)
+					ticks = 0;
 				ticksPc = ticks / localCounter;
 			}
 				
@@ -101,7 +108,8 @@ namespace Unclassified.FieldLog
 		/// Stops measuring elapsed time for an interval and schedules saving the measured time to
 		/// a log item. Does nothing if the measurement is currently stopped.
 		/// </summary>
-		public void Stop()
+		/// <param name="writeNow">true to write the timer value immediately, false for the normal delay.</param>
+		public void Stop(bool writeNow = false)
 		{
 			lock (syncLock)
 			{
@@ -109,7 +117,15 @@ namespace Unclassified.FieldLog
 
 				stopwatch.Stop();
 			}
-			timer.Change(customTimerDelay, Timeout.Infinite);
+			if (writeNow)
+			{
+				timer.Change(Timeout.Infinite, Timeout.Infinite);
+				OnCustomTimer(null);
+			}
+			else
+			{
+				timer.Change(customTimerDelay, Timeout.Infinite);
+			}
 		}
 	}
 
@@ -120,6 +136,7 @@ namespace Unclassified.FieldLog
 	{
 		private string key;
 		private CustomTimerInfo cti;
+		private bool writeImmediately;
 		private bool isDisposed;
 
 		/// <summary>
@@ -137,10 +154,36 @@ namespace Unclassified.FieldLog
 		/// Initialises a new instance of the CustomTimerScope class and calls the Start method of
 		/// the CustomTimerInfo instance.
 		/// </summary>
+		/// <param name="key">The custom timer key for a dictionary lookup.</param>
+		/// <param name="writeImmediately">true to write the timer value immediately when stopping, false for the normal delay.</param>
+		public CustomTimerScope(string key, bool writeImmediately)
+		{
+			this.key = key;
+			this.writeImmediately = writeImmediately;
+			cti = FL.StartTimer(key);
+		}
+
+		/// <summary>
+		/// Initialises a new instance of the CustomTimerScope class and calls the Start method of
+		/// the CustomTimerInfo instance.
+		/// </summary>
 		/// <param name="cti">A CustomTimerInfo instance.</param>
 		public CustomTimerScope(CustomTimerInfo cti)
 		{
 			this.cti = cti;
+			cti.Start();
+		}
+
+		/// <summary>
+		/// Initialises a new instance of the CustomTimerScope class and calls the Start method of
+		/// the CustomTimerInfo instance.
+		/// </summary>
+		/// <param name="cti">A CustomTimerInfo instance.</param>
+		/// <param name="writeImmediately">true to write the timer value immediately when stopping, false for the normal delay.</param>
+		public CustomTimerScope(CustomTimerInfo cti, bool writeImmediately)
+		{
+			this.cti = cti;
+			this.writeImmediately = writeImmediately;
 			cti.Start();
 		}
 
@@ -152,7 +195,7 @@ namespace Unclassified.FieldLog
 			if (!isDisposed)
 			{
 				isDisposed = true;
-				cti.Stop();
+				cti.Stop(writeImmediately);
 				GC.SuppressFinalize(this);
 			}
 		}

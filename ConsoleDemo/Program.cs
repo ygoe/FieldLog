@@ -20,6 +20,7 @@ namespace ConsoleDemo
 
 			NormalActivity();
 			//LoadTest();
+			//TestTimerPrecision();
 		}
 
 		static void LoadTest()
@@ -29,6 +30,8 @@ namespace ConsoleDemo
 			for (int i = 1; i <= 50000; i++)
 			{
 				FL.Trace("Load test - " + i);
+				if ((i % 100) == 0)
+					FL.Error("Load test error message");
 				
 				if ((i % 10000) == 0)
 					Console.WriteLine("    now at " + i);
@@ -165,6 +168,34 @@ namespace ConsoleDemo
 					"You can't do that!",
 					new ApplicationException("An inner message 1",
 						new ApplicationException("An inner message 2")));
+			}
+		}
+
+		private static void TestTimerPrecision()
+		{
+			Console.WriteLine("Timer precision test is running, please wait...");
+			Console.WriteLine();
+
+			int[] iterationValues = new int[]
+			{
+				1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000,
+				10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000,
+				100000
+			};
+
+			Thread.Sleep(1000);
+
+			foreach (int iterations in iterationValues)
+			{
+				for (int j = 0; j < 20; j++)
+				{
+					using (FL.Timer("Loop " + iterations, j == 19))
+					{
+						for (int i = 0; i < iterations; i++)
+						{
+						}
+					}
+				}
 			}
 		}
 	}

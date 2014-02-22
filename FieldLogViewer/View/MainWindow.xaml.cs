@@ -73,7 +73,7 @@ namespace Unclassified.FieldLogViewer.View
 			newItemMediaPlayer.Open(new Uri(@"Sounds\ting.mp3", UriKind.Relative));
 
 			logItemsScrollPixelDc = DelayedCall.Create(() => { logItemsHostPanel.ScrollToPixel = true; }, 600);
-			updateScrollmapDc = DelayedCall.Create(UpdateScrollmap, 200);
+			updateScrollmapDc = DelayedCall.Create(UpdateScrollmap, 100);
 
 			AppSettings.Instance.OnPropertyChanged(s => s.ShowWarningsErrorsInScrollBar, v => InvalidateScrollmap(false));
 			AppSettings.Instance.OnPropertyChanged(s => s.ShowSelectionInScrollBar, v => InvalidateScrollmap(false));
@@ -158,7 +158,14 @@ namespace Unclassified.FieldLogViewer.View
 					// that is assigned to FilteredLogItems.Source in the MainViewModel
 					viewModel.OnPropertyChanged(
 						vm => vm.FilteredLogItemsView,
-						c => { if (c != null) c.CollectionChanged += LogItems_CollectionChanged; });
+						c =>
+						{
+							if (c != null)
+							{
+								c.CollectionChanged += LogItems_CollectionChanged;
+								InvalidateScrollmap();
+							}
+						});
 				}
 			}
 		}

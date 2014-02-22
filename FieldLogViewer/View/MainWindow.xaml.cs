@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -72,7 +73,7 @@ namespace Unclassified.FieldLogViewer.View
 			newItemMediaPlayer.Open(new Uri(@"Sounds\ting.mp3", UriKind.Relative));
 
 			logItemsScrollPixelDc = DelayedCall.Create(() => { logItemsHostPanel.ScrollToPixel = true; }, 600);
-			updateScrollmapDc = DelayedCall.Create(UpdateScrollmap, 250);
+			updateScrollmapDc = DelayedCall.Create(UpdateScrollmap, 200);
 
 			AppSettings.Instance.OnPropertyChanged(s => s.ShowWarningsErrorsInScrollBar, v => InvalidateScrollmap(false));
 			AppSettings.Instance.OnPropertyChanged(s => s.ShowSelectionInScrollBar, v => InvalidateScrollmap(false));
@@ -171,11 +172,11 @@ namespace Unclassified.FieldLogViewer.View
 			logItemsHostPanel = sender as SmoothVirtualizingPanel;
 		}
 
-		private void LogItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		private void LogItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
-			InvalidateScrollmap();
+			InvalidateScrollmap(e.Action != NotifyCollectionChangedAction.Add);
 
-			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+			if (e.Action == NotifyCollectionChangedAction.Add)
 			{
 				DateTime now = DateTime.UtcNow;
 

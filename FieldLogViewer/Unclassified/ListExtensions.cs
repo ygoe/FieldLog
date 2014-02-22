@@ -46,7 +46,7 @@ namespace Unclassified
 		}
 
 		/// <summary>
-		/// Removes all element from a list that do not match the specified condition.
+		/// Removes all elements from a list that do not match the specified condition.
 		/// </summary>
 		/// <typeparam name="T">The type of the elements of <paramref name="source"/>.</typeparam>
 		/// <param name="source">The list to filter.</param>
@@ -76,6 +76,26 @@ namespace Unclassified
 				return false;
 			}
 			return true;
+		}
+
+		/// <summary>
+		/// Returns an accumulated string of sequence items with the specified separator.
+		/// </summary>
+		/// <typeparam name="T">The type of the elements of <paramref name="source"/>.</typeparam>
+		/// <param name="source">The source sequence.</param>
+		/// <param name="separator">The separator that is inserted between all elements of the sequence.</param>
+		/// <param name="lastSeparator">If not null, the separator that is inserted between the last and second-last elements of the sequence.</param>
+		/// <returns>The final accumulated string.</returns>
+		public static string Aggregate<T>(this IEnumerable<T> source, string separator, string lastSeparator = null)
+		{
+			List<string> items = source.Select(i => i.ToString()).ToList();
+			if (lastSeparator != null && items.Count > 1)
+			{
+				string lastItem = items[items.Count - 1];
+				items.RemoveAt(items.Count - 1);
+				return items.Aggregate((a, b) => a + separator + b) + lastSeparator + lastItem;
+			}
+			return items.Aggregate((a, b) => a + separator + b);
 		}
 
 		#endregion List iteration

@@ -138,6 +138,21 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		public bool AcceptAll { get; private set; }
 
+		/// <summary>
+		/// Gets or sets the filter that was selected before this quick filter was created and selected.
+		/// </summary>
+		public FilterViewModel QuickPreviousFilter { get; set; }
+
+		/// <summary>
+		/// Gets or sets the time of the creation or last modification of this quick filter.
+		/// </summary>
+		public DateTime QuickModifiedTime { get; set; }
+
+		/// <summary>
+		/// Gets a value indicating whether this is a quick filter.
+		/// </summary>
+		public bool IsQuickFilter { get { return QuickModifiedTime != DateTime.MinValue; } }
+
 		#endregion Data properties
 
 		#region Loading and saving
@@ -156,8 +171,11 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			{
 				if (!haveName)
 				{
-					// The first line contains only the filter name
-					DisplayName = line;
+					// The first line contains the "quick filter" flag and filter name
+					string[] chunks = line.Split(new char[] { ',' }, 2);
+					if (chunks[0] == "qf")
+						QuickModifiedTime = DateTime.UtcNow.AddYears(-1);
+					DisplayName = chunks[1];
 					haveName = true;
 				}
 				else
@@ -198,7 +216,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			if (!ConditionGroups.Any()) return null;   // Intermediate state, should not be saved
 			
-			return DisplayName + Environment.NewLine +
+			return (IsQuickFilter ? "qf" : "") + "," + DisplayName + Environment.NewLine +
 				ConditionGroups.Select(c => c.SaveToString()).Aggregate((a, b) => a + Environment.NewLine + b);
 		}
 

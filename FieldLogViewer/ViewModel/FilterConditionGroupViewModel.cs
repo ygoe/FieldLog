@@ -135,7 +135,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public bool IsFirst
 		{
 			get { return isFirst; }
-			set { CheckUpdate(value, ref isFirst, "IsFirst", "Margin", "GroupTypes"); }
+			set { CheckUpdate(value, ref isFirst, "IsFirst", "Margin"); }
 		}
 
 		public Thickness Margin
@@ -154,7 +154,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			get { return isExclude; }
 			set
 			{
-				if (CheckUpdate(value, ref isExclude, "IsExclude", "GroupTypeIndex"))
+				if (CheckUpdate(value, ref isExclude, "IsExclude"))
 				{
 					OnFilterChanged(true);
 				}
@@ -165,15 +165,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			get
 			{
-				yield return new ViewModelBase() { DisplayName = "Include" };
-				yield return new ViewModelBase() { DisplayName = "Exclude" };
+				yield return new ValueViewModel<bool>("Include", false);
+				yield return new ValueViewModel<bool>("Exclude", true);
 			}
-		}
-
-		public int GroupTypeIndex
-		{
-			get { return isExclude ? 1 : 0; }
-			set { IsExclude = value == 1; }
 		}
 
 		private bool isEnabled;

@@ -152,14 +152,24 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		#region Commands
 
+		// Toolbar commands
 		public DelegateCommand LoadLogCommand { get; private set; }
 		public DelegateCommand StopLiveCommand { get; private set; }
 		public DelegateCommand ClearCommand { get; private set; }
 		public DelegateCommand LoadMapCommand { get; private set; }
 		public DelegateCommand DecreaseIndentSizeCommand { get; private set; }
 		public DelegateCommand IncreaseIndentSizeCommand { get; private set; }
+		public DelegateCommand DeleteFilterCommand { get; private set; }
 		public DelegateCommand ClearSearchTextCommand { get; private set; }
 		public DelegateCommand SettingsCommand { get; private set; }
+
+		// Log items list context menu commands
+		public DelegateCommand QuickFilterSessionCommand { get; private set; }
+		public DelegateCommand QuickFilterThreadCommand { get; private set; }
+		public DelegateCommand QuickFilterTypeCommand { get; private set; }
+		public DelegateCommand QuickFilterMinPrioCommand { get; private set; }
+		public DelegateCommand QuickFilterNotBeforeCommand { get; private set; }
+		public DelegateCommand QuickFilterNotAfterCommand { get; private set; }
 
 		private void InitializeCommands()
 		{
@@ -169,11 +179,19 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			LoadMapCommand = new DelegateCommand(OnLoadMap);
 			DecreaseIndentSizeCommand = new DelegateCommand(OnDecreaseIndentSize, CanDecreaseIndentSize);
 			IncreaseIndentSizeCommand = new DelegateCommand(OnIncreaseIndentSize, CanIncreaseIndentSize);
+			DeleteFilterCommand = new DelegateCommand(OnDeleteFilter, CanDeleteFilter);
 			ClearSearchTextCommand = new DelegateCommand(OnClearSearchText);
 			SettingsCommand = new DelegateCommand(OnSettings);
+
+			QuickFilterSessionCommand = new DelegateCommand(OnQuickFilterSession, CanQuickFilterSession);
+			QuickFilterThreadCommand = new DelegateCommand(OnQuickFilterThread, CanQuickFilterThread);
+			QuickFilterTypeCommand = new DelegateCommand(OnQuickFilterType, CanQuickFilterType);
+			QuickFilterMinPrioCommand = new DelegateCommand(OnQuickFilterMinPrio, CanQuickFilterMinPrio);
+			QuickFilterNotBeforeCommand = new DelegateCommand(OnQuickFilterNotBefore, CanQuickFilterNotBefore);
+			QuickFilterNotAfterCommand = new DelegateCommand(OnQuickFilterNotAfter, CanQuickFilterNotAfter);
 		}
 
-		private void InvalidateCommands()
+		private void InvalidateToolbarCommandsLoading()
 		{
 			LoadLogCommand.RaiseCanExecuteChanged();
 			StopLiveCommand.RaiseCanExecuteChanged();
@@ -181,6 +199,18 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			LoadMapCommand.RaiseCanExecuteChanged();
 			SettingsCommand.RaiseCanExecuteChanged();
 		}
+
+		private void InvalidateQuickFilterCommands()
+		{
+			QuickFilterSessionCommand.RaiseCanExecuteChanged();
+			QuickFilterThreadCommand.RaiseCanExecuteChanged();
+			QuickFilterTypeCommand.RaiseCanExecuteChanged();
+			QuickFilterMinPrioCommand.RaiseCanExecuteChanged();
+			QuickFilterNotBeforeCommand.RaiseCanExecuteChanged();
+			QuickFilterNotAfterCommand.RaiseCanExecuteChanged();
+		}
+
+		#region Toolbar
 
 		private bool CanLoadLog()
 		{
@@ -261,6 +291,44 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
+		private bool CanDeleteFilter()
+		{
+			return SelectedFilter != null && !SelectedFilter.AcceptAll;
+		}
+
+		private void OnDeleteFilter()
+		{
+			if (SelectedFilter != null && !SelectedFilter.AcceptAll)
+			{
+				if (!SelectedFilter.IsQuickFilter)
+				{
+					if (MessageBox.Show(
+						"Would you like to delete the selected filter “" + SelectedFilter.DisplayName + "”?",
+						"FieldLogViewer",
+						MessageBoxButton.YesNo,
+						MessageBoxImage.Question) == MessageBoxResult.Yes)
+					{
+						FilterViewModel filter = SelectedFilter;
+						SelectedFilter = Filters[0];
+						Filters.Remove(filter);
+					}
+				}
+				else
+				{
+					FilterViewModel filter = SelectedFilter;
+					if (filter.QuickPreviousFilter != null)
+					{
+						SelectedFilter = filter.QuickPreviousFilter;
+					}
+					else
+					{
+						SelectedFilter = Filters[0];
+					}
+					Filters.Remove(filter);
+				}
+			}
+		}
+
 		private void OnClearSearchText()
 		{
 			// Defer until after Render to make it look faster
@@ -278,9 +346,302 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			win.Show();
 		}
 
+		#endregion Toolbar
+
+		#region Log items list context menu
+
+		private FilterViewModel GetQuickFilter(out bool isNew)
+		{
+			isNew = false;
+			var filter = SelectedFilter;
+			if (!filter.IsQuickFilter)
+			{
+				isNew = true;
+				filter = filter.GetDuplicate();
+				filter.QuickModifiedTime = DateTime.UtcNow;
+			}
+			else if (filter.QuickModifiedTime.AddSeconds(10) < DateTime.UtcNow)
+			{
+				isNew = true;
+				filter = filter.GetDuplicate();
+				filter.QuickModifiedTime = DateTime.UtcNow;
+			}
+			if (filter.ConditionGroups.Count == 0)
+			{
+				filter.ConditionGroups.Add(new FilterConditionGroupViewModel(filter));
+			}
+			return filter;
+		}
+
+		private bool CanQuickFilterSession()
+		{
+			return SelectedItemsSessionIds.Any();
+		}
+
+		private void OnQuickFilterSession()
+		{
+			bool isNew;
+			var filter = GetQuickFilter(out isNew);
+			int sessionCount = SelectedItemsSessionIds.Count();
+			switch (sessionCount)
+			{
+				case 1:
+					filter.DisplayName = "By session";
+					break;
+				default:
+					filter.DisplayName = "By " + sessionCount + " sessions";
+					break;
+			}
+			foreach (var cg in filter.ConditionGroups)
+			{
+				// Remove all session and thread ID conditions
+				cg.Conditions.Filter(c => c.Column != FilterColumn.SessionId);
+				if (!cg.IsExclude)
+				{
+					if (sessionCount == 1)
+					{
+						cg.Conditions.Add(new FilterConditionViewModel(cg)
+						{
+							Column = FilterColumn.SessionId,
+							Comparison = FilterComparison.Equals,
+							Value = SelectedItemsSessionIds.First().ToString("D")
+						});
+					}
+					else
+					{
+						cg.Conditions.Add(new FilterConditionViewModel(cg)
+						{
+							Column = FilterColumn.SessionId,
+							Comparison = FilterComparison.InList,
+							Value = SelectedItemsSessionIds.Select(s => s.ToString("D")).Aggregate(";")
+						});
+					}
+				}
+			}
+			if (isNew)
+			{
+				filter.QuickPreviousFilter = SelectedFilter;
+				Filters.Add(filter);
+				SelectedFilter = filter;
+			}
+		}
+
+		private bool CanQuickFilterThread()
+		{
+			return SelectedItemsThreadIds.Any();
+		}
+
+		private void OnQuickFilterThread()
+		{
+			bool isNew;
+			var filter = GetQuickFilter(out isNew);
+			int threadCount = SelectedItemsThreadIds.Count();
+			switch (threadCount)
+			{
+				case 1:
+					filter.DisplayName = "Thread ID " + SelectedItemsThreadIds.First();
+					break;
+				default:
+					filter.DisplayName = "Thread IDs " + SelectedItemsThreadIds.Aggregate(", ", " and ");
+					break;
+			}
+			foreach (var cg in filter.ConditionGroups)
+			{
+				// Remove all session and thread ID conditions
+				cg.Conditions.Filter(c => c.Column != FilterColumn.SessionId);
+				cg.Conditions.Filter(c => c.Column != FilterColumn.ThreadId);
+				if (!cg.IsExclude)
+				{
+					cg.Conditions.Add(new FilterConditionViewModel(cg)
+					{
+						Column = FilterColumn.SessionId,
+						Comparison = FilterComparison.Equals,
+						Value = SelectedItemsSessionIds.First().ToString("D")
+					});
+					if (threadCount == 1)
+					{
+						cg.Conditions.Add(new FilterConditionViewModel(cg)
+						{
+							Column = FilterColumn.ThreadId,
+							Comparison = FilterComparison.Equals,
+							Value = SelectedItemsThreadIds.First().ToString()
+						});
+					}
+					else
+					{
+						cg.Conditions.Add(new FilterConditionViewModel(cg)
+						{
+							Column = FilterColumn.ThreadId,
+							Comparison = FilterComparison.InList,
+							Value = SelectedItemsThreadIds.Aggregate(";")
+						});
+					}
+				}
+			}
+			if (isNew)
+			{
+				filter.QuickPreviousFilter = SelectedFilter;
+				Filters.Add(filter);
+				SelectedFilter = filter;
+			}
+		}
+
+		private bool CanQuickFilterType()
+		{
+			return SelectedItems.Count == 1;
+		}
+
+		private void OnQuickFilterType()
+		{
+			bool isNew;
+			var filter = GetQuickFilter(out isNew);
+			filter.DisplayName = "Type " + EnumerationExtension<FilterItemType>.GetDescription(SelectedItemFilterItemType);
+			foreach (var cg in filter.ConditionGroups)
+			{
+				// Remove all session and thread ID conditions
+				cg.Conditions.Filter(c => c.Column != FilterColumn.Type);
+				if (!cg.IsExclude)
+				{
+					cg.Conditions.Add(new FilterConditionViewModel(cg)
+					{
+						Column = FilterColumn.Type,
+						Comparison = FilterComparison.Equals,
+						Value = SelectedItemFilterItemType.ToString()
+					});
+				}
+			}
+			if (isNew)
+			{
+				filter.QuickPreviousFilter = SelectedFilter;
+				Filters.Add(filter);
+				SelectedFilter = filter;
+			}
+		}
+
+		private bool CanQuickFilterMinPrio()
+		{
+			return SelectedItems.Count == 1 && SelectedItems[0] is FieldLogItemViewModel;
+		}
+
+		private void OnQuickFilterMinPrio()
+		{
+			FieldLogItemViewModel flItem = SelectedItems[0] as FieldLogItemViewModel;
+			bool isNew;
+			var filter = GetQuickFilter(out isNew);
+			filter.DisplayName = "Priority " + flItem.PrioTitle + " or higher";
+			foreach (var cg in filter.ConditionGroups)
+			{
+				// Remove all session and thread ID conditions
+				cg.Conditions.Filter(c => c.Column != FilterColumn.Priority);
+				if (!cg.IsExclude)
+				{
+					cg.Conditions.Add(new FilterConditionViewModel(cg)
+					{
+						Column = FilterColumn.Type,
+						Comparison = FilterComparison.GreaterOrEqual,
+						Value = flItem.Priority.ToString()
+					});
+				}
+			}
+			if (isNew)
+			{
+				filter.QuickPreviousFilter = SelectedFilter;
+				Filters.Add(filter);
+				SelectedFilter = filter;
+			}
+		}
+
+		private bool CanQuickFilterNotBefore()
+		{
+			return SelectedItems.Count == 1;
+		}
+
+		private void OnQuickFilterNotBefore()
+		{
+			bool isNew;
+			var filter = GetQuickFilter(out isNew);
+			filter.DisplayName = "Not before...";
+			foreach (var cg in filter.ConditionGroups)
+			{
+				// Remove all session and thread ID conditions
+				cg.Conditions.Filter(c => c.Column != FilterColumn.Time);
+				if (!cg.IsExclude)
+				{
+					DateTime itemTime = new DateTime(SelectedItems[0].Time.Ticks / 10 * 10);   // Round down to the next microsecond
+					switch (MainViewModel.Instance.ItemTimeMode)
+					{
+						case ItemTimeType.Local:
+							itemTime = itemTime.ToLocalTime();
+							break;
+						case ItemTimeType.Remote:
+							itemTime = itemTime.AddMinutes(SelectedItems[0].UtcOffset);
+							break;
+					}
+					cg.Conditions.Add(new FilterConditionViewModel(cg)
+					{
+						Column = FilterColumn.Time,
+						Comparison = FilterComparison.GreaterOrEqual,
+						Value = itemTime.ToString("yyyy-MM-dd HH:mm:ss.ffffff")
+					});
+				}
+			}
+			if (isNew)
+			{
+				filter.QuickPreviousFilter = SelectedFilter;
+				Filters.Add(filter);
+				SelectedFilter = filter;
+			}
+		}
+
+		private bool CanQuickFilterNotAfter()
+		{
+			return SelectedItems.Count == 1;
+		}
+
+		private void OnQuickFilterNotAfter()
+		{
+			bool isNew;
+			var filter = GetQuickFilter(out isNew);
+			filter.DisplayName = "Not after...";
+			foreach (var cg in filter.ConditionGroups)
+			{
+				// Remove all session and thread ID conditions
+				cg.Conditions.Filter(c => c.Column != FilterColumn.Time);
+				if (!cg.IsExclude)
+				{
+					DateTime itemTime = new DateTime((SelectedItems[0].Time.Ticks + 9) / 10 * 10);   // Round up to the next microsecond
+					switch (MainViewModel.Instance.ItemTimeMode)
+					{
+						case ItemTimeType.Local:
+							itemTime = itemTime.ToLocalTime();
+							break;
+						case ItemTimeType.Remote:
+							itemTime = itemTime.AddMinutes(SelectedItems[0].UtcOffset);
+							break;
+					}
+					cg.Conditions.Add(new FilterConditionViewModel(cg)
+					{
+						Column = FilterColumn.Time,
+						Comparison = FilterComparison.LessOrEqual,
+						Value = itemTime.ToString("yyyy-MM-dd HH:mm:ss.ffffff")
+					});
+				}
+			}
+			if (isNew)
+			{
+				filter.QuickPreviousFilter = SelectedFilter;
+				Filters.Add(filter);
+				SelectedFilter = filter;
+			}
+		}
+
+		#endregion Log items list context menu
+
 		#endregion Commands
 
 		#region Data properties
+
+		#region Toolbar and settings
 
 		public bool IsDebugMonitorActive
 		{
@@ -345,67 +706,54 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
+		private bool showRelativeTime;
+		public bool ShowRelativeTime
+		{
+			get { return showRelativeTime; }
+			set { CheckUpdate(value, ref showRelativeTime, "ShowRelativeTime"); }
+		}
+
+		private ItemTimeType itemTimeMode;
+		public ItemTimeType ItemTimeMode
+		{
+			get { return itemTimeMode; }
+			set
+			{
+				if (CheckUpdate(value, ref itemTimeMode, "ItemTimeMode"))
+				{
+					RefreshLogItemsFilterView();
+				}
+			}
+		}
+
+		#endregion Toolbar and settings
+
+		#region Log items list
+
+		public int SelectionDummy
+		{
+			get { return 0; }
+		}
+
 		public ObservableCollection<LogItemViewModelBase> LogItems
 		{
 			get { return this.logItems; }
 		}
 
-		public ICollectionView FilteredLogItems
+		public ICollectionView FilteredLogItemsView
 		{
 			get { return filteredLogItems.View; }
 		}
 
-		public ObservableCollection<FilterViewModel> Filters { get; private set; }
-
-		public ICollectionView SortedFilters
+		public List<LogItemViewModelBase> selectedItems;
+		public List<LogItemViewModelBase> SelectedItems
 		{
-			get { return sortedFilters.View; }
-		}
-
-		private FilterViewModel selectedFilter;
-		public FilterViewModel SelectedFilter
-		{
-			get { return selectedFilter; }
+			get { return selectedItems; }
 			set
 			{
-				if (CheckUpdate(value, ref selectedFilter, "SelectedFilter"))
+				if (CheckUpdate(value, ref selectedItems, "SelectedItems", "QuickFilterThreadTitle", "QuickFilterTypeTitle", "QuickFilterMinPrioTitle"))
 				{
-					ViewCommandManager.Invoke("SaveScrolling");
-					RefreshLogItemsFilterView();
-					ViewCommandManager.Invoke("RestoreScrolling");
-					if (selectedFilter != null)
-					{
-						AppSettings.Instance.SelectedFilter = selectedFilter.DisplayName;
-					}
-					else
-					{
-						AppSettings.Instance.SelectedFilter = "";
-					}
-				}
-			}
-		}
-
-		private string adhocSearchText;
-		public string AdhocSearchText
-		{
-			get { return adhocSearchText; }
-			set
-			{
-				if (CheckUpdate(value, ref adhocSearchText, "AdhocSearchText"))
-				{
-					if (!string.IsNullOrWhiteSpace(adhocSearchText))
-					{
-						adhocFilterCondition = new FilterConditionViewModel(null);
-						adhocFilterCondition.Value = adhocSearchText;
-					}
-					else
-					{
-						adhocFilterCondition = null;
-					}
-
-					ViewCommandManager.Invoke("SaveScrolling");
-					RefreshLogItemsFilterView();
-					ViewCommandManager.Invoke("RestoreScrolling");
+					InvalidateQuickFilterCommands();
 				}
 			}
 		}
@@ -428,11 +776,11 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						filteredLogItems.Source = logItems;
 						RefreshLogItemsFilterView();
 					}
-					OnPropertyChanged("FilteredLogItems");
+					OnPropertyChanged("FilteredLogItemsView");
 					OnPropertyChanged("LogItemsVisibility");
 					OnPropertyChanged("ItemDetailsVisibility");
 					OnPropertyChanged("LoadingMsgVisibility");
-					InvalidateCommands();
+					InvalidateToolbarCommandsLoading();
 				}
 			}
 		}
@@ -451,8 +799,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						filteredLogItems.Source = logItems;
 						RefreshLogItemsFilterView();
 					}
-					OnPropertyChanged("FilteredLogItems");
-					InvalidateCommands();
+					OnPropertyChanged("FilteredLogItemsView");
+					InvalidateToolbarCommandsLoading();
 				}
 			}
 		}
@@ -509,37 +857,175 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			set { CheckUpdate(value, ref highlightSameThread, "HighlightSameThread"); }
 		}
 
-		private bool showRelativeTime;
-		public bool ShowRelativeTime
+		#endregion Log items list
+
+		#region Filter
+
+		public ObservableCollection<FilterViewModel> Filters { get; private set; }
+
+		public ICollectionView SortedFilters
 		{
-			get { return showRelativeTime; }
-			set { CheckUpdate(value, ref showRelativeTime, "ShowRelativeTime"); }
+			get { return sortedFilters.View; }
 		}
 
-		private ItemTimeType itemTimeMode;
-		public ItemTimeType ItemTimeMode
+		private FilterViewModel selectedFilter;
+		public FilterViewModel SelectedFilter
 		{
-			get { return itemTimeMode; }
+			get { return selectedFilter; }
 			set
 			{
-				if (CheckUpdate(value, ref itemTimeMode, "ItemTimeMode"))
+				if (CheckUpdate(value, ref selectedFilter, "SelectedFilter"))
 				{
+					DeleteFilterCommand.RaiseCanExecuteChanged();
+					ViewCommandManager.Invoke("SaveScrolling");
 					RefreshLogItemsFilterView();
+					ViewCommandManager.Invoke("RestoreScrolling");
+					if (selectedFilter != null)
+					{
+						AppSettings.Instance.SelectedFilter = selectedFilter.DisplayName;
+					}
+					else
+					{
+						AppSettings.Instance.SelectedFilter = "";
+					}
 				}
 			}
 		}
 
-		public int SelectionDummy
+		private string adhocSearchText;
+		public string AdhocSearchText
 		{
-			get { return 0; }
+			get { return adhocSearchText; }
+			set
+			{
+				if (CheckUpdate(value, ref adhocSearchText, "AdhocSearchText"))
+				{
+					if (!string.IsNullOrWhiteSpace(adhocSearchText))
+					{
+						adhocFilterCondition = new FilterConditionViewModel(null);
+						adhocFilterCondition.Value = adhocSearchText;
+					}
+					else
+					{
+						adhocFilterCondition = null;
+					}
+
+					ViewCommandManager.Invoke("SaveScrolling");
+					RefreshLogItemsFilterView();
+					ViewCommandManager.Invoke("RestoreScrolling");
+				}
+			}
 		}
+
+		#endregion Filter
+
+		#region Quick filter
+
+		private IEnumerable<Guid> SelectedItemsSessionIds
+		{
+			get
+			{
+				if (SelectedItems != null)
+				{
+					return SelectedItems
+						.OfType<FieldLogItemViewModel>()
+						.Select(vm => vm.SessionId)
+						.Distinct()
+						.OrderBy(sid => sid);
+				}
+				return new Guid[0];
+			}
+		}
+
+		private IEnumerable<int> SelectedItemsThreadIds
+		{
+			get
+			{
+				if (SelectedItems != null)
+				{
+					return SelectedItems
+						.OfType<FieldLogItemViewModel>()
+						.Select(vm => vm.ThreadId)
+						.Distinct()
+						.OrderBy(tid => tid);
+				}
+				return new int[0];
+			}
+		}
+
+		public string QuickFilterThreadTitle
+		{
+			get
+			{
+				if (SelectedItemsThreadIds.Any())
+				{
+					string threadIdsStr = SelectedItemsThreadIds
+						.Select(tid => tid.ToString())
+						.Aggregate(", ", " and ");
+					switch (SelectedItemsThreadIds.Count())
+					{
+						case 1:
+							return "Filter by thread ID " + threadIdsStr + " (same session)";
+						default:
+							return "Filter by thread IDs " + threadIdsStr + " (same session)";
+					}
+				}
+				return "Filter by thread";
+			}
+		}
+
+		private FilterItemType SelectedItemFilterItemType
+		{
+			get
+			{
+				if (SelectedItems.Count == 1)
+				{
+					if (SelectedItems[0] is FieldLogDataItemViewModel) return FilterItemType.Data;
+					if (SelectedItems[0] is FieldLogExceptionItemViewModel) return FilterItemType.Exception;
+					if (SelectedItems[0] is FieldLogScopeItemViewModel) return FilterItemType.Scope;
+					if (SelectedItems[0] is FieldLogTextItemViewModel) return FilterItemType.Text;
+					if (SelectedItems[0] is DebugMessageViewModel) return FilterItemType.DebugOutput;
+				}
+				return FilterItemType.Any;
+			}
+		}
+
+		public string QuickFilterTypeTitle
+		{
+			get
+			{
+				if (SelectedItems.Count == 1)
+				{
+					return "Filter by type " + EnumerationExtension<FilterItemType>.GetDescription(SelectedItemFilterItemType);
+				}
+				return "Filter by type";
+			}
+		}
+
+		public string QuickFilterMinPrioTitle
+		{
+			get
+			{
+				if (SelectedItems.Count == 1)
+				{
+					FieldLogItemViewModel flItem = SelectedItems[0] as FieldLogItemViewModel;
+					if (flItem != null)
+					{
+						return "Filter by priority " + flItem.PrioTitle + " or higher";
+					}
+				}
+				return "Filter by priority";
+			}
+		}
+
+		#endregion Quick filter
 
 		#endregion Data properties
 
 		#region Log items filter
 
 		/// <summary>
-		/// Filter implementation for the collection view returned by FilteredLogItems.
+		/// Filter implementation for the collection view returned by FilteredLogItemsView.
 		/// </summary>
 		private void filteredLogItems_Filter(object sender, FilterEventArgs e)
 		{

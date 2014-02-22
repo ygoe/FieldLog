@@ -87,6 +87,9 @@
 				ItemsSource="{Binding SortedFilters}"
 				SelectedItem="{Binding SelectedFilter}"
 				DisplayMemberPath="DisplayName"/>
+			<Button Command="{Binding DeleteFilterCommand}" ToolTip="Delete selected filter">
+				<Image Source="/Images/filter_delete.png"/>
+			</Button>
 			<TextBox
 				Width="150"
 				ToolTip="Search text within filtered items"
@@ -94,7 +97,7 @@
 				ui:TextBoxExtensions.UpdateDelay="500"/>
 			<Button Command="{Binding ClearSearchTextCommand}" Content="Õ" FontFamily="Wingdings" ToolTip="Clear search text"/>
 			<TextBlock Margin="4,0,0,0" VerticalAlignment="Center" TextAlignment="Right" MinWidth="45">
-				<Run Text="{Binding FilteredLogItems.Count, Mode=OneWay}"/>
+				<Run Text="{Binding FilteredLogItemsView.Count, Mode=OneWay}"/>
 			</TextBlock>
 			<TextBlock Margin="0,0,0,0" VerticalAlignment="Center" Text="/"/>
 			<TextBlock Margin="0,0,4,0" VerticalAlignment="Center" TextAlignment="Right" MinWidth="45">
@@ -120,12 +123,13 @@
 		
 			<ListBox
 				Name="LogItemsList"
-				ItemsSource="{Binding FilteredLogItems}"
+				ItemsSource="{Binding FilteredLogItemsView}"
 				Grid.IsSharedSizeScope="True"
 				HorizontalContentAlignment="Stretch"
 				BorderThickness="0"
 				SelectionMode="Extended"
-				Visibility="{Binding LogItemsVisibility}">
+				Visibility="{Binding LogItemsVisibility}"
+				SelectionChanged="LogItemsList_SelectionChanged">
 				<ListBox.ItemsPanel>
 					<ItemsPanelTemplate>
 						<ui:SmoothVirtualizingPanel ItemHeight="18" Loaded="SmoothVirtualizingPanel_Loaded"/>
@@ -162,6 +166,16 @@
 						</Style.Resources>
 					</Style>
 				</ListBox.ItemContainerStyle>
+				<ListBox.ContextMenu>
+					<ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+						<MenuItem Header="Filter by same session" Command="{Binding QuickFilterSessionCommand}"/>
+						<MenuItem Header="{Binding QuickFilterThreadTitle}" Command="{Binding QuickFilterThreadCommand}"/>
+						<MenuItem Header="{Binding QuickFilterTypeTitle}" Command="{Binding QuickFilterTypeCommand}"/>
+						<MenuItem Header="{Binding QuickFilterMinPrioTitle}" Command="{Binding QuickFilterMinPrioCommand}"/>
+						<MenuItem Header="Not before this item" Command="{Binding QuickFilterNotBeforeCommand}"/>
+						<MenuItem Header="Not after this item" Command="{Binding QuickFilterNotAfterCommand}"/>
+					</ContextMenu>
+				</ListBox.ContextMenu>
 				<ListBox.Resources>
 					<DataTemplate DataType="{x:Type vm:FieldLogTextItemViewModel}">
 						<Grid Background="{Binding Background}" TextElement.Foreground="{Binding Foreground}">

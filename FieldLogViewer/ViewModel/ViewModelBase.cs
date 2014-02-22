@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
+using System.Linq.Expressions;
 using System.Windows.Threading;
 
 namespace Unclassified.FieldLogViewer.ViewModel
@@ -13,7 +10,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 	/// <summary>
 	/// Provides common properties and methods supporting view model classes.
 	/// </summary>
-	internal class ViewModelBase : INotifyPropertyChanged
+	internal abstract class ViewModelBase : INotifyPropertyChanged
 	{
 		#region Common view properties
 
@@ -51,15 +48,14 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		/// <summary>
 		/// Checks whether the new property value has changed and updates the backing field.
 		/// </summary>
-		/// <typeparam name="T"></typeparam>
+		/// <typeparam name="T">Value type of the property.</typeparam>
 		/// <param name="value">New property value.</param>
 		/// <param name="field">Backing field.</param>
 		/// <param name="propertyNames">Names of the properties to notify updated.</param>
 		/// <returns>true if the value has changed, false otherwise.</returns>
 		protected bool CheckUpdate<T>(T value, ref T field, params string[] propertyNames)
 		{
-			if ((value == null) != (field == null) ||      // Exactly one is null
-				(value != null && !value.Equals(field)))   // Neither is null and they're not equal
+			if (!EqualityComparer<T>.Default.Equals(value, field))
 			{
 				field = value;
 				OnPropertyChanged(propertyNames);
@@ -239,18 +235,6 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public event PropertyChangedEventHandler PropertyChanged;
 
 		/// <summary>
-		/// Raises this object's PropertyChanged event once for each property.
-		/// </summary>
-		/// <param name="propertyNames">The properties that has a new value.</param>
-		protected void OnPropertyChanged(params string[] propertyNames)
-		{
-			foreach (string propertyName in propertyNames)
-			{
-				OnPropertyChanged(propertyName);
-			}
-		}
-
-		/// <summary>
 		/// Raises this object's PropertyChanged event.
 		/// </summary>
 		/// <param name="propertyName">The property that has a new value.</param>
@@ -259,7 +243,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 #if DEBUG
 			if (!TypeDescriptor.GetProperties(this).OfType<PropertyDescriptor>().Any(d => d.Name == propertyName))
 			{
-				throw new NotImplementedException("Notifying a change of non-existing property " + this.GetType().Name + "." + propertyName);
+				throw new ArgumentException("Notifying a change of non-existing property " + this.GetType().Name + "." + propertyName);
 			}
 #endif
 
@@ -270,7 +254,63 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
+		/// <summary>
+		/// Raises this object's PropertyChanged event for each property.
+		/// </summary>
+		/// <param name="propertyNames">The properties that have a new value.</param>
+		protected void OnPropertyChanged(params string[] propertyNames)
+		{
+			// Only do all this work if somebody might listen to it
+			var handler = this.PropertyChanged;
+			if (handler != null)
+			{
+				foreach (string propertyName in propertyNames)
+				{
+#if DEBUG
+					if (!TypeDescriptor.GetProperties(this).OfType<PropertyDescriptor>().Any(d => d.Name == propertyName))
+					{
+						throw new ArgumentException("Notifying a change of non-existing property " + this.GetType().Name + "." + propertyName);
+					}
+#endif
+
+					handler(this, new PropertyChangedEventArgs(propertyName));
+				}
+			}
+		}
+
+		/// <summary>
+		/// Raises this object's PropertyChanged event.
+		/// </summary>
+		/// <typeparam name="T">Value type of the property.</typeparam>
+		/// <param name="selectorExpression">A lambda expression that describes the property that has a new value.</param>
+		protected void OnPropertyChanged<TProperty>(Expression<Func<TProperty>> selectorExpression)
+		{
+			// This type of parameter can only be used with the params keyword if all passed
+			// member expressions have the same value type. When using object instead of the
+			// TProperty type parameter, the expression gets wrapped with some Convert method and
+			// is no longer a MemberExpression. So this only works for one property per method call.
+
+			// Only do all this work if somebody might listen to it
+			if (this.PropertyChanged != null)
+			{
+				if (selectorExpression == null)
+					throw new ArgumentNullException("selectorExpression");
+				MemberExpression body = selectorExpression.Body as MemberExpression;
+				if (body == null)
+					throw new ArgumentException("The body must be a member expression");
+				OnPropertyChanged(body.Member.Name);
+			}
+		}
+
 		#endregion INotifyPropertyChanged Member
+	}
+
+	internal sealed class EmptyViewModel : ViewModelBase
+	{
+		public EmptyViewModel(string displayName)
+		{
+			DisplayName = displayName;
+		}
 	}
 
 	internal class ValueViewModel<T> : ViewModelBase

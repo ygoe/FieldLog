@@ -114,7 +114,8 @@
 												Margin="4,0,0,0" VerticalAlignment="Center"
 												ItemsSource="{Binding GroupTypes}"
 												DisplayMemberPath="DisplayName"
-												SelectedIndex="{Binding GroupTypeIndex}"
+												SelectedValue="{Binding IsExclude}"
+												SelectedValuePath="Value"
 												Style="{StaticResource LightComboBoxStyle}"
 												Opacity="{Binding Opacity}"/>
 

@@ -61,15 +61,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		private void OnDeleteFilter()
 		{
-			if (MainViewModel.Instance.SelectedFilter != null)
+			if (SelectedFilter != null)
 			{
-				var filterToDelete = MainViewModel.Instance.SelectedFilter;
-				MainViewModel.Instance.SelectedFilter = MainViewModel.Instance.Filters[0];
-				MainViewModel.Instance.Filters.Remove(filterToDelete);
-				if (MainViewModel.Instance.Filters.Count == 0)
-				{
-					OnCreateFilter();
-				}
+				MainViewModel.Instance.DeleteFilterCommand.Execute();
 			}
 		}
 

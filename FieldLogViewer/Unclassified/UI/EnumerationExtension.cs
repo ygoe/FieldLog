@@ -281,7 +281,7 @@ namespace Unclassified.UI
 				select new EnumerationMember
 				{
 					Value = enumValue,
-					Description = GetDescription(EnumType, enumValue)
+					Description = GetDescription(enumValue)
 				}).ToArray();
 		}
 
@@ -315,12 +315,11 @@ namespace Unclassified.UI
 		/// <summary>
 		/// Returns the value of the Description attribute of an enumeration member.
 		/// </summary>
-		/// <param name="enumType">Enum type that defines the specified value.</param>
 		/// <param name="enumValue">Value of the enum type to get the description text for.</param>
 		/// <returns></returns>
-		public static string GetDescription(Type enumType, T enumValue)
+		public static string GetDescription(T enumValue)
 		{
-			var descriptionAttribute = enumType
+			var descriptionAttribute = typeof(T)
 				.GetField(enumValue.ToString())
 				.GetCustomAttributes(typeof(DescriptionAttribute), false)
 				.FirstOrDefault() as DescriptionAttribute;

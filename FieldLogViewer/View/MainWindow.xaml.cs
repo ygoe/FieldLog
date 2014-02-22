@@ -143,8 +143,10 @@ namespace Unclassified.FieldLogViewer.View
 				var viewModel = DataContext as MainViewModel;
 				if (viewModel != null)
 				{
-					viewModel.LinkProperty(
-						vm => vm.FilteredLogItems,
+					// Add event handler for every new ObservableCollection<LogItemViewModelBase>
+					// that is assigned to FilteredLogItems.Source in the MainViewModel
+					viewModel.OnPropertyChanged(
+						vm => vm.FilteredLogItemsView,
 						c => { if (c != null) c.CollectionChanged += LogItems_CollectionChanged; });
 				}
 			}
@@ -279,6 +281,11 @@ namespace Unclassified.FieldLogViewer.View
 			}
 		}
 
+		private void LogItemsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			MainViewModel.Instance.SelectedItems = LogItemsList.SelectedItems.OfType<LogItemViewModelBase>().ToList();
+		}
+
 		#endregion Control event handlers
 
 		#region View commands
@@ -292,7 +299,10 @@ namespace Unclassified.FieldLogViewer.View
 		[ViewCommand]
 		public void FinishedReadingFiles()
 		{
-			logItemsHostPanel.UpdateLayout();
+			if (logItemsHostPanel != null)
+			{
+				logItemsHostPanel.UpdateLayout();
+			}
 			ScrollToEnd();
 			logItemsSmoothScrollActive = true;
 		}

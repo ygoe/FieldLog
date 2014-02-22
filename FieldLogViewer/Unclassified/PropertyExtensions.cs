@@ -1,10 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq.Expressions;
 using System.Reflection;
-using System.Collections.Specialized;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace Unclassified
 {
@@ -24,9 +21,7 @@ namespace Unclassified
 		//}
 
 		/// <summary>
-		/// Links the value of a property of a source object to an action method. Whenever the
-		/// source property is changed, the setter action is invoked and can update the value in
-		/// another property or method.
+		/// Invokes the specified action when the value of the source property changed.
 		/// </summary>
 		/// <typeparam name="TSource">Type that defines the property.</typeparam>
 		/// <typeparam name="TProperty">Value type of the property.</typeparam>
@@ -36,21 +31,21 @@ namespace Unclassified
 		/// <example>
 		/// Link a source property to a local property of the same type:
 		/// <code>
-		/// source.LinkProperty(s => s.SourceProperty, v => this.MyProperty = v);
+		/// source.LinkProperty(src => src.SourceProperty, value => MyProperty = value);
 		/// </code>
 		/// Link a source property to a local method that accepts the source property's value type
 		/// as its only parameter:
 		/// <code>
-		/// source.LinkProperty(s => s.SourceProperty, OnUpdate);
+		/// source.LinkProperty(src => src.SourceProperty, OnUpdate);
 		/// </code>
 		/// </example>
-		public static void LinkProperty<TSource, TProperty>(
+		public static void OnPropertyChanged<TSource, TProperty>(
 			this TSource source,
-			System.Linq.Expressions.Expression<Func<TSource, TProperty>> expr,
+			Expression<Func<TSource, TProperty>> expr,
 			Action<TProperty> handler)
 			where TSource : INotifyPropertyChanged
 		{
-			var memberExpr = expr.Body as System.Linq.Expressions.MemberExpression;
+			var memberExpr = expr.Body as MemberExpression;
 			if (memberExpr != null)
 			{
 				PropertyInfo property = memberExpr.Member as PropertyInfo;
@@ -77,7 +72,8 @@ namespace Unclassified
 		/// Whenever either property is changed, the other side of the binding is set to the same
 		/// value. To avoid endless loops, the PropertyChanged event must only be raised when the
 		/// value actually changed, not already on assignment. The target property is updated
-		/// immediately after setting up the binding.
+		/// immediately after setting up the binding, if <paramref name="direction"/> is not
+		/// OneWayToSource.
 		/// </summary>
 		/// <typeparam name="TTarget">Type that defines the target property.</typeparam>
 		/// <typeparam name="TSource">Type that defines the source property.</typeparam>
@@ -86,67 +82,78 @@ namespace Unclassified
 		/// <param name="targetExpr">Lambda expression of the target property.</param>
 		/// <param name="source">Instance of the type that defines the source property. Must implement INotifyPropertyChanged.</param>
 		/// <param name="sourceExpr">Lambda expression of the source property.</param>
+		/// <param name="direction">The direction of property value updates.</param>
 		/// <example>
 		/// Bind a source property to a local property of the same type:
 		/// <code>
-		/// source.BindProperty(me => me.TargetProperty, sourceObj, src => src.SourceProperty);
+		/// this.BindProperty(me => me.TargetProperty, source, src => src.SourceProperty);
 		/// </code>
 		/// </example>
 		public static void BindProperty<TTarget, TSource, TProperty>(
 			this TTarget target,
-			System.Linq.Expressions.Expression<Func<TTarget, TProperty>> targetExpr,
+			Expression<Func<TTarget, TProperty>> targetExpr,
 			TSource source,
-			System.Linq.Expressions.Expression<Func<TSource, TProperty>> sourceExpr)
+			Expression<Func<TSource, TProperty>> sourceExpr,
+			PropertyBindingDirection direction = PropertyBindingDirection.TwoWay)
 			where TTarget : INotifyPropertyChanged
 			where TSource : INotifyPropertyChanged
 		{
 			// Initialise all expression parts and reflected properties
-			var targetMemberExpr = targetExpr.Body as System.Linq.Expressions.MemberExpression;
+			var targetMemberExpr = targetExpr.Body as MemberExpression;
 			if (targetMemberExpr == null)
 				throw new ArgumentException("Unsupported target expression type.");
 			PropertyInfo targetProperty = targetMemberExpr.Member as PropertyInfo;
 			if (targetProperty == null)
 				throw new ArgumentException("Unsupported target expression type.");
 
-			var sourceMemberExpr = sourceExpr.Body as System.Linq.Expressions.MemberExpression;
+			var sourceMemberExpr = sourceExpr.Body as MemberExpression;
 			if (sourceMemberExpr == null)
 				throw new ArgumentException("Unsupported source expression type.");
 			PropertyInfo sourceProperty = sourceMemberExpr.Member as PropertyInfo;
 			if (sourceProperty == null)
 				throw new ArgumentException("Unsupported source expression type.");
 
-			// When the source changes, update the target
-			source.PropertyChanged += (s, e) =>
+			if (direction != PropertyBindingDirection.OneWayToSource)
 			{
-				if (e.PropertyName == sourceProperty.Name)
+				// When the source changes, update the target
+				source.PropertyChanged += (s, e) =>
 				{
-					targetProperty.SetValue(
-						target, 
-						sourceProperty.GetValue(source, null),
-						null);
-				}
-			};
-			// When the target changes, update the source
-			target.PropertyChanged += (s, e) =>
+					if (e.PropertyName == sourceProperty.Name)
+					{
+						targetProperty.SetValue(
+							target,
+							sourceProperty.GetValue(source, null),
+							null);
+					}
+				};
+			}
+			if (direction != PropertyBindingDirection.OneWayToTarget)
 			{
-				if (e.PropertyName == targetProperty.Name)
+				// When the target changes, update the source
+				target.PropertyChanged += (s, e) =>
 				{
-					sourceProperty.SetValue(
-						source,
-						targetProperty.GetValue(target, null),
-						null);
-				}
-			};
+					if (e.PropertyName == targetProperty.Name)
+					{
+						sourceProperty.SetValue(
+							source,
+							targetProperty.GetValue(target, null),
+							null);
+					}
+				};
+			}
 
-			// Update the target immediately
-			targetProperty.SetValue(
-				target,
-				sourceProperty.GetValue(source, null),
-				null);
+			if (direction != PropertyBindingDirection.OneWayToSource)
+			{
+				// Update the target immediately
+				targetProperty.SetValue(
+					target,
+					sourceProperty.GetValue(source, null),
+					null);
+			}
 		}
 
 		/// <summary>
-		/// Returns the property name of a lambda expression.
+		/// Returns the name of the member in a lambda expression.
 		/// </summary>
 		/// <typeparam name="TSource">Type that defines the property.</typeparam>
 		/// <typeparam name="TProperty">Value type of the property.</typeparam>
@@ -155,26 +162,37 @@ namespace Unclassified
 		/// <returns></returns>
 		/// <example>
 		/// <code>
-		/// string name = this.ExprName(x => x.MyProperty);
+		/// string name = this.MemberName(x => x.MyProperty);
 		/// </code>
-		/// The value of name is set to "MyProperty".
+		/// The value of name is set to "MyProperty", unless changed by a code obfuscator.
 		/// </example>
-		public static string ExprName<TSource, TProperty>(
+		public static string MemberName<TSource, TProperty>(
 			this TSource source,
-			System.Linq.Expressions.Expression<Func<TSource, TProperty>> expr)
+			Expression<Func<TSource, TProperty>> expr)
 		{
-			var memberExpr = expr.Body as System.Linq.Expressions.MemberExpression;
+			if (expr == null)
+				throw new ArgumentNullException("expr");
+			var memberExpr = expr.Body as MemberExpression;
 			if (memberExpr != null)
 			{
-				PropertyInfo property = memberExpr.Member as PropertyInfo;
-				if (property != null)
-				{
-					return property.Name;
-				}
+				return memberExpr.Member.Name;
 			}
 			throw new ArgumentException("Unsupported expression type.");
 		}
 
 		#endregion INotifyPropertyChanged helpers
+	}
+
+	/// <summary>
+	/// Defines values for the direction of property value bindings.
+	/// </summary>
+	public enum PropertyBindingDirection
+	{
+		/// <summary>Updates a changed value on either side to the other side.</summary>
+		TwoWay,
+		/// <summary>Only updates a changed value on the source to the target.</summary>
+		OneWayToTarget,
+		/// <summary>Only updates a changed value on the target to the source.</summary>
+		OneWayToSource
 	}
 }

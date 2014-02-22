@@ -81,6 +81,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						"Column",
 						"AvailableComparisons",
 						"ValueTextVisibility", "ValueListVisibility");
+					enableFilterChangedEvent = false;
 					// Set value to an acceptable default
 					switch (column)
 					{
@@ -102,6 +103,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 							Comparison = AvailableComparisons.First().Value;
 						}
 					}
+					enableFilterChangedEvent = true;
 					OnFilterChanged(true);
 				}
 			}
@@ -946,6 +948,10 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				case FilterComparison.Regex:
 				case FilterComparison.NotRegex:
 					return Regex.IsMatch(str ?? "", Value ?? "", RegexOptions.IgnoreCase);
+				case FilterComparison.InList:
+					return Value.Split(';').Any(s => s.Trim() == (str ?? "").Trim());
+				case FilterComparison.NotInList:
+					return !Value.Split(';').Any(s => s.Trim() == (str ?? "").Trim());
 				default:
 					throw new Exception("Invalid comparison for string column: " + Comparison);
 			}
@@ -953,6 +959,14 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		private bool CompareInt(int i)
 		{
+			if (Comparison == FilterComparison.InList)
+			{
+				return Value.Split(';').Any(li => li.Trim() == i.ToString());
+			}
+			if (Comparison == FilterComparison.NotInList)
+			{
+				return !Value.Split(';').Any(li => li.Trim() == i.ToString());
+			}
 			int filterInt;
 			if (int.TryParse(Value, out filterInt))
 			{
@@ -982,6 +996,14 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		private bool CompareLong(long l)
 		{
+			if (Comparison == FilterComparison.InList)
+			{
+				return Value.Split(';').Any(ll => ll.Trim() == l.ToString());
+			}
+			if (Comparison == FilterComparison.NotInList)
+			{
+				return !Value.Split(';').Any(ll => ll.Trim() == l.ToString());
+			}
 			long filterLong;
 			if (long.TryParse(Value, out filterLong))
 			{
@@ -1221,6 +1243,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		[UseForBoolColumn]
 		[Description("is not set")]
 		NotSet,
+		[UseForNumberColumn, UseForStringColumn]
+		[Description("is in list")]
+		InList,
+		[UseForNumberColumn, UseForStringColumn]
+		[Description("is not in list")]
+		NotInList,
 	}
 
 	enum FilterItemType

@@ -20,6 +20,7 @@
 					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
 				</Grid.RowDefinitions>
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="100"/>
@@ -34,6 +35,13 @@
 
 				<TextBlock Grid.Row="2" Grid.Column="0" Margin="0,8,0,0" Text="Text:"/>
 				<TextBox Grid.Row="2" Grid.Column="1" Margin="0,8,0,0" Text="{Binding Message, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+				
+				<Button
+					Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+					Margin="0,16,0,0" HorizontalAlignment="Left" Padding="6,1"
+					Visibility="{Binding OpenLogFileButtonVisibility}"
+					Content="Open log files from this path"
+					Command="{Binding OpenLogFileCommand}"/>
 			</Grid>
 		</ScrollViewer>
 	</Grid>

@@ -202,6 +202,15 @@ namespace Unclassified.FieldLog
 		/// Time when the log files of each priority were last purged. Only used in the send thread.
 		/// </summary>
 		private static Dictionary<FieldLogPriority, DateTime> priorityLastPurgeTimes = new Dictionary<FieldLogPriority, DateTime>();
+		/// <summary>
+		/// Indicates whether the configuration file has changed and should be reloaded.
+		/// Synchronised by sendThread.
+		/// </summary>
+		private static bool configChanged;
+		/// <summary>
+		/// Detects changes to the configuration file.
+		/// </summary>
+		private static FileSystemWatcher configFileWatcher;
 
 		/// <summary>
 		/// Keeps all buffers that still need to be sent. Used by the send thread only.
@@ -1606,9 +1615,43 @@ namespace Unclassified.FieldLog
 				{
 					SendBuffers();
 				}
+				bool localConfigChanged = false;
 				lock (sendThread)
 				{
 					if (sendThreadCancellationPending) break;
+					if (configChanged)
+					{
+						// Close all files and re-read the configuration file
+						foreach (FieldLogFileWriter writer in priorityLogWriters.Values)
+						{
+							writer.Dispose();
+						}
+						priorityLogWriters.Clear();
+						// Forget the current path to have it newly determined next time
+						logFileBasePathSet = false;
+						// Don't clear the value of customLogFileBasePath so that any previously
+						// set value through code will remain in effect, but only reset the lock
+						// that would prevent it from being set again (normally because the send
+						// thread is currently using it - but now we're in the send thread and
+						// everything is nicely synchronised).
+						bool wasSet = customLogFileBasePathSet;
+						customLogFileBasePathSet = false;
+						// Now read the new configuration
+						ReadLogConfiguration();
+						// If the custom path was set before this event, set it again so that
+						// TestLogPaths isn't blocked by it.
+						customLogFileBasePathSet = wasSet;
+						// Determine log path now so that LogFileBasePath returns something
+						// immediately, not only after writing new items to the files.
+						TestLogPaths();
+						// Reset the flag, still in the lock before it could be set again
+						configChanged = false;
+						localConfigChanged = true;
+					}
+				}
+				if (localConfigChanged)
+				{
+					FL.Trace("FieldLog configuration file re-read");
 				}
 			}
 			// Send remaining buffers
@@ -2093,6 +2136,14 @@ namespace Unclassified.FieldLog
 			string execFile = Path.GetFileNameWithoutExtension(execPath);
 			string configFileName = Path.Combine(execDir, execFile + logConfigExtension);
 
+			if (configFileWatcher == null)
+			{
+				configFileWatcher = new FileSystemWatcher(execDir, execFile + logConfigExtension);
+				configFileWatcher.Changed += configFileWatcher_Event;
+				configFileWatcher.Created += configFileWatcher_Event;
+				configFileWatcher.EnableRaisingEvents = true;
+			}
+			
 			try
 			{
 				ResetLogConfiguration();
@@ -2200,6 +2251,15 @@ namespace Unclassified.FieldLog
 				}
 				// Set all values to default
 				ResetLogConfiguration();
+			}
+		}
+
+		private static void configFileWatcher_Event(object sender, FileSystemEventArgs e)
+		{
+			Thread.Sleep(500);
+			lock (sendThread)
+			{
+				configChanged = true;
 			}
 		}
 

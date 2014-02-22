@@ -1302,7 +1302,8 @@ namespace Unclassified.FieldLog
 			{
 				if (isShutdown)
 				{
-					System.Diagnostics.Trace.WriteLine("FieldLog: New messages are not accepted because the log queue has been shut down.");
+					System.Diagnostics.Trace.WriteLine("FieldLog warning: New messages are not accepted because the log queue has been shut down.");
+					System.Diagnostics.Trace.WriteLine(item.ToString());
 					return;
 				}
 				eventCounter++;
@@ -1814,6 +1815,8 @@ namespace Unclassified.FieldLog
 
 					logFileBasePathSet = true;
 					Thread.MemoryBarrier();   // Ensure that logFileBasePathSet (and logFileBasePath) are current elsewhere
+
+					System.Diagnostics.Trace.WriteLine("FieldLog info: Now writing to " + logFileBasePath);
 					return true;
 				}
 				catch
@@ -1829,6 +1832,12 @@ namespace Unclassified.FieldLog
 
 		private static void AppendLogItemsToFile(IEnumerable<FieldLogItem> logItems)
 		{
+			// If nothing should be kept, don't write anything
+			if (maxTotalSize == 0)
+			{
+				return;
+			}
+			
 			if (logFileBasePath == null) return;   // Nowhere to write the log items, drop them
 			Dictionary<FieldLogFileWriter, bool> usedWriters = new Dictionary<FieldLogFileWriter, bool>();
 			// NOTE: HashSet<T> would be better here, but it's not supported in .NET 2.0, so we're
@@ -1875,7 +1884,7 @@ namespace Unclassified.FieldLog
 				TimeSpan keepTime;
 				if (priorityKeepTimes.TryGetValue(logItem.Priority, out keepTime))
 				{
-					if (keepTime.Ticks == 0)
+					if (keepTime.Ticks <= 0)
 						continue;
 				}
 
@@ -2112,41 +2121,51 @@ namespace Unclassified.FieldLog
 								case "path":
 									if (!string.IsNullOrEmpty(value))
 									{
+										if (!Path.IsPathRooted(value))
+										{
+											value = Path.Combine(execDir, value);
+										}
 										configLogPath = value;
 									}
 									break;
 								case "maxfilesize":
-									maxFileSize = (int) ParseConfigNumber(value);
+									maxFileSize = (int) ParseConfigNumber(value, maxFileSize);
 									// Don't come near the technical limit of 2 GiB due to Int32 file addressing
 									const int maxMaxFileSize = 1 * 1024 * 1024 * 1024; /* GiB */
 									if (maxFileSize > maxMaxFileSize)
 									{
 										maxFileSize = maxMaxFileSize;
 									}
+									// Don't keep it too small so that repeated scopes (esp. LogStart) fit in
+									const int minMaxFileSize = 50 * 1024; /* KiB */
+									if (maxFileSize < minMaxFileSize)
+									{
+										maxFileSize = minMaxFileSize;
+									}
 									break;
 								case "maxtotalsize":
-									maxTotalSize = ParseConfigNumber(value);
+									maxTotalSize = ParseConfigNumber(value, maxTotalSize);
 									break;
 								case "keeptrace":
-									priorityKeepTimes[FieldLogPriority.Trace] = ParseConfigTimeSpan(value);
+									priorityKeepTimes[FieldLogPriority.Trace] = ParseConfigTimeSpan(value, priorityKeepTimes[FieldLogPriority.Trace]);
 									break;
 								case "keepcheckpoint":
-									priorityKeepTimes[FieldLogPriority.Checkpoint] = ParseConfigTimeSpan(value);
+									priorityKeepTimes[FieldLogPriority.Checkpoint] = ParseConfigTimeSpan(value, priorityKeepTimes[FieldLogPriority.Checkpoint]);
 									break;
 								case "keepinfo":
-									priorityKeepTimes[FieldLogPriority.Info] = ParseConfigTimeSpan(value);
+									priorityKeepTimes[FieldLogPriority.Info] = ParseConfigTimeSpan(value, priorityKeepTimes[FieldLogPriority.Info]);
 									break;
 								case "keepnotice":
-									priorityKeepTimes[FieldLogPriority.Notice] = ParseConfigTimeSpan(value);
+									priorityKeepTimes[FieldLogPriority.Notice] = ParseConfigTimeSpan(value, priorityKeepTimes[FieldLogPriority.Notice]);
 									break;
 								case "keepwarning":
-									priorityKeepTimes[FieldLogPriority.Warning] = ParseConfigTimeSpan(value);
+									priorityKeepTimes[FieldLogPriority.Warning] = ParseConfigTimeSpan(value, priorityKeepTimes[FieldLogPriority.Warning]);
 									break;
 								case "keeperror":
-									priorityKeepTimes[FieldLogPriority.Error] = ParseConfigTimeSpan(value);
+									priorityKeepTimes[FieldLogPriority.Error] = ParseConfigTimeSpan(value, priorityKeepTimes[FieldLogPriority.Error]);
 									break;
 								case "keepcritical":
-									priorityKeepTimes[FieldLogPriority.Critical] = ParseConfigTimeSpan(value);
+									priorityKeepTimes[FieldLogPriority.Critical] = ParseConfigTimeSpan(value, priorityKeepTimes[FieldLogPriority.Critical]);
 									break;
 							}
 						}
@@ -2165,10 +2184,21 @@ namespace Unclassified.FieldLog
 					}
 				}
 			}
-			catch
+			catch (Exception ex)
 			{
-				// Something went really bad while reading the configuration file.
-				// Set all values to default.
+				// Something went really bad while reading the configuration file
+				System.Diagnostics.Trace.WriteLine("FieldLog error: Reading configuration file " + configFileName);
+				System.Diagnostics.Trace.WriteLine(ex.ToString());
+				// Try to log it as well
+				try
+				{
+					FL.Warning(ex, "FieldLog.ReadLogConfiguration");
+				}
+				catch
+				{
+					// Bad luck...
+				}
+				// Set all values to default
 				ResetLogConfiguration();
 			}
 		}
@@ -2196,8 +2226,9 @@ namespace Unclassified.FieldLog
 		/// Parses a number description from the configuration file.
 		/// </summary>
 		/// <param name="value">A number value with an optional byte size suffix "k", "m" or "g" (case-insensitive).</param>
-		/// <returns>The parsed value, or -1 on error.</returns>
-		private static long ParseConfigNumber(string value)
+		/// <param name="defaultValue">The value to return if the value cannot be parsed or used.</param>
+		/// <returns>The parsed value, or <paramref name="defaultValue"/> on error.</returns>
+		private static long ParseConfigNumber(string value, long defaultValue)
 		{
 			value = value.Trim().ToLowerInvariant();
 			Match m = Regex.Match(value, @"^([0-9]+)\s*(?:([kmg])b?)?$");
@@ -2219,15 +2250,26 @@ namespace Unclassified.FieldLog
 				}
 				return num;
 			}
-			return -1;
+			System.Diagnostics.Trace.WriteLine("FieldLog warning: Invalid size format in configuration file");
+			// Try to log it as well
+			try
+			{
+				FL.Warning("FieldLog configuration: Invalid size format", "Value provided: " + value + "\nDefault value: " + defaultValue);
+			}
+			catch
+			{
+				// Bad luck...
+			}
+			return defaultValue;
 		}
 
 		/// <summary>
 		/// Parses a timespan description from the configuration file.
 		/// </summary>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		private static TimeSpan ParseConfigTimeSpan(string value)
+		/// <param name="value">A number value with an optional time unit suffix "s", "m", "h" or "d" (case-insensitive).</param>
+		/// <param name="defaultValue">The value to return if the value cannot be parsed or used.</param>
+		/// <returns>The parsed value, or <paramref name="defaultValue"/> on error.</returns>
+		private static TimeSpan ParseConfigTimeSpan(string value, TimeSpan defaultValue)
 		{
 			value = value.Trim().ToLowerInvariant();
 			Match m = Regex.Match(value, @"^([0-9]+)\s*([smhd])?$");
@@ -2257,7 +2299,17 @@ namespace Unclassified.FieldLog
 			{
 				return TimeSpan.Zero;
 			}
-			return TimeSpan.MinValue;
+			System.Diagnostics.Trace.WriteLine("FieldLog warning: Invalid time format in configuration file");
+			// Try to log it as well
+			try
+			{
+				FL.Warning("FieldLog configuration: Invalid time format", "Value provided: " + value + "\nDefault value: " + defaultValue);
+			}
+			catch
+			{
+				// Bad luck...
+			}
+			return defaultValue;
 		}
 
 		#endregion Log configuration

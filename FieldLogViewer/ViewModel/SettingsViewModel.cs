@@ -16,6 +16,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			InitializeCommands();
 
 			this.BindProperty(vm => vm.ItemTimeMode, AppSettings.Instance, s => s.ItemTimeMode);
+			this.BindProperty(vm => vm.ShowWarningsErrorsInScrollBar, AppSettings.Instance, s => s.ShowWarningsErrorsInScrollBar);
+			this.BindProperty(vm => vm.ShowSelectionInScrollBar, AppSettings.Instance, s => s.ShowSelectionInScrollBar);
 
 			this.BindProperty(vm => vm.SelectedFilter, MainViewModel.Instance, vm => vm.SelectedFilter);
 		}
@@ -71,6 +73,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		#region Data properties
 
+		#region General tab
+
 		private ItemTimeType itemTimeMode;
 		public ItemTimeType ItemTimeMode
 		{
@@ -90,6 +94,24 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				};
 			}
 		}
+
+		private bool showWarningsErrorsInScrollBar;
+		public bool ShowWarningsErrorsInScrollBar
+		{
+			get { return showWarningsErrorsInScrollBar; }
+			set { CheckUpdate(value, ref showWarningsErrorsInScrollBar, "ShowWarningsErrorsInScrollBar"); }
+		}
+
+		private bool showSelectionInScrollBar;
+		public bool ShowSelectionInScrollBar
+		{
+			get { return showSelectionInScrollBar; }
+			set { CheckUpdate(value, ref showSelectionInScrollBar, "ShowSelectionInScrollBar"); }
+		}
+
+		#endregion General tab
+
+		#region Filters tab
 
 		public ObservableCollection<FilterViewModel> Filters
 		{
@@ -114,6 +136,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				}
 			}
 		}
+
+		#endregion Filters tab
 
 		#endregion Data properties
 	}

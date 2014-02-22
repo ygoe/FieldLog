@@ -103,6 +103,8 @@ namespace Unclassified.FieldLogViewer
 			AddPropertyHandler("Filters");
 			AddPropertyHandler("SelectedFilter");
 			AddPropertyHandler("ItemTimeMode");
+			AddPropertyHandler("ShowWarningsErrorsInScrollBar");
+			AddPropertyHandler("ShowSelectionInScrollBar");
 		}
 
 		#endregion Constructors
@@ -209,10 +211,31 @@ namespace Unclassified.FieldLogViewer
 			set { Set("SelectedFilter", value); }
 		}
 
+		/// <summary>
+		/// Gets or sets the time zone to use for displaying log item times.
+		/// </summary>
 		public ItemTimeType ItemTimeMode
 		{
-			get { return (ItemTimeType) GetInt("ItemTimeMode"); }
+			get { return (ItemTimeType) GetInt("ItemTimeMode", (int) ItemTimeType.Remote); }
 			set { Set("ItemTimeMode", (int) value); }
+		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether warnings and errors are marked in the scroll bar.
+		/// </summary>
+		public bool ShowWarningsErrorsInScrollBar
+		{
+			get { return GetBool("ShowWarningsErrorsInScrollBar", true); }
+			set { Set("ShowWarningsErrorsInScrollBar", value); }
+		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether the selected items are marked in the scroll bar.
+		/// </summary>
+		public bool ShowSelectionInScrollBar
+		{
+			get { return GetBool("ShowSelectionInScrollBar", true); }
+			set { Set("ShowSelectionInScrollBar", value); }
 		}
 
 		#endregion Data properties

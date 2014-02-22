@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -11,8 +13,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Unclassified.FieldLogViewer.ViewModel;
 using Unclassified;
+using Unclassified.FieldLog;
+using Unclassified.FieldLogViewer.ViewModel;
 using Unclassified.UI;
 
 namespace Unclassified.FieldLogViewer.View
@@ -47,6 +50,7 @@ namespace Unclassified.FieldLogViewer.View
 		private DelayedCall logItemsScrollPixelDc;
 		private bool isFlashing;
 		private bool isScrollAnimationPosted;
+		private DelayedCall updateScrollmapDc;
 
 		#endregion Private data
 
@@ -68,6 +72,10 @@ namespace Unclassified.FieldLogViewer.View
 			newItemMediaPlayer.Open(new Uri(@"Sounds\ting.mp3", UriKind.Relative));
 
 			logItemsScrollPixelDc = DelayedCall.Create(() => { logItemsHostPanel.ScrollToPixel = true; }, 600);
+			updateScrollmapDc = DelayedCall.Create(UpdateScrollmap, 250);
+
+			AppSettings.Instance.OnPropertyChanged(s => s.ShowWarningsErrorsInScrollBar, v => InvalidateScrollmap(false));
+			AppSettings.Instance.OnPropertyChanged(s => s.ShowSelectionInScrollBar, v => InvalidateScrollmap(false));
 		}
 
 		#endregion Constructors
@@ -128,6 +136,8 @@ namespace Unclassified.FieldLogViewer.View
 
 				prevRatio = ratio;
 			}
+
+			InvalidateScrollmap();
 		}
 
 		private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -163,6 +173,8 @@ namespace Unclassified.FieldLogViewer.View
 
 		private void LogItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
+			InvalidateScrollmap();
+
 			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
 			{
 				DateTime now = DateTime.UtcNow;
@@ -284,9 +296,136 @@ namespace Unclassified.FieldLogViewer.View
 		private void LogItemsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			MainViewModel.Instance.SelectedItems = LogItemsList.SelectedItems.OfType<LogItemViewModelBase>().ToList();
+			InvalidateScrollmap(false);
 		}
 
 		#endregion Control event handlers
+
+		#region Scrollmap
+
+		private void InvalidateScrollmap(bool clear = true)
+		{
+			if (clear)
+				ClearScrollmap();
+			updateScrollmapDc.Reset();
+		}
+		
+		private void ClearScrollmap()
+		{
+			WarningMap.Data = null;
+			ErrorMap.Data = null;
+			CriticalMap.Data = null;
+			SelectionMap.Data = null;
+		}
+
+		private void UpdateScrollmap()
+		{
+			if (logItemsHostPanel == null) return;
+			if (logItemsScroll == null) return;
+
+			bool showWarningsErrors = AppSettings.Instance.ShowWarningsErrorsInScrollBar;
+			bool showSelection = AppSettings.Instance.ShowSelectionInScrollBar;
+
+			if (!showWarningsErrors && !showSelection) return;   // Nothing to do
+			
+			double itemOffset = 0;
+			double itemHeight = logItemsHostPanel.ItemHeight;
+
+			bool scrollBarVisible = logItemsScroll.ComputedVerticalScrollBarVisibility == Visibility.Visible;
+			if (scrollBarVisible)
+			{
+				ScrollBar sb = logItemsScroll.FindVisualChild<ScrollBar>(d => AutomationProperties.GetAutomationId(d) == "VerticalScrollBar");
+				if (sb != null)
+				{
+					Grid g = sb.FindVisualChild<Grid>();
+					if (g != null && g.RowDefinitions.Count == 3)
+					{
+						itemOffset = g.RowDefinitions[0].ActualHeight + 2;
+						itemHeight = (g.RowDefinitions[1].ActualHeight - 4) / LogItemsList.Items.Count;
+					}
+				}
+			}
+			else
+			{
+				return;
+			}
+
+			StreamGeometry warningGeometry = new StreamGeometry();
+			warningGeometry.FillRule = FillRule.Nonzero;
+			StreamGeometry errorGeometry = new StreamGeometry();
+			errorGeometry.FillRule = FillRule.Nonzero;
+			StreamGeometry criticalGeometry = new StreamGeometry();
+			criticalGeometry.FillRule = FillRule.Nonzero;
+			StreamGeometry selectionGeometry = new StreamGeometry();
+			selectionGeometry.FillRule = FillRule.Nonzero;
+
+			StreamGeometryContext warningCtx = warningGeometry.Open();
+			StreamGeometryContext errorCtx = errorGeometry.Open();
+			StreamGeometryContext criticalCtx = criticalGeometry.Open();
+			StreamGeometryContext selectionCtx = selectionGeometry.Open();
+
+			HashSet<object> selectedItems = new HashSet<object>(LogItemsList.SelectedItems.OfType<object>());
+
+			for (int index = 0; index < LogItemsList.Items.Count; index++)
+			{
+				if (showWarningsErrors)
+				{
+					FieldLogItemViewModel flItem = LogItemsList.Items[index] as FieldLogItemViewModel;
+					if (flItem != null)
+					{
+						if (flItem.Priority >= FieldLogPriority.Warning)
+						{
+							double y = Math.Round(itemOffset + (index + 0.5) * itemHeight);
+
+							StreamGeometryContext ctx;
+							if (flItem.Priority == FieldLogPriority.Warning) ctx = warningCtx;
+							else if (flItem.Priority == FieldLogPriority.Error) ctx = errorCtx;
+							else if (flItem.Priority == FieldLogPriority.Critical) ctx = criticalCtx;
+							else continue;
+
+							ctx.BeginFigure(new Point(0, y - 2), true, true);
+							ctx.PolyLineTo(new Point[]
+								{
+									new Point(3, y - 2),
+									new Point(3, y + 2),
+									new Point(0, y + 2)
+								}, false, false);
+						}
+					}
+				}
+
+				if (showSelection)
+				{
+					if (selectedItems.Contains(LogItemsList.Items[index]))
+					{
+						double y = Math.Round(itemOffset + (index + 0.5) * itemHeight);
+						selectionCtx.BeginFigure(new Point(4, y - 1), true, true);
+						selectionCtx.PolyLineTo(new Point[]
+							{
+								new Point(7, y - 1),
+								new Point(7, y + 1),
+								new Point(4, y + 1)
+							}, false, false);
+					}
+				}
+			}
+
+			warningCtx.Close();
+			warningGeometry.Freeze();
+			errorCtx.Close();
+			errorGeometry.Freeze();
+			criticalCtx.Close();
+			criticalGeometry.Freeze();
+			selectionCtx.Close();
+			selectionGeometry.Freeze();
+
+			WarningMap.Data = warningGeometry;
+			ErrorMap.Data = errorGeometry;
+			CriticalMap.Data = criticalGeometry;
+			SelectionMap.Data = selectionGeometry;
+		}
+
+		#endregion Scrollmap
 
 		#region View commands
 

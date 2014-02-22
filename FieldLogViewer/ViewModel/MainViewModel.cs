@@ -537,7 +537,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				{
 					cg.Conditions.Add(new FilterConditionViewModel(cg)
 					{
-						Column = FilterColumn.Type,
+						Column = FilterColumn.Priority,
 						Comparison = FilterComparison.GreaterOrEqual,
 						Value = flItem.Priority.ToString()
 					});
@@ -978,7 +978,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			get
 			{
-				if (SelectedItems.Count == 1)
+				if (SelectedItems != null && SelectedItems.Count == 1)
 				{
 					if (SelectedItems[0] is FieldLogDataItemViewModel) return FilterItemType.Data;
 					if (SelectedItems[0] is FieldLogExceptionItemViewModel) return FilterItemType.Exception;
@@ -994,7 +994,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			get
 			{
-				if (SelectedItems.Count == 1)
+				if (SelectedItems != null && SelectedItems.Count == 1)
 				{
 					return "Filter by type " + EnumerationExtension<FilterItemType>.GetDescription(SelectedItemFilterItemType);
 				}
@@ -1006,7 +1006,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			get
 			{
-				if (SelectedItems.Count == 1)
+				if (SelectedItems != null && SelectedItems.Count == 1)
 				{
 					FieldLogItemViewModel flItem = SelectedItems[0] as FieldLogItemViewModel;
 					if (flItem != null)

@@ -21,6 +21,7 @@
 				<Grid Margin="4">
 					<Grid.RowDefinitions>
 						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
 					</Grid.RowDefinitions>
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="Auto"/>
@@ -35,6 +36,12 @@
 						DisplayMemberPath="DisplayName"
 						SelectedValue="{Binding ItemTimeMode}"
 						SelectedValuePath="Value"/>
+
+					<TextBlock Grid.Row="1" Grid.Column="0" Margin="0,6,0,0" VerticalAlignment="Center" Text="Scroll bar markers:"/>
+					<StackPanel Grid.Row="1" Grid.Column="1" Margin="8,6,0,0" Orientation="Horizontal">
+						<CheckBox Content="Warnings and errors" IsChecked="{Binding ShowWarningsErrorsInScrollBar}"/>
+						<CheckBox Margin="8,0,0,0" Content="Current selection" IsChecked="{Binding ShowSelectionInScrollBar}"/>
+					</StackPanel>
 				</Grid>
 			</TabItem>
 

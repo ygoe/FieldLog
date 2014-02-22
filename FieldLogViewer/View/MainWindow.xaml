@@ -574,6 +574,13 @@
 					</DataTemplate>
 				</ListBox.Resources>
 			</ListBox>
+				
+			<Canvas HorizontalAlignment="Right" Margin="0,0,13,0" IsHitTestVisible="False">
+				<Path Name="WarningMap" Fill="#e0c720"/>
+				<Path Name="ErrorMap" Fill="#fa6400"/>
+				<Path Name="CriticalMap" Fill="#c80000"/>
+				<Path Name="SelectionMap" Fill="#6070e0"/>
+			</Canvas>
 
 			<Border
 				Name="ItemDetailsBorder"

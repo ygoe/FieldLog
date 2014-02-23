@@ -15,6 +15,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			base.Item = item;
 
 			this.ExceptionVM = new FieldLogExceptionViewModel(item.Exception);
+			this.EnvironmentVM = new FieldLogEnvironmentViewModel(item.EnvironmentData, item.Time);
 		}
 
 		public new FieldLogExceptionItem Item { get; private set; }
@@ -22,7 +23,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		public FieldLogExceptionViewModel ExceptionVM { get; private set; }
 		public string Context { get { return this.Item.Context; } }
-		public FieldLogEventEnvironment EnvironmentData { get { return this.Item.EnvironmentData; } }
+		public FieldLogEnvironmentViewModel EnvironmentVM { get; private set; }
 
 		public string SimpleMessage
 		{
@@ -49,9 +50,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			{
 				// There's no hard indicator to know whether environment data is available in an
 				// exception item. We just check for some values that should always be set.
-				return EnvironmentData.ClrType != null ||
-					EnvironmentData.CurrentDirectory != null ||
-					EnvironmentData.ExecutablePath != null ?
+				return Item.EnvironmentData.ClrType != null ||
+					Item.EnvironmentData.CurrentDirectory != null ||
+					Item.EnvironmentData.ExecutablePath != null ?
 					Visibility.Visible : Visibility.Collapsed;
 			}
 		}

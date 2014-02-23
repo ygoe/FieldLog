@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -70,6 +71,21 @@ namespace Unclassified.FieldLog
 		/// is started; otherwise, 0.
 		/// </summary>
 		private const int SM_TABLETPC = 86;
+		/// <summary>
+		/// Nonzero if the current operating system is Windows 7 or Windows Server 2008 R2 and the
+		/// Tablet PC Input service is started; otherwise, 0. The return value is a bitmask that
+		/// specifies the type of digitizer input supported by the device. (Only supported in
+		/// Windows 7 an newer.)
+		/// </summary>
+		private const int SM_DIGITIZER = 94;
+		/// <summary>
+		/// Nonzero if there are digitizers in the system; otherwise, 0. SM_MAXIMUMTOUCHES returns
+		/// the aggregate maximum of the maximum number of contacts supported by every digitizer in
+		/// the system. If the system has only single-touch digitizers, the return value is 1. If
+		/// the system has multi-touch digitizers, the return value is the number of simultaneous
+		/// contacts the hardware can provide. (Only supported in Windows 7 an newer.)
+		/// </summary>
+		private const int SM_MAXIMUMTOUCHES = 95;
 
 		/// <summary>
 		/// Microsoft BackOffice components are installed.
@@ -133,10 +149,52 @@ namespace Unclassified.FieldLog
 		
 		private const ushort VER_NT_WORKSTATION = 1;
 
+		/// <summary>
+		/// An integrated (built-in) touch digitizer is used for input.
+		/// </summary>
+		private const int NID_INTEGRATED_TOUCH = 0x1;
+		/// <summary>
+		/// An external (connected) touch digitizer is used for input.
+		/// </summary>
+		private const int NID_EXTERNAL_TOUCH = 0x2;
+		/// <summary>
+		/// An integrated (built-in) pen digitizer is used for input.
+		/// </summary>
+		private const int NID_INTEGRATED_PEN = 0x4;
+		/// <summary>
+		/// An external (connected) pen digitizer is used for input.
+		/// </summary>
+		private const int NID_EXTERNAL_PEN = 0x8;
+		/// <summary>
+		/// An input digitizer with support for multiple inputs is used for input.
+		/// </summary>
+		private const int NID_MULTI_INPUT = 0x40;
+		/// <summary>
+		/// The input digitizer is ready for input. If this value is unset, it may mean that the
+		/// tablet service is stopped, the digitizer is not supported, or digitizer drivers have
+		/// not been installed.
+		/// </summary>
+		private const int NID_READY = 0x80;
+
+		/// <summary>
+		/// Logical pixels inch in X.
+		/// </summary>
+		private const int LOGPIXELSX = 88;
+		/// <summary>
+		/// Logical pixels inch in Y.
+		/// </summary>
+		private const int LOGPIXELSY = 90;
+
 		[DllImport("kernel32.dll")]
 		private static extern short GetVersionEx(ref OSVERSIONINFOEX osvi);
 		[DllImport("user32.dll")]
 		private static extern int GetSystemMetrics(int smIndex);
+		[DllImport("gdi32.dll")]
+		static extern int GetDeviceCaps(IntPtr hdc, int nIndex);
+		[DllImport("user32.dll", SetLastError = true)]
+		static extern IntPtr GetDC(IntPtr hWnd);
+		[DllImport("user32.dll")]
+		static extern bool ReleaseDC(IntPtr hWnd, IntPtr hDC);
 
 		#endregion Native interop
 
@@ -189,6 +247,10 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		public static DateTime LastBootTime { get; private set; }
 		/// <summary>
+		/// Gets a value indicating whether the system is started in fail-safe mode.
+		/// </summary>
+		public static bool IsFailSafeBoot { get; private set; }
+		/// <summary>
 		/// Gets the application compatibility layers that are in effect for the current process.
 		/// </summary>
 		public static string AppCompatLayer { get; private set; }
@@ -197,6 +259,18 @@ namespace Unclassified.FieldLog
 		/// "Mono".
 		/// </summary>
 		public static string ClrType { get; private set; }
+		/// <summary>
+		/// Gets the number of buttons on a mouse, or zero if no mouse is installed.
+		/// </summary>
+		public static int MouseButtons { get; private set; }
+		/// <summary>
+		/// Gets the number of supported touch points.
+		/// </summary>
+		public static int MaxTouchPoints { get; private set; }
+		/// <summary>
+		/// Gets the logical resolution of the screen. 100 % is 96 dpi.
+		/// </summary>
+		public static int ScreenDpi { get; private set; }
 
 		#endregion Public static properties
 
@@ -217,10 +291,35 @@ namespace Unclassified.FieldLog
 			else
 				LastBootTime = LastBootTime.AddMilliseconds(-tickCount);
 
+			IsFailSafeBoot = GetSystemMetrics(SM_CLEANBOOT) != 0;
+
 			if (System.Type.GetType("Mono.Runtime") != null)
 				ClrType = "Mono";
 			else
 				ClrType = "Microsoft .NET";
+
+			MouseButtons = GetSystemMetrics(SM_CMOUSEBUTTONS);
+
+			// Look for integrated or external touch capability, then count touch points
+			int smDigitizer = GetSystemMetrics(SM_DIGITIZER);
+			if ((smDigitizer & (NID_INTEGRATED_TOUCH | NID_EXTERNAL_TOUCH)) != 0)
+			{
+				if ((smDigitizer & NID_MULTI_INPUT) != 0)
+				{
+					MaxTouchPoints = GetSystemMetrics(SM_MAXIMUMTOUCHES);
+				}
+				else
+				{
+					MaxTouchPoints = 1;
+				}
+			}
+
+			IntPtr hdc = GetDC(IntPtr.Zero);
+			if (hdc != IntPtr.Zero)
+			{
+				ScreenDpi = GetDeviceCaps(hdc, LOGPIXELSY);
+				ReleaseDC(IntPtr.Zero, hdc);
+			}
 
 			if (Environment.OSVersion.Platform == PlatformID.Win32Windows)
 			{
@@ -1284,10 +1383,13 @@ namespace Unclassified.FieldLog
 	public enum OSType
 	{
 		/// <summary>A client system.</summary>
+		[Description("Client")]
 		Client,
 		/// <summary>A server system.</summary>
+		[Description("Server")]
 		Server,
 		/// <summary>A server core system.</summary>
+		[Description("Server Core")]
 		ServerCore
 	}
 
@@ -1297,50 +1399,71 @@ namespace Unclassified.FieldLog
 	public enum OSVersion
 	{
 		/// <summary>Unknown version.</summary>
+		[Description("Unknown")]
 		Unknown = 0,
 
 		/// <summary>Not Windows.</summary>
+		[Description("Not Windows")]
 		NonWindows = 1,
 
 		/// <summary>Windows 98</summary>
+		[Description("Windows 98")]
 		Windows98 = 10,
 		/// <summary>Windows 98 SE</summary>
+		[Description("Windows 98 SE")]
 		Windows98SE,
 		/// <summary>Windows ME</summary>
+		[Description("Windows ME")]
 		WindowsME,
 		/// <summary>Windows NT 4</summary>
+		[Description("Windows NT 4")]
 		WindowsNT4,
 		/// <summary>Windows 2000</summary>
+		[Description("Windows 2000")]
 		Windows2000,
 		/// <summary>Windows XP</summary>
+		[Description("Windows XP")]
 		WindowsXP,
 		/// <summary>Windows Vista</summary>
+		[Description("Windows Vista")]
 		WindowsVista,
 		/// <summary>Windows 7</summary>
+		[Description("Windows 7")]
 		Windows7,
 		/// <summary>Windows 8</summary>
+		[Description("Windows 8")]
 		Windows8,
 		/// <summary>Windows 8.1</summary>
+		[Description("Windows 8.1")]
 		Windows81,
 
 		/// <summary>Windows 2000 Server</summary>
+		[Description("Windows 2000 Server")]
 		Windows2000Server = 100,
 		/// <summary>Windows Home Server</summary>
+		[Description("Windows Home Server")]
 		WindowsHomeServer,
 		/// <summary>Windows Server 2003</summary>
+		[Description("Windows Server 2003")]
 		WindowsServer2003,
 		/// <summary>Windows Server 2003 R2</summary>
+		[Description("Windows Server 2003 R2")]
 		WindowsServer2003R2,
 		/// <summary>Windows Server 2008</summary>
+		[Description("Windows Server 2008")]
 		WindowsServer2008,
 		/// <summary>Windows Server 2008 R2</summary>
+		[Description("Windows Server 2008 R2")]
 		WindowsServer2008R2,
 		/// <summary>Windows Server 2012</summary>
+		[Description("Windows Server 2012")]
 		WindowsServer2012,
 		/// <summary>Windows Server 2012 R2</summary>
+		[Description("Windows Server 2012 R2")]
 		WindowsServer2012R2,
 
 		/// <summary>A future version of Windows not yet known by this implementation.</summary>
+		[Description("Future Windows version")]
 		WindowsFuture = 200
 	}
 
@@ -1350,107 +1473,154 @@ namespace Unclassified.FieldLog
 	public enum OSEdition
 	{
 		/// <summary>No special edition.</summary>
+		[Description("No special edition")]
 		None = 0,
 
 		// NOTE: There should also exist a Windows 2000 Standard Edition, but I can't find anything about it
 		/// <summary>Windows 2000 Professional.</summary>
+		[Description("Windows 2000 Professional")]
 		Windows2000Professional,
 		/// <summary>Windows 2000 Server.</summary>
+		[Description("Windows 2000 Server")]
 		Windows2000Server,
 		/// <summary>Windows 2000 Advanced Server.</summary>
+		[Description("Windows 2000 Advanced Server")]
 		Windows2000AdvancedServer,
 		/// <summary>Windows 2000 Datacenter Server.</summary>
+		[Description("Windows 2000 Datacenter Server")]
 		Windows2000DatacenterServer,
 
 		/// <summary>Windows XP Starter.</summary>
+		[Description("Windows XP Starter")]
 		WindowsXPStarter,
 		/// <summary>Windows XP Home.</summary>
+		[Description("Windows XP Home")]
 		WindowsXPHome,
 		/// <summary>Windows XP Professional.</summary>
+		[Description("Windows XP Professional")]
 		WindowsXPProfessional,
 		/// <summary>Windows XP Media Center.</summary>
+		[Description("Windows XP Media Center")]
 		WindowsXPMediaCenter,
 		/// <summary>Windows XP Tablet PC.</summary>
+		[Description("Windows XP Tablet PC")]
 		WindowsXPTabletPC,
 		/// <summary>Windows XP Professional x64.</summary>
+		[Description("Windows XP Professional x64")]
 		WindowsXPProfessionalX64,
 
 		/// <summary>Windows Vista Starter.</summary>
+		[Description("Windows Vista Starter")]
 		WindowsVistaStarter,
 		/// <summary>Windows Vista Home Basic.</summary>
+		[Description("Windows Vista Home Basic")]
 		WindowsVistaHomeBasic,
 		/// <summary>Windows Vista Home Premium.</summary>
+		[Description("Windows Vista Home Premium")]
 		WindowsVistaHomePremium,
 		/// <summary>Windows Vista Business.</summary>
+		[Description("Windows Vista Business")]
 		WindowsVistaBusiness,
 		/// <summary>Windows Vista Enterprise.</summary>
+		[Description("Windows Vista Enterprise")]
 		WindowsVistaEnterprise,
 		/// <summary>Windows Vista Ultimate.</summary>
+		[Description("Windows Vista Ultimate")]
 		WindowsVistaUltimate,
 
 		/// <summary>Windows 7 Starter.</summary>
+		[Description("Windows 7 Starter")]
 		Windows7Starter,
 		/// <summary>Windows 7 Home Basic.</summary>
+		[Description("Windows 7 Home Basic")]
 		Windows7HomeBasic,
 		/// <summary>Windows 7 Home Premium.</summary>
+		[Description("Windows 7 Home Premium")]
 		Windows7HomePremium,
 		/// <summary>Windows 7 Professional.</summary>
+		[Description("Windows 7 Professional")]
 		Windows7Professional,
 		/// <summary>Windows 7 Enterprise.</summary>
+		[Description("Windows 7 Enterprise")]
 		Windows7Enterprise,
 		/// <summary>Windows 7 Ultimate.</summary>
+		[Description("Windows 7 Ultimate")]
 		Windows7Ultimate,
 
 		/// <summary>Windows 8 ("Core").</summary>
+		[Description("Windows 8 (\"Core\")")]
 		Windows8Core,
 		/// <summary>Windows 8 Pro.</summary>
+		[Description("Windows 8 Pro")]
 		Windows8Pro,
 		/// <summary>Windows 8 Enterprise.</summary>
+		[Description("Windows 8 Enterprise")]
 		Windows8Enterprise,
 
 		/// <summary>Windows Server 2003/2003 R2 Web.</summary>
+		[Description("Windows Server 2003/2003 R2 Web")]
 		WindowsServer2003Web = 100,
 		/// <summary>Windows Server 2003/2003 R2 Standard.</summary>
+		[Description("Windows Server 2003/2003 R2 Standard")]
 		WindowsServer2003Standard,
 		/// <summary>Windows Server 2003/2003 R2 Enterprise.</summary>
+		[Description("Windows Server 2003/2003 R2 Enterprise")]
 		WindowsServer2003Enterprise,
 		/// <summary>Windows Server 2003/2003 R2 Datacenter.</summary>
+		[Description("Windows Server 2003/2003 R2 Datacenter")]
 		WindowsServer2003Datacenter,
 		/// <summary>Windows Server 2003/2003 R2 Cluster.</summary>
+		[Description("Windows Server 2003/2003 R2 Cluster")]
 		WindowsServer2003Cluster,
 		/// <summary>Windows Server 2003/2003 R2 Storage.</summary>
+		[Description("Windows Server 2003/2003 R2 Storage")]
 		WindowsServer2003Storage,
 		/// <summary>Windows Server 2003/2003 R2 Small Business.</summary>
+		[Description("Windows Server 2003/2003 R2 Small Business")]
 		WindowsServer2003SmallBusiness,
 		/// <summary>Windows Server 2003/2003 R2 Home.</summary>
+		[Description("Windows Server 2003/2003 R2 Home")]
 		WindowsServer2003Home,
 
 		/// <summary>Windows Server 2008/2008 R2 Foundation.</summary>
+		[Description("Windows Server 2008/2008 R2 Foundation")]
 		WindowsServer2008Foundation,
 		/// <summary>Windows Server 2008/2008 R2 Standard.</summary>
+		[Description("Windows Server 2008/2008 R2 Standard")]
 		WindowsServer2008Standard,
 		/// <summary>Windows Server 2008/2008 R2 Enterprise.</summary>
+		[Description("Windows Server 2008/2008 R2 Enterprise")]
 		WindowsServer2008Enterprise,
 		/// <summary>Windows Server 2008/2008 R2 Datacenter.</summary>
+		[Description("Windows Server 2008/2008 R2 Datacenter")]
 		WindowsServer2008Datacenter,
 		/// <summary>Windows Server 2008/2008 R2 HPC.</summary>
+		[Description("Windows Server 2008/2008 R2 HPC")]
 		WindowsServer2008Hpc,
 		/// <summary>Windows Server 2008/2008 R2 Web.</summary>
+		[Description("Windows Server 2008/2008 R2 Web")]
 		WindowsServer2008Web,
 		/// <summary>Windows Server 2008/2008 R2 Storage.</summary>
+		[Description("Windows Server 2008/2008 R2 Storage")]
 		WindowsServer2008Storage,
 		/// <summary>Windows Server 2008/2008 R2 Small Business.</summary>
+		[Description("Windows Server 2008/2008 R2 Small Business")]
 		WindowsServer2008SmallBusiness,
 		/// <summary>Windows Server 2008/2008 R2 Essential Business.</summary>
+		[Description("Windows Server 2008/2008 R2 Essential Business")]
 		WindowsServer2008EssentialBusiness,
 
 		/// <summary>Windows Server 2012/2012 R2 Foundation.</summary>
+		[Description("Windows Server 2012/2012 R2 Foundation")]
 		WindowsServer2012Foundation,
 		/// <summary>Windows Server 2012/2012 R2 Essentials.</summary>
+		[Description("Windows Server 2012/2012 R2 Essentials")]
 		WindowsServer2012Essentials,
 		/// <summary>Windows Server 2012/2012 R2 Standard.</summary>
+		[Description("Windows Server 2012/2012 R2 Standard")]
 		WindowsServer2012Standard,
 		/// <summary>Windows Server 2012/2012 R2 Datacenter.</summary>
+		[Description("Windows Server 2012/2012 R2 Datacenter")]
 		WindowsServer2012Datacenter,
 	}
 

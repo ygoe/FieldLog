@@ -173,10 +173,9 @@ namespace ConsoleDemo
 
 		private static void TestTimerPrecision()
 		{
-			Console.WriteLine("Timer precision test is running, please wait...");
-			Console.WriteLine();
+			Console.WriteLine("Timer precision test...");
 
-			int[] iterationValues = new int[]
+			int[] iterationValues =
 			{
 				1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000,
 				10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000,

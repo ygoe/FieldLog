@@ -20,29 +20,7 @@ namespace Unclassified.FieldLog
 		static FieldLogEventEnvironment()
 		{
 			Empty = new FieldLogEventEnvironment();
-			Empty.Size = 4 + 4 + 4 + 4 +
-				0 +
-				1 + 4 + 4 +
-				0 +
-				1 +
-				0 +
-				8 +
-				0 +
-				0 +
-				0 +
-				1 +
-				0 +
-				0 +
-				4 +
-				0 +
-				0 +
-				1 +
-				0 +
-				0 +
-				0 +
-				1 +
-				0 +
-				8 + 8 + 8 + 8 + 8;
+			Empty.Size = 148 + 14 * IntPtr.Size;
 		}
 
 		/// <summary>
@@ -110,6 +88,10 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		public DateTime OSLastBootTime { get; private set; }
 		/// <summary>
+		/// Gets a value indicating whether the system is started in fail-safe mode. (From OSInfo)
+		/// </summary>
+		public bool OSIsFailSafeBoot { get; private set; }
+		/// <summary>
 		/// Gets the application compatibility layers that are in effect for the current process.
 		/// (From OSInfo)
 		/// </summary>
@@ -119,15 +101,23 @@ namespace Unclassified.FieldLog
 		/// "Mono". (From OSInfo)
 		/// </summary>
 		public string ClrType { get; private set; }
+		/// <summary>
+		/// Gets the number of buttons on a mouse, or zero if no mouse is installed. (From OSInfo)
+		/// </summary>
+		public byte MouseButtons { get; private set; }
+		/// <summary>
+		/// Gets the number of supported touch points. (From OSInfo)
+		/// </summary>
+		public byte MaxTouchPoints { get; private set; }
+		/// <summary>
+		/// Gets the logical resolution of the screen. 100 % is 96 dpi. (From OSInfo)
+		/// </summary>
+		public ushort ScreenDpi { get; private set; }
 
 		/// <summary>
 		/// Gets the current thread culture code.
 		/// </summary>
 		public string CultureName { get; private set; }
-		/// <summary>
-		/// Gets a value indicating whether the system is currently shutting down.
-		/// </summary>
-		public bool IsShuttingDown { get; private set; }
 		/// <summary>
 		/// Gets the current working directory.
 		/// </summary>
@@ -139,7 +129,7 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Gets the number of installed (logical) processors.
 		/// </summary>
-		public int CpuCount { get; private set; }
+		public ushort CpuCount { get; private set; }
 		/// <summary>
 		/// Gets the host name of the computer.
 		/// </summary>
@@ -193,6 +183,47 @@ namespace Unclassified.FieldLog
 		/// Gets the amount of available memory on the computer in bytes.
 		/// </summary>
 		public long AvailableMemory { get; private set; }
+		/// <summary>
+		/// Gets the process ID of the current process.
+		/// </summary>
+		public int ProcessId { get; private set; }
+		/// <summary>
+		/// Gets a value indicating whether the current process is running with administrator
+		/// privileges.
+		/// </summary>
+		public bool IsAdministrator { get; private set; }
+		/// <summary>
+		/// Gets the width of the primary screen in pixels.
+		/// </summary>
+		public ushort PrimaryScreenWidth { get; private set; }
+		/// <summary>
+		/// Gets the height of the primary screen in pixels.
+		/// </summary>
+		public ushort PrimaryScreenHeight { get; private set; }
+		/// <summary>
+		/// Gets the bits per pixel of the primary screen, a.k.a. colour depth.
+		/// </summary>
+		public byte PrimaryScreenBitsPerPixel { get; private set; }
+		/// <summary>
+		/// Gets the left of the primary screen workspace in pixels.
+		/// </summary>
+		public ushort PrimaryScreenWorkingAreaLeft { get; private set; }
+		/// <summary>
+		/// Gets the top of the primary screen workspace in pixels.
+		/// </summary>
+		public ushort PrimaryScreenWorkingAreaTop { get; private set; }
+		/// <summary>
+		/// Gets the width of the primary screen workspace in pixels.
+		/// </summary>
+		public ushort PrimaryScreenWorkingAreaWidth { get; private set; }
+		/// <summary>
+		/// Gets the height of the primary screen workspace in pixels.
+		/// </summary>
+		public ushort PrimaryScreenWorkingAreaHeight { get; private set; }
+		/// <summary>
+		/// Gets the number of screens attached to this computer.
+		/// </summary>
+		public byte ScreenCount { get; private set; }
 
 		#endregion Data properties
 
@@ -225,11 +256,14 @@ namespace Unclassified.FieldLog
 			env.OSIsAppServer = OSInfo.IsAppServer;
 			env.OSLanguage = OSInfo.Language;
 			env.OSLastBootTime = OSInfo.LastBootTime;
+			env.OSIsFailSafeBoot = OSInfo.IsFailSafeBoot;
 			env.AppCompatLayer = OSInfo.AppCompatLayer;
 			env.ClrType = OSInfo.ClrType;
+			env.MouseButtons = (byte) OSInfo.MouseButtons;
+			env.MaxTouchPoints = (byte) OSInfo.MaxTouchPoints;
+			env.ScreenDpi = (ushort) OSInfo.ScreenDpi;
 
 			env.CultureName = Thread.CurrentThread.CurrentCulture.Name;
-			env.IsShuttingDown = Environment.HasShutdownStarted;
 			env.CurrentDirectory = Environment.CurrentDirectory;
 			List<string> envNames = new List<string>();
 			foreach (DictionaryEntry de in Environment.GetEnvironmentVariables())
@@ -246,7 +280,7 @@ namespace Unclassified.FieldLog
 				envSb.Append("\n");
 			}
 			env.EnvironmentVariables = envSb.ToString().TrimEnd();
-			env.CpuCount = Environment.ProcessorCount;
+			env.CpuCount = (ushort) Environment.ProcessorCount;
 			env.HostName = Environment.MachineName;
 			env.UserName = Environment.UserDomainName + "\\" + Environment.UserName;
 			env.IsInteractive = Environment.UserInteractive;
@@ -261,30 +295,45 @@ namespace Unclassified.FieldLog
 			env.PeakProcessMemory = OSInfo.GetProcessPeakMemory();
 			env.TotalMemory = OSInfo.GetTotalMemorySize();
 			env.AvailableMemory = OSInfo.GetAvailableMemorySize();
+			env.ProcessId = System.Diagnostics.Process.GetCurrentProcess().Id;
+			env.IsAdministrator = OSInfo.IsCurrentUserLocalAdministrator();
+			env.PrimaryScreenWidth = (ushort) System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width;
+			env.PrimaryScreenHeight = (ushort) System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height;
+			env.PrimaryScreenBitsPerPixel = (byte) System.Windows.Forms.Screen.PrimaryScreen.BitsPerPixel;
+			env.PrimaryScreenWorkingAreaLeft = (ushort) System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Left;
+			env.PrimaryScreenWorkingAreaTop = (ushort) System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Top;
+			env.PrimaryScreenWorkingAreaWidth = (ushort) System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Width;
+			env.PrimaryScreenWorkingAreaHeight = (ushort) System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Height;
+			env.ScreenCount = (byte) System.Windows.Forms.Screen.AllScreens.Length;
+
+			// Source: http://www.informit.com/guides/content.aspx?g=dotnet&seqNum=682
+			int ptrSize = IntPtr.Size;
+			int strSize = ptrSize == 4 ? 20 : 32;
 
 			env.Size = 4 + 4 + 4 + 4 +
-				(env.OSServicePack != null ? env.OSServicePack.Length * 2 : 0) +
-				1 + 4 + 4 +
-				(env.OSProductName != null ? env.OSProductName.Length * 2 : 0) +
-				1 +
-				(env.OSLanguage != null ? env.OSLanguage.Length * 2 : 0) +
-				8 +
-				(env.AppCompatLayer != null ? env.AppCompatLayer.Length * 2 : 0) +
-				(env.ClrType != null ? env.ClrType.Length * 2 : 0) +
-				(env.CultureName != null ? env.CultureName.Length * 2 : 0) +
-				1 +
-				(env.CurrentDirectory != null ? env.CurrentDirectory.Length * 2 : 0) +
-				(env.EnvironmentVariables != null ? env.EnvironmentVariables.Length * 2 : 0) +
+				ptrSize + (env.OSServicePack != null ? strSize + env.OSServicePack.Length * 2 : 0) +
+				4 + 4 + 4 +
+				ptrSize + (env.OSProductName != null ? strSize + env.OSProductName.Length * 2 : 0) +
 				4 +
-				(env.HostName != null ? env.HostName.Length * 2 : 0) +
-				(env.UserName != null ? env.UserName.Length * 2 : 0) +
-				1 +
-				(env.ExecutablePath != null ? env.ExecutablePath.Length * 2 : 0) +
-				(env.CommandLine != null ? env.CommandLine.Length * 2 : 0) +
-				(env.AppVersion != null ? env.AppVersion.Length * 2 : 0) +
-				1 +
-				(env.ClrVersion != null ? env.ClrVersion.Length * 2 : 0) +
-				8 + 8 + 8 + 8 + 8;
+				ptrSize + (env.OSLanguage != null ? strSize + env.OSLanguage.Length * 2 : 0) +
+				8 + 4 +
+				ptrSize + (env.AppCompatLayer != null ? strSize + env.AppCompatLayer.Length * 2 : 0) +
+				ptrSize + (env.ClrType != null ? strSize + env.ClrType.Length * 2 : 0) +
+				4 + 4 + 4 +
+				ptrSize + (env.CultureName != null ? strSize + env.CultureName.Length * 2 : 0) +
+				ptrSize + (env.CurrentDirectory != null ? strSize + env.CurrentDirectory.Length * 2 : 0) +
+				ptrSize + (env.EnvironmentVariables != null ? strSize + env.EnvironmentVariables.Length * 2 : 0) +
+				4 +
+				ptrSize + (env.HostName != null ? strSize + env.HostName.Length * 2 : 0) +
+				ptrSize + (env.UserName != null ? strSize + env.UserName.Length * 2 : 0) +
+				4 +
+				ptrSize + (env.ExecutablePath != null ? strSize + env.ExecutablePath.Length * 2 : 0) +
+				ptrSize + (env.CommandLine != null ? strSize + env.CommandLine.Length * 2 : 0) +
+				ptrSize + (env.AppVersion != null ? strSize + env.AppVersion.Length * 2 : 0) +
+				4 +
+				ptrSize + (env.ClrVersion != null ? strSize + env.ClrVersion.Length * 2 : 0) +
+				8 + 8 + 8 + 8 + 8 +
+				4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4;
 			return env;
 		}
 
@@ -309,6 +358,9 @@ namespace Unclassified.FieldLog
 			writer.AddBuffer(OSLastBootTime.Ticks);
 			writer.AddBuffer(AppCompatLayer);
 			writer.AddBuffer(ClrType);
+			writer.AddBuffer(MouseButtons);
+			writer.AddBuffer(MaxTouchPoints);
+			writer.AddBuffer(ScreenDpi);
 
 			writer.AddBuffer(CultureName);
 			writer.AddBuffer(CurrentDirectory);
@@ -320,18 +372,28 @@ namespace Unclassified.FieldLog
 			writer.AddBuffer(CommandLine);
 			writer.AddBuffer(AppVersion);
 			writer.AddBuffer(ClrVersion);
-			writer.AddBuffer((int) LocalTimeZoneOffset.TotalMinutes);
+			writer.AddBuffer((short) LocalTimeZoneOffset.TotalMinutes);
 			writer.AddBuffer(ProcessMemory);
 			writer.AddBuffer(PeakProcessMemory);
 			writer.AddBuffer(TotalMemory);
 			writer.AddBuffer(AvailableMemory);
+			writer.AddBuffer(ProcessId);
+			writer.AddBuffer(PrimaryScreenWidth);
+			writer.AddBuffer(PrimaryScreenHeight);
+			writer.AddBuffer(PrimaryScreenBitsPerPixel);
+			writer.AddBuffer(PrimaryScreenWorkingAreaLeft);
+			writer.AddBuffer(PrimaryScreenWorkingAreaTop);
+			writer.AddBuffer(PrimaryScreenWorkingAreaWidth);
+			writer.AddBuffer(PrimaryScreenWorkingAreaHeight);
+			writer.AddBuffer(ScreenCount);
 
 			byte flags = 0;
 			if (OSIs64Bit) flags |= 1;
 			if (OSIsAppServer) flags |= 2;
-			if (IsShuttingDown) flags |= 4;
+			if (OSIsFailSafeBoot) flags |= 4;
 			if (IsInteractive) flags |= 8;
 			if (IsProcess64Bit) flags |= 16;
+			if (IsAdministrator) flags |= 32;
 			writer.AddBuffer(flags);
 		}
 
@@ -354,29 +416,42 @@ namespace Unclassified.FieldLog
 			env.OSLastBootTime = new DateTime(reader.ReadInt64(), DateTimeKind.Utc);
 			env.AppCompatLayer = reader.ReadString();
 			env.ClrType = reader.ReadString();
+			env.MouseButtons = reader.ReadByte();
+			env.MaxTouchPoints = reader.ReadByte();
+			env.ScreenDpi = reader.ReadUInt16();
 
 			env.CultureName = reader.ReadString();
 			env.CurrentDirectory = reader.ReadString();
 			env.EnvironmentVariables = reader.ReadString();
-			env.CpuCount = reader.ReadInt32();
+			env.CpuCount = reader.ReadUInt16();
 			env.HostName = reader.ReadString();
 			env.UserName = reader.ReadString();
 			env.ExecutablePath = reader.ReadString();
 			env.CommandLine = reader.ReadString();
 			env.AppVersion = reader.ReadString();
 			env.ClrVersion = reader.ReadString();
-			env.LocalTimeZoneOffset = TimeSpan.FromMinutes(reader.ReadInt32());
+			env.LocalTimeZoneOffset = TimeSpan.FromMinutes(reader.ReadInt16());
 			env.ProcessMemory = reader.ReadInt64();
 			env.PeakProcessMemory = reader.ReadInt64();
 			env.TotalMemory = reader.ReadInt64();
 			env.AvailableMemory = reader.ReadInt64();
+			env.ProcessId = reader.ReadInt32();
+			env.PrimaryScreenWidth = reader.ReadUInt16();
+			env.PrimaryScreenHeight = reader.ReadUInt16();
+			env.PrimaryScreenBitsPerPixel = reader.ReadByte();
+			env.PrimaryScreenWorkingAreaLeft = reader.ReadUInt16();
+			env.PrimaryScreenWorkingAreaTop = reader.ReadUInt16();
+			env.PrimaryScreenWorkingAreaWidth = reader.ReadUInt16();
+			env.PrimaryScreenWorkingAreaHeight = reader.ReadUInt16();
+			env.ScreenCount = reader.ReadByte();
 
 			byte flags = reader.ReadByte();
 			env.OSIs64Bit = (flags & 1) != 0;
 			env.OSIsAppServer = (flags & 2) != 0;
-			env.IsShuttingDown = (flags & 4) != 0;
+			env.OSIsFailSafeBoot = (flags & 4) != 0;
 			env.IsInteractive = (flags & 8) != 0;
 			env.IsProcess64Bit = (flags & 16) != 0;
+			env.IsAdministrator = (flags & 32) != 0;
 
 			// Check if the environment is actually empty
 			if (env.CpuCount == 0)

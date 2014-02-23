@@ -94,6 +94,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						case FilterColumn.ScopeType:
 							Value = FilterScopeType.Enter.ToString();
 							break;
+						case FilterColumn.EnvironmentOSType:
+							Value = OSType.Client.ToString();
+							break;
+						case FilterColumn.EnvironmentOSVersion:
+							Value = OSVersion.Unknown.ToString();
+							break;
 					}
 					// Check whether the selected comparison is still valid
 					if (AvailableComparisons != null)
@@ -147,6 +153,10 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						return new EnumerationExtension(typeof(FilterPriority), true).ProvideTypedValue();
 					case FilterColumn.ScopeType:
 						return new EnumerationExtension(typeof(FilterScopeType), true).ProvideTypedValue();
+					case FilterColumn.EnvironmentOSType:
+						return new EnumerationExtension(typeof(OSType), true).ProvideTypedValue();
+					case FilterColumn.EnvironmentOSVersion:
+						return new EnumerationExtension(typeof(OSVersion), true).ProvideTypedValue();
 					default:
 						return null;
 				}
@@ -170,16 +180,18 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					case FilterColumn.ExceptionData:
 					case FilterColumn.ExceptionContext:
 					case FilterColumn.ScopeName:
-					case FilterColumn.EnvironmentCultureName:
-					case FilterColumn.EnvironmentCurrentDirectory:
-					case FilterColumn.EnvironmentEnvironmentVariables:
-					case FilterColumn.EnvironmentUserName:
 					case FilterColumn.EnvironmentCommandLine:
 					case FilterColumn.EnvironmentAppVersion:
+					case FilterColumn.EnvironmentCurrentDirectory:
+					case FilterColumn.EnvironmentCultureName:
+					case FilterColumn.EnvironmentUserName:
+					case FilterColumn.EnvironmentHostName:
+					case FilterColumn.EnvironmentEnvironmentVariables:
 						return new EnumerationExtension<FilterComparison>(typeof(UseForStringColumnAttribute)).ProvideTypedValue();
 
 					case FilterColumn.Type:
 					case FilterColumn.ScopeType:
+					case FilterColumn.EnvironmentOSType:
 						return new EnumerationExtension<FilterComparison>(typeof(UseForEnumColumnAttribute)).ProvideTypedValue();
 
 					case FilterColumn.Time:
@@ -189,15 +201,19 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					case FilterColumn.ThreadId:
 					case FilterColumn.ExceptionCode:
 					case FilterColumn.ScopeLevel:
+					case FilterColumn.EnvironmentProcessId:
 					case FilterColumn.EnvironmentProcessMemory:
 					case FilterColumn.EnvironmentPeakProcessMemory:
+					case FilterColumn.EnvironmentOSVersion:
+					case FilterColumn.EnvironmentCpuCount:
 					case FilterColumn.EnvironmentTotalMemory:
 					case FilterColumn.EnvironmentAvailableMemory:
+					case FilterColumn.EnvironmentScreenDpi:
 						return new EnumerationExtension<FilterComparison>(typeof(UseForNumberColumnAttribute)).ProvideTypedValue();
 
 					case FilterColumn.ScopeIsBackgroundThread:
 					case FilterColumn.ScopeIsPoolThread:
-					case FilterColumn.EnvironmentIsShuttingDown:
+					case FilterColumn.EnvironmentIsAdministrator:
 					case FilterColumn.EnvironmentIsInteractive:
 						return new EnumerationExtension<FilterComparison>(typeof(UseForBoolColumnAttribute)).ProvideTypedValue();
 
@@ -228,16 +244,20 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					case FilterColumn.ExceptionContext:
 					case FilterColumn.ScopeLevel:
 					case FilterColumn.ScopeName:
-					case FilterColumn.EnvironmentCultureName:
-					case FilterColumn.EnvironmentCurrentDirectory:
-					case FilterColumn.EnvironmentEnvironmentVariables:
-					case FilterColumn.EnvironmentUserName:
+					case FilterColumn.EnvironmentProcessId:
 					case FilterColumn.EnvironmentCommandLine:
 					case FilterColumn.EnvironmentAppVersion:
+					case FilterColumn.EnvironmentCurrentDirectory:
+					case FilterColumn.EnvironmentCultureName:
+					case FilterColumn.EnvironmentUserName:
 					case FilterColumn.EnvironmentProcessMemory:
 					case FilterColumn.EnvironmentPeakProcessMemory:
+					case FilterColumn.EnvironmentCpuCount:
+					case FilterColumn.EnvironmentHostName:
 					case FilterColumn.EnvironmentTotalMemory:
 					case FilterColumn.EnvironmentAvailableMemory:
+					case FilterColumn.EnvironmentScreenDpi:
+					case FilterColumn.EnvironmentEnvironmentVariables:
 						return Visibility.Visible;
 					default:
 						return Visibility.Hidden;
@@ -254,6 +274,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					case FilterColumn.Type:
 					case FilterColumn.Priority:
 					case FilterColumn.ScopeType:
+					case FilterColumn.EnvironmentOSType:
+					case FilterColumn.EnvironmentOSVersion:
 						return Visibility.Visible;
 					default:
 						return Visibility.Hidden;
@@ -342,6 +364,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			FieldLogExceptionItemViewModel exItem = null;
 			FieldLogScopeItemViewModel scopeItem = null;
 			DebugMessageViewModel dbgMsg = null;
+			FieldLogEventEnvironment env = null;
+			FieldLogEventEnvironment envFallback = null;
 
 			// Negation must be handled after all field comparisons are done because the negation
 			// may need logical parentheses around the rest of the expression. All type-specific
@@ -356,6 +380,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				case FilterComparison.NotRegex:
 				case FilterComparison.NotSet:
 				case FilterComparison.NotStartsWith:
+				case FilterComparison.NotInList:
 					negate = true;
 					break;
 			}
@@ -401,48 +426,45 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						scopeItem = item as FieldLogScopeItemViewModel;
 					if (textItem == null && dataItem == null && exItem == null && scopeItem == null)
 						dbgMsg = item as DebugMessageViewModel;
+					env = GetEnvironmentFromItem(item, false);
+					envFallback = GetEnvironmentFromItem(item, true);
+
+					bool envFallbackResult = envFallback != null &&
+						(CompareString(envFallback.ProcessId.ToString()) ||
+						CompareString(envFallback.CommandLine) ||
+						CompareString(envFallback.AppVersion) ||
+						CompareString(envFallback.UserName) ||
+						CompareString(envFallback.HostName));
 
 					if (textItem != null)
 						result = CompareString(textItem.SessionId.ToString("D")) ||
 							CompareString(textItem.Text) ||
-							CompareString(textItem.Details);
+							CompareString(textItem.Details) ||
+							envFallbackResult;
 					else if (dataItem != null)
 						result = CompareString(dataItem.SessionId.ToString("D")) ||
 							CompareString(dataItem.Name) ||
-							CompareString(dataItem.Value);
+							CompareString(dataItem.Value) ||
+							envFallbackResult;
 					else if (exItem != null)
 						result = CompareString(exItem.SessionId.ToString("D")) ||
 							CompareString(exItem.Context) ||
 							CompareExceptionTypeRecursive(exItem.Exception) ||
 							CompareExceptionMessageRecursive(exItem.Exception) ||
 							CompareExceptionDataRecursive(exItem.Exception) ||
-							!FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData) &&
-								(CompareString(exItem.EnvironmentData.AppCompatLayer) ||
-								CompareString(exItem.EnvironmentData.AppVersion) ||
-								CompareString(exItem.EnvironmentData.CommandLine) ||
-								CompareString(exItem.EnvironmentData.CultureName) ||
-								CompareString(exItem.EnvironmentData.CurrentDirectory) ||
-								CompareString(exItem.EnvironmentData.EnvironmentVariables) ||
-								CompareString(exItem.EnvironmentData.ExecutablePath) ||
-								CompareString(exItem.EnvironmentData.HostName) ||
-								CompareString(exItem.EnvironmentData.OSLanguage) ||
-								CompareString(exItem.EnvironmentData.OSProductName) ||
-								CompareString(exItem.EnvironmentData.UserName));
+							env != null &&
+								(CompareString(env.CurrentDirectory) ||
+								CompareString(env.CultureName) ||
+								CompareString(env.EnvironmentVariables)) ||
+							envFallbackResult;
 					else if (scopeItem != null)
 						result = CompareString(scopeItem.SessionId.ToString("D")) ||
 							CompareString(scopeItem.Name) ||
-							!FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData) &&
-								(CompareString(scopeItem.EnvironmentData.AppCompatLayer) ||
-								CompareString(scopeItem.EnvironmentData.AppVersion) ||
-								CompareString(scopeItem.EnvironmentData.CommandLine) ||
-								CompareString(scopeItem.EnvironmentData.CultureName) ||
-								CompareString(scopeItem.EnvironmentData.CurrentDirectory) ||
-								CompareString(scopeItem.EnvironmentData.EnvironmentVariables) ||
-								CompareString(scopeItem.EnvironmentData.ExecutablePath) ||
-								CompareString(scopeItem.EnvironmentData.HostName) ||
-								CompareString(scopeItem.EnvironmentData.OSLanguage) ||
-								CompareString(scopeItem.EnvironmentData.OSProductName) ||
-								CompareString(scopeItem.EnvironmentData.UserName));
+							env != null &&
+								(CompareString(env.CurrentDirectory) ||
+								CompareString(env.CultureName) ||
+								CompareString(env.EnvironmentVariables)) ||
+							envFallbackResult;
 					else if (dbgMsg != null)
 						result = CompareString(dbgMsg.Message);
 					break;
@@ -525,171 +547,96 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					if (scopeItem != null)
 						result = scopeItem.IsPoolThread;
 					break;
-				
-				case FilterColumn.EnvironmentCultureName:
-					exItem = item as FieldLogExceptionItemViewModel;
-					if (exItem == null)
-						scopeItem = item as FieldLogScopeItemViewModel;
 
-					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
-						result = CompareString(exItem.EnvironmentData.CultureName);
-					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
-						result = CompareString(scopeItem.EnvironmentData.CultureName);
-					break;
-				case FilterColumn.EnvironmentIsShuttingDown:
-					exItem = item as FieldLogExceptionItemViewModel;
-					if (exItem == null)
-						scopeItem = item as FieldLogScopeItemViewModel;
-
-					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
-						result = exItem.EnvironmentData.IsShuttingDown;
-					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
-						result = scopeItem.EnvironmentData.IsShuttingDown;
-					break;
-				case FilterColumn.EnvironmentCurrentDirectory:
-					exItem = item as FieldLogExceptionItemViewModel;
-					if (exItem == null)
-						scopeItem = item as FieldLogScopeItemViewModel;
-
-					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
-						result = CompareString(exItem.EnvironmentData.CurrentDirectory);
-					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
-						result = CompareString(scopeItem.EnvironmentData.CurrentDirectory);
-					break;
-				case FilterColumn.EnvironmentEnvironmentVariables:
-					exItem = item as FieldLogExceptionItemViewModel;
-					if (exItem == null)
-						scopeItem = item as FieldLogScopeItemViewModel;
-
-					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
-						result = CompareString(exItem.EnvironmentData.EnvironmentVariables);
-					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
-						result = CompareString(scopeItem.EnvironmentData.EnvironmentVariables);
-					break;
-				case FilterColumn.EnvironmentHostName:
-					exItem = item as FieldLogExceptionItemViewModel;
-					if (exItem == null)
-						scopeItem = item as FieldLogScopeItemViewModel;
-					if ((exItem == null || FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData)) &&
-						(scopeItem == null || FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData)))
-					{
-						flItem = item as FieldLogItemViewModel;
-						if (flItem != null)
-							scopeItem = flItem.LastLogStartItem;
-					}
-
-					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
-						result = CompareString(exItem.EnvironmentData.HostName);
-					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
-						result = CompareString(scopeItem.EnvironmentData.HostName);
-					break;
-				case FilterColumn.EnvironmentUserName:
-					exItem = item as FieldLogExceptionItemViewModel;
-					if (exItem == null)
-						scopeItem = item as FieldLogScopeItemViewModel;
-					if ((exItem == null || FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData)) &&
-						(scopeItem == null || FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData)))
-					{
-						flItem = item as FieldLogItemViewModel;
-						if (flItem != null)
-							scopeItem = flItem.LastLogStartItem;
-					}
-
-					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
-						result = CompareString(exItem.EnvironmentData.UserName);
-					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
-						result = CompareString(scopeItem.EnvironmentData.UserName);
-					break;
-				case FilterColumn.EnvironmentIsInteractive:
-					exItem = item as FieldLogExceptionItemViewModel;
-					if (exItem == null)
-						scopeItem = item as FieldLogScopeItemViewModel;
-					if ((exItem == null || FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData)) &&
-						(scopeItem == null || FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData)))
-					{
-						flItem = item as FieldLogItemViewModel;
-						if (flItem != null)
-							scopeItem = flItem.LastLogStartItem;
-					}
-
-					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
-						result = exItem.EnvironmentData.IsInteractive;
-					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
-						result = scopeItem.EnvironmentData.IsInteractive;
+				case FilterColumn.EnvironmentProcessId:
+					env = GetEnvironmentFromItem(item, true);
+					if (env != null)
+						result = CompareInt(env.ProcessId);
 					break;
 				case FilterColumn.EnvironmentCommandLine:
-					exItem = item as FieldLogExceptionItemViewModel;
-					if (exItem == null)
-						scopeItem = item as FieldLogScopeItemViewModel;
-					if ((exItem == null || FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData)) &&
-						(scopeItem == null || FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData)))
-					{
-						flItem = item as FieldLogItemViewModel;
-						if (flItem != null)
-							scopeItem = flItem.LastLogStartItem;
-					}
-
-					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
-						result = CompareString(exItem.EnvironmentData.CommandLine);
-					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
-						result = CompareString(scopeItem.EnvironmentData.CommandLine);
+					env = GetEnvironmentFromItem(item, true);
+					if (env != null)
+						result = CompareString(env.CommandLine);
 					break;
 				case FilterColumn.EnvironmentAppVersion:
-					exItem = item as FieldLogExceptionItemViewModel;
-					if (exItem == null)
-						scopeItem = item as FieldLogScopeItemViewModel;
-					if ((exItem == null || FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData)) &&
-						(scopeItem == null || FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData)))
-					{
-						flItem = item as FieldLogItemViewModel;
-						if (flItem != null)
-							scopeItem = flItem.LastLogStartItem;
-					}
-
-					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
-						result = CompareString(exItem.EnvironmentData.AppVersion);
-					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
-						result = CompareString(scopeItem.EnvironmentData.AppVersion);
+					env = GetEnvironmentFromItem(item, true);
+					if (env != null)
+						result = CompareString(env.AppVersion);
+					break;
+				case FilterColumn.EnvironmentCurrentDirectory:
+					env = GetEnvironmentFromItem(item, false);
+					if (env != null)
+						result = CompareString(env.CurrentDirectory);
+					break;
+				case FilterColumn.EnvironmentCultureName:
+					env = GetEnvironmentFromItem(item, false);
+					if (env != null)
+						result = CompareString(env.CultureName);
+					break;
+				case FilterColumn.EnvironmentUserName:
+					env = GetEnvironmentFromItem(item, true);
+					if (env != null)
+						result = CompareString(env.UserName);
+					break;
+				case FilterColumn.EnvironmentIsAdministrator:
+					env = GetEnvironmentFromItem(item, true);
+					if (env != null)
+						result = env.IsAdministrator;
+					break;
+				case FilterColumn.EnvironmentIsInteractive:
+					env = GetEnvironmentFromItem(item, true);
+					if (env != null)
+						result = env.IsInteractive;
 					break;
 				case FilterColumn.EnvironmentProcessMemory:
-					exItem = item as FieldLogExceptionItemViewModel;
-					if (exItem == null)
-						scopeItem = item as FieldLogScopeItemViewModel;
-
-					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
-						result = CompareLong(exItem.EnvironmentData.ProcessMemory);
-					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
-						result = CompareLong(scopeItem.EnvironmentData.ProcessMemory);
+					env = GetEnvironmentFromItem(item, false);
+					if (env != null)
+						result = CompareLong(env.ProcessMemory);
 					break;
 				case FilterColumn.EnvironmentPeakProcessMemory:
-					exItem = item as FieldLogExceptionItemViewModel;
-					if (exItem == null)
-						scopeItem = item as FieldLogScopeItemViewModel;
-
-					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
-						result = CompareLong(exItem.EnvironmentData.PeakProcessMemory);
-					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
-						result = CompareLong(scopeItem.EnvironmentData.PeakProcessMemory);
+					env = GetEnvironmentFromItem(item, false);
+					if (env != null)
+						result = CompareLong(env.PeakProcessMemory);
+					break;
+				case FilterColumn.EnvironmentOSType:
+					env = GetEnvironmentFromItem(item, true);
+					if (env != null)
+						result = CompareOSType(env.OSType);
+					break;
+				case FilterColumn.EnvironmentOSVersion:
+					env = GetEnvironmentFromItem(item, true);
+					if (env != null)
+						result = CompareOSVersion(env.OSVersion);
+					break;
+				case FilterColumn.EnvironmentCpuCount:
+					env = GetEnvironmentFromItem(item, true);
+					if (env != null)
+						result = CompareInt(env.CpuCount);
+					break;
+				case FilterColumn.EnvironmentHostName:
+					env = GetEnvironmentFromItem(item, true);
+					if (env != null)
+						result = CompareString(env.HostName);
 					break;
 				case FilterColumn.EnvironmentTotalMemory:
-					exItem = item as FieldLogExceptionItemViewModel;
-					if (exItem == null)
-						scopeItem = item as FieldLogScopeItemViewModel;
-
-					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
-						result = CompareLong(exItem.EnvironmentData.TotalMemory);
-					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
-						result = CompareLong(scopeItem.EnvironmentData.TotalMemory);
+					env = GetEnvironmentFromItem(item, true);
+					if (env != null)
+						result = CompareLong(env.TotalMemory);
 					break;
 				case FilterColumn.EnvironmentAvailableMemory:
-					exItem = item as FieldLogExceptionItemViewModel;
-					if (exItem == null)
-						scopeItem = item as FieldLogScopeItemViewModel;
-
-					if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentData))
-						result = CompareLong(exItem.EnvironmentData.AvailableMemory);
-					else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentData))
-						result = CompareLong(scopeItem.EnvironmentData.AvailableMemory);
+					env = GetEnvironmentFromItem(item, false);
+					if (env != null)
+						result = CompareLong(env.AvailableMemory);
+					break;
+				case FilterColumn.EnvironmentScreenDpi:
+					env = GetEnvironmentFromItem(item, true);
+					if (env != null)
+						result = CompareInt(env.ScreenDpi);
+					break;
+				case FilterColumn.EnvironmentEnvironmentVariables:
+					env = GetEnvironmentFromItem(item, false);
+					if (env != null)
+						result = CompareString(env.EnvironmentVariables);
 					break;
 			}
 
@@ -697,6 +644,43 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				return !result;
 			else
 				return result;
+		}
+
+		/// <summary>
+		/// Finds the environment instance in the specified item.
+		/// </summary>
+		/// <param name="item">The item to search.</param>
+		/// <param name="useLastLogStart">true to regard LastLogStartItem.</param>
+		/// <returns>The FieldLogEventEnvironment instance if it is not null or Empty; otherwise, null.</returns>
+		private FieldLogEventEnvironment GetEnvironmentFromItem(object item, bool useLastLogStart)
+		{
+			FieldLogItemViewModel flItem = null;
+			FieldLogExceptionItemViewModel exItem = null;
+			FieldLogScopeItemViewModel scopeItem = null;
+
+			exItem = item as FieldLogExceptionItemViewModel;
+			if (exItem == null)
+				scopeItem = item as FieldLogScopeItemViewModel;
+			if (useLastLogStart)
+			{
+				if ((exItem == null || FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentVM.Environment)) &&
+					(scopeItem == null || FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentVM.Environment)))
+				{
+					flItem = item as FieldLogItemViewModel;
+					if (flItem != null)
+						scopeItem = flItem.LastLogStartItem;
+				}
+			}
+
+			FieldLogEventEnvironment env = null;
+			if (exItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(exItem.EnvironmentVM.Environment))
+				env = exItem.EnvironmentVM.Environment;
+			else if (scopeItem != null && !FieldLogEventEnvironment.IsNullOrEmpty(scopeItem.EnvironmentVM.Environment))
+				env = scopeItem.EnvironmentVM.Environment;
+
+			if (FieldLogEventEnvironment.IsNullOrEmpty(env))
+				env = null;
+			return env;
 		}
 
 		private bool CompareTime(DateTime time, int utcOffset)
@@ -921,6 +905,56 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
+		private bool CompareOSType(OSType osType)
+		{
+			OSType filterOSType;
+			if (Enum.TryParse(Value, out filterOSType))
+			{
+				switch (Comparison)
+				{
+					case FilterComparison.Equals:
+					case FilterComparison.NotEquals:
+						return osType == filterOSType;
+					default:
+						throw new Exception("Invalid comparison for OSType column: " + Comparison);
+				}
+			}
+			else
+			{
+				// Invalid value for OSType column
+				return false;
+			}
+		}
+
+		private bool CompareOSVersion(OSVersion osVersion)
+		{
+			OSVersion filterOSVersion;
+			if (Enum.TryParse(Value, out filterOSVersion))
+			{
+				switch (Comparison)
+				{
+					case FilterComparison.Equals:
+					case FilterComparison.NotEquals:
+						return osVersion == filterOSVersion;
+					case FilterComparison.GreaterOrEqual:
+						return osVersion >= filterOSVersion;
+					case FilterComparison.GreaterThan:
+						return osVersion > filterOSVersion;
+					case FilterComparison.LessOrEqual:
+						return osVersion <= filterOSVersion;
+					case FilterComparison.LessThan:
+						return osVersion < filterOSVersion;
+					default:
+						throw new Exception("Invalid comparison for OSVersion column: " + Comparison);
+				}
+			}
+			else
+			{
+				// Invalid value for OSVersion column
+				return false;
+			}
+		}
+
 		private bool CompareString(string str)
 		{
 			switch (Comparison)
@@ -949,9 +983,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				case FilterComparison.NotRegex:
 					return Regex.IsMatch(str ?? "", Value ?? "", RegexOptions.IgnoreCase);
 				case FilterComparison.InList:
-					return Value.Split(';').Any(s => s.Trim() == (str ?? "").Trim());
 				case FilterComparison.NotInList:
-					return !Value.Split(';').Any(s => s.Trim() == (str ?? "").Trim());
+					return Value.Split(';').Any(s => s.Trim() == (str ?? "").Trim());
 				default:
 					throw new Exception("Invalid comparison for string column: " + Comparison);
 			}
@@ -959,13 +992,10 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		private bool CompareInt(int i)
 		{
-			if (Comparison == FilterComparison.InList)
+			if (Comparison == FilterComparison.InList ||
+				Comparison == FilterComparison.NotInList)
 			{
 				return Value.Split(';').Any(li => li.Trim() == i.ToString());
-			}
-			if (Comparison == FilterComparison.NotInList)
-			{
-				return !Value.Split(';').Any(li => li.Trim() == i.ToString());
 			}
 			int filterInt;
 			if (int.TryParse(Value, out filterInt))
@@ -996,13 +1026,10 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		private bool CompareLong(long l)
 		{
-			if (Comparison == FilterComparison.InList)
+			if (Comparison == FilterComparison.InList ||
+				Comparison == FilterComparison.NotInList)
 			{
 				return Value.Split(';').Any(ll => ll.Trim() == l.ToString());
-			}
-			if (Comparison == FilterComparison.NotInList)
-			{
-				return !Value.Split(';').Any(ll => ll.Trim() == l.ToString());
 			}
 			long filterLong;
 			if (long.TryParse(Value, out filterLong))
@@ -1150,32 +1177,42 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		[Description("Scope: Pool thread")]
 		ScopeIsPoolThread,
 
-		[Description("Env: Culture code")]
-		EnvironmentCultureName,
-		[Description("Env: Shutting down")]
-		EnvironmentIsShuttingDown,
-		[Description("Env: Current directory")]
-		EnvironmentCurrentDirectory,
-		[Description("Env: Environment variables")]
-		EnvironmentEnvironmentVariables,
-		[Description("Env: Host name")]
-		EnvironmentHostName,
-		[Description("Env: User name")]
-		EnvironmentUserName,
-		[Description("Env: Interactive")]
-		EnvironmentIsInteractive,
+		[Description("Env: Process ID")]
+		EnvironmentProcessId,
 		[Description("Env: Command line")]
 		EnvironmentCommandLine,
 		[Description("Env: App version")]
 		EnvironmentAppVersion,
+		[Description("Env: Current directory")]
+		EnvironmentCurrentDirectory,
+		[Description("Env: Culture code")]
+		EnvironmentCultureName,
+		[Description("Env: User name")]
+		EnvironmentUserName,
+		[Description("Env: Administrator")]
+		EnvironmentIsAdministrator,
+		[Description("Env: Interactive")]
+		EnvironmentIsInteractive,
 		[Description("Env: Process memory")]
 		EnvironmentProcessMemory,
 		[Description("Env: Peak process memory")]
 		EnvironmentPeakProcessMemory,
+		[Description("Env: OS type")]
+		EnvironmentOSType,
+		[Description("Env: OS version")]
+		EnvironmentOSVersion,
+		[Description("Env: CPU count")]
+		EnvironmentCpuCount,
+		[Description("Env: Host name")]
+		EnvironmentHostName,
 		[Description("Env: Total memory")]
 		EnvironmentTotalMemory,
 		[Description("Env: Available memory")]
 		EnvironmentAvailableMemory,
+		[Description("Env: Logical resolution")]
+		EnvironmentScreenDpi,
+		[Description("Env: Environment vars")]
+		EnvironmentEnvironmentVariables,
 	}
 
 	enum FilterComparison

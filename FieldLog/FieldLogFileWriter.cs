@@ -282,6 +282,30 @@ namespace Unclassified.FieldLog
 			buffer.AddRange(bytes);
 		}
 
+		internal void AddBuffer(ushort s)
+		{
+			byte[] bytes = BitConverter.GetBytes(s);
+			if (BitConverter.IsLittleEndian)
+				Array.Reverse(bytes);
+			buffer.AddRange(bytes);
+		}
+
+		internal void AddBuffer(uint i)
+		{
+			byte[] bytes = BitConverter.GetBytes(i);
+			if (BitConverter.IsLittleEndian)
+				Array.Reverse(bytes);
+			buffer.AddRange(bytes);
+		}
+
+		internal void AddBuffer(ulong l)
+		{
+			byte[] bytes = BitConverter.GetBytes(l);
+			if (BitConverter.IsLittleEndian)
+				Array.Reverse(bytes);
+			buffer.AddRange(bytes);
+		}
+
 		internal void AddBuffer(byte[] bytes)
 		{
 			buffer.AddRange(bytes);

@@ -281,6 +281,42 @@ namespace Unclassified.FieldLog
 		}
 
 		/// <summary>
+		/// Reads a ushort value from the file.
+		/// </summary>
+		/// <returns></returns>
+		internal ushort ReadUInt16()
+		{
+			byte[] bytes = ReadBytes(2);
+			if (BitConverter.IsLittleEndian)
+				Array.Reverse(bytes);
+			return BitConverter.ToUInt16(bytes, 0);
+		}
+
+		/// <summary>
+		/// Reads a uint value from the file.
+		/// </summary>
+		/// <returns></returns>
+		internal uint ReadUInt32()
+		{
+			byte[] bytes = ReadBytes(4);
+			if (BitConverter.IsLittleEndian)
+				Array.Reverse(bytes);
+			return BitConverter.ToUInt32(bytes, 0);
+		}
+
+		/// <summary>
+		/// Reads a ulong value from the file.
+		/// </summary>
+		/// <returns></returns>
+		internal ulong ReadUInt64()
+		{
+			byte[] bytes = ReadBytes(8);
+			if (BitConverter.IsLittleEndian)
+				Array.Reverse(bytes);
+			return BitConverter.ToUInt64(bytes, 0);
+		}
+
+		/// <summary>
 		/// Reads a string from the file, using the text cache.
 		/// </summary>
 		/// <returns></returns>

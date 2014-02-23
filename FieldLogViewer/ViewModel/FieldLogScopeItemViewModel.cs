@@ -13,6 +13,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			this.Item = item;
 			base.Item = item;
+
+			this.EnvironmentVM = new FieldLogEnvironmentViewModel(item.EnvironmentData, item.Time);
 		}
 
 		public new FieldLogScopeItem Item { get; private set; }
@@ -22,7 +24,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public bool IsBackgroundThread { get { return this.Item.IsBackgroundThread; } }
 		public bool IsPoolThread { get { return this.Item.IsPoolThread; } }
 		public bool IsRepeated { get { return this.Item.IsRepeated; } }
-		public FieldLogEventEnvironment EnvironmentData { get { return this.Item.EnvironmentData; } }
+		public FieldLogEnvironmentViewModel EnvironmentVM { get; private set; }
 
 		public string TypeTitle
 		{
@@ -107,7 +109,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			if (Type == FieldLogScopeType.LogStart)
 			{
-				utcOffset = (int) EnvironmentData.LocalTimeZoneOffset.TotalMinutes;
+				utcOffset = (int) Item.EnvironmentData.LocalTimeZoneOffset.TotalMinutes;
 				return true;
 			}
 			utcOffset = 0;

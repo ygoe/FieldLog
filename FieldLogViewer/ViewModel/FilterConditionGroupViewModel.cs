@@ -367,11 +367,18 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						}
 						itemType = FilterItemType.Scope;
 						break;
-					case FilterColumn.EnvironmentHostName:
-					case FilterColumn.EnvironmentUserName:
-					case FilterColumn.EnvironmentIsInteractive:
-					case FilterColumn.EnvironmentAppVersion:
+					case FilterColumn.EnvironmentProcessId:
 					case FilterColumn.EnvironmentCommandLine:
+					case FilterColumn.EnvironmentAppVersion:
+					case FilterColumn.EnvironmentUserName:
+					case FilterColumn.EnvironmentIsAdministrator:
+					case FilterColumn.EnvironmentIsInteractive:
+					case FilterColumn.EnvironmentOSType:
+					case FilterColumn.EnvironmentOSVersion:
+					case FilterColumn.EnvironmentCpuCount:
+					case FilterColumn.EnvironmentHostName:
+					case FilterColumn.EnvironmentTotalMemory:
+					case FilterColumn.EnvironmentScreenDpi:
 						if (itemType != FilterItemType.Text &&
 							itemType != FilterItemType.Data &&
 							itemType != FilterItemType.Exception /*&&
@@ -384,14 +391,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						}
 						// Cannot set an item type because multiple types are allowed
 						break;
-					case FilterColumn.EnvironmentCultureName:
-					case FilterColumn.EnvironmentIsShuttingDown:
 					case FilterColumn.EnvironmentCurrentDirectory:
-					case FilterColumn.EnvironmentEnvironmentVariables:
+					case FilterColumn.EnvironmentCultureName:
 					case FilterColumn.EnvironmentProcessMemory:
 					case FilterColumn.EnvironmentPeakProcessMemory:
-					case FilterColumn.EnvironmentTotalMemory:
 					case FilterColumn.EnvironmentAvailableMemory:
+					case FilterColumn.EnvironmentEnvironmentVariables:
 						if (itemType != FilterItemType.Exception /*&&
 							itemType != FilterItemType.ExceptionRecursive*/ &&
 							itemType != FilterItemType.Scope &&

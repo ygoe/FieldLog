@@ -86,7 +86,6 @@ namespace Unclassified.FieldLog
 						int newMins = Math.Abs(newLocalOffset) % 60;
 
 						localOffset = newLocalOffset;
-						// TODO: Notify FieldLog about change and write a new environment log item for further analysis?
 
 						string msg = "Local time UTC offset changed from " +
 							hours.ToString("+00;-00;+00") + ":" + mins.ToString("00") + " to " +

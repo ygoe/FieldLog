@@ -78,7 +78,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			this.BindProperty(vm => vm.ItemTimeMode, AppSettings.Instance, s => s.ItemTimeMode);
 			
 			Filters = new ObservableCollection<FilterViewModel>();
-			Filters.ForNewOld(
+			Filters.ForAddedRemoved(
 				f => f.FilterChanged += LogItemsFilterChanged,
 				f => f.FilterChanged -= LogItemsFilterChanged);
 			Filters.Add(new FilterViewModel(true));
@@ -1099,6 +1099,17 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				MessageBox.Show(
 					"You cannot open the log file that this instance of FieldLogViewer is currently writing to.\n\n" +
 						"Trying to read the messages that may be generated while reading messages leads to a locking situation.",
+					"Error",
+					MessageBoxButton.OK,
+					MessageBoxImage.Warning);
+				return;
+			}
+			if (!Directory.Exists(Path.GetDirectoryName(basePath)))
+			{
+				MessageBox.Show(
+					"The directory of the log file path does not exist. If you expect log files to be created here, " +
+						"please create the directory now or retry loading when a file has been created.\n\n" +
+						"Selected base path: " + basePath,
 					"Error",
 					MessageBoxButton.OK,
 					MessageBoxImage.Warning);

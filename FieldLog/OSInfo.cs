@@ -1476,7 +1476,6 @@ namespace Unclassified.FieldLog
 		[Description("No special edition")]
 		None = 0,
 
-		// NOTE: There should also exist a Windows 2000 Standard Edition, but I can't find anything about it
 		/// <summary>Windows 2000 Professional.</summary>
 		[Description("Windows 2000 Professional")]
 		Windows2000Professional,

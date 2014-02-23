@@ -15,7 +15,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			base.Item = item;
 
 			this.ExceptionVM = new FieldLogExceptionViewModel(item.Exception);
-			this.EnvironmentVM = new FieldLogEnvironmentViewModel(item.EnvironmentData, item.Time);
+			this.EnvironmentVM = new FieldLogEnvironmentViewModel(item.EnvironmentData, this);
 		}
 
 		public new FieldLogExceptionItem Item { get; private set; }

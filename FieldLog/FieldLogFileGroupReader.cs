@@ -227,7 +227,7 @@ namespace Unclassified.FieldLog
 				readers[prio].Append(reader, fromFsw);
 
 				// TODO,DEBUG: What for?
-				newFilePrioEvent.Set();
+				//newFilePrioEvent.Set();
 			}
 		}
 

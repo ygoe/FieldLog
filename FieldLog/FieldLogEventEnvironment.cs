@@ -287,10 +287,9 @@ namespace Unclassified.FieldLog
 			env.ExecutablePath = Assembly.GetEntryAssembly().Location;
 			env.CommandLine = Environment.CommandLine;
 			env.AppVersion = FL.AppVersion;
-			//env.IsProcess64Bit = Environment.Is64BitProcess;   // .NET 4 only
-			env.IsProcess64Bit = IntPtr.Size == 8;
+			env.IsProcess64Bit = IntPtr.Size == 8;   // .NET 4 only: Environment.Is64BitProcess
 			env.ClrVersion = Environment.Version.ToString();
-			env.LocalTimeZoneOffset = DateTimeOffset.Now.Offset;
+			env.LocalTimeZoneOffset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
 			env.ProcessMemory = OSInfo.GetProcessPrivateMemory();
 			env.PeakProcessMemory = OSInfo.GetProcessPeakMemory();
 			env.TotalMemory = OSInfo.GetTotalMemorySize();

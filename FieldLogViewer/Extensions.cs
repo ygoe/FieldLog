@@ -31,7 +31,7 @@ namespace Unclassified.FieldLogViewer
 
 		#region Color maths
 
-		// TODO: Compare with ColorMath class, add comments
+		// TODO: Compare with ColorMath class, add comments, move to different extensions class
 
 		public static Color BlendWith(this Color c1, Color c2, float ratio = 0.5f)
 		{

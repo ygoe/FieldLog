@@ -40,12 +40,12 @@
 //   http://blogs.msdn.com/search/searchresults.aspx?q=iscrollinfo&sections=3253
 
 using System;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using System.Collections.Specialized;
 
 namespace Unclassified.UI
 {

@@ -8,14 +8,14 @@ namespace Unclassified.FieldLogViewer.ViewModel
 {
 	class FieldLogEnvironmentViewModel : ViewModelBase
 	{
-		public FieldLogEnvironmentViewModel(FieldLogEventEnvironment environment, DateTime itemTime)
+		public FieldLogEnvironmentViewModel(FieldLogEventEnvironment environment, FieldLogItemViewModel itemVM)
 		{
 			this.Environment = environment;
-			this.ItemTime = itemTime;
+			this.ItemVM = itemVM;
 		}
 
 		public FieldLogEventEnvironment Environment { get; private set; }
-		public DateTime ItemTime { get; private set; }
+		public FieldLogItemViewModel ItemVM { get; private set; }
 
 		public string ProcessIdArchitecture
 		{
@@ -68,6 +68,36 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				if (Environment != null)
 				{
 					return Environment.IsInteractive ? "Yes" : "No";
+				}
+				return null;
+			}
+		}
+
+		public string ProcessUptime
+		{
+			get
+			{
+				if (Environment != null && ItemVM.LastLogStartItem != null)
+				{
+					string startTime = "";
+					switch (MainViewModel.Instance.ItemTimeMode)
+					{
+						case ItemTimeType.Utc:
+							startTime = ItemVM.LastLogStartItem.Time.ToString("yyyy-MM-dd, HH:mm:ss") + " UTC";
+							break;
+						case ItemTimeType.Local:
+							startTime = ItemVM.LastLogStartItem.Time.ToLocalTime().ToString("yyyy-MM-dd, HH:mm:ss");
+							break;
+						case ItemTimeType.Remote:
+							int hours = ItemVM.LastLogStartItem.UtcOffset / 60;
+							int mins = Math.Abs(ItemVM.LastLogStartItem.UtcOffset) % 60;
+							startTime = ItemVM.LastLogStartItem.Time.AddMinutes(ItemVM.LastLogStartItem.UtcOffset).ToString("yyyy-MM-dd, HH:mm:ss") + " " +
+								hours.ToString("+00;-00;+00") + ":" + mins.ToString("00");
+							break;
+					}
+
+					return (ItemVM.Time - ItemVM.LastLogStartItem.Time).ToString(@"d\.hh\:mm\:ss") +
+						", started " + startTime;
 				}
 				return null;
 			}
@@ -148,7 +178,25 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			{
 				if (Environment != null)
 				{
-					return (ItemTime - Environment.OSLastBootTime).ToString(@"d\.hh\:mm\:ss") +
+					string startTime = "";
+					switch (MainViewModel.Instance.ItemTimeMode)
+					{
+						case ItemTimeType.Utc:
+							startTime = Environment.OSLastBootTime.ToString("yyyy-MM-dd, HH:mm:ss") + " UTC";
+							break;
+						case ItemTimeType.Local:
+							startTime = Environment.OSLastBootTime.ToLocalTime().ToString("yyyy-MM-dd, HH:mm:ss");
+							break;
+						case ItemTimeType.Remote:
+							int hours = ItemVM.UtcOffset / 60;
+							int mins = Math.Abs(ItemVM.UtcOffset) % 60;
+							startTime = Environment.OSLastBootTime.AddMinutes(ItemVM.UtcOffset).ToString("yyyy-MM-dd, HH:mm:ss") + " " +
+								hours.ToString("+00;-00;+00") + ":" + mins.ToString("00");
+							break;
+					}
+
+					return (ItemVM.Time - Environment.OSLastBootTime).ToString(@"d\.hh\:mm\:ss") +
+						", started " + startTime +
 						(Environment.OSIsFailSafeBoot ? " (fail-safe boot)" : " (normal boot)");
 				}
 				return null;

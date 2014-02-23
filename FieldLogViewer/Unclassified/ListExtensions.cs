@@ -335,7 +335,6 @@ namespace Unclassified
 
 		#region INotifyCollectionChanged helpers
 
-		// TODO: Find a better name for this method
 		/// <summary>
 		/// Invokes an action for every element that is added to or removed from the
 		/// ObservableCollection. <paramref name="newAction"/> is also invoked immediately for
@@ -345,7 +344,7 @@ namespace Unclassified
 		/// <param name="source">The source sequence.</param>
 		/// <param name="newAction">Method to invoke for each added sequence element.</param>
 		/// <param name="oldAction">Method to invoke for each removed sequence element.</param>
-		public static void ForNewOld<T>(this ObservableCollection<T> source, Action<T> newAction, Action<T> oldAction)
+		public static void ForAddedRemoved<T>(this ObservableCollection<T> source, Action<T> newAction, Action<T> oldAction)
 		{
 			foreach (T item in source)
 			{

@@ -14,7 +14,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			this.Item = item;
 			base.Item = item;
 
-			this.EnvironmentVM = new FieldLogEnvironmentViewModel(item.EnvironmentData, item.Time);
+			this.EnvironmentVM = new FieldLogEnvironmentViewModel(item.EnvironmentData, this);
 		}
 
 		public new FieldLogScopeItem Item { get; private set; }

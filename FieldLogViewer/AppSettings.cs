@@ -22,6 +22,9 @@ namespace Unclassified.FieldLogViewer
 		//       Serializable. Also support special view layers for generic hierarchy. Keep those
 		//       helper methods protected to have a clean public API.
 
+		// Especially SettingsStore.AddPropertyHandler should not be required anymore. Reflection
+		// in a type initialiser (static constructor) can be helpful.
+
 		#region Static members
 
 		/// <summary>

@@ -80,7 +80,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				if (Environment != null && ItemVM.LastLogStartItem != null)
 				{
 					string startTime = "";
-					switch (MainViewModel.Instance.ItemTimeMode)
+					switch (AppSettings.Instance.ItemTimeMode)
 					{
 						case ItemTimeType.Utc:
 							startTime = ItemVM.LastLogStartItem.Time.ToString("yyyy-MM-dd, HH:mm:ss") + " UTC";
@@ -179,7 +179,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				if (Environment != null)
 				{
 					string startTime = "";
-					switch (MainViewModel.Instance.ItemTimeMode)
+					switch (AppSettings.Instance.ItemTimeMode)
 					{
 						case ItemTimeType.Utc:
 							startTime = Environment.OSLastBootTime.ToString("yyyy-MM-dd, HH:mm:ss") + " UTC";

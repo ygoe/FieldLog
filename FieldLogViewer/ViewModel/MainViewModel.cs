@@ -65,18 +65,29 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			dispatcher = Dispatcher.CurrentDispatcher;
 
 			InitializeCommands();
-
 			UpdateWindowTitle();
 
-			this.BindProperty(vm => vm.IsDebugMonitorActive, AppSettings.Instance, s => s.IsDebugMonitorActive);
-			this.BindProperty(vm => vm.ShowRelativeTime, AppSettings.Instance, s => s.ShowRelativeTime);
-			this.BindProperty(vm => vm.IsLiveScrollingEnabled, AppSettings.Instance, s => s.IsLiveScrollingEnabled);
-			this.BindProperty(vm => vm.IsFlashingEnabled, AppSettings.Instance, s => s.IsFlashingEnabled);
-			this.BindProperty(vm => vm.IsSoundEnabled, AppSettings.Instance, s => s.IsSoundEnabled);
-			this.BindProperty(vm => vm.IsWindowOnTop, AppSettings.Instance, s => s.IsWindowOnTop);
-			this.BindProperty(vm => vm.IndentSize, AppSettings.Instance, s => s.IndentSize);
-			this.BindProperty(vm => vm.ItemTimeMode, AppSettings.Instance, s => s.ItemTimeMode);
-			
+			// Setup toolbar and settings events
+			this.BindProperty(vm => vm.IsDebugMonitorActive, AppSettings, s => s.IsDebugMonitorActive);
+			AppSettings.OnPropertyChanged(
+				s => s.IsLiveScrollingEnabled,
+				v => { if (v) ViewCommandManager.Invoke("ScrollToEnd"); });
+			AppSettings.OnPropertyChanged(
+				s => s.IsWindowOnTop,
+				v => MainWindow.Instance.Topmost = v,
+				true);
+			AppSettings.OnPropertyChanged(
+				s => s.IndentSize,
+				() =>
+				{
+					DecreaseIndentSizeCommand.RaiseCanExecuteChanged();
+					IncreaseIndentSizeCommand.RaiseCanExecuteChanged();
+				});
+			AppSettings.OnPropertyChanged(
+				s => s.ItemTimeMode,
+				() => RefreshLogItemsFilterView());
+
+			// Setup filter events
 			Filters = new ObservableCollection<FilterViewModel>();
 			Filters.ForAddedRemoved(
 				f => f.FilterChanged += LogItemsFilterChanged,
@@ -90,7 +101,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				TaskHelper.WhenLoaded(() => LogItemsFilterChanged(false));
 			};
 
-			foreach (string s in AppSettings.Instance.Filters)
+			// Load filters
+			foreach (string s in AppSettings.Filters)
 			{
 				FilterViewModel f = new FilterViewModel();
 				try
@@ -108,7 +120,6 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				}
 				Filters.Add(f);
 			}
-
 			// If no filter is defined, create some basic filters for a start
 			if (Filters.Count == 1)
 			{
@@ -116,7 +127,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				CreateBasicFilters();
 			}
 			
-			FilterViewModel selectedFilterVM = Filters.FirstOrDefault(f => f.DisplayName == AppSettings.Instance.SelectedFilter);
+			// Restore filter selection
+			FilterViewModel selectedFilterVM = Filters.FirstOrDefault(f => f.DisplayName == AppSettings.SelectedFilter);
 			if (selectedFilterVM != null)
 			{
 				SelectedFilter = selectedFilterVM;
@@ -126,13 +138,16 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				SelectedFilter = Filters[0];
 			}
 
+			// Setup sorted filters view
 			sortedFilters.Source = Filters;
 			sortedFilters.SortDescriptions.Add(new SortDescription("AcceptAll", ListSortDirection.Descending));
 			sortedFilters.SortDescriptions.Add(new SortDescription("DisplayName", ListSortDirection.Ascending));
 
+			// Setup filtered log items view
 			filteredLogItems.Source = logItems;
 			filteredLogItems.Filter += filteredLogItems_Filter;
 
+			// Setup debug message monitor events
 			DebugMonitor.MessageReceived += (pid, text) =>
 			{
 				var itemVM = new DebugMessageViewModel(pid, text);
@@ -265,29 +280,29 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		private bool CanDecreaseIndentSize()
 		{
-			return IndentSize > 4;
+			return AppSettings.IndentSize > 4;
 		}
 
 		private void OnDecreaseIndentSize()
 		{
-			IndentSize -= 4;
-			if (IndentSize < 4)
+			AppSettings.IndentSize -= 4;
+			if (AppSettings.IndentSize < 4)
 			{
-				IndentSize = 4;
+				AppSettings.IndentSize = 4;
 			}
 		}
 
 		private bool CanIncreaseIndentSize()
 		{
-			return IndentSize < 32;
+			return AppSettings.IndentSize < 32;
 		}
 
 		private void OnIncreaseIndentSize()
 		{
-			IndentSize += 4;
-			if (IndentSize > 32)
+			AppSettings.IndentSize += 4;
+			if (AppSettings.IndentSize > 32)
 			{
-				IndentSize = 32;
+				AppSettings.IndentSize = 32;
 			}
 		}
 
@@ -568,7 +583,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				if (!cg.IsExclude)
 				{
 					DateTime itemTime = new DateTime(SelectedItems[0].Time.Ticks / 10 * 10);   // Round down to the next microsecond
-					switch (MainViewModel.Instance.ItemTimeMode)
+					switch (AppSettings.ItemTimeMode)
 					{
 						case ItemTimeType.Local:
 							itemTime = itemTime.ToLocalTime();
@@ -610,7 +625,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				if (!cg.IsExclude)
 				{
 					DateTime itemTime = new DateTime((SelectedItems[0].Time.Ticks + 9) / 10 * 10);   // Round up to the next microsecond
-					switch (MainViewModel.Instance.ItemTimeMode)
+					switch (AppSettings.ItemTimeMode)
 					{
 						case ItemTimeType.Local:
 							itemTime = itemTime.ToLocalTime();
@@ -641,6 +656,11 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		#region Data properties
 
+		public AppSettings AppSettings
+		{
+			get { return AppSettings.Instance; }
+		}
+
 		#region Toolbar and settings
 
 		public bool IsDebugMonitorActive
@@ -657,72 +677,6 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					DebugMonitor.Stop();
 				}
 				OnPropertyChanged("IsDebugMonitorActive");
-			}
-		}
-
-		private bool isLiveScrollingEnabled;
-		public bool IsLiveScrollingEnabled
-		{
-			get { return isLiveScrollingEnabled; }
-			set
-			{
-				if (CheckUpdate(value, ref isLiveScrollingEnabled, "IsLiveScrollingEnabled"))
-				{
-					if (isLiveScrollingEnabled)
-					{
-						ViewCommandManager.Invoke("ScrollToEnd");
-					}
-				}
-			}
-		}
-
-		private bool isSoundEnabled;
-		public bool IsSoundEnabled
-		{
-			get { return isSoundEnabled; }
-			set { CheckUpdate(value, ref isSoundEnabled, "IsSoundEnabled"); }
-		}
-
-		private bool isFlashingEnabled;
-		public bool IsFlashingEnabled
-		{
-			get { return isFlashingEnabled; }
-			set { CheckUpdate(value, ref isFlashingEnabled, "IsFlashingEnabled"); }
-		}
-
-		public bool IsWindowOnTop
-		{
-			get
-			{
-				return MainWindow.Instance.Topmost;
-			}
-			set
-			{
-				if (value != MainWindow.Instance.Topmost)
-				{
-					MainWindow.Instance.Topmost = value;
-					OnPropertyChanged("IsWindowOnTop");
-				}
-			}
-		}
-
-		private bool showRelativeTime;
-		public bool ShowRelativeTime
-		{
-			get { return showRelativeTime; }
-			set { CheckUpdate(value, ref showRelativeTime, "ShowRelativeTime"); }
-		}
-
-		private ItemTimeType itemTimeMode;
-		public ItemTimeType ItemTimeMode
-		{
-			get { return itemTimeMode; }
-			set
-			{
-				if (CheckUpdate(value, ref itemTimeMode, "ItemTimeMode"))
-				{
-					RefreshLogItemsFilterView();
-				}
 			}
 		}
 
@@ -836,27 +790,6 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
-		private int indentSize;
-		public int IndentSize
-		{
-			get { return indentSize; }
-			set
-			{
-				if (CheckUpdate(value, ref indentSize, "IndentSize"))
-				{
-					DecreaseIndentSizeCommand.RaiseCanExecuteChanged();
-					IncreaseIndentSizeCommand.RaiseCanExecuteChanged();
-				}
-			}
-		}
-
-		private bool highlightSameThread = true;
-		public bool HighlightSameThread
-		{
-			get { return highlightSameThread; }
-			set { CheckUpdate(value, ref highlightSameThread, "HighlightSameThread"); }
-		}
-
 		#endregion Log items list
 
 		#region Filter
@@ -882,11 +815,11 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					ViewCommandManager.Invoke("RestoreScrolling");
 					if (selectedFilter != null)
 					{
-						AppSettings.Instance.SelectedFilter = selectedFilter.DisplayName;
+						AppSettings.SelectedFilter = selectedFilter.DisplayName;
 					}
 					else
 					{
-						AppSettings.Instance.SelectedFilter = "";
+						AppSettings.SelectedFilter = "";
 					}
 				}
 			}
@@ -1051,7 +984,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			{
 				RefreshLogItemsFilterView();
 			}
-			AppSettings.Instance.Filters = Filters
+			AppSettings.Filters = Filters
 				.Where(f => !f.AcceptAll)
 				.Select(f => f.SaveToString())
 				.Where(s => !string.IsNullOrEmpty(s))

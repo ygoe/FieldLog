@@ -75,8 +75,8 @@ namespace Unclassified.FieldLogViewer.View
 			logItemsScrollPixelDc = DelayedCall.Create(() => { logItemsHostPanel.ScrollToPixel = true; }, 600);
 			updateScrollmapDc = DelayedCall.Create(UpdateScrollmap, 100);
 
-			AppSettings.Instance.OnPropertyChanged(s => s.ShowWarningsErrorsInScrollBar, v => InvalidateScrollmap(false));
-			AppSettings.Instance.OnPropertyChanged(s => s.ShowSelectionInScrollBar, v => InvalidateScrollmap(false));
+			AppSettings.Instance.OnPropertyChanged(s => s.ShowWarningsErrorsInScrollBar, () => InvalidateScrollmap(false));
+			AppSettings.Instance.OnPropertyChanged(s => s.ShowSelectionInScrollBar, () => InvalidateScrollmap(false));
 		}
 
 		#endregion Constructors
@@ -190,7 +190,7 @@ namespace Unclassified.FieldLogViewer.View
 				CheckScrollToEnd();
 
 				// Flash window on new item, if window is inactive and not yet flashing
-				if (MainViewModel.Instance.IsFlashingEnabled)
+				if (AppSettings.Instance.IsFlashingEnabled)
 				{
 					if (!this.IsActive)
 					{
@@ -207,7 +207,7 @@ namespace Unclassified.FieldLogViewer.View
 				}
 
 				// Play sound on new item, with rate limiting
-				if (MainViewModel.Instance.IsSoundEnabled)
+				if (AppSettings.Instance.IsSoundEnabled)
 				{
 					if (now > prevItemTime.AddSeconds(1))
 					{
@@ -226,7 +226,7 @@ namespace Unclassified.FieldLogViewer.View
 			if (logItemsScroll != null)
 			{
 				// Only scroll to the end if we're already near it and if the option is enabled
-				if (logItemsScrolledNearEnd && MainViewModel.Instance.IsLiveScrollingEnabled)
+				if (logItemsScrolledNearEnd && AppSettings.Instance.IsLiveScrollingEnabled)
 				{
 					if (logItemsSmoothScrollActive)
 					{

@@ -15,10 +15,6 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			InitializeCommands();
 
-			this.BindProperty(vm => vm.ItemTimeMode, AppSettings.Instance, s => s.ItemTimeMode);
-			this.BindProperty(vm => vm.ShowWarningsErrorsInScrollBar, AppSettings.Instance, s => s.ShowWarningsErrorsInScrollBar);
-			this.BindProperty(vm => vm.ShowSelectionInScrollBar, AppSettings.Instance, s => s.ShowSelectionInScrollBar);
-
 			this.BindProperty(vm => vm.SelectedFilter, MainViewModel.Instance, vm => vm.SelectedFilter);
 		}
 
@@ -73,14 +69,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		#region Data properties
 
-		#region General tab
-
-		private ItemTimeType itemTimeMode;
-		public ItemTimeType ItemTimeMode
+		public AppSettings AppSettings
 		{
-			get { return itemTimeMode; }
-			set { CheckUpdate(value, ref itemTimeMode, "ItemTimeMode"); }
+			get { return AppSettings.Instance; }
 		}
+
+		#region General tab
 
 		public IEnumerable<ValueViewModel<ItemTimeType>> AvailableItemTimeModes
 		{
@@ -93,20 +87,6 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					new ValueViewModel<ItemTimeType>("Remote system", ItemTimeType.Remote),
 				};
 			}
-		}
-
-		private bool showWarningsErrorsInScrollBar;
-		public bool ShowWarningsErrorsInScrollBar
-		{
-			get { return showWarningsErrorsInScrollBar; }
-			set { CheckUpdate(value, ref showWarningsErrorsInScrollBar, "ShowWarningsErrorsInScrollBar"); }
-		}
-
-		private bool showSelectionInScrollBar;
-		public bool ShowSelectionInScrollBar
-		{
-			get { return showSelectionInScrollBar; }
-			set { CheckUpdate(value, ref showSelectionInScrollBar, "ShowSelectionInScrollBar"); }
 		}
 
 		#endregion General tab

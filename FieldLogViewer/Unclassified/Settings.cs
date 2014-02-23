@@ -220,8 +220,8 @@ namespace Unclassified
 				{
 					CheckType(newValue);
 
-					object oldValue = null;
-					if (store.ContainsKey(key)) oldValue = store[key];
+					object oldValue;
+					store.TryGetValue(key, out oldValue);
 					if (newValue.Equals(oldValue)) return;
 					store[key] = newValue;
 					InvokeHandlers(key, oldValue, newValue);

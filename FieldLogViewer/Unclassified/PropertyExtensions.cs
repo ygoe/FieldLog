@@ -12,13 +12,32 @@ namespace Unclassified
 	{
 		#region INotifyPropertyChanged helpers
 
-		//public static void OnPropertyChanged(this INotifyPropertyChanged sender, string propertyName, Action handler)
-		//{
-		//    sender.PropertyChanged += (s, e) =>
-		//    {
-		//        if (e.PropertyName == propertyName) handler();
-		//    };
-		//}
+		/// <summary>
+		/// Invokes the specified action when the value of the source property changed.
+		/// </summary>
+		/// <param name="source">Instance of the type that defines the property. Must implement INotifyPropertyChanged.</param>
+		/// <param name="propertyName">Name of the property.</param>
+		/// <param name="handler">Action that handles the changed value.</param>
+		/// <param name="notifyNow">true to invoke the handler now, too.</param>
+		public static void OnPropertyChanged(
+			this INotifyPropertyChanged source,
+			string propertyName,
+			Action handler,
+			bool notifyNow = false)
+		{
+			source.PropertyChanged += (s, e) =>
+			{
+				if (e.PropertyName == propertyName)
+				{
+					handler();
+				}
+			};
+
+			if (notifyNow)
+			{
+				handler();
+			}
+		}
 
 		/// <summary>
 		/// Invokes the specified action when the value of the source property changed.
@@ -28,21 +47,52 @@ namespace Unclassified
 		/// <param name="source">Instance of the type that defines the property. Must implement INotifyPropertyChanged.</param>
 		/// <param name="expr">Lambda expression of the property.</param>
 		/// <param name="handler">Action that handles the changed value.</param>
-		/// <example>
-		/// Link a source property to a local property of the same type:
-		/// <code>
-		/// source.LinkProperty(src => src.SourceProperty, value => MyProperty = value);
-		/// </code>
-		/// Link a source property to a local method that accepts the source property's value type
-		/// as its only parameter:
-		/// <code>
-		/// source.LinkProperty(src => src.SourceProperty, OnUpdate);
-		/// </code>
-		/// </example>
+		/// <param name="notifyNow">true to invoke the handler now, too.</param>
 		public static void OnPropertyChanged<TSource, TProperty>(
 			this TSource source,
 			Expression<Func<TSource, TProperty>> expr,
-			Action<TProperty> handler)
+			Action handler,
+			bool notifyNow = false)
+			where TSource : INotifyPropertyChanged
+		{
+			var memberExpr = expr.Body as MemberExpression;
+			if (memberExpr != null)
+			{
+				PropertyInfo property = memberExpr.Member as PropertyInfo;
+				if (property != null)
+				{
+					source.PropertyChanged += (s, e) =>
+					{
+						if (e.PropertyName == property.Name)
+						{
+							handler();
+						}
+					};
+
+					if (notifyNow)
+					{
+						handler();
+					}
+					return;
+				}
+			}
+			throw new ArgumentException("Unsupported expression type.");
+		}
+
+		/// <summary>
+		/// Invokes the specified action when the value of the source property changed.
+		/// </summary>
+		/// <typeparam name="TSource">Type that defines the property.</typeparam>
+		/// <typeparam name="TProperty">Value type of the property.</typeparam>
+		/// <param name="source">Instance of the type that defines the property. Must implement INotifyPropertyChanged.</param>
+		/// <param name="expr">Lambda expression of the property.</param>
+		/// <param name="handler">Action that handles the changed value.</param>
+		/// <param name="notifyNow">true to invoke the handler now, too.</param>
+		public static void OnPropertyChanged<TSource, TProperty>(
+			this TSource source,
+			Expression<Func<TSource, TProperty>> expr,
+			Action<TProperty> handler,
+			bool notifyNow = false)
 			where TSource : INotifyPropertyChanged
 		{
 			var memberExpr = expr.Body as MemberExpression;
@@ -59,8 +109,10 @@ namespace Unclassified
 						}
 					};
 
-					// Set value immediately
-					handler((TProperty) property.GetValue(source, null));
+					if (notifyNow)
+					{
+						handler((TProperty) property.GetValue(source, null));
+					}
 					return;
 				}
 			}

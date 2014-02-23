@@ -22,7 +22,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			get
 			{
-				switch (MainViewModel.Instance.ItemTimeMode)
+				switch (AppSettings.Instance.ItemTimeMode)
 				{
 					case ItemTimeType.Utc:
 						return Time.ToString("yyyy-MM-dd  HH:mm:ss.ffffff") + "  UTC";

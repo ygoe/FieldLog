@@ -63,7 +63,7 @@ namespace Unclassified.FieldLogViewer.Converters
 				}
 				else
 				{
-					switch (MainViewModel.Instance.ItemTimeMode)
+					switch (AppSettings.Instance.ItemTimeMode)
 					{
 						case ItemTimeType.Local:
 							itemTime = itemTime.ToLocalTime();
@@ -97,7 +97,7 @@ namespace Unclassified.FieldLogViewer.Converters
 				DateTime itemTime = (DateTime) values[0];
 				int utcOffset = (int) values[1];
 
-				switch (MainViewModel.Instance.ItemTimeMode)
+				switch (AppSettings.Instance.ItemTimeMode)
 				{
 					case ItemTimeType.Local:
 						itemTime = itemTime.ToLocalTime();

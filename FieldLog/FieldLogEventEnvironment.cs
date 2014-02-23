@@ -289,7 +289,11 @@ namespace Unclassified.FieldLog
 			env.AppVersion = FL.AppVersion;
 			env.IsProcess64Bit = IntPtr.Size == 8;   // .NET 4 only: Environment.Is64BitProcess
 			env.ClrVersion = Environment.Version.ToString();
+#if NET20
+			env.LocalTimeZoneOffset = TimeZone.CurrentTimeZone.GetUtcOffset(DateTime.UtcNow);
+#else
 			env.LocalTimeZoneOffset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
+#endif
 			env.ProcessMemory = OSInfo.GetProcessPrivateMemory();
 			env.PeakProcessMemory = OSInfo.GetProcessPeakMemory();
 			env.TotalMemory = OSInfo.GetTotalMemorySize();

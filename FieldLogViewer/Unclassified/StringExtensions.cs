@@ -17,6 +17,12 @@ namespace Unclassified
 		/// <returns></returns>
 		public static string ToFileName(this string str)
 		{
+			// TODO: Consider more restrictions
+			// See http://msdn.microsoft.com/en-us/library/aa365247%28v=vs.85%29.aspx
+			// * Maximum length (minus a bit for automatic numbering), maybe 100 chars?
+			// * Reserved names (NUL, CON, ., .., etc.)
+			// * No space at the beginning
+			// * No space or . at the end
 			return str
 				.Replace('"', '_')
 				.Replace('*', '_')
@@ -25,7 +31,8 @@ namespace Unclassified
 				.Replace('<', '_')
 				.Replace('>', '_')
 				.Replace('?', '_')
-				.Replace('\\', '_');
+				.Replace('\\', '_')
+				.Replace('|', '_');
 		}
 
 		/// <summary>

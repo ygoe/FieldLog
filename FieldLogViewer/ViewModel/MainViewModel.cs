@@ -163,6 +163,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		#region Public properties
 
+		public string LoadedBasePath { get { return loadedBasePath; } }
+
 		#endregion Public properties
 
 		#region Commands

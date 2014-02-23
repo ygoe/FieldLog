@@ -93,7 +93,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			get
 			{
-				return Message.StartsWith("FieldLog info: Now writing to ") ? Visibility.Visible : Visibility.Collapsed;
+				return GetLogFileBasePath() != null ? Visibility.Visible : Visibility.Collapsed;
 			}
 		}
 		
@@ -105,23 +105,34 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		private void InitializeCommands()
 		{
-			OpenLogFileCommand = new DelegateCommand(OnOpenLogFile);
+			OpenLogFileCommand = new DelegateCommand(OnOpenLogFile, CanOpenLogFile);
+		}
+
+		private bool CanOpenLogFile()
+		{
+			// TODO: More robust comparing with the GetFinalPathNameByHandle function
+			//       http://msdn.microsoft.com/en-us/library/aa364962%28VS.85%29.aspx
+			// See also http://stackoverflow.com/q/2281531/143684
+			return !string.Equals(
+				MainViewModel.Instance.LoadedBasePath,
+				GetLogFileBasePath(),
+				StringComparison.InvariantCultureIgnoreCase);
 		}
 
 		private void OnOpenLogFile()
 		{
-			string s = "FieldLog info: Now writing to ";
-			if (Message.StartsWith(s))
+			string path = GetLogFileBasePath();
+			if (path != null)
 			{
 				try
 				{
-					MainViewModel.Instance.OpenFiles(Message.Substring(s.Length).Trim());
+					MainViewModel.Instance.OpenFiles(path);
 				}
 				catch (Exception ex)
 				{
 					FL.Error(ex, "Loading log files from DebugOutputString notification");
 					MessageBox.Show(
-						"Error loading the specified log files. " + ex.Message,
+						"Error loading the specified log files. " + ex.Message + "\nSee the log file for details.",
 						"FieldLogViewer",
 						MessageBoxButton.OK,
 						MessageBoxImage.Error);
@@ -130,5 +141,19 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		}
 
 		#endregion Commands
+
+		#region Helper methods
+
+		private string GetLogFileBasePath()
+		{
+			string s = "FieldLog info: Now writing to ";
+			if (Message.StartsWith(s))
+			{
+				return Message.Substring(s.Length).Trim();
+			}
+			return null;
+		}
+
+		#endregion Helper methods
 	}
 }

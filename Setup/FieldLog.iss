@@ -17,7 +17,7 @@
 #include "scripts\products\dotnetfx40full.iss"
 
 [Setup]
-AppCopyright=© Yves Goergen
+AppCopyright=© Yves Goergen, GNU GPL v3
 AppPublisher=Yves Goergen
 AppPublisherURL=http://dev.unclassified.de/source/fieldlog
 AppName=FieldLog
@@ -105,14 +105,14 @@ de.OpenSingleFileCommand=Einzelne Datei öffnen
 Source: "..\FieldLogViewer\bin\Release\FieldLogViewer.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\FieldLogViewer\bin\Release\InTheHand.Net.Personal.dll"; DestDir: "{app}"; Flags: ignoreversion
 ;Source: "..\FieldLog Documentation.pdf"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\FieldLogViewer\bin\Release\FieldLog.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\FieldLogViewer\bin\Release\Unclassified.FieldLog.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\FieldLogViewer\bin\Release\Sounds\*.mp3"; DestDir: "{app}\Sounds"; Flags: ignoreversion
 
 ; FieldLog assembly
-Source: "..\FieldLog\bin\Release\FieldLog.dll"; DestDir: "{app}\FieldLog assembly (.NET 4.0)"; Flags: ignoreversion
-Source: "..\FieldLog\bin\Release\FieldLog.xml"; DestDir: "{app}\FieldLog assembly (.NET 4.0)"; Flags: ignoreversion
-Source: "..\FieldLog\bin\ReleaseNET20\FieldLog.dll"; DestDir: "{app}\FieldLog assembly (.NET 2.0)"; Flags: ignoreversion
-Source: "..\FieldLog\bin\ReleaseNET20\FieldLog.xml"; DestDir: "{app}\FieldLog assembly (.NET 2.0)"; Flags: ignoreversion
+Source: "..\FieldLog\bin\Release\Unclassified.FieldLog.dll"; DestDir: "{app}\FieldLog assembly (.NET 4.0)"; Flags: ignoreversion
+Source: "..\FieldLog\bin\Release\Unclassified.FieldLog.xml"; DestDir: "{app}\FieldLog assembly (.NET 4.0)"; Flags: ignoreversion
+Source: "..\FieldLog\bin\ReleaseNET20\Unclassified.FieldLog.dll"; DestDir: "{app}\FieldLog assembly (.NET 2.0)"; Flags: ignoreversion
+Source: "..\FieldLog\bin\ReleaseNET20\Unclassified.FieldLog.xml"; DestDir: "{app}\FieldLog assembly (.NET 2.0)"; Flags: ignoreversion
 
 ; FieldLog source code
 Source: "..\FieldLog\CheckTimeThread.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion

@@ -303,13 +303,13 @@ namespace LogBenchmark
 
 				if (flScopeReflection)
 				{
-					using (FL.NewScope())
+					using (FL.Scope())
 					{
 					}
 				}
 				else
 				{
-					using (FL.NewScope("Scope name"))
+					using (FL.Scope("Scope name"))
 					{
 					}
 				}

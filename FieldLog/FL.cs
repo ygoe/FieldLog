@@ -1341,7 +1341,7 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		/// <param name="name">The scope name.</param>
 		/// <returns></returns>
-		public static FieldLogScope NewScope(string name)
+		public static FieldLogScope Scope(string name)
 		{
 			return new FieldLogScope(name);
 		}
@@ -1351,7 +1351,7 @@ namespace Unclassified.FieldLog
 		/// scopes with the <c>using</c> statement. The calling method name is used as scope name.
 		/// </summary>
 		/// <returns></returns>
-		public static FieldLogScope NewScope()
+		public static FieldLogScope Scope()
 		{
 			StackFrame sf = new StackFrame(1, false);
 			string name = sf.GetMethod().Name;
@@ -1364,7 +1364,7 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		/// <param name="name">The thread scope name.</param>
 		/// <returns></returns>
-		public static FieldLogThreadScope NewThreadScope(string name)
+		public static FieldLogThreadScope ThreadScope(string name)
 		{
 			return new FieldLogThreadScope(name);
 		}

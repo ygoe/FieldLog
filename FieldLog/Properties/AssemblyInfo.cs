@@ -1,13 +1,12 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Windows;
 
 [assembly: AssemblyProduct("FieldLog")]
 [assembly: AssemblyTitle("FieldLog")]
 [assembly: AssemblyDescription("FieldLog library")]
 
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyCopyright("© Yves Goergen")]
+[assembly: AssemblyCopyright("© Yves Goergen, GNU GPL v3")]
+[assembly: AssemblyCompany("unclassified software development")]
 
 // Assembly version, also used for Win32 file version resource.
 // Must be a plain numeric version definition:

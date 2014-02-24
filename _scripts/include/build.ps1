@@ -39,8 +39,8 @@ if (IsSelected("build-debug"))
 
 	if (IsSelected("sign-lib"))
 	{
-		Sign-File "FieldLog\bin\Debug\FieldLog.dll" "signkey.pfx" "@signkey.password" 1
-		Sign-File "FieldLog\bin\DebugNET20\FieldLog.dll" "signkey.pfx" "@signkey.password" 1
+		Sign-File "FieldLog\bin\Debug\Unclassified.FieldLog.dll" "signkey.pfx" "@signkey.password" 1
+		Sign-File "FieldLog\bin\DebugNET20\Unclassified.FieldLog.dll" "signkey.pfx" "@signkey.password" 1
 	}
 	if (IsSelected("sign-app"))
 	{
@@ -50,14 +50,14 @@ if (IsSelected("build-debug"))
 
 # ---------- Release builds ----------
 
-if (IsSelected("build-release"))
+if ((IsSelected("build-release")) -or (IsSelected("commit")))
 {
 	Build-Solution "FieldLog.sln" "Release" "Any CPU" 6
 
 	if (IsSelected("sign-lib"))
 	{
-		Sign-File "FieldLog\bin\Release\FieldLog.dll" "signkey.pfx" "@signkey.password" 1
-		Sign-File "FieldLog\bin\ReleaseNET20\FieldLog.dll" "signkey.pfx" "@signkey.password" 1
+		Sign-File "FieldLog\bin\Release\Unclassified.FieldLog.dll" "signkey.pfx" "@signkey.password" 1
+		Sign-File "FieldLog\bin\ReleaseNET20\Unclassified.FieldLog.dll" "signkey.pfx" "@signkey.password" 1
 	}
 	if (IsSelected("sign-app"))
 	{
@@ -67,7 +67,7 @@ if (IsSelected("build-release"))
 
 # ---------- Release setups ----------
 
-if (IsSelected("setup-release"))
+if ((IsSelected("setup-release")) -or (IsSelected("commit")))
 {
 	Create-Setup "Setup\FieldLog.iss" Release 1
 
@@ -82,6 +82,13 @@ if (IsSelected("setup-release"))
 if (IsSelected("install"))
 {
 	Exec-File "Setup\FieldLogSetup-$revId.exe" "/silent" 1
+}
+
+# ---------- Commit to repository ----------
+
+if (IsSelected("commit"))
+{
+	Git-Commit 1
 }
 
 # ---------------------------------------------------------------------------------

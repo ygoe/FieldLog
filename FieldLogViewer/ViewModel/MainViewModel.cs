@@ -1150,7 +1150,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 							
 							// Setup everything as if we were still reading an initial set of log
 							// files and the the read Task thread use its local buffer again.
-							using (FL.NewScope("Copying logItems to localLogItems"))
+							using (FL.Scope("Copying logItems to localLogItems"))
 							{
 								localLogItems = new List<LogItemViewModelBase>(logItems);
 							}
@@ -1492,7 +1492,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				}
 
 				// Publish loaded items to the UI
-				using (FL.NewScope("Copying localLogItems to logItems"))
+				using (FL.Scope("Copying localLogItems to logItems"))
 				{
 					this.logItems = new ObservableCollection<LogItemViewModelBase>(localLogItems);
 				}

@@ -133,7 +133,7 @@ namespace ConsoleDemo
 
 		private static void DoSomeMaths()
 		{
-			using (FL.NewScope())
+			using (FL.Scope())
 			using (FL.Timer("DoSomeMaths"))
 			{
 				for (int i = 1; i <= 10; i++)
@@ -146,7 +146,7 @@ namespace ConsoleDemo
 
 		private static void ThrowException1()
 		{
-			using (FL.NewScope())
+			using (FL.Scope())
 			{
 				ThrowException1a();
 			}
@@ -154,7 +154,7 @@ namespace ConsoleDemo
 
 		private static void ThrowException1a()
 		{
-			using (FL.NewScope())
+			using (FL.Scope())
 			{
 				ThrowException1b();
 			}
@@ -162,7 +162,7 @@ namespace ConsoleDemo
 
 		private static void ThrowException1b()
 		{
-			using (FL.NewScope())
+			using (FL.Scope())
 			{
 				throw new InvalidOperationException(
 					"You can't do that!",

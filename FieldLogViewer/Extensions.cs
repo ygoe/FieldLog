@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Windows.Media;
 using Unclassified.FieldLogViewer.ViewModel;
+using Unclassified.Util;
 
 namespace Unclassified.FieldLogViewer
 {

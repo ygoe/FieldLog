@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Unclassified
+namespace Unclassified.Util
 {
 	/// <summary>
 	/// Implements a timer that invokes a method after a user-defined timeout.

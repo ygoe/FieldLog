@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace Unclassified
+namespace Unclassified.Util
 {
 	/// <summary>
 	/// Provides extension methods for sequences, lists and collections.
@@ -188,6 +188,26 @@ namespace Unclassified
 		}
 
 		#endregion SingleOrDefault replacement
+
+		#region Append
+
+		/// <summary>
+		/// Appends a single element at the end of the sequence.
+		/// </summary>
+		/// <typeparam name="T">The type of the elements of <paramref name="source"/>.</typeparam>
+		/// <param name="source">The source sequence.</param>
+		/// <param name="element">The element to append at the end of the sequence.</param>
+		/// <returns>A sequence of <paramref name="source"/> appended by <paramref name="element"/>.</returns>
+		public static IEnumerable<T> Append<T>(this IEnumerable<T> source, T element)
+		{
+			foreach (T se in source)
+			{
+				yield return se;
+			}
+			yield return element;
+		}
+
+		#endregion Append
 
 		#region Sorted collections
 

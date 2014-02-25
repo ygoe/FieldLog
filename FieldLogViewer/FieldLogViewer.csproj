@@ -111,13 +111,14 @@
     <Compile Include="Converters\RelativeTimeConverter.cs" />
     <Compile Include="Converters\SameThreadBrushConverter.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="Unclassified\DebugMonitor.cs" />
-    <Compile Include="Unclassified\DelayedCall.cs" />
-    <Compile Include="Unclassified\ListExtensions.cs" />
-    <Compile Include="Unclassified\PropertyExtensions.cs" />
-    <Compile Include="Unclassified\Settings.cs" />
-    <Compile Include="Unclassified\StringExtensions.cs" />
-    <Compile Include="Unclassified\TaskHelper.cs" />
+    <Compile Include="Unclassified\Util\GlobalMutex.cs" />
+    <Compile Include="Unclassified\Util\DebugMonitor.cs" />
+    <Compile Include="Unclassified\Util\DelayedCall.cs" />
+    <Compile Include="Unclassified\Util\ListExtensions.cs" />
+    <Compile Include="Unclassified\Util\PropertyExtensions.cs" />
+    <Compile Include="Unclassified\Util\Settings.cs" />
+    <Compile Include="Unclassified\Util\StringExtensions.cs" />
+    <Compile Include="Unclassified\Util\TaskHelper.cs" />
     <Compile Include="Unclassified\UI\AnimationHelper.cs" />
     <Compile Include="Unclassified\UI\BoolToVisibilityConverter.cs" />
     <Compile Include="Unclassified\UI\DelegateCommand.cs" />
@@ -342,6 +343,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>if not defined FASTBUILD "$(SolutionDir)\_tools\GitRevisionTool.exe" -ai "$(ProjectDir)"</PreBuildEvent>

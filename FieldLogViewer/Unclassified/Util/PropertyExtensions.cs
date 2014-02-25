@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Unclassified
+namespace Unclassified.Util
 {
 	/// <summary>
 	/// Provides extension methods for class property handling.

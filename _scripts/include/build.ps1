@@ -81,7 +81,7 @@ if ((IsSelected("setup-release")) -or (IsSelected("commit")))
 
 if (IsSelected("install"))
 {
-	Exec-File "Setup\FieldLogSetup-$revId.exe" "/silent" 1
+	Exec-File "Setup\FieldLogSetup-$revId.exe" "/verysilent" 3
 }
 
 # ---------- Commit to repository ----------

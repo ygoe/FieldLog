@@ -22,7 +22,7 @@ AppPublisher=Yves Goergen
 AppPublisherURL=http://dev.unclassified.de/source/fieldlog
 AppName=FieldLog
 AppVersion={#ShortRevId}
-AppMutex=Unclassified.FieldLogViewer
+AppMutex=Global\Unclassified.FieldLogViewer
 AppId={{52CCCE83-0A6F-447D-AAE0-506431641858}
 MinVersion=0,5.01sp3
 
@@ -35,6 +35,7 @@ DefaultGroupName=FieldLog
 DisableDirPage=auto
 DisableProgramGroupPage=auto
 
+; Large image max. 164x314 pixels, small image max. 55x58 pixels
 WizardImageFile=FieldLog_144.bmp
 WizardImageBackColor=$ffffff
 WizardImageStretch=no
@@ -92,6 +93,7 @@ OpenSingleFileCommand=Open single file
 de.Upgrade=&Aktualisieren
 de.UpdatedHeadingLabel=%n%n%n%n%nFieldLog wurde aktualisiert.
 de.Task_VSTool=In Visual Studio (2010/2012/2013) als Externes Tool eintragen
+Task_DeleteConfig=Vorhandene Konfiguration löschen
 de.NgenMessage=Anwendungs-Performance optimieren (kann einen Moment dauern)
 de.DowngradeUninstall=Sie versuchen, eine ältere Version zu installieren, als bereits im System installiert ist. Die neuere Version muss zuerst deinstalliert werden. Möchten Sie das jetzt tun?%n%nBitte beachten Sie, dass bei der Deinstallation auch die Einstellungen gelöscht werden. Wenn Sie diese behalten möchten, müssen Sie sie sichern. Die Datei befindet sich im Verzeichnis %AppData%\Unclassified\FieldLog.
 de.OpenSingleFileCommand=Einzelne Datei öffnen
@@ -99,6 +101,8 @@ de.OpenSingleFileCommand=Einzelne Datei öffnen
 [Tasks]
 ;Name: VSTool; Description: "{cm:Task_VSTool}"
 ; TODO: Also enable UnregisterVSTool script call below
+Name: DeleteConfig; Description: "{cm:Task_DeleteConfig}"; Flags: unchecked
+#define Task_DeleteConfig_Index 0
 
 [Files]
 ; FieldLogViewer application files
@@ -131,6 +135,9 @@ Source: "..\FieldLog\OSInfo.cs"; DestDir: "{app}\FieldLog source code"; Flags: i
 [Dirs]
 Name: "{app}\log"; Permissions: users-modify
 
+[InstallDelete]
+Type: files; Name: "{userappdata}\Unclassified\FieldLog\FieldLogViewer.conf"; Tasks: DeleteConfig
+
 [Registry]
 ; Register .fl file name extension
 Root: HKCR; Subkey: ".fl"; ValueType: string; ValueName: ""; ValueData: "FieldLogFile"; Flags: uninsdeletevalue 
@@ -155,16 +162,18 @@ Name: "{group}\FieldLog assembly (.NET 2.0)"; Filename: "{app}\FieldLog assembly
 Name: "{group}\FieldLog source code"; Filename: "{app}\FieldLog source code\"
 
 [Run]
-;Filename: {app}\FieldLogViewer.exe; WorkingDir: {app}; Flags: nowait postinstall
 Filename: {win}\Microsoft.NET\Framework\v4.0.30319\ngen.exe; Parameters: "install ""{app}\FieldLogViewer.exe"""; StatusMsg: "{cm:NgenMessage}"; Flags: runhidden
+Filename: {app}\FieldLogViewer.exe; WorkingDir: {app}; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
 Filename: {win}\Microsoft.NET\Framework\v4.0.30319\ngen.exe; Parameters: uninstall {app}\FieldLogViewer.exe; Flags: runhidden
 
 [UninstallDelete]
-Type: files; Name: "{userappdata}\Unclassified\FieldLog\FieldLogViewer.conf"
+; Delete user configuration files
 Type: dirifempty; Name: "{userappdata}\Unclassified\FieldLog"
 Type: dirifempty; Name: "{userappdata}\Unclassified"
+
+; Delete log files
 Type: files; Name: "{app}\log\FieldLogViewer-*.fl"
 
 [Code]
@@ -224,6 +233,10 @@ begin
 			begin
 				Result := false;
 			end;
+
+			// Pre-select task to delete existing configuration
+			// (Use the zero-based index of all rows in the tasks list GUI)
+			WizardForm.TasksList.Checked[{#Task_DeleteConfig_Index}] := true;
 		end;
 	end;
 	
@@ -366,3 +379,4 @@ begin
 		end;
 	end;
 end;
+

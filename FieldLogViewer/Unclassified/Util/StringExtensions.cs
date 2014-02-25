@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Unclassified
+namespace Unclassified.Util
 {
 	/// <summary>
 	/// Provides extension methods for strings.

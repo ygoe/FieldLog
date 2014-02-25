@@ -6,8 +6,9 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
+using Unclassified.FieldLog;
 
-namespace Unclassified
+namespace Unclassified.Util
 {
 	/// <summary>
 	/// Represents the method that handles a changed setting value.
@@ -1148,14 +1149,17 @@ namespace Unclassified
 		/// <param name="ex"></param>
 		private void HandleBrokenFile(Exception ex)
 		{
+			FL.Warning(ex, "Loading settings file");
 			store.Clear();
 			try
 			{
 				File.Delete(this.fileName + ".broken");
 				File.Move(this.fileName, this.fileName + ".broken");
+				FL.Trace("Broken settings file renamed", "New file name: " + this.fileName + ".broken");
 			}
-			catch
+			catch (Exception ex2)
 			{
+				FL.Warning(ex2, "Renaming broken settings file");
 				// Best-effort. If it fails, do nothing.
 			}
 

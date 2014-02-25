@@ -15,6 +15,7 @@ using TaskDialogInterop;
 using Unclassified.FieldLog;
 using Unclassified.FieldLogViewer.View;
 using Unclassified.UI;
+using Unclassified.Util;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {

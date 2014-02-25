@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Threading;
 using Unclassified.UI;
+using Unclassified.Util;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {

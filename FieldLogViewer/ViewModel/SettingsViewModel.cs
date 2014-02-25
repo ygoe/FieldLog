@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using Unclassified.UI;
+using Unclassified.Util;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {

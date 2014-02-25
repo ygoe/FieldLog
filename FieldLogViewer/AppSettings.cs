@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
-using Unclassified;
+using Unclassified.Util;
 
 namespace Unclassified.FieldLogViewer
 {

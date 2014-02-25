@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Diagnostics;
 
-namespace Unclassified
+namespace Unclassified.Util
 {
 	/// <summary>
 	/// Handles a received message from the DebugMonitor class.

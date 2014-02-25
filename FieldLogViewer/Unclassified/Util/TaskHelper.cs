@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
-namespace Unclassified
+namespace Unclassified.Util
 {
 	/// <summary>
 	/// Provides static helper methods for easier execution of asynchronous operations.

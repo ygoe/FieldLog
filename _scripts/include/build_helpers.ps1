@@ -46,6 +46,40 @@ function Clear-KeyBuffer()
 	}
 }
 
+function IsInputKey($key)
+{
+	$ignore =
+		16,    # Shift (left or right)
+		17,    # Ctrl (left or right)
+		18,    # Alt (left or right)
+		20,    # Caps lock
+		91,    # Windows key (left)
+		92,    # Windows key (right)
+		93,    # Menu key
+		144,   # Num lock
+		145,   # Scroll lock
+		166,   # Back
+		167,   # Forward
+		168,   # Refresh
+		169,   # Stop
+		170,   # Search
+		171,   # Favorites
+		172,   # Start/Home
+		173,   # Mute
+		174,   # Volume Down
+		175,   # Volume Up
+		176,   # Next Track
+		177,   # Previous Track
+		178,   # Stop Media
+		179,   # Play
+		180,   # Mail
+		181,   # Select Media
+		182,   # Application 1
+		183    # Application 2
+	
+	return !($key.VirtualKeyCode -eq $null -or $ignore -Contains $key.VirtualKeyCode)
+}
+
 function Wait-Key($msg = $true, $timeout = -1, $showDots = $false)
 {
 	if ($global:batchMode)
@@ -72,7 +106,9 @@ function Wait-Key($msg = $true, $timeout = -1, $showDots = $false)
 		{
 			Clear-KeyBuffer
 			#[void][System.Console]::ReadKey($true)
-			[void]$Host.UI.RawUI.ReadKey("IncludeKeyUp,IncludeKeyDown,NoEcho")
+			while (!(IsInputKey($Host.UI.RawUI.ReadKey("IncludeKeyDown,NoEcho"))))
+			{
+			}
 		}
 		else
 		{
@@ -89,7 +125,7 @@ function Wait-Key($msg = $true, $timeout = -1, $showDots = $false)
 			$step = 100
 			$nextSecond = 1000
 			Clear-KeyBuffer
-			while (!$Host.UI.RawUI.KeyAvailable -and ($counter -lt $timeout))
+			while (!($Host.UI.RawUI.KeyAvailable -and (IsInputKey($Host.UI.RawUI.ReadKey("IncludeKeyDown,NoEcho")))) -and ($counter -lt $timeout))
 			{
 				Start-Sleep -m $step
 				$counter += $step
@@ -237,10 +273,17 @@ function Git-Commit($time)
 	$global:actions += $action
 }
 
+function Svn-Commit($time)
+{
+	$action = @{ action = "svncommit"; time = $time }
+	$global:actions += $action
+}
+
 function Do-Build-Solution($solution, $configuration, $buildPlatform, $progressAfter)
 {
 	Write-Host ""
-	Write-Host -ForegroundColor DarkCyan "Building $solution for $configuration|$buildPlatform..."
+	Write-Host -ForegroundColor DarkCyan "Building $solution for $configuration|$buildPlatform..." -NoNewLine
+	Write-Host -ForegroundColor DarkGray " (Do not press Ctrl+C now)"
 
 	# Find the MSBuild binary
 	if ((Get-Platform) -eq "x64")
@@ -568,6 +611,37 @@ function Do-Git-Commit($progressAfter)
 	& ($toolsPath + "FlashConsoleWindow") -progress $progressAfter
 }
 
+function Do-Svn-Commit($progressAfter)
+{
+	Write-Host ""
+	Write-Host -ForegroundColor DarkCyan "Subversion commit and update..."
+
+	# Find the TortoiseProc binary
+	$tsvnBin = Check-RegFilename "hklm:\SOFTWARE\TortoiseSVN" "ProcPath"
+	if ($tsvnBin -eq $null)
+	{
+		WaitError "TortoiseProc binary not found"
+		exit 1
+	}
+	
+	# Wait until the started process has finished
+	& $tsvnBin /command:commit /path:"$sourcePath" | Out-Host
+	if (-not $?)
+	{
+		WaitError "Subversion commit failed"
+		exit 1
+	}
+
+	& $tsvnBin /command:update /path:"$sourcePath" | Out-Host
+	if (-not $?)
+	{
+		WaitError "Subversion update failed"
+		exit 1
+	}
+
+	& ($toolsPath + "FlashConsoleWindow") -progress $progressAfter
+}
+
 function Begin-BuildScript($projectTitle, $configParts, $batchMode = $false)
 {
 	$global:configParts = $configParts
@@ -631,6 +705,10 @@ function End-BuildScript()
 			"gitcommit"
 			{
 				Do-Git-Commit $progressAfter
+			}
+			"svncommit"
+			{
+				Do-Svn-Commit $progressAfter
 			}
 		}
 		$timeSum += $action.time

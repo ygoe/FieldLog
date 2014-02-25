@@ -7,10 +7,10 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
-using Unclassified;
 using Unclassified.FieldLog;
 using Unclassified.FieldLogViewer.View;
 using Unclassified.FieldLogViewer.ViewModel;
+using Unclassified.Util;
 
 namespace Unclassified.FieldLogViewer
 {
@@ -33,12 +33,6 @@ namespace Unclassified.FieldLogViewer
 
 		#endregion Application entry point
 
-		#region Setup detection mutex
-
-		private Mutex appMutex = new Mutex(false, "Unclassified.FieldLogViewer");
-
-		#endregion Setup detection mutex
-
 		#region Constructors
 
 		/// <summary>
@@ -46,6 +40,9 @@ namespace Unclassified.FieldLogViewer
 		/// </summary>
 		public App()
 		{
+			// Keep the setup away
+			GlobalMutex.Create("Unclassified.FieldLogViewer");
+			
 			// Make sure the settings are properly saved in the end
 			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 		}

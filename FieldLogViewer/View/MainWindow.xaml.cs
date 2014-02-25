@@ -14,10 +14,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Unclassified;
 using Unclassified.FieldLog;
 using Unclassified.FieldLogViewer.ViewModel;
 using Unclassified.UI;
+using Unclassified.Util;
 
 namespace Unclassified.FieldLogViewer.View
 {

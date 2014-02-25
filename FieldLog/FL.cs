@@ -64,6 +64,21 @@ namespace Unclassified.FieldLog
 		[DllImport("kernel32.dll", SetLastError = true)]
 		private static extern IntPtr GetStdHandle(StdHandle nStdHandle);
 
+		/// <summary>
+		/// Retrieves the window handle used by the console associated with the calling process.
+		/// </summary>
+		/// <returns></returns>
+		[DllImport("kernel32.dll", SetLastError = true)]
+		private static extern IntPtr GetConsoleWindow();
+
+		/// <summary>
+		/// Determines the visibility state of the specified window.
+		/// </summary>
+		/// <param name="hWnd">A handle to the window to be tested.</param>
+		/// <returns></returns>
+		[DllImport("user32.dll")]
+		static extern bool IsWindowVisible(IntPtr hWnd);
+
 		#endregion Native interop
 
 		#region Constants
@@ -77,6 +92,13 @@ namespace Unclassified.FieldLog
 		/// Defines the maximum buffer size to keep.
 		/// </summary>
 		private const int maxBufferSize = 65535;
+
+		/// <summary>
+		/// Defines the seconds to wait for user feedback in the application error message. If the
+		/// user does not respond within this time, a warning is logged and the application is
+		/// terminated.
+		/// </summary>
+		private const int AppErrorTerminateTimeout = 180;
 
 		/// <summary>
 		/// Defines the log configuration file name extension.
@@ -285,7 +307,10 @@ namespace Unclassified.FieldLog
 
 			SessionId = Guid.NewGuid();
 
+			IntPtr consoleWnd = GetConsoleWindow();
 			IsInteractiveConsoleApp = Environment.UserInteractive &&
+				consoleWnd != IntPtr.Zero &&
+				IsWindowVisible(consoleWnd) &&
 				GetFileType(GetStdHandle(StdHandle.Input)) == FileType.FileTypeChar &&
 				GetFileType(GetStdHandle(StdHandle.Output)) == FileType.FileTypeChar &&
 				GetFileType(GetStdHandle(StdHandle.Error)) == FileType.FileTypeChar;
@@ -568,6 +593,18 @@ namespace Unclassified.FieldLog
 				return;
 			}
 
+			// Safety timer to terminate the process if user feedback is unexpected
+			System.Threading.Timer timer = new System.Threading.Timer(
+				delegate(object state)
+				{
+					FL.Warning("Process waiting for user feedback terminated by safety timer.");
+					Shutdown();
+					Environment.Exit(1);
+				},
+				null,
+				AppErrorTerminateTimeout * 1000,
+				Timeout.Infinite);
+			
 			string msg;
 			if (allowContinue)
 			{

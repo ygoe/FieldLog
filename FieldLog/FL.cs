@@ -328,6 +328,7 @@ namespace Unclassified.FieldLog
 			AppErrorDialogLogPath = "The log file containing detailed error information is saved to {0}.";
 			AppErrorDialogNoLog = "The log file could not be written.";
 			AppErrorDialogConsoleAction = "Press the Enter key to continue, or Escape to quit the application.";
+			AppErrorDialogTimerNote = "The application will be terminated after {0} seconds without user response.";
 
 			//AppErrorDialogContinuable = "Es ist ein Fehler aufgetreten, die Anwendung kann möglicherweise nicht korrekt fortgesetzt werden. " +
 			//    "Drücken Sie auf „OK“, um das Programm fortzusetzen, oder „Abbrechen“, um das Programm zu beenden. " +
@@ -497,6 +498,8 @@ namespace Unclassified.FieldLog
 		public static string AppErrorDialogNoLog { get; set; }
 		/// <summary>Gets or sets the application error user dialog text to ask for an action (quit or continue).</summary>
 		public static string AppErrorDialogConsoleAction { get; set; }
+		/// <summary>Gets or sets the application error user dialog text informing about the safety timer.</summary>
+		public static string AppErrorDialogTimerNote { get; set; }
 
 		#endregion Static properties
 
@@ -670,7 +673,8 @@ namespace Unclassified.FieldLog
 				if (allowContinue)
 				{
 					Console.ForegroundColor = ConsoleColor.White;
-					Console.Error.Write(AppErrorDialogConsoleAction);
+					Console.Error.WriteLine(AppErrorDialogConsoleAction);
+					Console.Error.Write(string.Format(AppErrorDialogTimerNote, AppErrorTerminateTimeout));
 				}
 
 				Console.ForegroundColor = foreColor;
@@ -681,7 +685,13 @@ namespace Unclassified.FieldLog
 					while (true)
 					{
 						ConsoleKeyInfo key = Console.ReadKey(true);
-						if (key.Key == ConsoleKey.Enter) break;
+						if (key.Key == ConsoleKey.Enter)
+						{
+							// Cancel the timer so that the process will not be terminated
+							timer.Change(Timeout.Infinite, Timeout.Infinite);
+							timer.Dispose();
+							break;
+						}
 						if (key.Key == ConsoleKey.Escape)
 						{
 							Console.Error.WriteLine();
@@ -706,11 +716,19 @@ namespace Unclassified.FieldLog
 					title = appName + " – " + title;
 				}
 
+				msg += "\n\n" + string.Format(AppErrorDialogTimerNote, AppErrorTerminateTimeout);
+
 				if (System.Windows.Forms.MessageBox.Show(
 					msg,
 					title,
 					System.Windows.Forms.MessageBoxButtons.OKCancel,
-					System.Windows.Forms.MessageBoxIcon.Error) == System.Windows.Forms.DialogResult.Cancel)
+					System.Windows.Forms.MessageBoxIcon.Error) == System.Windows.Forms.DialogResult.OK)
+				{
+					// Cancel the timer so that the process will not be terminated
+					timer.Change(Timeout.Infinite, Timeout.Infinite);
+					timer.Dispose();
+				}
+				else
 				{
 					Shutdown();
 					Environment.Exit(1);

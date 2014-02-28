@@ -238,10 +238,10 @@ namespace Unclassified.FieldLog
 		#region Static Current method
 
 		/// <summary>
-		/// Gets a new instance of the FieldLogEventEnvironment class that contains information
+		/// Returns a new instance of the FieldLogEventEnvironment class that contains information
 		/// about the current environment and state of the system.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>The FieldLogEventEnvironment instance.</returns>
 		public static FieldLogEventEnvironment Current()
 		{
 			FieldLogEventEnvironment env = new FieldLogEventEnvironment();

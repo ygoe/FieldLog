@@ -26,10 +26,15 @@ namespace Unclassified.Util
 
 			// Create a new mutex and keep a reference to it so it won't be GC'ed
 			instance = new GlobalMutex(name);
-			// Release the mutex when the application exits
+			// Close the mutex when the application exits
 			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 		}
 
+		/// <summary>
+		/// Process exit handler. Closes the mutex.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
 		{
 			instance.Dispose();
@@ -48,6 +53,7 @@ namespace Unclassified.Util
 		#region Private data
 
 		private Mutex mutex;
+		private Thread ownerThread;
 		private bool hasHandle;
 		private bool isDisposed;
 
@@ -80,33 +86,74 @@ namespace Unclassified.Util
 		#region Synchronisation methods
 
 		/// <summary>
-		/// Waits to acquire a lock on the mutex.
+		/// Waits infinitely for the mutex.
 		/// </summary>
-		/// <param name="timeout">The timeout to wait for the lock.</param>
-		/// <returns>true if the mutex was acquired and the lock is now held; otherwise, false.</returns>
+		public void Wait()
+		{
+			TryWait(Timeout.Infinite);
+		}
+
+		/// <summary>
+		/// Waits for the mutex.
+		/// </summary>
+		/// <param name="timeout">The timeout to wait for the mutex.</param>
+		/// <returns>true if the mutex is owned; otherwise, false.</returns>
 		public bool TryWait(TimeSpan timeout)
+		{
+			return TryWait((int) timeout.TotalMilliseconds);
+		}
+
+		/// <summary>
+		/// Waits for the mutex.
+		/// </summary>
+		/// <param name="millisecondsTimeout">The timeout to wait for the mutex.</param>
+		/// <returns>true if the mutex is owned; otherwise, false.</returns>
+		public bool TryWait(int millisecondsTimeout)
 		{
 			try
 			{
-				hasHandle = mutex.WaitOne(timeout);
+				hasHandle = mutex.WaitOne(millisecondsTimeout);
 			}
 			catch (AbandonedMutexException)
 			{
-				// Not sure what happened now... Let it fail, just not as hard.
-				hasHandle = false;
+				// Another thread or process has abandoned the mutex. Now we own it.
+				hasHandle = true;
+			}
+			if (hasHandle)
+			{
+				// Remember the owning thread
+				ownerThread = Thread.CurrentThread;
 			}
 			return hasHandle;
 		}
 
 		/// <summary>
-		/// Releases the previously acquired lock on the mutex.
+		/// Releases the mutex.
 		/// </summary>
-		public void Release()
+		/// <returns>true if the mutex was owned and released; otherwise, false.</returns>
+		public bool Release()
 		{
 			if (hasHandle)
 			{
 				mutex.ReleaseMutex();
+				ownerThread = null;
+				hasHandle = false;
+				return true;
 			}
+			return false;
+		}
+
+		/// <summary>
+		/// Checks whether the current thread owns the mutex.
+		/// </summary>
+		/// <returns>true if the current thread owns the mutex; otherwise, false.</returns>
+		/// <remarks>
+		/// The mutex may only be released by the thread that owns it. Otherwise, an exception will
+		/// be thrown.
+		/// </remarks>
+		public bool CheckThread()
+		{
+			return Thread.CurrentThread == ownerThread;
 		}
 
 		#endregion Synchronisation methods
@@ -114,19 +161,27 @@ namespace Unclassified.Util
 		#region Dispose and finalizer
 
 		/// <summary>
-		/// Releases the mutex and frees all resources.
+		/// Closes the mutex and frees all resources. This method also releases the mutex if it is
+		/// owned by the current thread. Calling this method on a different thread will abandon the
+		/// mutex.
 		/// </summary>
 		public void Dispose()
 		{
 			if (!isDisposed)
 			{
-				Release();
-				mutex.Dispose();
+				if (CheckThread())
+				{
+					Release();
+				}
+				mutex.Close();
 				isDisposed = true;
 				GC.SuppressFinalize(this);
 			}
 		}
 
+		/// <summary>
+		/// Finalizer.
+		/// </summary>
 		~GlobalMutex()
 		{
 			Dispose();

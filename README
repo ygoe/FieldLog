@@ -2,7 +2,7 @@ About FieldLog
 
 Website: http://dev.unclassified.de/source/fieldlog
 
-FieldLog is a fast and comprehensive logging tool for .NET applications. It allows applications to write events, data and errors to managed and efficient log files. The logging methods are optimised for high performance multi-threaded operation and a single log method call takes as little as half a microsecond on modern hardware. There's no comparison to OutputDebugString, Debug.WriteLine or appending to a file each time! This logging can be used in high-performance loops without noticeably slowing down the application.
+FieldLog is a fast and comprehensive logging tool for .NET applications. It allows applications to write events, data and errors to managed and efficient log files. The logging methods are optimised for high performance multi-threaded operation and a single log method call takes as little as half a microsecond on modern hardware. There's no comparison to OutputDebugString, Debug.WriteLine or appending to a file each time! This logging can be used in performance-critical loops without noticeably slowing down the application.
 
 ALWAYS-ON LOGGING
 
@@ -18,13 +18,13 @@ LOG VIEWER
 
 The log viewer application, FieldLogViewer, loads a set of log files and displays the log items in a list. The user can select any item to view all the details like thread ID, additional exception data, stack traces or system environment data at that time. Items are colour-coded by their priority and icons display the type of event.
 
-A powerful filter editor allows you to quickly find the interesting events. The viewer can even keep reading at the end of the log files and show new log items as they are written by the running application. This allows a developer to monitor the application in real-time. The selected filter remains in effect.
+A powerful filter editor allows you to quickly find the interesting events and concentrate on what matters. The viewer can even keep reading at the end of the log files and show new log items as they are written by the running application. This allows a developer to monitor the application in real-time. The selected filter remains in effect.
 
 You can also use FieldLogViewer as a DebugOutputString listener (like Sysinternals' DbgView) and read limited debug output from other processes as well.
 
 SUBMIT TOOL
 
-An easy to use log sumit tool (not yet implemented) will guide the user through the process of selecting the relevant log files, packaging them for transport and choosing a suitable transport method. Sending an e-mail, using an HTTP or FTP server, sending with Bluetooth, and copying the package to a local directory are the planned transport methods. This tool can be started in response to an unhandled or unrecoverable application error so that the user is prompted with the right information and can submit trace logs while they're fresh.
+An easy to use log sumit tool (not yet implemented) will guide the user through the process of selecting the relevant log files, packaging them for transport and choosing a suitable transport method. Sending an e-mail, using an HTTP or FTP server, sending with Bluetooth, and copying the package to a local directory are the planned transport methods. This tool can be started in response to an unhandled or unrecoverable application error (crash reporting) so that the user is prompted with the right information and can submit trace logs while they're fresh.
 
 REQUIREMENTS
 
@@ -46,7 +46,7 @@ It is also possible to open the solution file in the repository's root directory
 
 THE NAME
 
-The name "FieldLog" was originally supposed to refer to "out in the field logging" which is where your applications run. It does everything it can to maintain itself out there and to provide the developer with all relevant information about any problems that might occur. The developer does not need to go where the application runs if they have sufficient remote support.
+The name "FieldLog" was originally supposed to refer to "out in the field logging" which is where your applications run. It does everything it can to maintain itself out there and to provide the developer with all relevant information about any problems that might occur. The developer does not need to go where the application runs if users have sufficient internet connectivity or remote hands to submit logs and install updates.
 
 Another interpretation might refer to the structured log items that distinguishes FieldLog from plain text log files that actually only store a single line of raw text about each event. Being able to access and understand each bit of information allows for filtering the data masses to actually see the interesting parts.
 

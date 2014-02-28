@@ -752,7 +752,7 @@ namespace Unclassified.FieldLog
 		/// dialog.
 		/// </summary>
 		/// <param name="ex">The exception to format.</param>
-		/// <returns></returns>
+		/// <returns>The formatted text for <paramref name="ex"/>.</returns>
 		public static string ExceptionUserMessageRecursive(FieldLogException ex)
 		{
 			return ExceptionUserMessageRecursive(ex, 0);
@@ -1395,7 +1395,7 @@ namespace Unclassified.FieldLog
 		/// scopes with the <c>using</c> statement.
 		/// </summary>
 		/// <param name="name">The scope name.</param>
-		/// <returns></returns>
+		/// <returns>A new <see cref="FieldLogScope"/> instance.</returns>
 		public static FieldLogScope Scope(string name)
 		{
 			return new FieldLogScope(name);
@@ -1405,7 +1405,7 @@ namespace Unclassified.FieldLog
 		/// Returns a new FieldLogScope item that implements IDisposable and can be used to log
 		/// scopes with the <c>using</c> statement. The calling method name is used as scope name.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>A new <see cref="FieldLogScope"/> instance.</returns>
 		public static FieldLogScope Scope()
 		{
 			StackFrame sf = new StackFrame(1, false);
@@ -1418,7 +1418,7 @@ namespace Unclassified.FieldLog
 		/// log thread scopes with the <c>using</c> statement.
 		/// </summary>
 		/// <param name="name">The thread scope name.</param>
-		/// <returns></returns>
+		/// <returns>A new <see cref="FieldLogThreadScope"/> instance.</returns>
 		public static FieldLogThreadScope ThreadScope(string name)
 		{
 			return new FieldLogThreadScope(name);
@@ -1559,7 +1559,7 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		/// <param name="key">The custom timer key.</param>
 		/// <param name="writeImmediately">true to write the timer value immediately when stopping, false for the normal delay.</param>
-		/// <returns></returns>
+		/// <returns>A new <see cref="CustomTimerScope"/> instance.</returns>
 		public static CustomTimerScope Timer(string key, bool writeImmediately = false)
 		{
 			return new CustomTimerScope(key, writeImmediately);
@@ -1825,7 +1825,8 @@ namespace Unclassified.FieldLog
 		/// <remarks>
 		/// Calling this method just tells FieldLog that the default paths are okay and logs shall
 		/// be written there if not specified otherwise in the flconfig file. No attempt to find a
-		/// working path is made until this method or <see cref="AcceptLogFileBasePath"/> is called.
+		/// working path is made until this method or <see cref="SetCustomLogFileBasePath"/> is
+		/// called.
 		/// </remarks>
 		public static void AcceptLogFileBasePath()
 		{

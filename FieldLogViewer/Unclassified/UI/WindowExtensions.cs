@@ -1,16 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 
 namespace Unclassified.UI
 {
-	// Based on: http://stackoverflow.com/a/6024229/143684
+	/// <summary>
+	/// Provides extensions for WPF Windows.
+	/// </summary>
 	public static class WindowExtensions
 	{
+		// Based on: http://stackoverflow.com/a/6024229/143684
+
+		#region Native interop
+
 		[DllImport("user32.dll")]
 		private static extern uint GetWindowLong(IntPtr hwnd, int index);
 		[DllImport("user32.dll")]
@@ -20,10 +23,10 @@ namespace Unclassified.UI
 		[DllImport("user32.dll")]
 		private static extern IntPtr SendMessage(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam);
 		[DllImport("user32.dll")]
-		static extern bool FlashWindowEx(ref FLASHWINFO pwfi);
+		private static extern bool FlashWindowEx(ref FLASHWINFO pwfi);
 
 		[StructLayout(LayoutKind.Sequential)]
-		public struct FLASHWINFO
+		private struct FLASHWINFO
 		{
 			public UInt32 cbSize;
 			public IntPtr hwnd;
@@ -48,20 +51,30 @@ namespace Unclassified.UI
 		private const uint DS_MODALFRAME = 0x80;
 		private const uint WM_SETICON = 0x0080;
 
-		//Stop flashing. The system restores the window to its original state.
-		public const UInt32 FLASHW_STOP = 0;
-		//Flash the window caption.
-		public const UInt32 FLASHW_CAPTION = 1;
-		//Flash the taskbar button.
-		public const UInt32 FLASHW_TRAY = 2;
-		//Flash both the window caption and taskbar button.
-		//This is equivalent to setting the FLASHW_CAPTION | FLASHW_TRAY flags.
-		public const UInt32 FLASHW_ALL = 3;
-		//Flash continuously, until the FLASHW_STOP flag is set.
-		public const UInt32 FLASHW_TIMER = 4;
-		//Flash continuously until the window comes to the foreground.
-		public const UInt32 FLASHW_TIMERNOFG = 12;
+		// Stop flashing. The system restores the window to its original state.
+		private const UInt32 FLASHW_STOP = 0;
+		// Flash the window caption.
+		private const UInt32 FLASHW_CAPTION = 1;
+		// Flash the taskbar button.
+		private const UInt32 FLASHW_TRAY = 2;
+		// Flash both the window caption and taskbar button.
+		// This is equivalent to setting the FLASHW_CAPTION | FLASHW_TRAY flags.
+		private const UInt32 FLASHW_ALL = 3;
+		// Flash continuously, until the FLASHW_STOP flag is set.
+		private const UInt32 FLASHW_TIMER = 4;
+		// Flash continuously until the window comes to the foreground.
+		private const UInt32 FLASHW_TIMERNOFG = 12;
 
+		#endregion Native interop
+
+		/// <summary>
+		/// Hides the icon in the window title bar.
+		/// </summary>
+		/// <param name="w">The Window instance.</param>
+		/// <remarks>
+		/// This method must be called in the <see cref="Window.OnSourceInitialized"/> override or
+		/// at a later point to have the desired effect.
+		/// </remarks>
 		public static void HideIcon(this Window w)
 		{
 			IntPtr hwnd = new WindowInteropHelper(w).Handle;
@@ -71,6 +84,14 @@ namespace Unclassified.UI
 			SendMessage(hwnd, WM_SETICON, IntPtr.Zero, IntPtr.Zero);
 		}
 
+		/// <summary>
+		/// Hides the system menu in the window title bar.
+		/// </summary>
+		/// <param name="w">The Window instance.</param>
+		/// <remarks>
+		/// This method must be called in the <see cref="Window.OnSourceInitialized"/> override or
+		/// at a later point to have the desired effect.
+		/// </remarks>
 		public static void HideSysMenu(this Window w)
 		{
 			IntPtr hwnd = new WindowInteropHelper(w).Handle;
@@ -79,6 +100,14 @@ namespace Unclassified.UI
 			SetWindowPos(hwnd, IntPtr.Zero, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 		}
 
+		/// <summary>
+		/// Hides the minimize button in the window title bar.
+		/// </summary>
+		/// <param name="w">The Window instance.</param>
+		/// <remarks>
+		/// This method must be called in the <see cref="Window.OnSourceInitialized"/> override or
+		/// at a later point to have the desired effect.
+		/// </remarks>
 		public static void HideMinimizeBox(this Window w)
 		{
 			IntPtr hwnd = new WindowInteropHelper(w).Handle;
@@ -86,6 +115,14 @@ namespace Unclassified.UI
 				GetWindowLong(hwnd, GWL_STYLE) & ~(WS_MINIMIZEBOX));
 		}
 
+		/// <summary>
+		/// Hides the maximize button in the window title bar.
+		/// </summary>
+		/// <param name="w">The Window instance.</param>
+		/// <remarks>
+		/// This method must be called in the <see cref="Window.OnSourceInitialized"/> override or
+		/// at a later point to have the desired effect.
+		/// </remarks>
 		public static void HideMaximizeBox(this Window w)
 		{
 			IntPtr hwnd = new WindowInteropHelper(w).Handle;
@@ -93,6 +130,14 @@ namespace Unclassified.UI
 				GetWindowLong(hwnd, GWL_STYLE) & ~(WS_MAXIMIZEBOX));
 		}
 
+		/// <summary>
+		/// Hides the minimize and maximize buttons in the window title bar.
+		/// </summary>
+		/// <param name="w">The Window instance.</param>
+		/// <remarks>
+		/// This method must be called in the <see cref="Window.OnSourceInitialized"/> override or
+		/// at a later point to have the desired effect.
+		/// </remarks>
 		public static void HideMinimizeAndMaximizeBoxes(this Window w)
 		{
 			IntPtr hwnd = new WindowInteropHelper(w).Handle;
@@ -100,6 +145,11 @@ namespace Unclassified.UI
 				GetWindowLong(hwnd, GWL_STYLE) & ~(WS_MAXIMIZEBOX | WS_MINIMIZEBOX));
 		}
 
+		/// <summary>
+		/// Flashes the window in the task bar.
+		/// </summary>
+		/// <param name="w">The Window instance.</param>
+		/// <returns></returns>
 		public static bool Flash(this Window w)
 		{
 			IntPtr hWnd = new WindowInteropHelper(w).Handle;

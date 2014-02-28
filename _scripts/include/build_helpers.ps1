@@ -564,7 +564,7 @@ function Do-Sign-File($file, $keyFile, $password, $progressAfter)
 		$password = gc ("$sourcePath\" + $password.SubString(1))
 	}
 
-	& $signtoolBin sign /f "$sourcePath\$keyFile" /p "$password" /t http://timestamp.verisign.com/scripts/timstamp.dll "$sourcePath\$file"
+	& $signtoolBin sign /q /f "$sourcePath\$keyFile" /p "$password" /t http://timestamp.verisign.com/scripts/timstamp.dll "$sourcePath\$file"
 	if (-not $?)
 	{
 		WaitError "Digitally signing failed"
@@ -579,7 +579,7 @@ function Do-Exec-File($file, $params, $progressAfter)
 	Write-Host -ForegroundColor DarkCyan "Executing $file $params..."
 
 	# Wait until the started process has finished
-	& "$sourcePath\$file" $params | Out-Host
+	Invoke-Expression ($sourcePath + "\" + $file + " " + $params + " | Out-Host")
 	if (-not $?)
 	{
 		WaitError "Execution failed"
@@ -726,9 +726,12 @@ function End-BuildScript()
 
 	Write-Host ""
 	Write-Host -ForegroundColor DarkGreen "Build succeeded in $duration."
-	& ($toolsPath + "FlashConsoleWindow") -progress 100
-	Write-Host "Press any key to exit" -NoNewLine
-	Wait-Key $false 10000 $true
-	Write-Host ""
+	if (!$global:batchMode)
+	{
+		& ($toolsPath + "FlashConsoleWindow") -progress 100
+		Write-Host "Press any key to exit" -NoNewLine
+		Wait-Key $false 10000 $true
+		Write-Host ""
+	}
 	& ($toolsPath + "FlashConsoleWindow") -noprogress
 }

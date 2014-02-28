@@ -335,7 +335,7 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Reads the next complete log item from the file.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>The next log item in the file.</returns>
 		/// <remarks>
 		/// This method will block until a complete log item is available in the file.
 		/// </remarks>
@@ -412,7 +412,7 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Reads the next complete log item from the file.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>The Task that reads a log item.</returns>
 		public Task<FieldLogItem> ReadLogItemAsync()
 		{
 			return new Task<FieldLogItem>(ReadLogItem);

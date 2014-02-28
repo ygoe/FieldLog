@@ -177,80 +177,81 @@ Type: dirifempty; Name: "{userappdata}\Unclassified"
 Type: files; Name: "{app}\log\FieldLogViewer-*.fl"
 
 [Code]
+var
+  IsDowngradeSetup: Boolean;
+
 function IsUpgrade: Boolean;
 var
-	Value: string;
-	UninstallKey: string;
+  Value: string;
+  UninstallKey: string;
 begin
-	UninstallKey := 'Software\Microsoft\Windows\CurrentVersion\Uninstall\' +
-		ExpandConstant('{#SetupSetting("AppId")}') + '_is1';
-	Result := (RegQueryStringValue(HKLM, UninstallKey, 'UninstallString', Value) or
-		RegQueryStringValue(HKCU, UninstallKey, 'UninstallString', Value)) and (Value <> '');
+  UninstallKey := 'Software\Microsoft\Windows\CurrentVersion\Uninstall\' +
+    ExpandConstant('{#SetupSetting("AppId")}') + '_is1';
+  Result := (RegQueryStringValue(HKLM, UninstallKey, 'UninstallString', Value) or
+    RegQueryStringValue(HKCU, UninstallKey, 'UninstallString', Value)) and (Value <> '');
 end;
 
 function GetQuietUninstallString: String;
 var
-	Value: string;
-	UninstallKey: string;
+  Value: string;
+  UninstallKey: string;
 begin
-	UninstallKey := 'Software\Microsoft\Windows\CurrentVersion\Uninstall\' +
-		ExpandConstant('{#SetupSetting("AppId")}') + '_is1';
-	if not RegQueryStringValue(HKLM, UninstallKey, 'QuietUninstallString', Value) then
-		RegQueryStringValue(HKCU, UninstallKey, 'QuietUninstallString', Value);
-	Result := Value;
+  UninstallKey := 'Software\Microsoft\Windows\CurrentVersion\Uninstall\' +
+    ExpandConstant('{#SetupSetting("AppId")}') + '_is1';
+  if not RegQueryStringValue(HKLM, UninstallKey, 'QuietUninstallString', Value) then
+    RegQueryStringValue(HKCU, UninstallKey, 'QuietUninstallString', Value);
+  Result := Value;
 end;
 
 function GetInstalledVersion: String;
 var
-	Value: string;
-	UninstallKey: string;
+  Value: string;
+  UninstallKey: string;
 begin
-	UninstallKey := 'Software\Microsoft\Windows\CurrentVersion\Uninstall\' +
-		ExpandConstant('{#SetupSetting("AppId")}') + '_is1';
-	if not RegQueryStringValue(HKLM, UninstallKey, 'DisplayVersion', Value) then
-		RegQueryStringValue(HKCU, UninstallKey, 'DisplayVersion', Value);
-	Result := Value;
+  UninstallKey := 'Software\Microsoft\Windows\CurrentVersion\Uninstall\' +
+    ExpandConstant('{#SetupSetting("AppId")}') + '_is1';
+  if not RegQueryStringValue(HKLM, UninstallKey, 'DisplayVersion', Value) then
+    RegQueryStringValue(HKCU, UninstallKey, 'DisplayVersion', Value);
+  Result := Value;
 end;
 
 function InitializeSetup(): boolean;
 var
-	ResultCode: Integer;
+  ResultCode: Integer;
 begin
-	Result := true;
+  Result := true;
+  
+  // Check for downgrade
+  if IsUpgrade then
+  begin
+    if '{#ShortRevId}' < GetInstalledVersion then
+    begin
+      if MsgBox(ExpandConstant('{cm:DowngradeUninstall}'), mbConfirmation, MB_YESNO) = IDYES then
+      begin
+        Exec('>', GetQuietUninstallString, '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
+      end;
 
-	// Check for downgrade
-	if IsUpgrade then
-	begin
-		if '{#ShortRevId}' < GetInstalledVersion then
-		begin
-			if MsgBox(ExpandConstant('{cm:DowngradeUninstall}'), mbConfirmation, MB_YESNO) = IDYES then
-			begin
-				Exec('>', GetQuietUninstallString, '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
-			end;
+      // Check again
+      if '{#ShortRevId}' < GetInstalledVersion then
+      begin
+        Result := false;
+      end;
 
-			// Check again
-			if '{#ShortRevId}' < GetInstalledVersion then
-			begin
-				Result := false;
-			end;
+      IsDowngradeSetup := true;
+    end;
+  end;
+  
+  if Result then
+  begin
+    //init windows version
+    initwinversion();
 
-			// Pre-select task to delete existing configuration
-			// (Use the zero-based index of all rows in the tasks list GUI)
-			WizardForm.TasksList.Checked[{#Task_DeleteConfig_Index}] := true;
-		end;
-	end;
-	
-	if Result then
-	begin
-		//init windows version
-		initwinversion();
+    msi31('3.1');
 
-		msi31('3.1');
-
-		// if no .netfx 4.0 is found, install the client (smallest)
-		if (not netfxinstalled(NetFx40Client, '') and not netfxinstalled(NetFx40Full, '')) then
-			dotnetfx40client();
-	end;
+    // if no .netfx 4.0 is found, install the client (smallest)
+    if (not netfxinstalled(NetFx40Client, '') and not netfxinstalled(NetFx40Full, '')) then
+      dotnetfx40client();
+  end;
 end;
 
 procedure RegRenameStringValue(const RootKey: Integer; const SubKeyName, ValueName, NewValueName: String);
@@ -365,18 +366,29 @@ end;
 
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
-	Result := ((PageID = wpSelectTasks) or (PageID = wpReady)) and IsUpgrade;
+  Result := ((PageID = wpSelectTasks) or (PageID = wpReady)) and IsUpgrade;
 end;
 
 procedure CurPageChanged(CurPageID: Integer);
 begin
-	if CurPageID = wpWelcome then
-	begin
-		if IsUpgrade then
-		begin
-			WizardForm.NextButton.Caption := ExpandConstant('{cm:Upgrade}');
-			WizardForm.FinishedHeadingLabel.Caption := ExpandConstant('{cm:UpdatedHeadingLabel}');
-		end;
-	end;
+  if CurPageID = wpWelcome then
+  begin
+    if IsUpgrade then
+    begin
+      WizardForm.NextButton.Caption := ExpandConstant('{cm:Upgrade}');
+      WizardForm.FinishedHeadingLabel.Caption := ExpandConstant('{cm:UpdatedHeadingLabel}');
+    end;
+  end;
+
+  if CurPageID = wpSelectTasks then
+  begin
+    if IsDowngradeSetup then
+    begin
+      // Pre-select task to delete existing configuration
+      // (Use the zero-based index of all rows in the tasks list GUI)
+      // Source: http://stackoverflow.com/a/10490352/143684
+      WizardForm.TasksList.Checked[{#Task_DeleteConfig_Index}] := true;
+    end;
+  end;
 end;
 

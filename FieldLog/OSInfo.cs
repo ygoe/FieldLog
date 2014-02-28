@@ -1203,7 +1203,7 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Determines whether the logged on Windows user is a local administrator.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>true if the user is a local administrator; otherwise, false.</returns>
 		public static bool IsCurrentUserLocalAdministrator()
 		{
 			return IsCurrentUserInWindowsGroup(WellKnownSidType.BuiltinAdministratorsSid);
@@ -1212,7 +1212,7 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Determines whether the logged on Windows user is a domain administrator.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>true if the user is a domain administrator; otherwise, false.</returns>
 		public static bool IsCurrentUserDomainAdministrator()
 		{
 			return IsCurrentUserInWindowsGroup(WellKnownSidType.AccountDomainAdminsSid);
@@ -1221,7 +1221,7 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Determines whether the logged on Windows user is the local system account.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>true if the user is the local system account; otherwise, false.</returns>
 		public static bool IsCurrentUserLocalSystem()
 		{
 			return IsCurrentUserInWindowsGroup(WellKnownSidType.LocalSystemSid);
@@ -1230,7 +1230,7 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Determines whether the logged on Windows user is the local service account.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>true if the user is the local service account; otherwise, false.</returns>
 		public static bool IsCurrentUserLocalService()
 		{
 			return IsCurrentUserInWindowsGroup(WellKnownSidType.LocalServiceSid);
@@ -1239,7 +1239,7 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Determines whether the logged on Windows user is the network service account.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>true if the user is the network service account; otherwise, false.</returns>
 		public static bool IsCurrentUserNetworkService()
 		{
 			return IsCurrentUserInWindowsGroup(WellKnownSidType.NetworkServiceSid);
@@ -1250,28 +1250,28 @@ namespace Unclassified.FieldLog
 		#region Memory usage methods
 
 		/// <summary>
-		/// Gets the private memory currently used by this process in bytes.
+		/// Gets the private memory currently used by this process.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>The private memory currently used by this process, in bytes.</returns>
 		public static long GetProcessPrivateMemory()
 		{
 			return System.Diagnostics.Process.GetCurrentProcess().PrivateMemorySize64;
 		}
 
 		/// <summary>
-		/// Gets the peak working set memory used by this process in bytes.
+		/// Gets the peak working set memory used by this process.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>The peak working set memory used by this process, in bytes.</returns>
 		public static long GetProcessPeakMemory()
 		{
 			return System.Diagnostics.Process.GetCurrentProcess().PeakWorkingSet64;
 		}
 
 		/// <summary>
-		/// Gets the amount of total visible memory on the computer in bytes. This is the installed
-		/// physical memory, excluding the memory reserved for hardware or that cannot be addressed.
+		/// Gets the amount of total visible memory on the computer. This is the installed physical
+		/// memory, excluding the memory reserved for hardware or that cannot be addressed.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>The amount of total visible memory on the computer, in bytes.</returns>
 		public static long GetTotalMemorySize()
 		{
 			long mem;
@@ -1281,10 +1281,10 @@ namespace Unclassified.FieldLog
 		}
 
 		/// <summary>
-		/// Gets the amount of available memory on the computer in bytes. This is the unused
-		/// physical memory, plus the memory currently used for cache.
+		/// Gets the amount of available memory on the computer. This is the unused physical
+		/// memory, plus the memory currently used for cache.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>The amount of available memory on the computer, in bytes.</returns>
 		public static long GetAvailableMemorySize()
 		{
 			long mem;
@@ -1295,7 +1295,7 @@ namespace Unclassified.FieldLog
 
 		#endregion Memory usage methods
 
-		#region Private helper methods
+		#region Helper methods
 
 		private static string ParseSPNumber(string spString)
 		{
@@ -1332,9 +1332,9 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Reads a value from the WMI interface.
 		/// </summary>
-		/// <param name="wmiClass"></param>
-		/// <param name="wmiProperty"></param>
-		/// <returns></returns>
+		/// <param name="wmiClass">The WMI management class name, e. g. "Win32_LogicalDisk" or "Win32_Process".</param>
+		/// <param name="wmiProperty">The name of the property of interest.</param>
+		/// <returns>The value of the requested property.</returns>
 		public static string GetWmiIdentifier(string wmiClass, string wmiProperty)
 		{
 			return GetWmiIdentifier(wmiClass, wmiProperty, null);
@@ -1343,10 +1343,10 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Reads a value from the WMI interface.
 		/// </summary>
-		/// <param name="wmiClass"></param>
-		/// <param name="wmiProperty"></param>
-		/// <param name="wmiCondition"></param>
-		/// <returns></returns>
+		/// <param name="wmiClass">The WMI management class name, e. g. "Win32_LogicalDisk" or "Win32_Process".</param>
+		/// <param name="wmiProperty">The name of the property of interest.</param>
+		/// <param name="wmiCondition">If not null, the name of the property whose value must be true (boolean) to select the object instance.</param>
+		/// <returns>The value of the requested property.</returns>
 		public static string GetWmiIdentifier(string wmiClass, string wmiProperty, string wmiCondition)
 		{
 			System.Management.ManagementClass mc = new System.Management.ManagementClass(wmiClass);
@@ -1370,7 +1370,7 @@ namespace Unclassified.FieldLog
 			return null;
 		}
 
-		#endregion Private helper methods
+		#endregion Helper methods
 	}
 
 	#endregion OSInfo class

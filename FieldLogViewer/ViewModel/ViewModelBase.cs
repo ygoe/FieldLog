@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Windows;
 using System.Windows.Threading;
 
 namespace Unclassified.FieldLogViewer.ViewModel
@@ -144,7 +145,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				// Don't do anything if not on the UI thread. The dispatcher event will never be
 				// fired there and probably there's nobody interested in changed properties
 				// anyway on that thread.
-				if (Dispatcher.CurrentDispatcher == System.Windows.Application.Current.MainWindow.Dispatcher)
+				if (Dispatcher.CurrentDispatcher == Application.Current.MainWindow.Dispatcher)
 				{
 					validationPending = true;
 					Dispatcher.CurrentDispatcher.BeginInvoke((Action) delegate
@@ -210,7 +211,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 			else if (more > 0)
 			{
-				// I18N - TODO: Is this method used at all?
+				// I18N - Not currently used
 				dict["zzz"] = "(" + more + " weitere Meldungen werden nicht angezeigt)";
 			}
 			return dict;
@@ -223,6 +224,41 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		/// <param name="objs">The list of objects to validate. Derived classes should add child objects to this list.</param>
 		protected virtual void AddErrorSubObjects(List<object> objs)
 		{
+		}
+
+		private Dictionary<string, string> propertyErrorMessages = new Dictionary<string, string>();
+
+		/// <summary>
+		/// Sets a validation error message for a property.
+		/// </summary>
+		/// <param name="propertyName">The name of the property to validate.</param>
+		/// <param name="message">The error message.</param>
+		protected void SetPropertyError(string propertyName, string message)
+		{
+			propertyErrorMessages[propertyName] = message;
+			RaiseValidationUpdated();
+		}
+
+		/// <summary>
+		/// Clears the validation error message for a property.
+		/// </summary>
+		/// <param name="propertyName">The name of the property to validate.</param>
+		protected void ClearPropertyError(string propertyName)
+		{
+			propertyErrorMessages.Remove(propertyName);
+			RaiseValidationUpdated();
+		}
+
+		/// <summary>
+		/// Returns the validation error message for a property.
+		/// </summary>
+		/// <param name="propertyName">The name of the property to validate.</param>
+		/// <returns>The error message if set; otherwise, null.</returns>
+		protected string GetPropertyError(string propertyName)
+		{
+			string msg;
+			propertyErrorMessages.TryGetValue(propertyName, out msg);
+			return msg;
 		}
 
 		#endregion Data validation
@@ -305,16 +341,34 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		#endregion INotifyPropertyChanged Member
 	}
 
+	#region Special view model classes
+
+	/// <summary>
+	/// Represents an empty view model with a display name.
+	/// </summary>
 	internal sealed class EmptyViewModel : ViewModelBase
 	{
+		/// <summary>
+		/// Initialises a new instance of the EmptyViewModel class.
+		/// </summary>
+		/// <param name="displayName">The display name of the new instance.</param>
 		public EmptyViewModel(string displayName)
 		{
 			DisplayName = displayName;
 		}
 	}
 
+	/// <summary>
+	/// Represents a view model for a value with a display name.
+	/// </summary>
+	/// <typeparam name="T">The type of the value.</typeparam>
 	internal class ValueViewModel<T> : ViewModelBase
 	{
+		/// <summary>
+		/// Initialises a new instance of the ValueViewModel class.
+		/// </summary>
+		/// <param name="displayName">The display name of the new instance.</param>
+		/// <param name="value">The value represented by the new instance.</param>
 		public ValueViewModel(string displayName, T value)
 		{
 			if (value == null)
@@ -324,8 +378,18 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			Value = value;
 		}
 
+		/// <summary>
+		/// Gets the value represented by the current instance.
+		/// </summary>
 		public T Value { get; private set; }
 
+		/// <summary>
+		/// Determines whether the specified ValueViewModel instance represents the same value as
+		/// the current instance.
+		/// </summary>
+		/// <param name="obj">The ValueViewModel to compare with the current object.</param>
+		/// <returns>true if the specified ValueViewModel represents the same value as the current
+		/// instance; otherwise, false.</returns>
 		public override bool Equals(object obj)
 		{
 			ValueViewModel<T> other = obj as ValueViewModel<T>;
@@ -336,9 +400,15 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			return false;
 		}
 
+		/// <summary>
+		/// Overriden.
+		/// </summary>
+		/// <returns></returns>
 		public override int GetHashCode()
 		{
 			return Value.GetHashCode();
 		}
 	}
+
+	#endregion Special view model classes
 }

@@ -410,7 +410,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					filter.DisplayName = "By " + sessionCount + " sessions";
 					break;
 			}
-			foreach (var cg in filter.ConditionGroups)
+			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
 			{
 				// Remove all session and thread ID conditions
 				cg.Conditions.Filter(c => c.Column != FilterColumn.SessionId);
@@ -463,7 +463,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					filter.DisplayName = "Thread IDs " + SelectedItemsThreadIds.Aggregate(", ", " and ");
 					break;
 			}
-			foreach (var cg in filter.ConditionGroups)
+			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
 			{
 				// Remove all session and thread ID conditions
 				cg.Conditions.Filter(c => c.Column != FilterColumn.SessionId);
@@ -514,7 +514,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			bool isNew;
 			var filter = GetQuickFilter(out isNew);
 			filter.DisplayName = "Type " + EnumerationExtension<FilterItemType>.GetDescription(SelectedItemFilterItemType);
-			foreach (var cg in filter.ConditionGroups)
+			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
 			{
 				// Remove all session and thread ID conditions
 				cg.Conditions.Filter(c => c.Column != FilterColumn.Type);
@@ -547,7 +547,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			bool isNew;
 			var filter = GetQuickFilter(out isNew);
 			filter.DisplayName = "Priority " + flItem.PrioTitle + " or higher";
-			foreach (var cg in filter.ConditionGroups)
+			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
 			{
 				// Remove all session and thread ID conditions
 				cg.Conditions.Filter(c => c.Column != FilterColumn.Priority);
@@ -579,7 +579,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			bool isNew;
 			var filter = GetQuickFilter(out isNew);
 			filter.DisplayName = "Not before...";
-			foreach (var cg in filter.ConditionGroups)
+			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
 			{
 				// Remove all session and thread ID conditions
 				cg.Conditions.Filter(c => c.Column != FilterColumn.Time);
@@ -621,7 +621,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			bool isNew;
 			var filter = GetQuickFilter(out isNew);
 			filter.DisplayName = "Not after...";
-			foreach (var cg in filter.ConditionGroups)
+			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
 			{
 				// Remove all session and thread ID conditions
 				cg.Conditions.Filter(c => c.Column != FilterColumn.Time);

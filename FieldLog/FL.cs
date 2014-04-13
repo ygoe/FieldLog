@@ -7,6 +7,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+#if !NET20
+using System.Windows.Threading;
+#endif
 
 namespace Unclassified.FieldLog
 {
@@ -1869,6 +1872,147 @@ namespace Unclassified.FieldLog
 #endif
 
 		#endregion Custom time measurement
+
+		#region WPF Dispatcher log methods
+
+#if !NET20
+		/// <summary>
+		/// Writes a text log item to the log file after the WPF dispatcher has processed other
+		/// queued events of the specified dispatcher priority.
+		/// </summary>
+		/// <param name="dispPriority">The WPF dispatcher priority to schedule the log message with.</param>
+		/// <param name="logPriority">The priority of the log item.</param>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static void TextOnDispatcherPriority(DispatcherPriority dispPriority, FieldLogPriority logPriority, string text, string details = null)
+		{
+			Dispatcher.CurrentDispatcher.BeginInvoke(new Action<FieldLogPriority, string, string>(Text), dispPriority, logPriority, text, details);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Trace priority to the log file after the WPF dispatcher has
+		/// processed other queued events of the specified dispatcher priority.
+		/// </summary>
+		/// <param name="priority">The WPF dispatcher priority to schedule the log message with.</param>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static void TraceOnDispatcherPriority(DispatcherPriority priority, string text, string details = null)
+		{
+			Dispatcher.CurrentDispatcher.BeginInvoke(new Action<string, string>(Trace), priority, text, details);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Trace priority to the log file after the WPF dispatcher has
+		/// processed other queued events of Background priority.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static void TraceOnBackground(string text, string details = null)
+		{
+			TraceOnDispatcherPriority(DispatcherPriority.Background, text, details);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Trace priority to the log file after the WPF dispatcher has
+		/// processed other queued events of Input priority.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static void TraceOnInput(string text, string details = null)
+		{
+			TraceOnDispatcherPriority(DispatcherPriority.Input, text, details);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Trace priority to the log file after the WPF dispatcher has
+		/// processed other queued events of Loaded priority.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static void TraceOnLoaded(string text, string details = null)
+		{
+			TraceOnDispatcherPriority(DispatcherPriority.Loaded, text, details);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Trace priority to the log file after the WPF dispatcher has
+		/// processed other queued events of Render priority.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static void TraceOnRender(string text, string details = null)
+		{
+			TraceOnDispatcherPriority(DispatcherPriority.Render, text, details);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Trace priority to the log file after the WPF dispatcher has
+		/// processed other queued events of DataBind priority.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static void TraceOnDataBind(string text, string details = null)
+		{
+			TraceOnDispatcherPriority(DispatcherPriority.DataBind, text, details);
+		}
+
+		/// <summary>
+		/// Stops a custom timer after the WPF dispatcher has processed other queued events of the
+		/// specified dispatcher priority.
+		/// </summary>
+		/// <param name="priority">The WPF dispatcher priority to schedule the timer with.</param>
+		/// <param name="key">The custom timer key.</param>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static void StopTimerOnDispatcherPriority(DispatcherPriority priority, string key)
+		{
+			Dispatcher.CurrentDispatcher.BeginInvoke(new Action<string, bool>(StopTimer), priority, key, false);
+		}
+
+		/// <summary>
+		/// Starts a custom timer and stops it after the WPF dispatcher has processed other queued
+		/// events of the specified dispatcher priority.
+		/// </summary>
+		/// <param name="priority">The WPF dispatcher priority to schedule the timer with.</param>
+		/// <param name="key">The custom timer key.</param>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static void TimerUntilDispatcherPriority(DispatcherPriority priority, string key)
+		{
+			Dispatcher disp = Dispatcher.CurrentDispatcher;
+			if (disp == null)
+			{
+				throw new InvalidOperationException("There is no Dispatcher available in the current thread.");
+			}
+			CustomTimerInfo cti = StartTimer(key);
+			disp.BeginInvoke(new Action<bool>(cti.Stop), priority, false);
+		}
+#endif
+
+		#endregion WPF Dispatcher log methods
 
 		#region Item buffer methods
 

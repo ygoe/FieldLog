@@ -94,6 +94,7 @@
     <Compile Include="FieldLogFileGroupReader.cs" />
     <Compile Include="FieldLogFileEnumerator.cs" />
     <Compile Include="FieldLogFileReader.cs" />
+    <Compile Include="FieldLogTraceListener.cs" />
     <Compile Include="FL.cs" />
     <Compile Include="FieldLogFileWriter.cs" />
     <Compile Include="LogItems.cs" />

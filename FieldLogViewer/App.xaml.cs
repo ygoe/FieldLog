@@ -45,6 +45,8 @@ namespace Unclassified.FieldLogViewer
 			
 			// Make sure the settings are properly saved in the end
 			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+
+			FL.RegisterWpfErrorHandler(this);
 		}
 
 		#endregion Constructors

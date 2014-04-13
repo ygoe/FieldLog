@@ -582,11 +582,14 @@ namespace Unclassified.FieldLog
 			}
 
 			// Handle UI thread exceptions
-			app.DispatcherUnhandledException += delegate(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+			app.DispatcherUnhandledException += delegate(object sender, DispatcherUnhandledExceptionEventArgs e)
 			{
 				FL.Critical(e.Exception, "WPF.DispatcherUnhandledException", true);
 				e.Handled = true;
 			};
+
+			// Listen for events on all WPF trace sources
+			FieldLogTraceListener.Start();
 		}
 #endif
 

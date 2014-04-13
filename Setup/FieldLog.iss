@@ -128,6 +128,7 @@ Source: "..\FieldLog\FieldLogFileEnumerator.cs"; DestDir: "{app}\FieldLog source
 Source: "..\FieldLog\FieldLogFileGroupReader.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
 Source: "..\FieldLog\FieldLogFileReader.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
 Source: "..\FieldLog\FieldLogFileWriter.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
+Source: "..\FieldLog\FieldLogTraceListener.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
 Source: "..\FieldLog\FL.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
 Source: "..\FieldLog\LogItems.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
 Source: "..\FieldLog\OSInfo.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion

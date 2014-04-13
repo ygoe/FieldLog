@@ -1401,22 +1401,45 @@ namespace Unclassified.FieldLog
 		/// scopes with the <c>using</c> statement.
 		/// </summary>
 		/// <param name="name">The scope name.</param>
+		/// <param name="values">Optional argument values for the scope.</param>
 		/// <returns>A new <see cref="FieldLogScope"/> instance.</returns>
-		public static FieldLogScope Scope(string name)
+		/// <remarks>
+		/// The <paramref name="values"/> parameter is any object whose public instance properties
+		/// and fields will be dumped to a multi-line string in the log. The property and field
+		/// names are determined through reflection.
+		/// </remarks>
+		public static FieldLogScope Scope(string name, object values = null)
 		{
-			return new FieldLogScope(name);
+			FieldLogScope scope = new FieldLogScope(name);
+			if (values != null)
+			{
+				TraceData("params", values);
+			}
+			return scope;
 		}
 
 		/// <summary>
 		/// Returns a new FieldLogScope item that implements IDisposable and can be used to log
 		/// scopes with the <c>using</c> statement. The calling method name is used as scope name.
 		/// </summary>
+		/// <param name="values">Optional argument values for the scope.</param>
 		/// <returns>A new <see cref="FieldLogScope"/> instance.</returns>
-		public static FieldLogScope Scope()
+		/// <remarks>
+		/// The <paramref name="values"/> parameter is any object whose public instance properties
+		/// and fields will be dumped to a multi-line string in the log. The property and field
+		/// names are determined through reflection.
+		/// </remarks>
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+		public static FieldLogScope Scope(object values = null)
 		{
 			StackFrame sf = new StackFrame(1, false);
 			string name = sf.GetMethod().Name;
-			return new FieldLogScope(name);
+			FieldLogScope scope = new FieldLogScope(name);
+			if (values != null)
+			{
+				TraceData("params", values);
+			}
+			return scope;
 		}
 
 		/// <summary>
@@ -1429,6 +1452,137 @@ namespace Unclassified.FieldLog
 		{
 			return new FieldLogThreadScope(name);
 		}
+
+#if !NET20
+		/// <summary>
+		/// Wraps an Action delegate in a FieldLogScope to mark its entering and returning.
+		/// </summary>
+		/// <param name="action">The action to execute.</param>
+		/// <param name="name">The scope name. Defaults to the delegate's method name if not specified.</param>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static void ScopeAction(Action action, string name = null)
+		{
+			if (name == null)
+			{
+				name = action.Method.Name;
+			}
+			using (Scope(name))
+			{
+				action();
+			}
+		}
+
+		/// <summary>
+		/// Wraps an Action delegate in a FieldLogScope to mark its entering and returning.
+		/// </summary>
+		/// <param name="action">The action to execute.</param>
+		/// <param name="arg1">The first argument passed to <paramref name="action"/>.</param>
+		/// <param name="name">The scope name. Defaults to the delegate's method name if not specified.</param>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static void ScopeAction<T>(Action<T> action, T arg1, string name = null)
+		{
+			if (name == null)
+			{
+				name = action.Method.Name;
+			}
+			using (Scope(name, new { arg1 }))
+			{
+				action(arg1);
+			}
+		}
+
+		/// <summary>
+		/// Wraps an Action delegate in a FieldLogScope to mark its entering and returning.
+		/// </summary>
+		/// <param name="action">The action to execute.</param>
+		/// <param name="arg1">The first argument passed to <paramref name="action"/>.</param>
+		/// <param name="arg2">The second argument passed to <paramref name="action"/>.</param>
+		/// <param name="name">The scope name. Defaults to the delegate's method name if not specified.</param>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static void ScopeAction<T1, T2>(Action<T1, T2> action, T1 arg1, T2 arg2, string name = null)
+		{
+			if (name == null)
+			{
+				name = action.Method.Name;
+			}
+			using (Scope(name, new { arg1, arg2 }))
+			{
+				action(arg1, arg2);
+			}
+		}
+
+		/// <summary>
+		/// Wraps a Func delegate in a FieldLogScope to mark its entering and returning.
+		/// </summary>
+		/// <param name="func">The function to execute.</param>
+		/// <param name="name">The scope name. Defaults to the delegate's method name if not specified.</param>
+		/// <returns>The return value of <paramref name="func"/>.</returns>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static TResult ScopeFunc<TResult>(Func<TResult> func, string name = null)
+		{
+			if (name == null)
+			{
+				name = func.Method.Name;
+			}
+			using (Scope(name))
+			{
+				return func();
+			}
+		}
+
+		/// <summary>
+		/// Wraps a Func delegate in a FieldLogScope to mark its entering and returning.
+		/// </summary>
+		/// <param name="func">The function to execute.</param>
+		/// <param name="arg1">The first argument passed to <paramref name="func"/>.</param>
+		/// <param name="name">The scope name. Defaults to the delegate's method name if not specified.</param>
+		/// <returns>The return value of <paramref name="func"/>.</returns>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static TResult ScopeFunc<T, TResult>(Func<T, TResult> func, T arg1, string name = null)
+		{
+			if (name == null)
+			{
+				name = func.Method.Name;
+			}
+			using (Scope(name, new { arg1 }))
+			{
+				return func(arg1);
+			}
+		}
+
+		/// <summary>
+		/// Wraps a Func delegate in a FieldLogScope to mark its entering and returning.
+		/// </summary>
+		/// <param name="func">The function to execute.</param>
+		/// <param name="arg1">The first argument passed to <paramref name="func"/>.</param>
+		/// <param name="arg2">The second argument passed to <paramref name="func"/>.</param>
+		/// <param name="name">The scope name. Defaults to the delegate's method name if not specified.</param>
+		/// <returns>The return value of <paramref name="func"/>.</returns>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static TResult ScopeFunc<T1, T2, TResult>(Func<T1, T2, TResult> func, T1 arg1, T2 arg2, string name = null)
+		{
+			if (name == null)
+			{
+				name = func.Method.Name;
+			}
+			using (Scope(name, new { arg1, arg2 }))
+			{
+				return func(arg1, arg2);
+			}
+		}
+#endif
 
 		#endregion Scope helpers
 
@@ -1570,6 +1724,149 @@ namespace Unclassified.FieldLog
 		{
 			return new CustomTimerScope(key, writeImmediately);
 		}
+
+#if !NET20
+		/// <summary>
+		/// Wraps an Action delegate in a CustomTimerScope to measure the time that the action
+		/// takes to execute.
+		/// </summary>
+		/// <param name="action">The action to execute.</param>
+		/// <param name="key">The custom timer key. Defaults to the delegate's method name if not specified.</param>
+		/// <param name="writeImmediately">true to write the timer value immediately when stopping, false for the normal delay.</param>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static void TimerAction(Action action, string key = null, bool writeImmediately = false)
+		{
+			if (key == null)
+			{
+				key = action.Method.Name;
+			}
+			using (Timer(key, writeImmediately))
+			{
+				action();
+			}
+		}
+
+		/// <summary>
+		/// Wraps an Action delegate in a CustomTimerScope to measure the time that the action
+		/// takes to execute.
+		/// </summary>
+		/// <param name="action">The action to execute.</param>
+		/// <param name="arg1">The first argument passed to <paramref name="action"/>.</param>
+		/// <param name="key">The custom timer key. Defaults to the delegate's method name if not specified.</param>
+		/// <param name="writeImmediately">true to write the timer value immediately when stopping, false for the normal delay.</param>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static void TimerAction<T>(Action<T> action, T arg1, string key = null, bool writeImmediately = false)
+		{
+			if (key == null)
+			{
+				key = action.Method.Name;
+			}
+			using (Timer(key, writeImmediately))
+			{
+				action(arg1);
+			}
+		}
+
+		/// <summary>
+		/// Wraps an Action delegate in a CustomTimerScope to measure the time that the action
+		/// takes to execute.
+		/// </summary>
+		/// <param name="action">The action to execute.</param>
+		/// <param name="arg1">The first argument passed to <paramref name="action"/>.</param>
+		/// <param name="arg2">The second argument passed to <paramref name="action"/>.</param>
+		/// <param name="key">The custom timer key. Defaults to the delegate's method name if not specified.</param>
+		/// <param name="writeImmediately">true to write the timer value immediately when stopping, false for the normal delay.</param>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static void TimerAction<T1, T2>(Action<T1, T2> action, T1 arg1, T2 arg2, string key = null, bool writeImmediately = false)
+		{
+			if (key == null)
+			{
+				key = action.Method.Name;
+			}
+			using (Timer(key, writeImmediately))
+			{
+				action(arg1, arg2);
+			}
+		}
+
+		/// <summary>
+		/// Wraps a Func delegate in a CustomTimerScope to measure the time that the action takes
+		/// to execute.
+		/// </summary>
+		/// <param name="func">The function to execute.</param>
+		/// <param name="key">The custom timer key. Defaults to the delegate's method name if not specified.</param>
+		/// <param name="writeImmediately">true to write the timer value immediately when stopping, false for the normal delay.</param>
+		/// <returns>The return value of <paramref name="func"/>.</returns>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static TResult TimerFunc<TResult>(Func<TResult> func, string key = null, bool writeImmediately = false)
+		{
+			if (key == null)
+			{
+				key = func.Method.Name;
+			}
+			using (Timer(key, writeImmediately))
+			{
+				return func();
+			}
+		}
+
+		/// <summary>
+		/// Wraps a Func delegate in a CustomTimerScope to measure the time that the action takes
+		/// to execute.
+		/// </summary>
+		/// <param name="func">The function to execute.</param>
+		/// <param name="arg1">The first argument passed to <paramref name="func"/>.</param>
+		/// <param name="key">The custom timer key. Defaults to the delegate's method name if not specified.</param>
+		/// <param name="writeImmediately">true to write the timer value immediately when stopping, false for the normal delay.</param>
+		/// <returns>The return value of <paramref name="func"/>.</returns>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static TResult TimerFunc<T, TResult>(Func<T, TResult> func, T arg1, string key = null, bool writeImmediately = false)
+		{
+			if (key == null)
+			{
+				key = func.Method.Name;
+			}
+			using (Timer(key, writeImmediately))
+			{
+				return func(arg1);
+			}
+		}
+
+		/// <summary>
+		/// Wraps a Func delegate in a CustomTimerScope to measure the time that the action takes
+		/// to execute.
+		/// </summary>
+		/// <param name="func">The function to execute.</param>
+		/// <param name="arg1">The first argument passed to <paramref name="func"/>.</param>
+		/// <param name="arg2">The second argument passed to <paramref name="func"/>.</param>
+		/// <param name="key">The custom timer key. Defaults to the delegate's method name if not specified.</param>
+		/// <param name="writeImmediately">true to write the timer value immediately when stopping, false for the normal delay.</param>
+		/// <returns>The return value of <paramref name="func"/>.</returns>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static TResult TimerFunc<T1, T2, TResult>(Func<T1, T2, TResult> func, T1 arg1, T2 arg2, string key = null, bool writeImmediately = false)
+		{
+			if (key == null)
+			{
+				key = func.Method.Name;
+			}
+			using (Timer(key, writeImmediately))
+			{
+				return func(arg1, arg2);
+			}
+		}
+#endif
 
 		#endregion Custom time measurement
 

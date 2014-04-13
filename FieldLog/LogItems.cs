@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
+using System.Text;
 using System.Threading;
 
 namespace Unclassified.FieldLog
@@ -225,8 +227,6 @@ namespace Unclassified.FieldLog
 		/// <summary>Gets the value of the data item.</summary>
 		public string Value { get; private set; }
 
-		// TODO: Add helper methods to serialise objects or other data types, e.g. to JSON
-
 		private FieldLogDataItem()
 		{
 		}
@@ -235,8 +235,8 @@ namespace Unclassified.FieldLog
 		/// Initialises a new instance of the FieldLogDataItem class with Trace priority.
 		/// </summary>
 		/// <param name="name">The name of the data item. Can be an arbitrary string that is useful for the logging purpose.</param>
-		/// <param name="value">The value of the data item. Must be converted to a string, line breaks are allowed for structuring.</param>
-		public FieldLogDataItem(string name, string value)
+		/// <param name="value">The value of the data item. Will be converted to a string. Line breaks are allowed for structuring.</param>
+		public FieldLogDataItem(string name, object value)
 			: this(FieldLogPriority.Trace, name, value)
 		{
 		}
@@ -257,7 +257,7 @@ namespace Unclassified.FieldLog
 			}
 			else
 			{
-				Value = value.ToString();
+				Value = FormatValues(value);
 			}
 
 			Size += (Name != null ? Name.Length * 2 : 0) +
@@ -298,6 +298,70 @@ namespace Unclassified.FieldLog
 			item.Name = reader.ReadString();
 			item.Value = reader.ReadString();
 			return item;
+		}
+
+		/// <summary>
+		/// Formats all public instance properties and fields from the specified object to a
+		/// multi-line string.
+		/// </summary>
+		/// <param name="data">The object containing public properties and/or fields.</param>
+		/// <param name="level">Indenting level.</param>
+		/// <returns>The formatted values of the object.</returns>
+		public static string FormatValues(object data, int level = 0)
+		{
+			if (data == null)
+			{
+				return "null";
+			}
+			if (data is bool ||
+				data is byte || data is ushort || data is uint || data is ulong ||
+				data is sbyte || data is short || data is int || data is long ||
+				data is float || data is double || data is decimal)
+			{
+				return Convert.ToString(data, CultureInfo.InvariantCulture);
+			}
+			if (data is char)
+			{
+				return "'" + data.ToString().Replace("\\", "\\\\").Replace("'", "\\'") + "'";
+			}
+			if (data is string)
+			{
+				return "\"" + ((string) data).Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
+			}
+
+			string indent = new string('\t', level);
+			StringBuilder sb = new StringBuilder();
+			if (level > 0)
+			{
+				sb.AppendLine();
+				sb.Append(indent);
+			}
+			sb.Append("{");
+			int count = 0;
+			foreach (var property in data.GetType().GetProperties())
+			{
+				if (count++ > 0) sb.Append(",");
+				sb.AppendLine();
+				sb.Append(indent);
+				sb.Append("\t");
+				sb.Append(property.Name);
+				sb.Append(": ");
+				sb.Append(FormatValues(property.GetValue(data, null), level + 1));
+			}
+			foreach (var field in data.GetType().GetFields())
+			{
+				if (count++ > 0) sb.Append(",");
+				sb.AppendLine();
+				sb.Append(indent);
+				sb.Append("\t");
+				sb.Append(field.Name);
+				sb.Append(": ");
+				sb.Append(FormatValues(field.GetValue(data), level + 1));
+			}
+			sb.AppendLine();
+			sb.Append(indent);
+			sb.Append("}");
+			return sb.ToString();
 		}
 	}
 

@@ -41,6 +41,13 @@ namespace ConsoleDemo
 		static void NormalActivity()
 		{
 			Console.WriteLine("Normal application activity pattern...");
+
+			FL.TimerAction(Delay);
+			FL.ScopeAction(Delay2, FL.TimerFunc(GetDelay, 400, "GetDelay"), "Delay2");
+			using (FL.Scope("Test", new { i = 0, j = 5, str = "Hello", x = new { a = "A", b = "B" } }))
+			{
+			}
+
 			Random rnd = new Random();
 			for (int i = 1; i <= 100; i++)
 			{
@@ -129,6 +136,21 @@ namespace ConsoleDemo
 			throw new ApplicationException("Test exception message",
 				new ApplicationException("An inner message 1",
 					new ApplicationException("An inner message 2")));
+		}
+
+		private static void Delay()
+		{
+			Thread.Sleep(300);
+		}
+
+		private static void Delay2(int ms)
+		{
+			Thread.Sleep(ms);
+		}
+
+		private static int GetDelay(int x)
+		{
+			return x * 2;
 		}
 
 		private static void DoSomeMaths()

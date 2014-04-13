@@ -555,6 +555,9 @@ namespace Unclassified.FieldLog
 		/// Registers application error handlers for a WPF application. This must be called after
 		/// the Application's constructor.
 		/// </summary>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
 		public static void RegisterWpfErrorHandler()
 		{
 			RegisterWpfErrorHandler(null);
@@ -565,6 +568,9 @@ namespace Unclassified.FieldLog
 		/// the Application's constructor or later.
 		/// </summary>
 		/// <param name="app">Application object. If null, Application.Current is used (only after Application constructor).</param>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
 		public static void RegisterWpfErrorHandler(System.Windows.Application app)
 		{
 			if (app == null)

@@ -413,6 +413,9 @@ namespace Unclassified.FieldLog
 		/// Reads the next complete log item from the file.
 		/// </summary>
 		/// <returns>The Task that reads a log item.</returns>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
 		public Task<FieldLogItem> ReadLogItemAsync()
 		{
 			return new Task<FieldLogItem>(ReadLogItem);

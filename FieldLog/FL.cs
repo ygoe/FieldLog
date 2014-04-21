@@ -511,6 +511,10 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Registers application error handlers for all application types.
 		/// </summary>
+		/// <remarks>
+		/// This method is called from the FL static constructor, and only if no debugger is
+		/// currently attached. A debugger should catch exceptions instead of us.
+		/// </remarks>
 		private static void RegisterAppErrorHandler()
 		{
 			// Reference: http://code.msdn.microsoft.com/Handling-Unhandled-47492d0b
@@ -555,10 +559,11 @@ namespace Unclassified.FieldLog
 
 #if !NET20
 		/// <summary>
-		/// Registers application error handlers for a WPF application. This must be called after
-		/// the Application's constructor.
+		/// Registers application error and trace handlers for a WPF application. This must be
+		/// called after the Application's constructor.
 		/// </summary>
 		/// <remarks>
+		/// The WPF exception handler is only registered if no debugger is currently attached.
 		/// This method is not available in the NET20 build.
 		/// </remarks>
 		public static void RegisterWpfErrorHandler()
@@ -567,11 +572,12 @@ namespace Unclassified.FieldLog
 		}
 
 		/// <summary>
-		/// Registers application error handlers for a WPF application. This must be called from
-		/// the Application's constructor or later.
+		/// Registers application error and trace handlers for a WPF application. This can be
+		/// called from the Application's constructor or later.
 		/// </summary>
-		/// <param name="app">Application object. If null, Application.Current is used (only after Application constructor).</param>
+		/// <param name="app">The Application object. If null, Application.Current is used (only after Application constructor).</param>
 		/// <remarks>
+		/// The WPF exception handler is only registered if no debugger is currently attached.
 		/// This method is not available in the NET20 build.
 		/// </remarks>
 		public static void RegisterWpfErrorHandler(System.Windows.Application app)
@@ -581,12 +587,15 @@ namespace Unclassified.FieldLog
 				app = System.Windows.Application.Current;
 			}
 
-			// Handle UI thread exceptions
-			app.DispatcherUnhandledException += delegate(object sender, DispatcherUnhandledExceptionEventArgs e)
+			if (!Debugger.IsAttached)
 			{
-				FL.Critical(e.Exception, "WPF.DispatcherUnhandledException", true);
-				e.Handled = true;
-			};
+				// Handle UI thread exceptions
+				app.DispatcherUnhandledException += delegate(object sender, DispatcherUnhandledExceptionEventArgs e)
+				{
+					FL.Critical(e.Exception, "WPF.DispatcherUnhandledException", true);
+					e.Handled = true;
+				};
+			}
 
 			// Listen for events on all WPF trace sources
 			FieldLogTraceListener.Start();
@@ -2226,10 +2235,13 @@ namespace Unclassified.FieldLog
 
 		/// <summary>
 		/// Sets an application-defined prefix for the log files. The default is the file name of
-		/// the entry assembly without its extension. This method must be called before
-		/// SetCustomLogFileBasePath or AcceptLogFileBasePath.
+		/// the entry assembly without its extension.
 		/// </summary>
 		/// <param name="prefix">The new log file name prefix.</param>
+		/// <remarks>
+		/// This method must be called before AcceptLogFileBasePath. SetCustomLogFileBasePath
+		/// effectively overwrites the file prefix so both methods cannot be used together.
+		/// </remarks>
 		public static void SetCustomLogFilePrefix(string prefix)
 		{
 			if (prefix == null) throw new ArgumentNullException("prefix");
@@ -2784,8 +2796,8 @@ namespace Unclassified.FieldLog
 		{
 			// A file size of 150 KiB gives a good compromise of granularity and flush time in the
 			// benchmark.
-			maxFileSize = 150 * 1024 /* KiB */;
-			maxTotalSize = 200L * 1024 * 1024 /* MiB */;
+			maxFileSize = 150 /*KiB*/ * 1024;
+			maxTotalSize = 200L /*MiB*/ * 1024 * 1024;
 			priorityKeepTimes.Clear();
 			priorityKeepTimes[FieldLogPriority.Trace] = TimeSpan.FromHours(3);
 			priorityKeepTimes[FieldLogPriority.Checkpoint] = TimeSpan.FromHours(3);

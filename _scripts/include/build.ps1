@@ -17,17 +17,9 @@ $sourcePath = $MyInvocation.MyCommand.Definition | split-path -parent | split-pa
 $gitRevisionFormat = "{bmin:2014:4}.{commit:6}{!:+}"
 $revId = Get-GitRevision
 
-# Disable FASTBUILD mode to always include a full version number in the assembly version info.
-#
-$env:FASTBUILD = ""
-
 # Disable parallel builds for overlapping projects in a solution
 #
 $noParallelBuild = $true
-
-# ---------------------------------------------------------------------------------
-
-Write-Host "Application version: $revId"
 
 # ------------------------------  ACTION DEFINITION  ------------------------------
 
@@ -73,7 +65,7 @@ if ((IsSelected("setup-release")) -or (IsSelected("commit")))
 
 	if (IsSelected("sign-setup"))
 	{
-		Sign-File "Setup\FieldLogSetup-$revId.exe" "signkey.pfx" "@signkey.password" 1
+		Sign-File "Setup\bin\FieldLogSetup-$revId.exe" "signkey.pfx" "@signkey.password" 1
 	}
 }
 
@@ -81,13 +73,14 @@ if ((IsSelected("setup-release")) -or (IsSelected("commit")))
 
 if (IsSelected("install"))
 {
-	Exec-File "Setup\FieldLogSetup-$revId.exe" "/verysilent" 3
+	Exec-File "Setup\bin\FieldLogSetup-$revId.exe" "/norestart /verysilent" 1
 }
 
 # ---------- Commit to repository ----------
 
 if (IsSelected("commit"))
 {
+	Delete-File "Setup\bin\FieldLogSetup-$revId.exe" 0
 	Git-Commit 1
 }
 

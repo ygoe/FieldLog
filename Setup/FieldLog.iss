@@ -44,7 +44,7 @@ WizardSmallImageFile=FieldLog_48.bmp
 UninstallDisplayName=FieldLog
 UninstallDisplayIcon={app}\FieldLogViewer.exe
 
-OutputDir=.
+OutputDir=bin
 OutputBaseFilename=FieldLogSetup-{#RevId}
 SolidCompression=True
 InternalCompressLevel=max

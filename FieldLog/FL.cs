@@ -259,6 +259,12 @@ namespace Unclassified.FieldLog
 		private static ReaderWriterLockSlim customTimersLock = new ReaderWriterLockSlim();
 #endif
 
+		/// <summary>
+		/// Contains all log items that are buffered in the current thread.
+		/// </summary>
+		[ThreadStatic]
+		private static List<FieldLogItem> threadBufferedItems;
+
 		#endregion Private static data
 
 		#region Internal static data
@@ -1386,6 +1392,22 @@ namespace Unclassified.FieldLog
 		/// <param name="item">The log item to write.</param>
 		public static void Log(FieldLogItem item)
 		{
+			// First write any buffered items for the current thread
+			if (threadBufferedItems != null)
+			{
+				foreach (var bufferedItem in threadBufferedItems)
+				{
+					LogInternal(bufferedItem);
+				}
+				// Clear buffer after writing it
+				threadBufferedItems = null;
+			}
+
+			LogInternal(item);
+		}
+
+		private static void LogInternal(FieldLogItem item)
+		{
 			//System.Diagnostics.Trace.WriteLine("FieldLog.Log: New item " + item.ToString());
 			// Add the item to the current buffer
 			int size = item.Size;
@@ -1408,6 +1430,33 @@ namespace Unclassified.FieldLog
 		}
 
 		#endregion General log method
+
+		#region Buffer log method
+
+		/// <summary>
+		/// Writes a log item to the buffer for the current thread. All buffered log items are only
+		/// written to the log file if an unbuffered (normal) log item is written through another
+		/// log method. The buffer can be cleared before it was written.
+		/// </summary>
+		/// <param name="item">The log item to add to the buffer.</param>
+		public static void LogBuffer(FieldLogItem item)
+		{
+			if (threadBufferedItems == null)
+			{
+				threadBufferedItems = new List<FieldLogItem>();
+			}
+			threadBufferedItems.Add(item);
+		}
+
+		/// <summary>
+		/// Clears the log items buffer for the current thread.
+		/// </summary>
+		public static void ClearLogBuffer()
+		{
+			threadBufferedItems = null;
+		}
+
+		#endregion Buffer log method
 
 		#region Scope helpers
 

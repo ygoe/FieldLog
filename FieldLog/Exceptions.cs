@@ -247,6 +247,12 @@ namespace Unclassified.FieldLog
 
 		/// <summary>Gets the module name.</summary>
 		public string Module { get; private set; }
+		/// <summary>Gets the metadata token of the method.</summary>
+		public int Token { get; private set; }
+		/// <summary>Gets the IL code offset of the executed instruction in the method body.</summary>
+		public int ILOffset { get; private set; }
+		/// <summary>Gets the native code offset of the executed instruction in the method body.</summary>
+		public int NativeOffset { get; private set; }
 		/// <summary>Gets the defining type name.</summary>
 		public string TypeName { get; private set; }
 		/// <summary>Gets the executed method name.</summary>
@@ -274,6 +280,9 @@ namespace Unclassified.FieldLog
 			MethodBase method = stackFrame.GetMethod();
 
 			Module = method.DeclaringType.Module.FullyQualifiedName;
+			Token = method.MetadataToken;
+			ILOffset = stackFrame.GetILOffset();
+			NativeOffset = stackFrame.GetNativeOffset();
 			TypeName = FormatTypeName(method.DeclaringType);
 			MethodName = method.Name;
 			if (method.IsGenericMethod)
@@ -296,6 +305,21 @@ namespace Unclassified.FieldLog
 			FileName = stackFrame.GetFileName();
 			Line = stackFrame.GetFileLineNumber();
 			Column = stackFrame.GetFileColumnNumber();
+
+			// TODO: Add separate fields for these - file format v2
+			if (!string.IsNullOrEmpty(FileName))
+			{
+				FileName = "; " + FileName;
+			}
+			if (NativeOffset != StackFrame.OFFSET_UNKNOWN)
+			{
+				FileName = "(+" + NativeOffset.ToString("x") + ")" + FileName;
+			}
+			if (ILOffset != StackFrame.OFFSET_UNKNOWN)
+			{
+				FileName = "+" + ILOffset.ToString("x") + FileName;
+			}
+			FileName = "@" + Token.ToString("x8") + FileName;
 
 			Size = (Module != null ? Module.Length * 2 : 0) +
 				(TypeName != null ? TypeName.Length * 2 : 0) +

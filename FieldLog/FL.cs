@@ -2848,13 +2848,13 @@ namespace Unclassified.FieldLog
 			maxFileSize = 150 /*KiB*/ * 1024;
 			maxTotalSize = 200L /*MiB*/ * 1024 * 1024;
 			priorityKeepTimes.Clear();
-			priorityKeepTimes[FieldLogPriority.Trace] = TimeSpan.FromHours(3);
-			priorityKeepTimes[FieldLogPriority.Checkpoint] = TimeSpan.FromHours(3);
-			priorityKeepTimes[FieldLogPriority.Info] = TimeSpan.FromDays(5);
-			priorityKeepTimes[FieldLogPriority.Notice] = TimeSpan.FromDays(5);
-			priorityKeepTimes[FieldLogPriority.Warning] = TimeSpan.FromDays(30);
-			priorityKeepTimes[FieldLogPriority.Error] = TimeSpan.FromDays(30);
-			priorityKeepTimes[FieldLogPriority.Critical] = TimeSpan.FromDays(30);
+			priorityKeepTimes[FieldLogPriority.Trace] = TimeSpan.FromHours(24);
+			priorityKeepTimes[FieldLogPriority.Checkpoint] = TimeSpan.FromHours(24);
+			priorityKeepTimes[FieldLogPriority.Info] = TimeSpan.FromDays(30);
+			priorityKeepTimes[FieldLogPriority.Notice] = TimeSpan.FromDays(30);
+			priorityKeepTimes[FieldLogPriority.Warning] = TimeSpan.FromDays(90);
+			priorityKeepTimes[FieldLogPriority.Error] = TimeSpan.FromDays(90);
+			priorityKeepTimes[FieldLogPriority.Critical] = TimeSpan.FromDays(90);
 		}
 
 		/// <summary>

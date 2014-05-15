@@ -24,7 +24,7 @@ You can also use FieldLogViewer as a DebugOutputString listener (like Sysinterna
 
 SUBMIT TOOL
 
-An easy to use log sumit tool (not yet implemented) will guide the user through the process of selecting the relevant log files, packaging them for transport and choosing a suitable transport method. Sending an e-mail, using an HTTP or FTP server, sending with Bluetooth, and copying the package to a local directory are the planned transport methods. This tool can be started in response to an unhandled or unrecoverable application error (crash reporting) so that the user is prompted with the right information and can submit trace logs while they're fresh.
+An easy to use log sumit tool (not yet implemented) will guide the user through the process of selecting the relevant log files, packaging them for transport and choosing a suitable transport method. The planned transport methods are sending an e-mail, using an HTTP or FTP server, sending with Bluetooth, and copying the package to a local directory like a USB flash drive. This tool can be started in response to an unhandled or unrecoverable application error (crash reporting) so that the user is prompted with the right information and can submit trace logs while they're fresh.
 
 REQUIREMENTS
 

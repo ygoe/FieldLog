@@ -364,7 +364,7 @@ namespace Unclassified.FieldLog
 			using (FL.Timer(EnsureJitTimerKey))
 			{
 			}
-			using (FL.Timer(EnsureJitTimerKey, true))
+			using (FL.Timer(EnsureJitTimerKey, true, true))
 			{
 			}
 		}
@@ -1656,8 +1656,9 @@ namespace Unclassified.FieldLog
 		/// Starts a custom timer. If the key does not exist, a new timer is created.
 		/// </summary>
 		/// <param name="key">The custom timer key.</param>
+		/// <param name="incrementCounter">Increment the counter value.</param>
 		/// <returns>An instance which can be used to call the Start and Stop methods without a further key lookup.</returns>
-		public static CustomTimerInfo StartTimer(string key)
+		public static CustomTimerInfo StartTimer(string key, bool incrementCounter = true)
 		{
 			CustomTimerInfo cti;
 
@@ -1709,7 +1710,7 @@ namespace Unclassified.FieldLog
 			}
 
 			// Last call for most precise measurement of the intended code
-			cti.Start();
+			cti.Start(incrementCounter);
 			return cti;
 		}
 
@@ -1782,11 +1783,12 @@ namespace Unclassified.FieldLog
 		/// time measuring with the <c>using</c> statement.
 		/// </summary>
 		/// <param name="key">The custom timer key.</param>
+		/// <param name="incrementCounter">Increment the counter value.</param>
 		/// <param name="writeImmediately">true to write the timer value immediately when stopping, false for the normal delay.</param>
 		/// <returns>A new <see cref="CustomTimerScope"/> instance.</returns>
-		public static CustomTimerScope Timer(string key, bool writeImmediately = false)
+		public static CustomTimerScope Timer(string key, bool incrementCounter = true, bool writeImmediately = false)
 		{
-			return new CustomTimerScope(key, writeImmediately);
+			return new CustomTimerScope(key, incrementCounter, writeImmediately);
 		}
 
 #if !NET20
@@ -1796,17 +1798,18 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		/// <param name="action">The action to execute.</param>
 		/// <param name="key">The custom timer key. Defaults to the delegate's method name if not specified.</param>
+		/// <param name="incrementCounter">Increment the counter value.</param>
 		/// <param name="writeImmediately">true to write the timer value immediately when stopping, false for the normal delay.</param>
 		/// <remarks>
 		/// This method is not available in the NET20 build.
 		/// </remarks>
-		public static void TimerAction(Action action, string key = null, bool writeImmediately = false)
+		public static void TimerAction(Action action, string key = null, bool incrementCounter = true, bool writeImmediately = false)
 		{
 			if (key == null)
 			{
 				key = action.Method.Name;
 			}
-			using (Timer(key, writeImmediately))
+			using (Timer(key, incrementCounter, writeImmediately))
 			{
 				action();
 			}
@@ -1819,17 +1822,18 @@ namespace Unclassified.FieldLog
 		/// <param name="action">The action to execute.</param>
 		/// <param name="arg1">The first argument passed to <paramref name="action"/>.</param>
 		/// <param name="key">The custom timer key. Defaults to the delegate's method name if not specified.</param>
+		/// <param name="incrementCounter">Increment the counter value.</param>
 		/// <param name="writeImmediately">true to write the timer value immediately when stopping, false for the normal delay.</param>
 		/// <remarks>
 		/// This method is not available in the NET20 build.
 		/// </remarks>
-		public static void TimerAction<T>(Action<T> action, T arg1, string key = null, bool writeImmediately = false)
+		public static void TimerAction<T>(Action<T> action, T arg1, string key = null, bool incrementCounter = true, bool writeImmediately = false)
 		{
 			if (key == null)
 			{
 				key = action.Method.Name;
 			}
-			using (Timer(key, writeImmediately))
+			using (Timer(key, incrementCounter, writeImmediately))
 			{
 				action(arg1);
 			}
@@ -1843,17 +1847,18 @@ namespace Unclassified.FieldLog
 		/// <param name="arg1">The first argument passed to <paramref name="action"/>.</param>
 		/// <param name="arg2">The second argument passed to <paramref name="action"/>.</param>
 		/// <param name="key">The custom timer key. Defaults to the delegate's method name if not specified.</param>
+		/// <param name="incrementCounter">Increment the counter value.</param>
 		/// <param name="writeImmediately">true to write the timer value immediately when stopping, false for the normal delay.</param>
 		/// <remarks>
 		/// This method is not available in the NET20 build.
 		/// </remarks>
-		public static void TimerAction<T1, T2>(Action<T1, T2> action, T1 arg1, T2 arg2, string key = null, bool writeImmediately = false)
+		public static void TimerAction<T1, T2>(Action<T1, T2> action, T1 arg1, T2 arg2, string key = null, bool incrementCounter = true, bool writeImmediately = false)
 		{
 			if (key == null)
 			{
 				key = action.Method.Name;
 			}
-			using (Timer(key, writeImmediately))
+			using (Timer(key, incrementCounter, writeImmediately))
 			{
 				action(arg1, arg2);
 			}
@@ -1865,18 +1870,19 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		/// <param name="func">The function to execute.</param>
 		/// <param name="key">The custom timer key. Defaults to the delegate's method name if not specified.</param>
+		/// <param name="incrementCounter">Increment the counter value.</param>
 		/// <param name="writeImmediately">true to write the timer value immediately when stopping, false for the normal delay.</param>
 		/// <returns>The return value of <paramref name="func"/>.</returns>
 		/// <remarks>
 		/// This method is not available in the NET20 build.
 		/// </remarks>
-		public static TResult TimerFunc<TResult>(Func<TResult> func, string key = null, bool writeImmediately = false)
+		public static TResult TimerFunc<TResult>(Func<TResult> func, string key = null, bool incrementCounter = true, bool writeImmediately = false)
 		{
 			if (key == null)
 			{
 				key = func.Method.Name;
 			}
-			using (Timer(key, writeImmediately))
+			using (Timer(key, incrementCounter, writeImmediately))
 			{
 				return func();
 			}
@@ -1889,18 +1895,19 @@ namespace Unclassified.FieldLog
 		/// <param name="func">The function to execute.</param>
 		/// <param name="arg1">The first argument passed to <paramref name="func"/>.</param>
 		/// <param name="key">The custom timer key. Defaults to the delegate's method name if not specified.</param>
+		/// <param name="incrementCounter">Increment the counter value.</param>
 		/// <param name="writeImmediately">true to write the timer value immediately when stopping, false for the normal delay.</param>
 		/// <returns>The return value of <paramref name="func"/>.</returns>
 		/// <remarks>
 		/// This method is not available in the NET20 build.
 		/// </remarks>
-		public static TResult TimerFunc<T, TResult>(Func<T, TResult> func, T arg1, string key = null, bool writeImmediately = false)
+		public static TResult TimerFunc<T, TResult>(Func<T, TResult> func, T arg1, string key = null, bool incrementCounter = true, bool writeImmediately = false)
 		{
 			if (key == null)
 			{
 				key = func.Method.Name;
 			}
-			using (Timer(key, writeImmediately))
+			using (Timer(key, incrementCounter, writeImmediately))
 			{
 				return func(arg1);
 			}
@@ -1914,18 +1921,19 @@ namespace Unclassified.FieldLog
 		/// <param name="arg1">The first argument passed to <paramref name="func"/>.</param>
 		/// <param name="arg2">The second argument passed to <paramref name="func"/>.</param>
 		/// <param name="key">The custom timer key. Defaults to the delegate's method name if not specified.</param>
+		/// <param name="incrementCounter">Increment the counter value.</param>
 		/// <param name="writeImmediately">true to write the timer value immediately when stopping, false for the normal delay.</param>
 		/// <returns>The return value of <paramref name="func"/>.</returns>
 		/// <remarks>
 		/// This method is not available in the NET20 build.
 		/// </remarks>
-		public static TResult TimerFunc<T1, T2, TResult>(Func<T1, T2, TResult> func, T1 arg1, T2 arg2, string key = null, bool writeImmediately = false)
+		public static TResult TimerFunc<T1, T2, TResult>(Func<T1, T2, TResult> func, T1 arg1, T2 arg2, string key = null, bool incrementCounter = true, bool writeImmediately = false)
 		{
 			if (key == null)
 			{
 				key = func.Method.Name;
 			}
-			using (Timer(key, writeImmediately))
+			using (Timer(key, incrementCounter, writeImmediately))
 			{
 				return func(arg1, arg2);
 			}

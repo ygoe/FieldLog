@@ -210,7 +210,7 @@ namespace ConsoleDemo
 			{
 				for (int j = 0; j < 20; j++)
 				{
-					using (FL.Timer("Loop " + iterations, j == 19))
+					using (FL.Timer("Loop " + iterations, true, j == 19))
 					{
 						for (int i = 0; i < iterations; i++)
 						{

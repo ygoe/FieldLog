@@ -91,7 +91,8 @@ namespace Unclassified.FieldLog
 		/// Starts, or resumes, measuring elapsed time for an interval and increases the call
 		/// counter. Does nothing if the measurement is currently started.
 		/// </summary>
-		public void Start()
+		/// <param name="incrementCounter">Increment the counter value.</param>
+		public void Start(bool incrementCounter = true)
 		{
 			// Don't start the timer now that we're starting a new iteration
 			timer.Change(Timeout.Infinite, Timeout.Infinite);
@@ -99,7 +100,10 @@ namespace Unclassified.FieldLog
 			{
 				if (stopwatch.IsRunning) return;   // Nothing to do
 
-				counter++;
+				if (incrementCounter)
+				{
+					counter++;
+				}
 				stopwatch.Start();
 			}
 		}
@@ -155,12 +159,13 @@ namespace Unclassified.FieldLog
 		/// the CustomTimerInfo instance.
 		/// </summary>
 		/// <param name="key">The custom timer key for a dictionary lookup.</param>
+		/// <param name="incrementCounter">Increment the counter value.</param>
 		/// <param name="writeImmediately">true to write the timer value immediately when stopping, false for the normal delay.</param>
-		public CustomTimerScope(string key, bool writeImmediately)
+		public CustomTimerScope(string key, bool incrementCounter, bool writeImmediately)
 		{
 			this.key = key;
 			this.writeImmediately = writeImmediately;
-			cti = FL.StartTimer(key);
+			cti = FL.StartTimer(key, incrementCounter);
 		}
 
 		/// <summary>
@@ -179,12 +184,13 @@ namespace Unclassified.FieldLog
 		/// the CustomTimerInfo instance.
 		/// </summary>
 		/// <param name="cti">A CustomTimerInfo instance.</param>
+		/// <param name="incrementCounter">Increment the counter value.</param>
 		/// <param name="writeImmediately">true to write the timer value immediately when stopping, false for the normal delay.</param>
-		public CustomTimerScope(CustomTimerInfo cti, bool writeImmediately)
+		public CustomTimerScope(CustomTimerInfo cti, bool incrementCounter, bool writeImmediately)
 		{
 			this.cti = cti;
 			this.writeImmediately = writeImmediately;
-			cti.Start();
+			cti.Start(incrementCounter);
 		}
 
 		/// <summary>

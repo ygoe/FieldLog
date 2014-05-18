@@ -560,49 +560,27 @@ namespace Unclassified.FieldLog
 				{
 					FL.Trace(e.Exception, "TaskScheduler.UnobservedTaskException");
 				};
+
+			// Handle WPF UI thread exceptions
+			// (The essence of System.Windows.Application.DispatcherUnhandledException)
+			Dispatcher.CurrentDispatcher.UnhandledException +=
+				delegate(object sender, DispatcherUnhandledExceptionEventArgs e)
+				{
+					FL.Critical(e.Exception, "WPF.DispatcherUnhandledException", true);
+					e.Handled = true;
+				};
 #endif
 		}
 
 #if !NET20
 		/// <summary>
-		/// Registers application error and trace handlers for a WPF application. This must be
-		/// called after the Application's constructor.
+		/// Registers presentation trace handlers for a WPF application.
 		/// </summary>
 		/// <remarks>
-		/// The WPF exception handler is only registered if no debugger is currently attached.
 		/// This method is not available in the NET20 build.
 		/// </remarks>
-		public static void RegisterWpfErrorHandler()
+		public static void RegisterPresentationTracing()
 		{
-			RegisterWpfErrorHandler(null);
-		}
-
-		/// <summary>
-		/// Registers application error and trace handlers for a WPF application. This can be
-		/// called from the Application's constructor or later.
-		/// </summary>
-		/// <param name="app">The Application object. If null, Application.Current is used (only after Application constructor).</param>
-		/// <remarks>
-		/// The WPF exception handler is only registered if no debugger is currently attached.
-		/// This method is not available in the NET20 build.
-		/// </remarks>
-		public static void RegisterWpfErrorHandler(System.Windows.Application app)
-		{
-			if (app == null)
-			{
-				app = System.Windows.Application.Current;
-			}
-
-			if (!Debugger.IsAttached)
-			{
-				// Handle UI thread exceptions
-				app.DispatcherUnhandledException += delegate(object sender, DispatcherUnhandledExceptionEventArgs e)
-				{
-					FL.Critical(e.Exception, "WPF.DispatcherUnhandledException", true);
-					e.Handled = true;
-				};
-			}
-
 			// Listen for events on all WPF trace sources
 			FieldLogTraceListener.Start();
 		}
@@ -1294,18 +1272,6 @@ namespace Unclassified.FieldLog
 		/// <param name="priority">The priority of the log item.</param>
 		/// <param name="ex">The exception instance.</param>
 		/// <param name="context">The context in which the exception has been thrown.</param>
-		/// <param name="customStackTrace">A StackTrace that shall be logged instead of the StackTrace from the Exception instance.</param>
-		public static void Exception(FieldLogPriority priority, Exception ex, string context, StackTrace customStackTrace)
-		{
-			Log(new FieldLogExceptionItem(priority, ex, context, customStackTrace));
-		}
-
-		/// <summary>
-		/// Writes an exception log item to the log file.
-		/// </summary>
-		/// <param name="priority">The priority of the log item.</param>
-		/// <param name="ex">The exception instance.</param>
-		/// <param name="context">The context in which the exception has been thrown.</param>
 		/// <param name="showUserDialog">true to show a user dialog about the application error.</param>
 		public static void Exception(FieldLogPriority priority, Exception ex, string context, bool showUserDialog)
 		{
@@ -1315,6 +1281,18 @@ namespace Unclassified.FieldLog
 			{
 				ShowAppErrorDialog(item, item.Context != "AppDomain.UnhandledException");
 			}
+		}
+
+		/// <summary>
+		/// Writes an exception log item to the log file.
+		/// </summary>
+		/// <param name="priority">The priority of the log item.</param>
+		/// <param name="ex">The exception instance.</param>
+		/// <param name="context">The context in which the exception has been thrown.</param>
+		/// <param name="customStackTrace">A StackTrace that shall be logged instead of the StackTrace from the Exception instance.</param>
+		internal static void Exception(FieldLogPriority priority, Exception ex, string context, StackTrace customStackTrace)
+		{
+			Log(new FieldLogExceptionItem(priority, ex, context, customStackTrace));
 		}
 
 		#endregion Log methods with variable priority for each item type

@@ -24,7 +24,15 @@ namespace Unclassified.FieldLogViewer
 		[STAThread]
 		public static void Main()
 		{
+			// Set up FieldLog
 			FL.AcceptLogFileBasePath();
+			FL.RegisterPresentationTracing();
+
+			// Keep the setup away
+			GlobalMutex.Create("Unclassified.FieldLogViewer");
+
+			// Make sure the settings are properly saved in the end
+			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 
 			App app = new App();
 			app.InitializeComponent();
@@ -40,13 +48,6 @@ namespace Unclassified.FieldLogViewer
 		/// </summary>
 		public App()
 		{
-			// Keep the setup away
-			GlobalMutex.Create("Unclassified.FieldLogViewer");
-			
-			// Make sure the settings are properly saved in the end
-			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
-
-			FL.RegisterWpfErrorHandler(this);
 		}
 
 		#endregion Constructors

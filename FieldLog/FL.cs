@@ -1458,6 +1458,28 @@ namespace Unclassified.FieldLog
 
 		#endregion Buffer log method
 
+		#region Timeout log methods
+
+		/// <summary>
+		/// Writes a log item to the log file if the specified timeout expires.
+		/// </summary>
+		/// <param name="item">The log item to write.</param>
+		/// <param name="milliseconds">The timeout in milliseconds.</param>
+		/// <remarks>
+		/// To cancel the timeout logging, call the Dispose method of the returned Timer instance.
+		/// </remarks>
+		public static Timer LogTimeout(FieldLogItem item, int milliseconds)
+		{
+			return new Timer(LogTimeoutCallback, item, milliseconds, Timeout.Infinite);
+		}
+
+		private static void LogTimeoutCallback(object item)
+		{
+			Log((FieldLogItem) item);
+		}
+
+		#endregion Timeout log methods
+
 		#region Scope helpers
 
 		/// <summary>

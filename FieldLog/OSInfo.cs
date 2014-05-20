@@ -452,9 +452,12 @@ namespace Unclassified.FieldLog
 					// Just make the entire string of it available for logging
 					try
 					{
-						using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"))
+						if (Assembly.GetEntryAssembly() != null)
 						{
-							AppCompatLayer = key.GetValue(Assembly.GetEntryAssembly().Location) as string;
+							using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"))
+							{
+								AppCompatLayer = key.GetValue(Assembly.GetEntryAssembly().Location) as string;
+							}
 						}
 					}
 					catch

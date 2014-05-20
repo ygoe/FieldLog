@@ -284,7 +284,7 @@ namespace Unclassified.FieldLog
 			env.HostName = Environment.MachineName;
 			env.UserName = Environment.UserDomainName + "\\" + Environment.UserName;
 			env.IsInteractive = Environment.UserInteractive;
-			env.ExecutablePath = Assembly.GetEntryAssembly().Location;
+			env.ExecutablePath = Assembly.GetEntryAssembly() != null ? Assembly.GetEntryAssembly().Location : "";
 			env.CommandLine = Environment.CommandLine;
 			env.AppVersion = FL.AppVersion;
 			env.IsProcess64Bit = IntPtr.Size == 8;   // .NET 4 only: Environment.Is64BitProcess

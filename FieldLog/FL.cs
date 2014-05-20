@@ -349,7 +349,8 @@ namespace Unclassified.FieldLog
 			ShowAppErrorDialog = DefaultShowAppErrorDialog;
 
 			LogScope(FieldLogScopeType.LogStart, null);
-			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+			AppDomain.CurrentDomain.ProcessExit += AppDomain_ProcessExit;
+			AppDomain.CurrentDomain.DomainUnload += AppDomain_DomainUnload;
 
 			if (!Debugger.IsAttached)
 			{
@@ -381,8 +382,26 @@ namespace Unclassified.FieldLog
 		/// This method is called on a pool thread.
 		/// </para>
 		/// </remarks>
-		private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
+		private static void AppDomain_ProcessExit(object sender, EventArgs e)
 		{
+			// Flush log files, if not already done by the application
+			Shutdown();
+		}
+
+		/// <summary>
+		/// Called when the current AppDomains is unloaded.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// This event is never raised in the default application domain.
+		/// </para>
+		/// <para>
+		/// This method is called on a pool thread.
+		/// </para>
+		/// </remarks>
+		private static void AppDomain_DomainUnload(object sender, EventArgs args)
+		{
+			Trace("AppDomain.DomainUnload");
 			// Flush log files, if not already done by the application
 			Shutdown();
 		}
@@ -2164,6 +2183,10 @@ namespace Unclassified.FieldLog
 			{
 				writer.Dispose();
 			}
+
+			// Unregister some events that are no longer needed now
+			AppDomain.CurrentDomain.ProcessExit -= AppDomain_ProcessExit;
+			AppDomain.CurrentDomain.DomainUnload -= AppDomain_DomainUnload;
 		}
 
 		/// <summary>
@@ -2364,8 +2387,8 @@ namespace Unclassified.FieldLog
 		{
 			if (logFileBasePathSet) return true;
 
-			string execPath = Assembly.GetEntryAssembly().Location;
-			string execFile = Path.GetFileNameWithoutExtension(execPath);
+			string execPath = Assembly.GetEntryAssembly() != null ? Assembly.GetEntryAssembly().Location : null;
+			string execFile = execPath != null ? Path.GetFileNameWithoutExtension(execPath) : null;
 			if (customLogFilePrefix != null)
 			{
 				execFile = customLogFilePrefix;
@@ -2396,6 +2419,11 @@ namespace Unclassified.FieldLog
 						}
 						break;
 					case 2:
+						if (execPath == null || execFile == null)
+						{
+							// No entry assembly available, log path and prefix must be set manually
+							return false;
+						}
 						// log subdirectory under the executable file
 						logFileBasePath = Path.Combine(Path.GetDirectoryName(execPath), "log" + Path.DirectorySeparatorChar + execFile);
 						break;
@@ -2714,21 +2742,29 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		private static void ReadLogConfiguration()
 		{
-			string execPath = Assembly.GetEntryAssembly().Location;
-			string execDir = Path.GetDirectoryName(execPath);
-			string execFile = Path.GetFileNameWithoutExtension(execPath);
-			string configFileName = Path.Combine(execDir, execFile + logConfigExtension);
-
-			if (configFileWatcher == null)
+			if (Assembly.GetEntryAssembly() == null)
 			{
-				configFileWatcher = new FileSystemWatcher(execDir, execFile + logConfigExtension);
-				configFileWatcher.Changed += configFileWatcher_Event;
-				configFileWatcher.Created += configFileWatcher_Event;
-				configFileWatcher.EnableRaisingEvents = true;
+				// No entry assembly available, config file not supported
+				ResetLogConfiguration();
+				return;
 			}
-			
+
+			string configFileName = null;
 			try
 			{
+				string execPath = Assembly.GetEntryAssembly().Location;
+				string execDir = Path.GetDirectoryName(execPath);
+				string execFile = Path.GetFileNameWithoutExtension(execPath);
+				configFileName = Path.Combine(execDir, execFile + logConfigExtension);
+
+				if (configFileWatcher == null)
+				{
+					configFileWatcher = new FileSystemWatcher(execDir, execFile + logConfigExtension);
+					configFileWatcher.Changed += configFileWatcher_Event;
+					configFileWatcher.Created += configFileWatcher_Event;
+					configFileWatcher.EnableRaisingEvents = true;
+				}
+
 				ResetLogConfiguration();
 
 				if (!File.Exists(configFileName))
@@ -2821,7 +2857,7 @@ namespace Unclassified.FieldLog
 			catch (Exception ex)
 			{
 				// Something went really bad while reading the configuration file
-				System.Diagnostics.Trace.WriteLine("FieldLog error: Reading configuration file " + configFileName);
+				System.Diagnostics.Trace.WriteLine("FieldLog error: Reading configuration file " + (configFileName ?? "(null)"));
 				System.Diagnostics.Trace.WriteLine(ex.ToString());
 				// Try to log it as well
 				try
@@ -2979,6 +3015,10 @@ namespace Unclassified.FieldLog
 		{
 			get
 			{
+				if (Assembly.GetEntryAssembly() == null)
+				{
+					return null;
+				}
 				object[] customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
@@ -3006,6 +3046,10 @@ namespace Unclassified.FieldLog
 		{
 			get
 			{
+				if (Assembly.GetEntryAssembly() == null)
+				{
+					return null;
+				}
 				object[] customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyProductAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
@@ -3028,6 +3072,10 @@ namespace Unclassified.FieldLog
 		{
 			get
 			{
+				if (Assembly.GetEntryAssembly() == null)
+				{
+					return null;
+				}
 				object[] customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
@@ -3045,6 +3093,10 @@ namespace Unclassified.FieldLog
 		{
 			get
 			{
+				if (Assembly.GetEntryAssembly() == null)
+				{
+					return null;
+				}
 				object[] customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{

@@ -10,7 +10,7 @@ namespace Unclassified.FieldLog
 	/// <remarks>
 	/// Tests have shown that measurements are good for time spans from 1 microsecond (10 ticks) on.
 	/// </remarks>
-	public class CustomTimerInfo
+	public class CustomTimerInfo : IDisposable
 	{
 		/// <summary>
 		/// Defines the delay for saving custom timers, in milliseconds.
@@ -22,6 +22,7 @@ namespace Unclassified.FieldLog
 		private long counter;
 		private Timer timer;
 		private object syncLock = new object();
+		private bool writePending;
 
 		/// <summary>
 		/// Initialises a new instance of the CustomTimerInfo class. Does not start measuring.
@@ -32,6 +33,14 @@ namespace Unclassified.FieldLog
 			this.key = key;
 			stopwatch = new Stopwatch();
 			timer = new Timer(OnCustomTimer, null, Timeout.Infinite, Timeout.Infinite);
+		}
+
+		/// <summary>
+		/// Releases all resources used by the CustomTimerInfo.
+		/// </summary>
+		public void Dispose()
+		{
+			timer.Dispose();
 		}
 
 		/// <summary>
@@ -49,8 +58,11 @@ namespace Unclassified.FieldLog
 
 			lock (syncLock)
 			{
-				// Do nothing if the stopwatch was just started again
-				if (stopwatch.IsRunning) return;
+				// Do nothing if the stopwatch was just started again or current data has already
+				// been written
+				if (stopwatch.IsRunning || writePending) return;
+				// Clear the flag while we're in the lock region
+				writePending = false;
 
 				// Fetch the data in the lock region
 				localCounter = counter;
@@ -94,7 +106,7 @@ namespace Unclassified.FieldLog
 		/// <param name="incrementCounter">Increment the counter value.</param>
 		public void Start(bool incrementCounter = true)
 		{
-			// Don't start the timer now that we're starting a new iteration
+			// Don't fire the write timer now that we're starting a new iteration
 			timer.Change(Timeout.Infinite, Timeout.Infinite);
 			lock (syncLock)
 			{
@@ -105,6 +117,7 @@ namespace Unclassified.FieldLog
 					counter++;
 				}
 				stopwatch.Start();
+				writePending = true;
 			}
 		}
 
@@ -115,18 +128,27 @@ namespace Unclassified.FieldLog
 		/// <param name="writeNow">true to write the timer value immediately, false for the normal delay.</param>
 		public void Stop(bool writeNow = false)
 		{
+			bool wasRunning = false;
 			lock (syncLock)
 			{
-				if (!stopwatch.IsRunning) return;   // Nothing to do
-
-				stopwatch.Stop();
+				wasRunning = stopwatch.IsRunning;
+				if (wasRunning)
+				{
+					stopwatch.Stop();
+					writePending = true;
+				}
+				else if (!writePending)
+				{
+					return;   // Nothing to do
+				}
 			}
+			// wasRunning || writePending
 			if (writeNow)
 			{
 				timer.Change(Timeout.Infinite, Timeout.Infinite);
 				OnCustomTimer(null);
 			}
-			else
+			else if (wasRunning)
 			{
 				timer.Change(customTimerDelay, Timeout.Infinite);
 			}

@@ -1783,7 +1783,8 @@ namespace Unclassified.FieldLog
 			{
 				if (customTimers.TryGetValue(key, out cti))
 				{
-					cti.Stop();
+					cti.Stop(true);
+					cti.Dispose();
 					customTimers.Remove(key);
 				}
 			}

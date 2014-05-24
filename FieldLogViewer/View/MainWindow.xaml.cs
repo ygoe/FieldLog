@@ -480,7 +480,8 @@ namespace Unclassified.FieldLogViewer.View
 		[ViewCommand]
 		public void SaveScrolling()
 		{
-			if (LogItemsList.ActualHeight > 0 &&
+			if (logItemsScroll != null &&
+				LogItemsList.ActualHeight > 0 &&
 				logItemsHostPanel.ItemHeight > 0)
 			{
 				bool selectionIsVisible;

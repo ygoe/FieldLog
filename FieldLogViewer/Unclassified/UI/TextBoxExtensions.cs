@@ -7,7 +7,7 @@ using Unclassified.Util;
 namespace Unclassified.UI
 {
 	/// <summary>
-	/// Provides extensions for WPF TextBox controls.
+	/// Provides extension methods for WPF TextBox controls.
 	/// </summary>
 	public static class TextBoxExtensions
 	{

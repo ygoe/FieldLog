@@ -228,6 +228,10 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		private static Dictionary<FieldLogPriority, DateTime> priorityLastPurgeTimes = new Dictionary<FieldLogPriority, DateTime>();
 		/// <summary>
+		/// Time when the total size of all log files was last checked. Only used in the send thread.
+		/// </summary>
+		private static DateTime totalSizeLastPurgeTime;
+		/// <summary>
 		/// Indicates whether the configuration file has changed and should be reloaded.
 		/// Synchronised by sendThread.
 		/// </summary>
@@ -2629,6 +2633,13 @@ namespace Unclassified.FieldLog
 			}
 
 			// Purge all files according to the configured maximum total file size
+			DateTime now = DateTime.UtcNow;
+			if (now <= totalSizeLastPurgeTime.AddSeconds(2))
+			{
+				return;   // No need to check again right now
+			}
+			totalSizeLastPurgeTime = now;
+
 			string logDir = Path.GetDirectoryName(logFileBasePath);
 			string logFile = Path.GetFileName(logFileBasePath);
 			string[] fileNames = Directory.GetFiles(logDir, logFile + "-*-*.fl");
@@ -2697,7 +2708,7 @@ namespace Unclassified.FieldLog
 			}
 
 			// Determine whether it's time to check for old files
-			DateTime now = FL.UtcNow;
+			DateTime now = DateTime.UtcNow;
 			if (now <= lastPurgeTime.AddTicks(keepTime.Ticks / 4))
 			{
 				return;   // No need to check again right now

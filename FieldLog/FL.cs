@@ -791,7 +791,20 @@ namespace Unclassified.FieldLog
 			string msg;
 			if (level == 0)
 			{
-				msg = ex.Message + " (" + ex.Type + ")\n";
+#if !NET20
+				AggregateException aggEx = ex.Exception as AggregateException;
+				if (aggEx != null && aggEx.InnerExceptions.Count == 1)
+				{
+					// Simplify AggregateExceptions with a single InnerException
+					return ExceptionUserMessageRecursive(ex.InnerExceptions[0], 0);
+				}
+				else
+				{
+#endif
+					msg = ex.Message + " (" + ex.Type + ")\n";
+#if !NET20
+				}
+#endif
 			}
 			else
 			{

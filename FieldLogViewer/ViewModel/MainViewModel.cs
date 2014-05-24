@@ -262,6 +262,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			if (logFileGroupReader != null)
 			{
 				logFileGroupReader.Close();
+				IsLoadingFiles = false;
+				IsLoadingFilesAgain = false;
 				isLiveStopped = true;
 				StopLiveCommand.RaiseCanExecuteChanged();
 			}
@@ -1075,7 +1077,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			UpdateWindowTitle();
 
 			// Start the log file reading in a worker thread
-			readerTask = Task.Factory.StartNew(() => ReadTask(basePath, singleFile));
+			TaskHelper.Start(c => ReadTask(basePath, singleFile), out readerTask);
 		}
 
 		/// <summary>
@@ -1097,7 +1099,15 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				() => !isLiveStopped);
 
 			// Create the log file group reader and read each next item
-			logFileGroupReader = new FieldLogFileGroupReader(basePath, singleFile, readWaitHandle);
+			try
+			{
+				logFileGroupReader = new FieldLogFileGroupReader(basePath, singleFile, readWaitHandle);
+			}
+			catch (Exception ex)
+			{
+				logFileGroupReader_Error(this, new ErrorEventArgs(ex));
+				return;
+			}
 			logFileGroupReader.Error += logFileGroupReader_Error;
 			List<FieldLogScopeItem> seenScopeItems = new List<FieldLogScopeItem>();
 			while (true)
@@ -1222,7 +1232,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					allowDialogCancellation: true,
 					title: "FieldLogViewer",
 					mainInstruction: "An error occured while reading the log files.",
-					content: "For details, including the exact problem and the offending file name and position, please open FieldLogViewer's log file from " +
+					content: e.GetException().Message + "\n\n" +
+						"For details, including the exact problem and the offending file name and position, please open FieldLogViewer's log file from " +
 						FL.LogFileBasePath + ".\n\n" +
 						"If you continue reading, the loaded items may be incomplete or may not appear until you click the Stop button.",
 					customButtons: new string[] { "Continue &reading", "&Cancel" });

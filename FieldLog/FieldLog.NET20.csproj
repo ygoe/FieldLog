@@ -87,6 +87,7 @@
     <Compile Include="FieldLogEventEnvironment.cs" />
     <Compile Include="FieldLogFileEnumerator.cs" />
     <Compile Include="FieldLogFileReader.cs" />
+    <Compile Include="FieldLogWebRequestData.cs" />
     <Compile Include="FL.cs" />
     <Compile Include="FieldLogFileWriter.cs" />
     <Compile Include="LogItems.cs" />

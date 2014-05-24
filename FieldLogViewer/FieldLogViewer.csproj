@@ -144,6 +144,7 @@
     <Compile Include="ViewModel\FilterConditionViewModel.cs" />
     <Compile Include="ViewModel\FilterViewModel.cs" />
     <Compile Include="ViewModel\FieldLogEnvironmentViewModel.cs" />
+    <Compile Include="ViewModel\FieldLogWebRequestDataViewModel.cs" />
     <Compile Include="ViewModel\LogItemViewModelBase.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\SettingsViewModel.cs" />
@@ -168,6 +169,9 @@
     </Compile>
     <Compile Include="View\FieldLogEnvironmentView.xaml.cs">
       <DependentUpon>FieldLogEnvironmentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\FieldLogWebRequestDataView.xaml.cs">
+      <DependentUpon>FieldLogWebRequestDataView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -216,6 +220,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="View\FieldLogEnvironmentView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\FieldLogWebRequestDataView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

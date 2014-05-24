@@ -89,7 +89,7 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Defines the format version of log files.
 		/// </summary>
-		public const byte FileFormatVersion = 1;
+		public const byte FileFormatVersion = 2;
 
 		/// <summary>
 		/// Defines the maximum buffer size to keep.
@@ -265,6 +265,11 @@ namespace Unclassified.FieldLog
 		[ThreadStatic]
 		private static List<FieldLogItem> threadBufferedItems;
 
+		/// <summary>
+		/// The last assigned web request ID. Synchronised by Interlocked access.
+		/// </summary>
+		private static int LastWebRequestId;
+
 		#endregion Private static data
 
 		#region Internal static data
@@ -287,6 +292,13 @@ namespace Unclassified.FieldLog
 
 		[ThreadStatic]
 		internal static int ThreadId;
+
+		/// <summary>
+		/// The web request ID of the web request processed by the current thread. 0 if no web
+		/// request is currently processed in this thread.
+		/// </summary>
+		[ThreadStatic]
+		internal static uint WebRequestId;
 
 		#endregion Internal static data
 
@@ -1324,7 +1336,7 @@ namespace Unclassified.FieldLog
 		/// <param name="name">The scope name. Should be application-unique and hierarchical for easier analysis.</param>
 		public static void Enter(string name)
 		{
-			FL.ScopeLevel++;
+			ScopeLevel++;
 			Log(new FieldLogScopeItem(FieldLogScopeType.Enter, name));
 		}
 
@@ -1334,7 +1346,7 @@ namespace Unclassified.FieldLog
 		/// <param name="name">The scope name. Should be the same as the corresponding Enter scope name.</param>
 		public static void Leave(string name)
 		{
-			FL.ScopeLevel--;
+			ScopeLevel--;
 			Log(new FieldLogScopeItem(FieldLogScopeType.Leave, name));
 		}
 
@@ -1365,17 +1377,48 @@ namespace Unclassified.FieldLog
 			}
 			else if (type == FieldLogScopeType.Enter)
 			{
-				FL.ScopeLevel++;
+				ScopeLevel++;
 				Log(scopeItem);
 			}
 			else if (type == FieldLogScopeType.Leave)
 			{
-				FL.ScopeLevel--;
+				ScopeLevel--;
+				Log(scopeItem);
+			}
+			else if (type == FieldLogScopeType.WebRequestStart)
+			{
+				throw new ArgumentException("Missing FieldLogWebRequestData instance. Use the other overloaded method", "type");
+			}
+			else if (type == FieldLogScopeType.WebRequestEnd)
+			{
+				Log(scopeItem);
+				WebRequestId = 0;
+			}
+			else
+			{
+				throw new ArgumentException("Invalid scope type value.", "type");
+			}
+		}
+
+		/// <summary>
+		/// Writes a scope log item to the log file.
+		/// </summary>
+		/// <param name="type">The scope type.</param>
+		/// <param name="name">The scope name. Should be application-unique and hierarchical for easier analysis.</param>
+		/// <param name="webRequestData">The web request data. This parameter is required for the WebRequestStart scope type.</param>
+		public static void LogScope(FieldLogScopeType type, string name, FieldLogWebRequestData webRequestData)
+		{
+			if (type == FieldLogScopeType.WebRequestStart)
+			{
+				// Interlocked.Increment is only available for Int32 but it handles the overflow, so
+				// we can safely cast it to UInt32 to use the other half of the value space.
+				WebRequestId = unchecked((uint) Interlocked.Increment(ref LastWebRequestId));
+				FieldLogScopeItem scopeItem = new FieldLogScopeItem(FieldLogPriority.Trace, type, name, webRequestData);
 				Log(scopeItem);
 			}
 			else
 			{
-				throw new ArgumentException("Invalid value.", "type");
+				throw new ArgumentException("Invalid scope type value for this overloaded method.", "type");
 			}
 		}
 

@@ -20,7 +20,7 @@ namespace Unclassified.FieldLog
 		static FieldLogEventEnvironment()
 		{
 			Empty = new FieldLogEventEnvironment();
-			Empty.Size = 148 + 14 * IntPtr.Size;
+			Empty.Size = 148 + 14 * IntPtr.Size;   // 148 bytes + 14 null strings
 		}
 
 		/// <summary>
@@ -37,7 +37,9 @@ namespace Unclassified.FieldLog
 
 		#region Data properties
 
-		/// <summary>Approximate data size of this data structure. Used for buffer size estimation.</summary>
+		/// <summary>
+		/// Gets the approximate data size of this data structure. Used for buffer size estimation.
+		/// </summary>
 		public int Size { get; protected set; }
 
 		/// <summary>

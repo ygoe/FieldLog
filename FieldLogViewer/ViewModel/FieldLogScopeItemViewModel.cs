@@ -15,6 +15,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			base.Item = item;
 
 			this.EnvironmentVM = new FieldLogEnvironmentViewModel(item.EnvironmentData, this);
+			this.WebRequestDataVM = new FieldLogWebRequestDataViewModel(item.WebRequestData, this);
 		}
 
 		public new FieldLogScopeItem Item { get; private set; }
@@ -25,6 +26,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public bool IsPoolThread { get { return this.Item.IsPoolThread; } }
 		public bool IsRepeated { get { return this.Item.IsRepeated; } }
 		public FieldLogEnvironmentViewModel EnvironmentVM { get; private set; }
+		public FieldLogWebRequestDataViewModel WebRequestDataVM { get; private set; }
 
 		public string TypeTitle
 		{
@@ -38,6 +40,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					case FieldLogScopeType.ThreadEnd: return "Thread end";
 					case FieldLogScopeType.LogStart: return "Log start";
 					case FieldLogScopeType.LogShutdown: return "Log shutdown";
+					case FieldLogScopeType.WebRequestStart: return "Web request start";
+					case FieldLogScopeType.WebRequestEnd: return "Web request end";
 					default: return "Unknown (" + (int) this.Type + ")";
 				}
 			}
@@ -55,6 +59,9 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					case FieldLogScopeType.ThreadEnd: return "/Images/ScopeItem_ThreadEnd_14.png";
 					case FieldLogScopeType.LogStart: return "/Images/ScopeItem_LogStart_14.png";
 					case FieldLogScopeType.LogShutdown: return "/Images/ScopeItem_LogShutdown_14.png";
+					// TODO: Add icons for WebRequestStart/End
+					case FieldLogScopeType.WebRequestStart: return "/Images/ScopeItem_Enter_14.png";
+					case FieldLogScopeType.WebRequestEnd: return "/Images/ScopeItem_Leave_14.png";
 					default: return null;
 				}
 			}
@@ -97,6 +104,14 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			get
 			{
 				return Type == FieldLogScopeType.LogStart ? Visibility.Visible : Visibility.Collapsed;
+			}
+		}
+
+		public Visibility WebRequestVisibility
+		{
+			get
+			{
+				return Type == FieldLogScopeType.WebRequestStart ? Visibility.Visible : Visibility.Collapsed;
 			}
 		}
 

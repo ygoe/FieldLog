@@ -97,6 +97,7 @@
     <Compile Include="FieldLogTraceListener.cs" />
     <Compile Include="FL.cs" />
     <Compile Include="FieldLogFileWriter.cs" />
+    <Compile Include="FieldLogWebRequestData.cs" />
     <Compile Include="LogItems.cs" />
     <Compile Include="OSInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -188,6 +188,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public DelegateCommand QuickFilterMinPrioCommand { get; private set; }
 		public DelegateCommand QuickFilterNotBeforeCommand { get; private set; }
 		public DelegateCommand QuickFilterNotAfterCommand { get; private set; }
+		public DelegateCommand QuickFilterWebRequestCommand { get; private set; }
 
 		private void InitializeCommands()
 		{
@@ -207,6 +208,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			QuickFilterMinPrioCommand = new DelegateCommand(OnQuickFilterMinPrio, CanQuickFilterMinPrio);
 			QuickFilterNotBeforeCommand = new DelegateCommand(OnQuickFilterNotBefore, CanQuickFilterNotBefore);
 			QuickFilterNotAfterCommand = new DelegateCommand(OnQuickFilterNotAfter, CanQuickFilterNotAfter);
+			QuickFilterWebRequestCommand = new DelegateCommand(OnQuickFilterWebRequest, CanQuickFilterWebRequest);
 		}
 
 		private void InvalidateToolbarCommandsLoading()
@@ -226,6 +228,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			QuickFilterMinPrioCommand.RaiseCanExecuteChanged();
 			QuickFilterNotBeforeCommand.RaiseCanExecuteChanged();
 			QuickFilterNotAfterCommand.RaiseCanExecuteChanged();
+			QuickFilterWebRequestCommand.RaiseCanExecuteChanged();
 		}
 
 		#region Toolbar
@@ -653,6 +656,66 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
+		private bool CanQuickFilterWebRequest()
+		{
+			return SelectedItemsWebRequestIds.Any();
+		}
+
+		private void OnQuickFilterWebRequest()
+		{
+			bool isNew;
+			var filter = GetQuickFilter(out isNew);
+			int webRequestCount = SelectedItemsWebRequestIds.Count();
+			switch (webRequestCount)
+			{
+				case 1:
+					filter.DisplayName = "Web request " + SelectedItemsWebRequestIds.First();
+					break;
+				default:
+					filter.DisplayName = "Web requests " + SelectedItemsWebRequestIds.Aggregate(", ", " and ");
+					break;
+			}
+			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
+			{
+				// Remove all session and web request ID conditions
+				cg.Conditions.Filter(c => c.Column != FilterColumn.SessionId);
+				cg.Conditions.Filter(c => c.Column != FilterColumn.WebRequestId);
+				if (!cg.IsExclude)
+				{
+					cg.Conditions.Add(new FilterConditionViewModel(cg)
+					{
+						Column = FilterColumn.SessionId,
+						Comparison = FilterComparison.Equals,
+						Value = SelectedItemsSessionIds.First().ToString("D")
+					});
+					if (webRequestCount == 1)
+					{
+						cg.Conditions.Add(new FilterConditionViewModel(cg)
+						{
+							Column = FilterColumn.WebRequestId,
+							Comparison = FilterComparison.Equals,
+							Value = SelectedItemsWebRequestIds.First().ToString()
+						});
+					}
+					else
+					{
+						cg.Conditions.Add(new FilterConditionViewModel(cg)
+						{
+							Column = FilterColumn.WebRequestId,
+							Comparison = FilterComparison.InList,
+							Value = SelectedItemsWebRequestIds.Aggregate(";")
+						});
+					}
+				}
+			}
+			if (isNew)
+			{
+				filter.QuickPreviousFilter = SelectedFilter;
+				Filters.Add(filter);
+				SelectedFilter = filter;
+			}
+		}
+
 		#endregion Log items list context menu
 
 		#endregion Commands
@@ -951,6 +1014,22 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					}
 				}
 				return "Filter by priority";
+			}
+		}
+
+		private IEnumerable<uint> SelectedItemsWebRequestIds
+		{
+			get
+			{
+				if (SelectedItems != null)
+				{
+					return SelectedItems
+						.OfType<FieldLogItemViewModel>()
+						.Select(vm => vm.WebRequestId)
+						.Distinct()
+						.OrderBy(tid => tid);
+				}
+				return new uint[0];
 			}
 		}
 
@@ -1288,22 +1367,55 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					item.UtcOffset = tryUtcOffset;
 				}
 
+				FieldLogScopeItemViewModel scope = item as FieldLogScopeItemViewModel;
+
 				// Use LastLogStartItem and UtcOffset of the previous item from the same session
-				prevIndex = newIndex - 1;
-				while (prevIndex >= 0)
+				if (scope != null && scope.Type == FieldLogScopeType.LogStart)
 				{
-					FieldLogItemViewModel prevFlItem = logItems[prevIndex] as FieldLogItemViewModel;
-					if (prevFlItem != null &&
-						prevFlItem.SessionId == flItem.SessionId)
+					// This is a LogStart item, don't look elsewhere
+					flItem.LastLogStartItem = scope;
+				}
+				else
+				{
+					prevIndex = newIndex - 1;
+					while (prevIndex >= 0)
 					{
-						flItem.LastLogStartItem = prevFlItem.LastLogStartItem;
-						if (!newUtcOffset)
+						FieldLogItemViewModel prevFlItem = logItems[prevIndex] as FieldLogItemViewModel;
+						if (prevFlItem != null &&
+							prevFlItem.SessionId == flItem.SessionId)
 						{
-							flItem.UtcOffset = prevFlItem.UtcOffset;
+							flItem.LastLogStartItem = prevFlItem.LastLogStartItem;
+							if (!newUtcOffset)
+							{
+								flItem.UtcOffset = prevFlItem.UtcOffset;
+							}
+							break;
 						}
-						break;
+						prevIndex--;
 					}
-					prevIndex--;
+				}
+
+				// Use LastWebRequestStartItem of the previous item from the same session and web request
+				if (scope != null && scope.Type == FieldLogScopeType.WebRequestStart)
+				{
+					// This is a WebRequestStart item, don't look elsewhere
+					flItem.LastWebRequestStartItem = scope;
+				}
+				else
+				{
+					prevIndex = newIndex - 1;
+					while (prevIndex >= 0)
+					{
+						FieldLogItemViewModel prevFlItem = logItems[prevIndex] as FieldLogItemViewModel;
+						if (prevFlItem != null &&
+							prevFlItem.SessionId == flItem.SessionId &&
+							prevFlItem.WebRequestId == flItem.WebRequestId)
+						{
+							flItem.LastWebRequestStartItem = prevFlItem.LastWebRequestStartItem;
+							break;
+						}
+						prevIndex--;
+					}
 				}
 
 				// Update all items after the inserted item
@@ -1330,6 +1442,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 							}
 						}
 
+						if (nextFlItem.WebRequestId == flItem.WebRequestId)
+						{
+							// Same web request gets the LastWebRequestStartItem
+							nextFlItem.LastWebRequestStartItem = flItem.LastWebRequestStartItem;
+						}
+
 						// All same session also get LastLogStartItem and UtcOffset
 						nextFlItem.LastLogStartItem = flItem.LastLogStartItem;
 
@@ -1344,6 +1462,13 @@ namespace Unclassified.FieldLogViewer.ViewModel
 							nextFlItem.UtcOffset = flItem.UtcOffset;
 						}
 					}
+				}
+
+				// Update the filter now that the item has more data (LastLogStartItem and
+				// LastWebRequestStartItem) and potentially following items have been updated, too
+				if (SelectedFilter != null)
+				{
+					SelectedFilter.OnFilterChanged(true);
 				}
 			}
 
@@ -1442,6 +1567,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				// Apply scope-based indenting and UtcOffset to all items now
 				Dictionary<int, int> threadLevels = new Dictionary<int, int>();
 				Dictionary<Guid, FieldLogScopeItemViewModel> logStartItems = new Dictionary<Guid, FieldLogScopeItemViewModel>();
+				Dictionary<Tuple<Guid, uint>, FieldLogScopeItemViewModel> webRequestStartItems = new Dictionary<Tuple<Guid, uint>, FieldLogScopeItemViewModel>();
 				int utcOffset = 0;
 				foreach (var item in localLogItems)
 				{
@@ -1474,6 +1600,10 @@ namespace Unclassified.FieldLogViewer.ViewModel
 							{
 								logStartItems[scope.SessionId] = scope;
 							}
+							if (scope.Type == FieldLogScopeType.WebRequestStart)
+							{
+								webRequestStartItems[new Tuple<Guid, uint>(scope.SessionId, scope.WebRequestId)] = scope;
+							}
 						}
 						else
 						{
@@ -1488,6 +1618,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						if (logStartItems.TryGetValue(flItem.SessionId, out tryLastLogStartScope))
 						{
 							flItem.LastLogStartItem = tryLastLogStartScope;
+						}
+
+						FieldLogScopeItemViewModel tryLastWebRequestStartScope;
+						if (webRequestStartItems.TryGetValue(new Tuple<Guid, uint>(flItem.SessionId, flItem.WebRequestId), out tryLastWebRequestStartScope))
+						{
+							flItem.LastWebRequestStartItem = tryLastWebRequestStartScope;
 						}
 					}
 				}

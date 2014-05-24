@@ -53,9 +53,11 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public FieldLogPriority Priority { get { return this.Item.Priority; } }
 		public Guid SessionId { get { return this.Item.SessionId; } }
 		public int ThreadId { get { return this.Item.ThreadId; } }
+		public uint WebRequestId { get { return this.Item.WebRequestId; } }
 		public string LogItemSourceFileName { get { return this.Item.LogItemSourceFileName; } }
 
 		public FieldLogScopeItemViewModel LastLogStartItem { get; set; }
+		public FieldLogScopeItemViewModel LastWebRequestStartItem { get; set; }
 
 		public string EventCounterAndSourceFile
 		{
@@ -158,6 +160,11 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					return Brushes.White;
 				}
 			}
+		}
+
+		public Visibility WebRequestIdVisibility
+		{
+			get { return WebRequestId != 0 ? Visibility.Visible : Visibility.Collapsed; }
 		}
 
 		private bool isSelected;

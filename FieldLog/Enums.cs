@@ -44,7 +44,11 @@
 		/// <summary>The logging has started. This occurs only once in an application's lifetime.</summary>
 		LogStart,
 		/// <summary>The logging was shut down. This occurs only once in an application's lifetime.</summary>
-		LogShutdown
+		LogShutdown,
+		/// <summary>A web request has started.</summary>
+		WebRequestStart,
+		/// <summary>A web request has ended.</summary>
+		WebRequestEnd
 	}
 
 	/// <summary>

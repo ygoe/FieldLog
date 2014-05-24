@@ -72,7 +72,7 @@ namespace Unclassified.UI
 
 		#endregion View registration
 
-		#region Command invokation
+		#region Command invocation
 
 		/// <summary>
 		/// Invokes a command on all registered views.
@@ -144,7 +144,7 @@ namespace Unclassified.UI
 			BeginInvoke(commandName, DispatcherPriority.Loaded, args);
 		}
 
-		#endregion Command invokation
+		#endregion Command invocation
 	}
 
 	/// <summary>

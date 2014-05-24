@@ -25,6 +25,7 @@
 					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
 				</Grid.RowDefinitions>
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="100"/>
@@ -54,16 +55,19 @@
 				<TextBlock Grid.Row="4" Grid.Column="0" Margin="0,0,0,0" Text="Thread:"/>
 				<TextBox Grid.Row="4" Grid.Column="1" Margin="0,0,0,0" Text="{Binding ThreadId, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
-				<TextBlock Grid.Row="5" Grid.Column="0" Margin="0,0,0,0" Text="Context:"/>
-				<TextBox Grid.Row="5" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Context, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+				<TextBlock Grid.Row="5" Grid.Column="0" Margin="0,0,0,0" Text="Web request:" Visibility="{Binding WebRequestIdVisibility}"/>
+				<TextBox Grid.Row="5" Grid.Column="1" Margin="0,0,0,0" Text="{Binding WebRequestId, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}" Visibility="{Binding WebRequestIdVisibility}"/>
+
+				<TextBlock Grid.Row="6" Grid.Column="0" Margin="0,0,0,0" Text="Context:"/>
+				<TextBox Grid.Row="6" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Context, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
 				<v:FieldLogExceptionView
-					Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
+					Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2"
 					Margin="0,6,0,0"
 					DataContext="{Binding ExceptionVM}"/>
 
 				<Grid
-					Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2"
+					Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2"
 					Margin="0,8,0,0" Visibility="{Binding EnvVisibility}">
 					<v:FieldLogEnvironmentView DataContext="{Binding EnvironmentVM}"/>
 				</Grid>

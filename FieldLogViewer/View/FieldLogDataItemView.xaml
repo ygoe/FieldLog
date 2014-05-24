@@ -8,7 +8,7 @@
 	xmlns:v="clr-namespace:Unclassified.FieldLogViewer.View" 
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	mc:Ignorable="d" 
-	d:DesignHeight="190" d:DesignWidth="572"
+	d:DesignHeight="240" d:DesignWidth="572"
 	Focusable="False">
 	<UserControl.Resources>
 	</UserControl.Resources>
@@ -17,6 +17,7 @@
 		<ScrollViewer VerticalScrollBarVisibility="Auto">
 			<Grid Margin="10" VerticalAlignment="Top">
 				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="Auto"/>
@@ -54,11 +55,14 @@
 				<TextBlock Grid.Row="4" Grid.Column="0" Margin="0,0,0,0" Text="Thread:"/>
 				<TextBox Grid.Row="4" Grid.Column="1" Margin="0,0,0,0" Text="{Binding ThreadId, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
-				<TextBlock Grid.Row="5" Grid.Column="0" Margin="0,8,0,0" Text="Name:"/>
-				<TextBox Grid.Row="5" Grid.Column="1" Margin="0,8,0,0" Text="{Binding Name, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+				<TextBlock Grid.Row="5" Grid.Column="0" Margin="0,0,0,0" Text="Web request:" Visibility="{Binding WebRequestIdVisibility}"/>
+				<TextBox Grid.Row="5" Grid.Column="1" Margin="0,0,0,0" Text="{Binding WebRequestId, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}" Visibility="{Binding WebRequestIdVisibility}"/>
 
-				<TextBlock Grid.Row="6" Grid.Column="0" Margin="0,8,0,0" Text="Value:"/>
-				<TextBox Grid.Row="6" Grid.Column="1" Margin="0,8,0,0" Text="{Binding Value, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+				<TextBlock Grid.Row="6" Grid.Column="0" Margin="0,8,0,0" Text="Name:"/>
+				<TextBox Grid.Row="6" Grid.Column="1" Margin="0,8,0,0" Text="{Binding Name, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="7" Grid.Column="0" Margin="0,8,0,0" Text="Value:"/>
+				<TextBox Grid.Row="7" Grid.Column="1" Margin="0,8,0,0" Text="{Binding Value, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 			</Grid>
 		</ScrollViewer>
 	</Grid>

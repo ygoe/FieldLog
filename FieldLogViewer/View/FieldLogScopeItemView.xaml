@@ -27,6 +27,8 @@
 					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
 				</Grid.RowDefinitions>
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="100"/>
@@ -56,8 +58,11 @@
 				<TextBlock Grid.Row="4" Grid.Column="0" Margin="0,0,0,0" Text="Thread:"/>
 				<TextBox Grid.Row="4" Grid.Column="1" Margin="0,0,0,0" Text="{Binding ThreadId, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
-				<TextBlock Grid.Row="5" Grid.Column="0" Margin="0,8,0,0" Text="Scope type:"/>
-				<Grid Grid.Row="5" Grid.Column="1" Margin="2,8,0,0">
+				<TextBlock Grid.Row="5" Grid.Column="0" Margin="0,0,0,0" Text="Web request:" Visibility="{Binding WebRequestIdVisibility}"/>
+				<TextBox Grid.Row="5" Grid.Column="1" Margin="0,0,0,0" Text="{Binding WebRequestId, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}" Visibility="{Binding WebRequestIdVisibility}"/>
+
+				<TextBlock Grid.Row="6" Grid.Column="0" Margin="0,8,0,0" Text="Scope type:"/>
+				<Grid Grid.Row="6" Grid.Column="1" Margin="2,8,0,0">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="Auto"/>
 						<ColumnDefinition Width="*"/>
@@ -67,19 +72,25 @@
 					<TextBox Grid.Column="1" Margin="2,0,0,0" Text="{Binding TypeTitle, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 				</Grid>
 
-				<TextBlock Grid.Row="6" Grid.Column="0" Margin="0,0,0,0" Text="Name:"/>
-				<TextBox Grid.Row="6" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Name, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+				<TextBlock Grid.Row="7" Grid.Column="0" Margin="0,0,0,0" Text="Name:"/>
+				<TextBox Grid.Row="7" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Name, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
-				<TextBlock Grid.Row="7" Grid.Column="0" Margin="0,0,0,0" Text="Level:"/>
-				<TextBox Grid.Row="7" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Level, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+				<TextBlock Grid.Row="8" Grid.Column="0" Margin="0,0,0,0" Text="Level:"/>
+				<TextBox Grid.Row="8" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Level, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
-				<TextBlock Grid.Row="8" Grid.Column="0" Margin="0,0,0,0" Text="Repeated:"/>
-				<TextBox Grid.Row="8" Grid.Column="1" Margin="0,0,0,0" Text="{Binding IsRepeatedString, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+				<TextBlock Grid.Row="9" Grid.Column="0" Margin="0,0,0,0" Text="Repeated:"/>
+				<TextBox Grid.Row="9" Grid.Column="1" Margin="0,0,0,0" Text="{Binding IsRepeatedString, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
 				<Grid
-					Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2"
+					Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2"
 					Margin="0,8,0,0" Visibility="{Binding EnvVisibility}">
 					<v:FieldLogEnvironmentView DataContext="{Binding EnvironmentVM}"/>
+				</Grid>
+
+				<Grid
+					Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2"
+					Margin="0,8,0,0" Visibility="{Binding WebRequestVisibility}">
+					<v:FieldLogWebRequestDataView DataContext="{Binding WebRequestDataVM}"/>
 				</Grid>
 			</Grid>
 		</ScrollViewer>

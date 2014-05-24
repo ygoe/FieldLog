@@ -34,7 +34,7 @@
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
 
-			<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,8,0,0" Text="Web request" FontWeight="Bold"/>
+			<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,8,0,8" Text="Web request" FontWeight="Bold"/>
 
 			<TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,0,0" Text="URL:"/>
 			<TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,0" Text="{Binding WebRequestData.RequestUrl, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>

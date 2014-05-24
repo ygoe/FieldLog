@@ -59,9 +59,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					case FieldLogScopeType.ThreadEnd: return "/Images/ScopeItem_ThreadEnd_14.png";
 					case FieldLogScopeType.LogStart: return "/Images/ScopeItem_LogStart_14.png";
 					case FieldLogScopeType.LogShutdown: return "/Images/ScopeItem_LogShutdown_14.png";
-					// TODO: Add icons for WebRequestStart/End
-					case FieldLogScopeType.WebRequestStart: return "/Images/ScopeItem_Enter_14.png";
-					case FieldLogScopeType.WebRequestEnd: return "/Images/ScopeItem_Leave_14.png";
+					case FieldLogScopeType.WebRequestStart: return "/Images/ScopeItem_WebRequestStart_14.png";
+					case FieldLogScopeType.WebRequestEnd: return "/Images/ScopeItem_WebRequestEnd_14.png";
 					default: return null;
 				}
 			}

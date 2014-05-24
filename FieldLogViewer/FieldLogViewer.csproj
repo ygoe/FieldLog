@@ -338,6 +338,8 @@
     <Resource Include="Images\indent_plus.png" />
     <Resource Include="Images\flash.png" />
     <Resource Include="Images\filter_delete.png" />
+    <Resource Include="Images\ScopeItem_WebRequestEnd_14.png" />
+    <Resource Include="Images\ScopeItem_WebRequestStart_14.png" />
     <Content Include="Sounds\high.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

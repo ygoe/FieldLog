@@ -1466,10 +1466,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 				// Update the filter now that the item has more data (LastLogStartItem and
 				// LastWebRequestStartItem) and potentially following items have been updated, too
-				if (SelectedFilter != null)
-				{
-					SelectedFilter.OnFilterChanged(true);
-				}
+				RefreshLogItemsFilterView();
 			}
 
 			// Ensure the items list is current when the queued counter is decremented

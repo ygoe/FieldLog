@@ -18,10 +18,24 @@ using System.Runtime.InteropServices;
 // Informational version string, used for the About dialog, error reports and the setup script.
 // Can be any freely formatted string containing punctuation, letters and revision codes.
 // Should be set to the same value as AssemblyVersion if only the basic numbering scheme is applied.
+#if NET20
 #if DEBUG
-[assembly: AssemblyInformationalVersion("{bmin:2014:4}.{commit:6}{!:+}-d")]
+[assembly: AssemblyInformationalVersion("{bmin:2014:4}.{commit:6}{!:+}-d (NET20)")]
 #else
-[assembly: AssemblyInformationalVersion("{bmin:2014:4}.{commit:6}{!:+}")]
+[assembly: AssemblyInformationalVersion("{bmin:2014:4}.{commit:6}{!:+} (NET20)")]
+#endif
+#elif ASPNET
+#if DEBUG
+[assembly: AssemblyInformationalVersion("{bmin:2014:4}.{commit:6}{!:+}-d (ASPNET40)")]
+#else
+[assembly: AssemblyInformationalVersion("{bmin:2014:4}.{commit:6}{!:+} (ASPNET40)")]
+#endif
+#else
+#if DEBUG
+[assembly: AssemblyInformationalVersion("{bmin:2014:4}.{commit:6}{!:+}-d (NET40)")]
+#else
+[assembly: AssemblyInformationalVersion("{bmin:2014:4}.{commit:6}{!:+} (NET40)")]
+#endif
 #endif
 
 [assembly: ComVisible(false)]

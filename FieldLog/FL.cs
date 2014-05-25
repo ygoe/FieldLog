@@ -10,6 +10,10 @@ using System.Threading;
 #if !NET20
 using System.Windows.Threading;
 #endif
+#if ASPNET
+using System.Linq;
+using System.Web;
+#endif
 
 namespace Unclassified.FieldLog
 {
@@ -2145,6 +2149,62 @@ namespace Unclassified.FieldLog
 #endif
 
 		#endregion WPF Dispatcher log methods
+
+		#region ASP.NET log methods
+
+#if ASPNET
+		/// <summary>
+		/// Writes a web request start scope log item to the log file.
+		/// </summary>
+		/// <param name="useSession">true to access the Session, false to leave it alone.</param>
+		public static void LogWebRequestStart(bool useSession = true)
+		{
+			LogWebRequestStart(useSession, null, null);
+		}
+
+		/// <summary>
+		/// Writes a web request start scope log item to the log file.
+		/// </summary>
+		/// <param name="useSession">true to access the Session, false to leave it alone.</param>
+		/// <param name="appUserId">The application-specific user ID, if available.</param>
+		/// <param name="appUserName">The application-specific user name, if available.</param>
+		public static void LogWebRequestStart(bool useSession, string appUserId, string appUserName)
+		{
+			FieldLogWebRequestData wrd = new FieldLogWebRequestData();
+			wrd.RequestUrl = HttpContext.Current.Request.Url.ToString();
+			wrd.ClientAddress = HttpContext.Current.Request.UserHostAddress;
+			wrd.ClientHostName = HttpContext.Current.Request.UserHostName;
+			wrd.Referrer = HttpContext.Current.Request.UrlReferrer != null ? HttpContext.Current.Request.UrlReferrer.ToString() : null;
+			wrd.UserAgent = HttpContext.Current.Request.UserAgent;
+			wrd.AcceptLanguages = HttpContext.Current.Request.UserLanguages != null ? HttpContext.Current.Request.UserLanguages.Aggregate((a, b) => a + "," + b) : null;
+			wrd.Accept = HttpContext.Current.Request.AcceptTypes != null ? HttpContext.Current.Request.AcceptTypes.Aggregate((a, b) => a + "," + b) : null;
+			if (useSession)
+			{
+				try
+				{
+					wrd.WebSessionId = HttpContext.Current.Session != null ? HttpContext.Current.Session.SessionID : null;
+				}
+				catch
+				{
+					// Sometimes it just throws. Ignore it.
+				}
+			}
+			wrd.AppUserId = appUserId;
+			wrd.AppUserName = appUserName;
+
+			LogScope(FieldLogScopeType.WebRequestStart, null, wrd);
+		}
+
+		/// <summary>
+		/// Writes a web request end scope log item to the log file.
+		/// </summary>
+		public static void LogWebRequestEnd()
+		{
+			LogScope(FieldLogScopeType.WebRequestEnd, null);
+		}
+#endif
+
+		#endregion ASP.NET log methods
 
 		#region Item buffer methods
 

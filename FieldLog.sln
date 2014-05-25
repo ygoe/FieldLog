@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FieldLog", "FieldLog\FieldLog.csproj", "{5024F0F3-092C-414A-94C6-36764C4D42EA}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleDemo", "ConsoleDemo\ConsoleDemo.csproj", "{9A83B21E-3BDB-4F7D-A6A1-E92C5F6A5530}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FieldLogViewer", "FieldLogViewer\FieldLogViewer.csproj", "{1C7994D4-0E71-4EDE-8832-0FDB6FFFF7B7}"
@@ -13,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmoothListTest", "SmoothLis
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogBenchmark", "LogBenchmark\LogBenchmark.csproj", "{A58A3F11-E46D-4440-B1C5-217E2906A76B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FieldLog.NET40", "FieldLog\FieldLog.NET40.csproj", "{5024F0F3-092C-414A-94C6-36764C4D42EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FieldLog.ASPNET40", "FieldLog\FieldLog.ASPNET40.csproj", "{96E92847-D5F7-4552-83C6-36FEDD5CA895}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,14 +23,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5024F0F3-092C-414A-94C6-36764C4D42EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5024F0F3-092C-414A-94C6-36764C4D42EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5024F0F3-092C-414A-94C6-36764C4D42EA}.Debug|x86.ActiveCfg = Debug|x86
-		{5024F0F3-092C-414A-94C6-36764C4D42EA}.Debug|x86.Build.0 = Debug|x86
-		{5024F0F3-092C-414A-94C6-36764C4D42EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5024F0F3-092C-414A-94C6-36764C4D42EA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5024F0F3-092C-414A-94C6-36764C4D42EA}.Release|x86.ActiveCfg = Release|x86
-		{5024F0F3-092C-414A-94C6-36764C4D42EA}.Release|x86.Build.0 = Release|x86
 		{9A83B21E-3BDB-4F7D-A6A1-E92C5F6A5530}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9A83B21E-3BDB-4F7D-A6A1-E92C5F6A5530}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A83B21E-3BDB-4F7D-A6A1-E92C5F6A5530}.Debug|x86.ActiveCfg = Debug|x86
@@ -68,6 +62,22 @@ Global
 		{A58A3F11-E46D-4440-B1C5-217E2906A76B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A58A3F11-E46D-4440-B1C5-217E2906A76B}.Release|x86.ActiveCfg = Release|x86
 		{A58A3F11-E46D-4440-B1C5-217E2906A76B}.Release|x86.Build.0 = Release|x86
+		{5024F0F3-092C-414A-94C6-36764C4D42EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5024F0F3-092C-414A-94C6-36764C4D42EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5024F0F3-092C-414A-94C6-36764C4D42EA}.Debug|x86.ActiveCfg = Debug|x86
+		{5024F0F3-092C-414A-94C6-36764C4D42EA}.Debug|x86.Build.0 = Debug|x86
+		{5024F0F3-092C-414A-94C6-36764C4D42EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5024F0F3-092C-414A-94C6-36764C4D42EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5024F0F3-092C-414A-94C6-36764C4D42EA}.Release|x86.ActiveCfg = Release|x86
+		{5024F0F3-092C-414A-94C6-36764C4D42EA}.Release|x86.Build.0 = Release|x86
+		{96E92847-D5F7-4552-83C6-36FEDD5CA895}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96E92847-D5F7-4552-83C6-36FEDD5CA895}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96E92847-D5F7-4552-83C6-36FEDD5CA895}.Debug|x86.ActiveCfg = Debug|x86
+		{96E92847-D5F7-4552-83C6-36FEDD5CA895}.Debug|x86.Build.0 = Debug|x86
+		{96E92847-D5F7-4552-83C6-36FEDD5CA895}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96E92847-D5F7-4552-83C6-36FEDD5CA895}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96E92847-D5F7-4552-83C6-36FEDD5CA895}.Release|x86.ActiveCfg = Release|x86
+		{96E92847-D5F7-4552-83C6-36FEDD5CA895}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

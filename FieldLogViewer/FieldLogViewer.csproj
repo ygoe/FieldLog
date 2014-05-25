@@ -266,12 +266,6 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FieldLog\FieldLog.csproj">
-      <Project>{5024F0F3-092C-414A-94C6-36764C4D42EA}</Project>
-      <Name>FieldLog</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\DataItem_14.png" />
     <Resource Include="Images\ExceptionItem_14.png" />
     <Resource Include="Images\TextItem_14.png" />
@@ -353,7 +347,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\FieldLog\FieldLog.NET40.csproj">
+      <Project>{5024F0F3-092C-414A-94C6-36764C4D42EA}</Project>
+      <Name>FieldLog.NET40</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>if not defined FASTBUILD "$(SolutionDir)\_tools\GitRevisionTool.exe" -ai "$(ProjectDir)"</PreBuildEvent>

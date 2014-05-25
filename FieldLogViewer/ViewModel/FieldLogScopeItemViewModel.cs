@@ -84,6 +84,24 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						else
 							return TypeTitle;
 
+					case FieldLogScopeType.WebRequestStart:
+						int index = WebRequestDataVM.WebRequestData.RequestUrl.IndexOf("//");
+						if (index != -1)
+						{
+							index = WebRequestDataVM.WebRequestData.RequestUrl.IndexOf("/", index + 2);
+						}
+						if (index == -1)
+						{
+							index = 0;
+						}
+						return TypeTitle + ": " + WebRequestDataVM.WebRequestData.RequestUrl.Substring(index);
+					case FieldLogScopeType.WebRequestEnd:
+						if (LastWebRequestStartItem != null)
+						{
+							return TypeTitle + ": " + LastWebRequestStartItem.WebRequestDataVM.RequestDuration.TotalMilliseconds.ToString("0.0") + " ms";
+						}
+						return TypeTitle;
+
 					default:
 						return TypeTitle;
 				}

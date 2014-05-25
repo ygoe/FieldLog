@@ -1418,6 +1418,16 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					}
 				}
 
+				// Update web request processing time
+				if (scope != null && scope.Type == FieldLogScopeType.WebRequestEnd)
+				{
+					if (flItem.LastWebRequestStartItem != null)
+					{
+						flItem.LastWebRequestStartItem.WebRequestDataVM.RequestDuration =
+							flItem.Time - flItem.LastWebRequestStartItem.Time;
+					}
+				}
+
 				// Update all items after the inserted item
 				bool setIndentLevel = true;
 				bool setUtcOffset = true;
@@ -1446,6 +1456,17 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						{
 							// Same web request gets the LastWebRequestStartItem
 							nextFlItem.LastWebRequestStartItem = flItem.LastWebRequestStartItem;
+							
+							// Update web request processing time
+							FieldLogScopeItemViewModel nextScope = nextFlItem as FieldLogScopeItemViewModel;
+							if (nextScope != null && nextScope.Type == FieldLogScopeType.WebRequestEnd)
+							{
+								if (nextFlItem.LastWebRequestStartItem != null)
+								{
+									nextFlItem.LastWebRequestStartItem.WebRequestDataVM.RequestDuration =
+										nextFlItem.Time - nextFlItem.LastWebRequestStartItem.Time;
+								}
+							}
 						}
 
 						// All same session also get LastLogStartItem and UtcOffset
@@ -1622,6 +1643,17 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						{
 							flItem.LastWebRequestStartItem = tryLastWebRequestStartScope;
 						}
+
+						// Update web request processing time
+						if (scope != null && scope.Type == FieldLogScopeType.WebRequestEnd)
+						{
+							if (flItem.LastWebRequestStartItem != null)
+							{
+								flItem.LastWebRequestStartItem.WebRequestDataVM.RequestDuration =
+									flItem.Time - flItem.LastWebRequestStartItem.Time;
+							}
+						}
+
 					}
 				}
 

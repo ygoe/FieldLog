@@ -220,6 +220,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					case FilterColumn.EnvironmentTotalMemory:
 					case FilterColumn.EnvironmentAvailableMemory:
 					case FilterColumn.EnvironmentScreenDpi:
+					case FilterColumn.WebRequestDuration:
 						return new EnumerationExtension<FilterComparison>(typeof(UseForNumberColumnAttribute)).ProvideTypedValue();
 
 					case FilterColumn.ScopeIsBackgroundThread:
@@ -280,6 +281,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					case FilterColumn.WebRequestWebSessionId:
 					case FilterColumn.WebRequestAppUserId:
 					case FilterColumn.WebRequestAppUserName:
+					case FilterColumn.WebRequestDuration:
 						return Visibility.Visible;
 					default:
 						return Visibility.Hidden;
@@ -733,6 +735,13 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					webRequestData = GetWebRequestDataFromItem(item);
 					if (webRequestData != null)
 						result = CompareString(webRequestData.AppUserName);
+					break;
+				case FilterColumn.WebRequestDuration:
+					flItem = item as FieldLogItemViewModel;
+					if (flItem != null && flItem.LastWebRequestStartItem != null)
+					{
+						result = CompareInt((int) Math.Round(flItem.LastWebRequestStartItem.WebRequestDataVM.RequestDuration.TotalMilliseconds));
+					}
 					break;
 			}
 
@@ -1359,6 +1368,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		WebRequestAppUserId,
 		[Description("Web: App user name")]
 		WebRequestAppUserName,
+		[Description("Web: Request duration [ms]")]
+		WebRequestDuration,
 	}
 
 	enum FilterComparison

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Unclassified.FieldLog;
 using System.Windows;
+using System.IO;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
@@ -32,11 +33,57 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
+		public string FullMeta
+		{
+			get
+			{
+				StringBuilder sb = new StringBuilder();
+				if (!string.IsNullOrEmpty(Module))
+				{
+					sb.Append("[").Append(Path.GetFileNameWithoutExtension(Module)).Append("]");
+					if (StackFrame.Token != 0)
+					{
+						sb.Append(" @").Append(StackFrame.Token.ToString("x8"));
+						if (StackFrame.ILOffset != System.Diagnostics.StackFrame.OFFSET_UNKNOWN)
+						{
+							sb.Append("+").Append(StackFrame.ILOffset.ToString("x"));
+						}
+						if (StackFrame.NativeOffset != System.Diagnostics.StackFrame.OFFSET_UNKNOWN)
+						{
+							sb.Append("(+").Append(StackFrame.NativeOffset.ToString("x")).Append(")");
+						}
+					}
+				}
+				return sb.ToString();
+			}
+		}
+
+		public Visibility MetaVisibility
+		{
+			get
+			{
+				return !string.IsNullOrEmpty(Module) ? Visibility.Visible : Visibility.Collapsed;
+			}
+		}
+
 		public string FullSource
 		{
 			get
 			{
-				return this.FileName + ":" + this.Line + "," + this.Column;
+				StringBuilder sb = new StringBuilder();
+				if (!string.IsNullOrEmpty(FileName))
+				{
+					sb.Append(FileName);
+					if (Line != 0)
+					{
+						sb.Append(":").Append(Line);
+						if (Column != 0)
+						{
+							sb.Append(",").Append(Column);
+						}
+					}
+				}
+				return sb.ToString();
 			}
 		}
 
@@ -44,7 +91,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			get
 			{
-				return !string.IsNullOrEmpty(this.FileName) ? Visibility.Visible : Visibility.Collapsed;
+				return !string.IsNullOrEmpty(FileName) ? Visibility.Visible : Visibility.Collapsed;
 			}
 		}
 	}

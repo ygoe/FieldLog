@@ -306,21 +306,6 @@ namespace Unclassified.FieldLog
 			Line = stackFrame.GetFileLineNumber();
 			Column = stackFrame.GetFileColumnNumber();
 
-			// TODO: Add separate fields for these - file format v2
-			if (!string.IsNullOrEmpty(FileName))
-			{
-				FileName = "; " + FileName;
-			}
-			if (NativeOffset != StackFrame.OFFSET_UNKNOWN)
-			{
-				FileName = "(+" + NativeOffset.ToString("x") + ")" + FileName;
-			}
-			if (ILOffset != StackFrame.OFFSET_UNKNOWN)
-			{
-				FileName = "+" + ILOffset.ToString("x") + FileName;
-			}
-			FileName = "@" + Token.ToString("x8") + FileName;
-
 			Size = (Module != null ? Module.Length * 2 : 0) +
 				(TypeName != null ? TypeName.Length * 2 : 0) +
 				(MethodName != null ? MethodName.Length * 2 : 0) +
@@ -406,6 +391,9 @@ namespace Unclassified.FieldLog
 		internal void Write(FieldLogFileWriter writer)
 		{
 			writer.AddBuffer(Module);
+			writer.AddBuffer(Token);
+			writer.AddBuffer(ILOffset);
+			writer.AddBuffer(NativeOffset);
 			writer.AddBuffer(TypeName);
 			writer.AddBuffer(MethodName);
 			writer.AddBuffer(MethodSignature);
@@ -422,6 +410,12 @@ namespace Unclassified.FieldLog
 		{
 			FieldLogStackFrame frame = new FieldLogStackFrame();
 			frame.Module = reader.ReadString();
+			if (reader.FormatVersion >= 2)
+			{
+				frame.Token = reader.ReadInt32();
+				frame.ILOffset = reader.ReadInt32();
+				frame.NativeOffset = reader.ReadInt32();
+			}
 			frame.TypeName = reader.ReadString();
 			frame.MethodName = reader.ReadString();
 			frame.MethodSignature = reader.ReadString();

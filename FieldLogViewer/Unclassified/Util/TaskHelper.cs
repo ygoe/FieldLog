@@ -7,23 +7,70 @@ using System.Windows.Threading;
 namespace Unclassified.Util
 {
 	/// <summary>
-	/// Provides static helper methods for easier execution of asynchronous operations.
+	/// Provides static helper methods for easier execution of asynchronous and synchronised
+	/// operations.
 	/// </summary>
 	public static class TaskHelper
 	{
 		/// <summary>
-		/// Starts an Action in a worker thread.
+		/// Gets or sets a handler method for unhandled task exceptions.
 		/// </summary>
-		/// <param name="action">Action to start in a worker thread.</param>
-		/// <param name="endAction">Action to post back to the Dispatcher when the background work has finished.</param>
+		public static Action<Exception> UnhandledTaskException { get; set; }
+
+		/// <summary>
+		/// Starts an Action in a pool thread.
+		/// </summary>
+		/// <param name="action">Action to start in a pool thread.</param>
+		/// <param name="endAction">Action to start in the source synchronisation context when the background work has finished.</param>
 		/// <returns>A CancellationTokenSource instance to control cancelling of the background task.</returns>
-		public static CancellationTokenSource Start(Action<CancellationToken> action, Action<Task> endAction)
+		public static CancellationTokenSource Start(Action<CancellationToken> action, Action<Task> endAction = null)
 		{
-			var dispatcher = Dispatcher.CurrentDispatcher;
+			Task task;
+			return Start(action, endAction, out task);
+		}
+
+		/// <summary>
+		/// Starts an Action in a pool thread.
+		/// </summary>
+		/// <param name="action">Action to start in a pool thread.</param>
+		/// <param name="task">Returns the created task instance.</param>
+		/// <returns>A CancellationTokenSource instance to control cancelling of the background task.</returns>
+		public static CancellationTokenSource Start(Action<CancellationToken> action, out Task task)
+		{
+			return Start(action, null, out task);
+		}
+
+		/// <summary>
+		/// Starts an Action in a pool thread.
+		/// </summary>
+		/// <param name="action">Action to start in a pool thread.</param>
+		/// <param name="endAction">Action to start in the source synchronisation context when the background work has finished.</param>
+		/// <param name="task">Returns the created task instance.</param>
+		/// <returns>A CancellationTokenSource instance to control cancelling of the background task.</returns>
+		public static CancellationTokenSource Start(Action<CancellationToken> action, Action<Task> endAction, out Task task)
+		{
+			TaskScheduler scheduler = null;
+			if (endAction != null)
+			{
+				scheduler = TaskScheduler.FromCurrentSynchronizationContext();
+			}
 			var cts = new CancellationTokenSource();
-			var task = new Task(() => action(cts.Token), cts.Token);
-			task.ContinueWith((t) => dispatcher.BeginInvoke(endAction, t));
-			task.Start();
+			task = Task.Factory.StartNew(() => action(cts.Token), cts.Token);
+			if (endAction != null)
+			{
+				task = task.ContinueWith(endAction, scheduler);
+			}
+			if (scheduler == null)
+			{
+				scheduler = TaskScheduler.Current;
+			}
+			task.ContinueWith(t =>
+			{
+				if (UnhandledTaskException != null)
+				{
+					UnhandledTaskException(t.Exception);
+				}
+			}, cts.Token, TaskContinuationOptions.OnlyOnFaulted, scheduler);
 			return cts;
 		}
 
@@ -75,7 +122,7 @@ namespace Unclassified.Util
 		/// again after invoking the action. If null, the waiting is not repeated.</param>
 		public static void WaitAction(this WaitHandle handle, Action action, Func<bool> repeatCondition = null)
 		{
-			Task.Factory.StartNew(() =>
+			Start(c =>
 			{
 				do
 				{

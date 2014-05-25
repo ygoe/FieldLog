@@ -962,6 +962,7 @@ namespace Unclassified.Util
 
 					if (!string.IsNullOrEmpty(this.password))
 					{
+						FL.Trace("SettingsStore.Load", "fileName = " + fileName + "\nWith password");
 						using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read))
 						{
 							byte[] salt = new byte[8];
@@ -972,7 +973,7 @@ namespace Unclassified.Util
 							{
 								aes.Key = keyGenerator.GetBytes(aes.KeySize / 8);
 								aes.IV = keyGenerator.GetBytes(aes.BlockSize / 8);
-								
+
 								using (CryptoStream cs = new CryptoStream(fs, aes.CreateDecryptor(), CryptoStreamMode.Read))
 								using (StreamReader sr = new StreamReader(cs))
 								{
@@ -985,6 +986,7 @@ namespace Unclassified.Util
 					}
 					else
 					{
+						FL.Trace("SettingsStore.Load", "fileName = " + fileName + "\nNo password");
 						using (StreamReader sr = new StreamReader(fileName))
 						{
 							xdoc.Load(sr);
@@ -1127,9 +1129,11 @@ namespace Unclassified.Util
 				}
 				catch (DirectoryNotFoundException)
 				{
+					FL.Trace("SettingsStore.Load: DirectoryNotFoundException, no settings loaded");
 				}
 				catch (FileNotFoundException)
 				{
+					FL.Trace("SettingsStore.Load: FileNotFoundException, no settings loaded");
 				}
 				catch (FormatException ex)
 				{
@@ -1195,7 +1199,7 @@ namespace Unclassified.Util
 			lock (syncLock)
 			{
 				if (isDisposed) return;
-				if (readOnly) throw new InvalidOperationException("This Settings instance is created in read-only mode.");
+				if (readOnly) throw new InvalidOperationException("This SettingsStore instance is created in read-only mode.");
 
 				List<string> listKeys = new List<string>(store.Keys);
 				listKeys.Sort();
@@ -1362,8 +1366,12 @@ namespace Unclassified.Util
 					root.AppendChild(xn);
 				}
 
+				FL.Trace("SettingsStore.Save", "fileName = " + fileName);
 				if (!Directory.Exists(Path.GetDirectoryName(fileName)))
+				{
+					FL.Trace("SettingsStore.Save: Creating directory");
 					Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+				}
 
 				XmlWriterSettings xws = new XmlWriterSettings();
 				xws.Encoding = Encoding.UTF8;

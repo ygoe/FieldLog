@@ -27,6 +27,7 @@ namespace Unclassified.FieldLogViewer
 			// Set up FieldLog
 			FL.AcceptLogFileBasePath();
 			FL.RegisterPresentationTracing();
+			TaskHelper.UnhandledTaskException = ex => FL.Critical(ex, "TaskHelper.UnhandledTaskException", true);
 
 			// Keep the setup away
 			GlobalMutex.Create("Unclassified.FieldLogViewer");

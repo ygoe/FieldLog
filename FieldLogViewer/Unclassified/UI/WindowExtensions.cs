@@ -6,7 +6,7 @@ using System.Windows.Interop;
 namespace Unclassified.UI
 {
 	/// <summary>
-	/// Provides extensions for WPF Windows.
+	/// Provides extension methods for WPF Windows.
 	/// </summary>
 	public static class WindowExtensions
 	{
@@ -16,12 +16,16 @@ namespace Unclassified.UI
 
 		[DllImport("user32.dll")]
 		private static extern uint GetWindowLong(IntPtr hwnd, int index);
+
 		[DllImport("user32.dll")]
 		private static extern uint SetWindowLong(IntPtr hwnd, int index, uint newStyle);
+
 		[DllImport("user32.dll")]
 		private static extern bool SetWindowPos(IntPtr hwnd, IntPtr hwndInsertAfter, int x, int y, int width, int height, uint flags);
+
 		[DllImport("user32.dll")]
 		private static extern IntPtr SendMessage(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam);
+
 		[DllImport("user32.dll")]
 		private static extern bool FlashWindowEx(ref FLASHWINFO pwfi);
 
@@ -34,7 +38,7 @@ namespace Unclassified.UI
 			public UInt32 uCount;
 			public UInt32 dwTimeout;
 		}
-	
+
 		private const int GWL_EXSTYLE = -20;
 		private const int WS_EX_DLGMODALFRAME = 0x0001;
 		private const int SWP_NOSIZE = 0x0001;

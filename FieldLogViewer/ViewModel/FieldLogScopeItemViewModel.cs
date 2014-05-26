@@ -94,7 +94,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						{
 							index = 0;
 						}
-						return TypeTitle + ": " + WebRequestDataVM.WebRequestData.RequestUrl.Substring(index);
+						string method = "";
+						if (WebRequestDataVM.WebRequestData.Method != "GET")
+						{
+							method = WebRequestDataVM.WebRequestData.Method + " ";
+						}
+						return TypeTitle + ": " + method + WebRequestDataVM.WebRequestData.RequestUrl.Substring(index);
 					case FieldLogScopeType.WebRequestEnd:
 						if (LastWebRequestStartItem != null)
 						{

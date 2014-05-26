@@ -188,6 +188,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					case FilterColumn.EnvironmentHostName:
 					case FilterColumn.EnvironmentEnvironmentVariables:
 					case FilterColumn.WebRequestRequestUrl:
+					case FilterColumn.WebRequestMethod:
 					case FilterColumn.WebRequestClientAddress:
 					case FilterColumn.WebRequestClientHostName:
 					case FilterColumn.WebRequestReferrer:
@@ -272,6 +273,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					case FilterColumn.EnvironmentScreenDpi:
 					case FilterColumn.EnvironmentEnvironmentVariables:
 					case FilterColumn.WebRequestRequestUrl:
+					case FilterColumn.WebRequestMethod:
 					case FilterColumn.WebRequestClientAddress:
 					case FilterColumn.WebRequestClientHostName:
 					case FilterColumn.WebRequestReferrer:
@@ -690,6 +692,11 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					webRequestData = GetWebRequestDataFromItem(item);
 					if (webRequestData != null)
 						result = CompareString(webRequestData.RequestUrl);
+					break;
+				case FilterColumn.WebRequestMethod:
+					webRequestData = GetWebRequestDataFromItem(item);
+					if (webRequestData != null)
+						result = CompareString(webRequestData.Method);
 					break;
 				case FilterColumn.WebRequestClientAddress:
 					webRequestData = GetWebRequestDataFromItem(item);
@@ -1350,6 +1357,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		[Description("Web: Request URL")]
 		WebRequestRequestUrl,
+		[Description("Web: Method")]
+		WebRequestMethod,
 		[Description("Web: Client address")]
 		WebRequestClientAddress,
 		[Description("Web: Client host name")]

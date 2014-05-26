@@ -49,6 +49,7 @@ namespace Unclassified.FieldLog
 
 				return 4 +
 					ptrSize + (RequestUrl != null ? strSize + RequestUrl.Length * 2 : 0) +
+					ptrSize + (Method != null ? strSize + RequestUrl.Length * 2 : 0) +
 					ptrSize + (ClientAddress != null ? strSize + ClientAddress.Length * 2 : 0) +
 					ptrSize + (ClientHostName != null ? strSize + ClientHostName.Length * 2 : 0) +
 					ptrSize + (Referrer != null ? strSize + Referrer.Length * 2 : 0) +
@@ -65,6 +66,10 @@ namespace Unclassified.FieldLog
 		/// Gets or sets the URL of the request.
 		/// </summary>
 		public string RequestUrl { get; set; }
+		/// <summary>
+		/// Gets or sets the HTTP request method (GET, POST).
+		/// </summary>
+		public string Method { get; set; }
 		/// <summary>
 		/// Gets or sets the network (IP) address of the client.
 		/// </summary>
@@ -124,6 +129,7 @@ namespace Unclassified.FieldLog
 		internal void Write(FieldLogFileWriter writer)
 		{
 			writer.AddBuffer(RequestUrl);
+			writer.AddBuffer(Method);
 			writer.AddBuffer(ClientAddress);
 			writer.AddBuffer(ClientHostName);
 			writer.AddBuffer(Referrer);
@@ -144,6 +150,7 @@ namespace Unclassified.FieldLog
 		{
 			FieldLogWebRequestData data = new FieldLogWebRequestData();
 			data.RequestUrl = reader.ReadString();
+			data.Method = reader.ReadString();
 			data.ClientAddress = reader.ReadString();
 			data.ClientHostName = reader.ReadString();
 			data.Referrer = reader.ReadString();

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
@@ -362,25 +363,42 @@ namespace Unclassified.FieldLog
 			}
 			sb.Append("{");
 			int count = 0;
-			foreach (var property in data.GetType().GetProperties())
+			NameValueCollection nvc = data as NameValueCollection;
+			if (nvc != null)
 			{
-				if (count++ > 0) sb.Append(",");
-				sb.AppendLine();
-				sb.Append(indent);
-				sb.Append("\t");
-				sb.Append(property.Name);
-				sb.Append(": ");
-				sb.Append(FormatValues(property.GetValue(data, null), level + 1));
+				foreach (var key in nvc.AllKeys)
+				{
+					if (count++ > 0) sb.Append(",");
+					sb.AppendLine();
+					sb.Append(indent);
+					sb.Append("\t");
+					sb.Append(key);
+					sb.Append(": ");
+					sb.Append(FormatValues(nvc[key], level + 1));
+				}
 			}
-			foreach (var field in data.GetType().GetFields())
+			else
 			{
-				if (count++ > 0) sb.Append(",");
-				sb.AppendLine();
-				sb.Append(indent);
-				sb.Append("\t");
-				sb.Append(field.Name);
-				sb.Append(": ");
-				sb.Append(FormatValues(field.GetValue(data), level + 1));
+				foreach (var property in data.GetType().GetProperties())
+				{
+					if (count++ > 0) sb.Append(",");
+					sb.AppendLine();
+					sb.Append(indent);
+					sb.Append("\t");
+					sb.Append(property.Name);
+					sb.Append(": ");
+					sb.Append(FormatValues(property.GetValue(data, null), level + 1));
+				}
+				foreach (var field in data.GetType().GetFields())
+				{
+					if (count++ > 0) sb.Append(",");
+					sb.AppendLine();
+					sb.Append(indent);
+					sb.Append("\t");
+					sb.Append(field.Name);
+					sb.Append(": ");
+					sb.Append(FormatValues(field.GetValue(data), level + 1));
+				}
 			}
 			sb.AppendLine();
 			sb.Append(indent);

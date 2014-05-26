@@ -2198,6 +2198,7 @@ namespace Unclassified.FieldLog
 		{
 			FieldLogWebRequestData wrd = new FieldLogWebRequestData();
 			wrd.RequestUrl = HttpContext.Current.Request.Url.ToString();
+			wrd.Method = HttpContext.Current.Request.HttpMethod;
 			wrd.ClientAddress = HttpContext.Current.Request.UserHostAddress;
 			wrd.ClientHostName = HttpContext.Current.Request.UserHostName;
 			wrd.Referrer = HttpContext.Current.Request.UrlReferrer != null ? HttpContext.Current.Request.UrlReferrer.ToString() : null;
@@ -2227,6 +2228,18 @@ namespace Unclassified.FieldLog
 		public static void LogWebRequestEnd()
 		{
 			LogScope(FieldLogScopeType.WebRequestEnd, null);
+		}
+
+		/// <summary>
+		/// Writes the HTTP POST data sent from the client to the log file, if the request method is
+		/// "POST".
+		/// </summary>
+		public static void LogWebPostData()
+		{
+			if (HttpContext.Current.Request.HttpMethod == "POST")
+			{
+				TraceData("POST data", HttpContext.Current.Request.Form);
+			}
 		}
 #endif
 

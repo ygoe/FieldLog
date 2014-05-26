@@ -3,6 +3,9 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Threading;
+#if ASPNET
+using System.Web;
+#endif
 
 namespace Unclassified.FieldLog
 {
@@ -57,6 +60,19 @@ namespace Unclassified.FieldLog
 			}
 			ThreadId = FL.ThreadId;
 			WebRequestId = FL.WebRequestId;
+#if ASPNET
+			if (WebRequestId == 0 && HttpContext.Current != null)
+			{
+				// Sometimes a request is ended in a different thread than it was started. We have
+				// a backup copy of the web request ID value in the HttpContext items that we can
+				// use now.
+				object value = HttpContext.Current.Items["FieldLog_WebRequestId"];
+				if (value is uint)
+				{
+					WebRequestId = (uint) value;
+				}
+			}
+#endif
 
 			Size = 4 + 4 + 8 + 4 + 16 + 4 + 4;
 		}

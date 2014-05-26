@@ -100,6 +100,10 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						{
 							return TypeTitle + ": " + LastWebRequestStartItem.WebRequestDataVM.RequestDuration.TotalMilliseconds.ToString("0.0") + " ms";
 						}
+						if (WebRequestId == 0)
+						{
+							return TypeTitle + " (orphan)";
+						}
 						return TypeTitle;
 
 					default:

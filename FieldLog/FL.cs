@@ -1436,6 +1436,15 @@ namespace Unclassified.FieldLog
 				WebRequestId = unchecked((uint) Interlocked.Increment(ref LastWebRequestId));
 				FieldLogScopeItem scopeItem = new FieldLogScopeItem(FieldLogPriority.Trace, type, name, webRequestData);
 				Log(scopeItem);
+#if ASPNET
+				// Sometimes a request is ended in a different thread than it was started. Keep a
+				// backup copy of the web request ID value in the HttpContext for that case. As a
+				// side effect, the value becomes available to the web application.
+				if (HttpContext.Current != null)
+				{
+					HttpContext.Current.Items["FieldLog_WebRequestId"] = WebRequestId;
+				}
+#endif
 			}
 			else
 			{

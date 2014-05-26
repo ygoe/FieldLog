@@ -174,7 +174,16 @@
 						<MenuItem Header="{Binding QuickFilterMinPrioTitle}" Command="{Binding QuickFilterMinPrioCommand}"/>
 						<MenuItem Header="Not before this item" Command="{Binding QuickFilterNotBeforeCommand}"/>
 						<MenuItem Header="Not after this item" Command="{Binding QuickFilterNotAfterCommand}"/>
-						<MenuItem Header="Filter by same web request" Command="{Binding QuickFilterWebRequestCommand}"/>
+						<MenuItem Header="Exclude this text" Command="{Binding QuickFilterExcludeTextCommand}" Visibility="{Binding QuickFilterExcludeTextVisibility}"/>
+						<MenuItem Header="Filter by this data name" Command="{Binding QuickFilterDataNameCommand}" Visibility="{Binding QuickFilterDataVisibility}"/>
+						<MenuItem Header="Filter by this exception type" Command="{Binding QuickFilterExceptionTypeCommand}" Visibility="{Binding QuickFilterExceptionVisibility}"/>
+						<Separator Visibility="{Binding QuickFilterWebVisibility}"/>
+						<MenuItem Header="Filter by same web request" Command="{Binding QuickFilterWebRequestCommand}" Visibility="{Binding QuickFilterWebVisibility}"/>
+						<MenuItem Header="Filter by this web request URL" Command="{Binding QuickFilterWebRequestUrlCommand}" Visibility="{Binding QuickFilterWebVisibility}"/>
+						<MenuItem Header="Filter by this web client address" Command="{Binding QuickFilterWebClientAddressCommand}" Visibility="{Binding QuickFilterWebVisibility}"/>
+						<MenuItem Header="Filter by this web user agent" Command="{Binding QuickFilterWebUserAgentCommand}" Visibility="{Binding QuickFilterWebVisibility}"/>
+						<MenuItem Header="Filter by this web session" Command="{Binding QuickFilterWebSessionCommand}" Visibility="{Binding QuickFilterWebSessionVisibility}"/>
+						<MenuItem Header="Filter by this web user" Command="{Binding QuickFilterWebUserCommand}" Visibility="{Binding QuickFilterWebUserVisibility}"/>
 					</ContextMenu>
 				</ListBox.ContextMenu>
 				<ListBox.Resources>

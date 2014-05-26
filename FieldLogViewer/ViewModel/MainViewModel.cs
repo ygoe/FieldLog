@@ -188,7 +188,15 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public DelegateCommand QuickFilterMinPrioCommand { get; private set; }
 		public DelegateCommand QuickFilterNotBeforeCommand { get; private set; }
 		public DelegateCommand QuickFilterNotAfterCommand { get; private set; }
+		public DelegateCommand QuickFilterExcludeTextCommand { get; private set; }
+		public DelegateCommand QuickFilterDataNameCommand { get; private set; }
+		public DelegateCommand QuickFilterExceptionTypeCommand { get; private set; }
 		public DelegateCommand QuickFilterWebRequestCommand { get; private set; }
+		public DelegateCommand QuickFilterWebRequestUrlCommand { get; private set; }
+		public DelegateCommand QuickFilterWebClientAddressCommand { get; private set; }
+		public DelegateCommand QuickFilterWebUserAgentCommand { get; private set; }
+		public DelegateCommand QuickFilterWebSessionCommand { get; private set; }
+		public DelegateCommand QuickFilterWebUserCommand { get; private set; }
 
 		private void InitializeCommands()
 		{
@@ -208,7 +216,15 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			QuickFilterMinPrioCommand = new DelegateCommand(OnQuickFilterMinPrio, CanQuickFilterMinPrio);
 			QuickFilterNotBeforeCommand = new DelegateCommand(OnQuickFilterNotBefore, CanQuickFilterNotBefore);
 			QuickFilterNotAfterCommand = new DelegateCommand(OnQuickFilterNotAfter, CanQuickFilterNotAfter);
+			QuickFilterExcludeTextCommand = new DelegateCommand(OnQuickFilterExcludeText, CanQuickFilterExcludeText);
+			QuickFilterDataNameCommand = new DelegateCommand(OnQuickFilterDataName, CanQuickFilterDataName);
+			QuickFilterExceptionTypeCommand = new DelegateCommand(OnQuickFilterExceptionType, CanQuickFilterExceptionType);
 			QuickFilterWebRequestCommand = new DelegateCommand(OnQuickFilterWebRequest, CanQuickFilterWebRequest);
+			QuickFilterWebRequestUrlCommand = new DelegateCommand(OnQuickFilterWebRequestUrl, CanQuickFilterWebRequestUrl);
+			QuickFilterWebClientAddressCommand = new DelegateCommand(OnQuickFilterWebClientAddress, CanQuickFilterWebClientAddress);
+			QuickFilterWebUserAgentCommand = new DelegateCommand(OnQuickFilterWebUserAgent, CanQuickFilterWebUserAgent);
+			QuickFilterWebSessionCommand = new DelegateCommand(OnQuickFilterWebSession, CanQuickFilterWebSession);
+			QuickFilterWebUserCommand = new DelegateCommand(OnQuickFilterWebUser, CanQuickFilterWebUser);
 		}
 
 		private void InvalidateToolbarCommandsLoading()
@@ -396,6 +412,73 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			return filter;
 		}
 
+		/// <summary>
+		/// Sets up a quick filter for a single filter column and one or multiple values.
+		/// </summary>
+		/// <typeparam name="T">The type of the values to use in the filter.</typeparam>
+		/// <param name="values">The values to use in the filter.</param>
+		/// <param name="singlePrefix">The filter name prefix for a single value.</param>
+		/// <param name="multiPrefix">The filter name prefix for multiple values.</param>
+		/// <param name="filterColumn">The filter column to set.</param>
+		/// <param name="useRegex">true to use the Regex comparison for multiple values (required for strings), false to use the InList comparison (for numbers).</param>
+		private void MultiValueQuickFilter<T>(IEnumerable<T> values, string singlePrefix, string multiPrefix, FilterColumn filterColumn, bool useRegex)
+		{
+			bool isNew;
+			var filter = GetQuickFilter(out isNew);
+			int typeCount = values.Count();
+			switch (typeCount)
+			{
+				case 1:
+					filter.DisplayName = singlePrefix + values.First();
+					break;
+				default:
+					filter.DisplayName = multiPrefix + values.Aggregate(", ", " and ");
+					break;
+			}
+			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
+			{
+				// Remove all existing conditions
+				cg.Conditions.Filter(c => c.Column != filterColumn);
+				if (!cg.IsExclude)
+				{
+					if (typeCount == 1)
+					{
+						cg.Conditions.Add(new FilterConditionViewModel(cg)
+						{
+							Column = filterColumn,
+							Comparison = FilterComparison.Equals,
+							Value = values.First().ToString()
+						});
+					}
+					else if (useRegex)
+					{
+						cg.Conditions.Add(new FilterConditionViewModel(cg)
+						{
+							Column = filterColumn,
+							Comparison = FilterComparison.Regex,
+							Value = "^(" + values.Aggregate("|") + ")$"
+							// TODO: Make values regex-safe
+						});
+					}
+					else
+					{
+						cg.Conditions.Add(new FilterConditionViewModel(cg)
+						{
+							Column = filterColumn,
+							Comparison = FilterComparison.InList,
+							Value = values.Aggregate(";")
+						});
+					}
+				}
+			}
+			if (isNew)
+			{
+				filter.QuickPreviousFilter = SelectedFilter;
+				Filters.Add(filter);
+				SelectedFilter = filter;
+			}
+		}
+
 		private bool CanQuickFilterSession()
 		{
 			return SelectedItemsSessionIds.Any();
@@ -521,7 +604,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			filter.DisplayName = "Type " + EnumerationExtension<FilterItemType>.GetDescription(SelectedItemFilterItemType);
 			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
 			{
-				// Remove all session and thread ID conditions
+				// Remove all type conditions
 				cg.Conditions.Filter(c => c.Column != FilterColumn.Type);
 				if (!cg.IsExclude)
 				{
@@ -554,7 +637,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			filter.DisplayName = "Priority " + flItem.PrioTitle + " or higher";
 			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
 			{
-				// Remove all session and thread ID conditions
+				// Remove all priority conditions
 				cg.Conditions.Filter(c => c.Column != FilterColumn.Priority);
 				if (!cg.IsExclude)
 				{
@@ -586,7 +669,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			filter.DisplayName = "Not before...";
 			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
 			{
-				// Remove all session and thread ID conditions
+				// Remove all time conditions
 				cg.Conditions.Filter(c => c.Column != FilterColumn.Time);
 				if (!cg.IsExclude)
 				{
@@ -628,7 +711,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			filter.DisplayName = "Not after...";
 			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
 			{
-				// Remove all session and thread ID conditions
+				// Remove all time conditions
 				cg.Conditions.Filter(c => c.Column != FilterColumn.Time);
 				if (!cg.IsExclude)
 				{
@@ -656,6 +739,54 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				Filters.Add(filter);
 				SelectedFilter = filter;
 			}
+		}
+
+		private bool CanQuickFilterExcludeText()
+		{
+			return SelectedItems.Count == 1 && SelectedItems[0] is FieldLogTextItemViewModel;
+		}
+
+		private void OnQuickFilterExcludeText()
+		{
+			bool isNew;
+			var filter = GetQuickFilter(out isNew);
+			filter.DisplayName = "Exclude text";
+			string text = ((FieldLogTextItemViewModel) SelectedItems[0]).Text;
+			var cg = new FilterConditionGroupViewModel(filter);
+			cg.IsExclude = true;
+			cg.Conditions.Add(new FilterConditionViewModel(cg)
+			{
+				Column = FilterColumn.TextText,
+				Comparison = FilterComparison.Equals,
+				Value = text
+			});
+			filter.ConditionGroups.Add(cg);
+			if (isNew)
+			{
+				filter.QuickPreviousFilter = SelectedFilter;
+				Filters.Add(filter);
+				SelectedFilter = filter;
+			}
+		}
+
+		private bool CanQuickFilterDataName()
+		{
+			return SelectedItemsDataNames.Any();
+		}
+
+		private void OnQuickFilterDataName()
+		{
+			MultiValueQuickFilter(SelectedItemsDataNames, "Data name ", "Data names ", FilterColumn.DataName, true);
+		}
+
+		private bool CanQuickFilterExceptionType()
+		{
+			return SelectedItemsExceptionTypes.Any();
+		}
+
+		private void OnQuickFilterExceptionType()
+		{
+			MultiValueQuickFilter(SelectedItemsExceptionTypes, "Exception type ", "Exception types ", FilterColumn.ExceptionType, true);
 		}
 
 		private bool CanQuickFilterWebRequest()
@@ -716,6 +847,56 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				Filters.Add(filter);
 				SelectedFilter = filter;
 			}
+		}
+
+		private bool CanQuickFilterWebRequestUrl()
+		{
+			return SelectedItemsWebRequestUrls.Any();
+		}
+
+		private void OnQuickFilterWebRequestUrl()
+		{
+			MultiValueQuickFilter(SelectedItemsWebRequestUrls, "Request URL ", "Request URLs ", FilterColumn.WebRequestRequestUrl, true);
+		}
+
+		private bool CanQuickFilterWebClientAddress()
+		{
+			return SelectedItemsWebClientAddresses.Any();
+		}
+
+		private void OnQuickFilterWebClientAddress()
+		{
+			MultiValueQuickFilter(SelectedItemsWebClientAddresses, "Client ", "Clients ", FilterColumn.WebRequestClientAddress, true);
+		}
+
+		private bool CanQuickFilterWebUserAgent()
+		{
+			return SelectedItemsWebUserAgents.Any();
+		}
+
+		private void OnQuickFilterWebUserAgent()
+		{
+			MultiValueQuickFilter(SelectedItemsWebUserAgents, "User agent ", "User agents ", FilterColumn.WebRequestUserAgent, true);
+		}
+
+		private bool CanQuickFilterWebSession()
+		{
+			return SelectedItemsWebSessionIds.Any();
+		}
+
+		private void OnQuickFilterWebSession()
+		{
+			MultiValueQuickFilter(SelectedItemsWebSessionIds, "Web session ", "Web sessions ", FilterColumn.WebRequestWebSessionId, true);
+		}
+
+		private bool CanQuickFilterWebUser()
+		{
+			return SelectedItemsWebUserIds.Any();
+		}
+
+		private void OnQuickFilterWebUser()
+		{
+			MultiValueQuickFilter(SelectedItemsWebUserIds, "Web user ", "Web users ", FilterColumn.WebRequestAppUserId, true);
 		}
 
 		#endregion Log items list context menu
@@ -1019,6 +1200,38 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
+		private IEnumerable<string> SelectedItemsDataNames
+		{
+			get
+			{
+				if (SelectedItems != null)
+				{
+					return SelectedItems
+						.OfType<FieldLogDataItemViewModel>()
+						.Select(vm => vm.Name)
+						.Distinct()
+						.OrderBy(name => name);
+				}
+				return new string[0];
+			}
+		}
+
+		private IEnumerable<string> SelectedItemsExceptionTypes
+		{
+			get
+			{
+				if (SelectedItems != null)
+				{
+					return SelectedItems
+						.OfType<FieldLogExceptionItemViewModel>()
+						.Select(vm => vm.ExceptionVM.Type)
+						.Distinct()
+						.OrderBy(type => type);
+				}
+				return new string[0];
+			}
+		}
+
 		private IEnumerable<uint> SelectedItemsWebRequestIds
 		{
 			get
@@ -1032,6 +1245,159 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						.OrderBy(tid => tid);
 				}
 				return new uint[0];
+			}
+		}
+
+		private IEnumerable<string> SelectedItemsWebRequestUrls
+		{
+			get
+			{
+				if (SelectedItems != null)
+				{
+					return SelectedItems
+						.OfType<FieldLogItemViewModel>()
+						.Where(i => i.LastWebRequestStartItem != null)
+						.Select(vm => vm.LastWebRequestStartItem.WebRequestDataVM.WebRequestData.RequestUrl)
+						.Distinct()
+						.OrderBy(url => url);
+				}
+				return new string[0];
+			}
+		}
+
+		private IEnumerable<string> SelectedItemsWebClientAddresses
+		{
+			get
+			{
+				if (SelectedItems != null)
+				{
+					return SelectedItems
+						.OfType<FieldLogItemViewModel>()
+						.Where(i => i.LastWebRequestStartItem != null)
+						.Select(vm => vm.LastWebRequestStartItem.WebRequestDataVM.WebRequestData.ClientAddress)
+						.Distinct()
+						.OrderBy(address => address);
+				}
+				return new string[0];
+			}
+		}
+
+		private IEnumerable<string> SelectedItemsWebUserAgents
+		{
+			get
+			{
+				if (SelectedItems != null)
+				{
+					return SelectedItems
+						.OfType<FieldLogItemViewModel>()
+						.Where(i => i.LastWebRequestStartItem != null)
+						.Select(vm => vm.LastWebRequestStartItem.WebRequestDataVM.WebRequestData.UserAgent)
+						.Distinct()
+						.OrderBy(ua => ua);
+				}
+				return new string[0];
+			}
+		}
+
+		private IEnumerable<string> SelectedItemsWebSessionIds
+		{
+			get
+			{
+				if (SelectedItems != null)
+				{
+					return SelectedItems
+						.OfType<FieldLogItemViewModel>()
+						.Where(i => i.LastWebRequestStartItem != null)
+						.Select(vm => vm.LastWebRequestStartItem.WebRequestDataVM.WebRequestData.WebSessionId)
+						.Distinct()
+						.OrderBy(sid => sid);
+				}
+				return new string[0];
+			}
+		}
+
+		private IEnumerable<string> SelectedItemsWebUserIds
+		{
+			get
+			{
+				if (SelectedItems != null)
+				{
+					return SelectedItems
+						.OfType<FieldLogItemViewModel>()
+						.Where(i => i.LastWebRequestStartItem != null)
+						.Select(vm => vm.LastWebRequestStartItem.WebRequestDataVM.WebRequestData.AppUserId)
+						.Distinct()
+						.OrderBy(uid => uid);
+				}
+				return new string[0];
+			}
+		}
+
+		public Visibility QuickFilterDataVisibility
+		{
+			get
+			{
+				return SelectedItems != null && SelectedItems.OfType<FieldLogDataItemViewModel>().Any() ?
+					Visibility.Visible :
+					Visibility.Collapsed;
+			}
+		}
+
+		public Visibility QuickFilterExcludeTextVisibility
+		{
+			get
+			{
+				return CanQuickFilterExcludeText() ?
+					Visibility.Visible :
+					Visibility.Collapsed;
+			}
+		}
+
+		public Visibility QuickFilterExceptionVisibility
+		{
+			get
+			{
+				return SelectedItems != null && SelectedItems.OfType<FieldLogExceptionItemViewModel>().Any() ?
+					Visibility.Visible :
+					Visibility.Collapsed;
+			}
+		}
+
+		public Visibility QuickFilterWebVisibility
+		{
+			get
+			{
+				return SelectedItems != null && SelectedItems.OfType<FieldLogItemViewModel>().Any(i => i.WebRequestId != 0) ?
+					Visibility.Visible :
+					Visibility.Collapsed;
+			}
+		}
+
+		public Visibility QuickFilterWebSessionVisibility
+		{
+			get
+			{
+				return SelectedItems != null &&
+					SelectedItems
+						.OfType<FieldLogItemViewModel>()
+						.Any(i => i.LastWebRequestStartItem != null &&
+							!string.IsNullOrEmpty(i.LastWebRequestStartItem.WebRequestDataVM.WebRequestData.WebSessionId)) ?
+					Visibility.Visible :
+					Visibility.Collapsed;
+			}
+		}
+
+		public Visibility QuickFilterWebUserVisibility
+		{
+			get
+			{
+				return SelectedItems != null &&
+					SelectedItems
+						.OfType<FieldLogItemViewModel>()
+						.Any(i => i.LastWebRequestStartItem != null &&
+							!string.IsNullOrEmpty(i.LastWebRequestStartItem.WebRequestDataVM.WebRequestData.AppUserId)) ?
+					Visibility.Visible :
+					Visibility.Collapsed;
 			}
 		}
 

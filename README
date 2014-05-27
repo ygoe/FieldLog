@@ -78,4 +78,8 @@ Flushing FieldLog items to the log files happens on a separate thread. That is w
 
 LICENCE
 
-This software is released under the terms of the GNU GPL licence, version 3. You can find the detailed terms and conditions in the download or on the GNU website <http://www.gnu.org/licenses/gpl-3.0.html>.
+The FieldLog library, which is used in applications, is released under the terms of the GNU Lesser GPL (LGPL) licence, version 3.
+
+The other projects (FieldLogViewer, demos and tools) are released under the terms of the GNU GPL licence, version 3.
+
+You can find the detailed terms and conditions in the download or on the GNU website <http://www.gnu.org/licenses/lgpl-3.0.html> and <http://www.gnu.org/licenses/gpl-3.0.html>.

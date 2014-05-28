@@ -200,7 +200,7 @@ namespace Unclassified.FieldLog
 		private const int LOGPIXELSY = 90;
 
 		[DllImport("kernel32.dll")]
-		private static extern short GetVersionEx(ref OSVERSIONINFOEX osvi);
+		private static extern bool GetVersionEx(ref OSVERSIONINFOEX osvi);
 		[DllImport("user32.dll")]
 		private static extern int GetSystemMetrics(int smIndex);
 		[DllImport("gdi32.dll")]

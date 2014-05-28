@@ -265,8 +265,6 @@ namespace Unclassified.FieldLog
 		public int Token { get; private set; }
 		/// <summary>Gets the IL code offset of the executed instruction in the method body.</summary>
 		public int ILOffset { get; private set; }
-		/// <summary>Gets the native code offset of the executed instruction in the method body.</summary>
-		public int NativeOffset { get; private set; }
 		/// <summary>Gets the defining type name.</summary>
 		public string TypeName { get; private set; }
 		/// <summary>Gets the executed method name.</summary>
@@ -296,7 +294,6 @@ namespace Unclassified.FieldLog
 			Module = method.DeclaringType.Module.FullyQualifiedName;
 			Token = method.MetadataToken;
 			ILOffset = stackFrame.GetILOffset();
-			NativeOffset = stackFrame.GetNativeOffset();
 			TypeName = FormatTypeName(method.DeclaringType);
 			MethodName = method.Name;
 			if (method.IsGenericMethod)
@@ -407,7 +404,6 @@ namespace Unclassified.FieldLog
 			writer.AddBuffer(Module);
 			writer.AddBuffer(Token);
 			writer.AddBuffer(ILOffset);
-			writer.AddBuffer(NativeOffset);
 			writer.AddBuffer(TypeName);
 			writer.AddBuffer(MethodName);
 			writer.AddBuffer(MethodSignature);
@@ -428,7 +424,6 @@ namespace Unclassified.FieldLog
 			{
 				frame.Token = reader.ReadInt32();
 				frame.ILOffset = reader.ReadInt32();
-				frame.NativeOffset = reader.ReadInt32();
 			}
 			frame.TypeName = reader.ReadString();
 			frame.MethodName = reader.ReadString();

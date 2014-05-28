@@ -48,10 +48,6 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						{
 							sb.Append("+").Append(StackFrame.ILOffset.ToString("x"));
 						}
-						if (StackFrame.NativeOffset != System.Diagnostics.StackFrame.OFFSET_UNKNOWN)
-						{
-							sb.Append("(+").Append(StackFrame.NativeOffset.ToString("x")).Append(")");
-						}
 					}
 				}
 				return sb.ToString();

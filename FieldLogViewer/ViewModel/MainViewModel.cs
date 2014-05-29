@@ -39,6 +39,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		private DateTime insertingItemsSince;
 		private Task readerTask;
 		private FilterConditionViewModel adhocFilterCondition;
+		private SourceResolver sourceResolver = new SourceResolver();
 		
 		/// <summary>
 		/// Buffer for all read items that are collected in the separate Task thread and then
@@ -166,6 +167,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		public string LoadedBasePath { get { return loadedBasePath; } }
 
+		public SourceResolver SourceResolver { get { return sourceResolver; } }
+
 		#endregion Public properties
 
 		#region Commands
@@ -174,7 +177,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public DelegateCommand LoadLogCommand { get; private set; }
 		public DelegateCommand StopLiveCommand { get; private set; }
 		public DelegateCommand ClearCommand { get; private set; }
-		public DelegateCommand LoadMapCommand { get; private set; }
+		public DelegateCommand LoadSymbolsCommand { get; private set; }
+		public DelegateCommand LoadObfuscationMapCommand { get; private set; }
 		public DelegateCommand DecreaseIndentSizeCommand { get; private set; }
 		public DelegateCommand IncreaseIndentSizeCommand { get; private set; }
 		public DelegateCommand DeleteFilterCommand { get; private set; }
@@ -203,12 +207,15 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			LoadLogCommand = new DelegateCommand(OnLoadLog, CanLoadLog);
 			StopLiveCommand = new DelegateCommand(OnStopLive, CanStopLive);
 			ClearCommand = new DelegateCommand(OnClear, CanClear);
-			LoadMapCommand = new DelegateCommand(OnLoadMap);
+			LoadSymbolsCommand = new DelegateCommand(OnLoadSymbols);
+			LoadObfuscationMapCommand = new DelegateCommand(OnLoadObfuscationMap);
 			DecreaseIndentSizeCommand = new DelegateCommand(OnDecreaseIndentSize, CanDecreaseIndentSize);
 			IncreaseIndentSizeCommand = new DelegateCommand(OnIncreaseIndentSize, CanIncreaseIndentSize);
 			DeleteFilterCommand = new DelegateCommand(OnDeleteFilter, CanDeleteFilter);
 			ClearSearchTextCommand = new DelegateCommand(OnClearSearchText);
 			SettingsCommand = new DelegateCommand(OnSettings);
+
+			LoadObfuscationMapCommand.IsEnabled = false;   // Not implemented yet
 
 			QuickFilterSessionCommand = new DelegateCommand(OnQuickFilterSession, CanQuickFilterSession);
 			QuickFilterThreadCommand = new DelegateCommand(OnQuickFilterThread, CanQuickFilterThread);
@@ -232,7 +239,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			LoadLogCommand.RaiseCanExecuteChanged();
 			StopLiveCommand.RaiseCanExecuteChanged();
 			ClearCommand.RaiseCanExecuteChanged();
-			LoadMapCommand.RaiseCanExecuteChanged();
+			LoadObfuscationMapCommand.RaiseCanExecuteChanged();
 			SettingsCommand.RaiseCanExecuteChanged();
 		}
 
@@ -257,6 +264,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		private void OnLoadLog()
 		{
 			OpenFileDialog dlg = new OpenFileDialog();
+			dlg.Filter = "FieldLog files|*.fl|All files|*.*";
+			dlg.Title = "Select a file from the log file group to load";
 			if (dlg.ShowDialog() == true)
 			{
 				string prefix = GetPrefixFromPath(dlg.FileName);
@@ -298,8 +307,28 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			logItems.Clear();
 		}
 
-		private void OnLoadMap()
+		private void OnLoadSymbols()
 		{
+			OpenFileDialog dlg = new OpenFileDialog();
+			dlg.Filter = "Symbol files|*.xml;*.xml.gz|All files|*.*";
+			dlg.InitialDirectory = Path.GetDirectoryName(loadedBasePath);
+			dlg.Multiselect = true;
+			dlg.Title = "Select the symbol file(s) to load";
+			if (dlg.ShowDialog() == true)
+			{
+				foreach (string fileName in dlg.FileNames)
+				{
+					sourceResolver.AddFile(fileName);
+				}
+
+				logItems.ForEach(i => i.Refresh());
+				RefreshLogItemsFilterView();
+			}
+		}
+
+		private void OnLoadObfuscationMap()
+		{
+			// When implementing this, remove static disabling of the LoadObfuscationMapCommand above
 		}
 
 		private bool CanDecreaseIndentSize()

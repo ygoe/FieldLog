@@ -110,11 +110,12 @@
     <Compile Include="Converters\ListItemsConverter.cs" />
     <Compile Include="Converters\RelativeTimeConverter.cs" />
     <Compile Include="Converters\SameThreadBrushConverter.cs" />
-    <Compile Include="Extensions.cs" />
+    <Compile Include="SourceResolver.cs" />
     <Compile Include="Unclassified\Util\GlobalMutex.cs" />
     <Compile Include="Unclassified\Util\DebugMonitor.cs" />
     <Compile Include="Unclassified\Util\DelayedCall.cs" />
     <Compile Include="Unclassified\Util\ListExtensions.cs" />
+    <Compile Include="Unclassified\Util\MediaExtensions.cs" />
     <Compile Include="Unclassified\Util\PropertyExtensions.cs" />
     <Compile Include="Unclassified\Util\Settings.cs" />
     <Compile Include="Unclassified\Util\StringExtensions.cs" />
@@ -319,9 +320,6 @@
     <Resource Include="Images\event.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\association.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\pin.png" />
   </ItemGroup>
   <ItemGroup>
@@ -334,6 +332,8 @@
     <Resource Include="Images\filter_delete.png" />
     <Resource Include="Images\ScopeItem_WebRequestEnd_14.png" />
     <Resource Include="Images\ScopeItem_WebRequestStart_14.png" />
+    <Resource Include="Images\ghost.png" />
+    <Resource Include="Images\pdb-file.png" />
     <Content Include="Sounds\high.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

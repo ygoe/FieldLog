@@ -48,12 +48,15 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				if (Environment != null)
 				{
 					string cn = Environment.CultureName;
-					try
+					if (!string.IsNullOrEmpty(cn))
 					{
-						cn += ", " + new CultureInfo(Environment.CultureName).DisplayName;
-					}
-					catch
-					{
+						try
+						{
+							cn += ", " + new CultureInfo(Environment.CultureName).DisplayName;
+						}
+						catch
+						{
+						}
 					}
 					return cn;
 				}
@@ -159,12 +162,15 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				if (Environment != null)
 				{
 					string cn = Environment.OSLanguage;
-					try
+					if (!string.IsNullOrEmpty(cn))
 					{
-						cn += ", " + new CultureInfo(Environment.OSLanguage).DisplayName;
-					}
-					catch
-					{
+						try
+						{
+							cn += ", " + new CultureInfo(Environment.OSLanguage).DisplayName;
+						}
+						catch
+						{
+						}
 					}
 					return cn;
 				}

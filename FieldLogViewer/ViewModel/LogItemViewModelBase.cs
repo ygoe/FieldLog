@@ -63,5 +63,13 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 			return EventCounter.CompareTo(other.EventCounter);
 		}
+
+		/// <summary>
+		/// Refreshes all data in the item that can be resolved from other sources. Deriving
+		/// classes override this method to refresh the relevant item data.
+		/// </summary>
+		public virtual void Refresh()
+		{
+		}
 	}
 }

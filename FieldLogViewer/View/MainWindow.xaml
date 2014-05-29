@@ -47,8 +47,11 @@
 				<Image Source="/Images/clearwindowcontent.png"/>
 			</Button>
 			<Separator/>
-			<Button Command="{Binding LoadMapCommand}" ToolTip="Load obfuscation map">
-				<Image Source="/Images/association.png"/>
+			<Button Command="{Binding LoadSymbolsCommand}" ToolTip="Load source code symbols file">
+				<Image Source="/Images/pdb-file.png"/>
+			</Button>
+			<Button Command="{Binding LoadObfuscationMapCommand}" ToolTip="Load obfuscation map">
+				<Image Source="/Images/ghost.png"/>
 			</Button>
 			<Separator/>
 			<ToggleButton IsChecked="{Binding IsDebugMonitorActive}" ToolTip="Debug monitor">

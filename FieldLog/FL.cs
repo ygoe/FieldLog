@@ -3203,6 +3203,27 @@ namespace Unclassified.FieldLog
 		}
 
 		/// <summary>
+		/// Gets the assembly configuration of the current application from the
+		/// AssemblyConfigurationAttribute value, or null if none is set.
+		/// </summary>
+		public static string AppAsmConfiguration
+		{
+			get
+			{
+				if (Assembly.GetEntryAssembly() == null)
+				{
+					return null;
+				}
+				object[] customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyConfigurationAttribute), false);
+				if (customAttributes != null && customAttributes.Length > 0)
+				{
+					return ((AssemblyConfigurationAttribute) customAttributes[0]).Configuration;
+				}
+				return null;
+			}
+		}
+
+		/// <summary>
 		/// Gets the name of the current application from the AssemblyProductAttribute or
 		/// AssemblyTitleAttribute value, or null if none is set.
 		/// </summary>

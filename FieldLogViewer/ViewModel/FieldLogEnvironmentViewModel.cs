@@ -29,6 +29,18 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
+		public string AppVersionAndConfig
+		{
+			get
+			{
+				if (Environment != null)
+				{
+					return Environment.AppVersion + (!string.IsNullOrEmpty(Environment.AppAsmConfiguration) ? " (" + Environment.AppAsmConfiguration + ")" : "");
+				}
+				return null;
+			}
+		}
+
 		public string CultureName
 		{
 			get

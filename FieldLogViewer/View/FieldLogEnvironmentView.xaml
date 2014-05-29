@@ -71,7 +71,7 @@
 			<TextBox Grid.Row="4" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Environment.CommandLine, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
 			<TextBlock Grid.Row="5" Grid.Column="0" Margin="0,0,0,0" Text="App version:"/>
-			<TextBox Grid.Row="5" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Environment.AppVersion, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+			<TextBox Grid.Row="5" Grid.Column="1" Margin="0,0,0,0" Text="{Binding AppVersionAndConfig, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
 			<TextBlock Grid.Row="6" Grid.Column="0" Margin="0,0,0,0" Text="Current directory:"/>
 			<TextBox Grid.Row="6" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Environment.CurrentDirectory, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>

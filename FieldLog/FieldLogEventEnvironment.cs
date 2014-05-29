@@ -172,6 +172,10 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		public string AppVersion { get; private set; }
 		/// <summary>
+		/// Gets the assembly configuration of the current application.
+		/// </summary>
+		public string AppAsmConfiguration { get; private set; }
+		/// <summary>
 		/// Gets a value indicating whether the running process is 64 bit.
 		/// </summary>
 		public bool IsProcess64Bit { get; private set; }
@@ -303,6 +307,7 @@ namespace Unclassified.FieldLog
 			env.ExecutablePath = Assembly.GetEntryAssembly() != null ? Assembly.GetEntryAssembly().Location : "";
 			env.CommandLine = Environment.CommandLine;
 			env.AppVersion = FL.AppVersion;
+			env.AppAsmConfiguration = FL.AppAsmConfiguration;
 			env.IsProcess64Bit = IntPtr.Size == 8;   // .NET 4 only: Environment.Is64BitProcess
 			env.ClrVersion = Environment.Version.ToString();
 #if NET20
@@ -349,6 +354,7 @@ namespace Unclassified.FieldLog
 				ptrSize + (env.ExecutablePath != null ? strSize + env.ExecutablePath.Length * 2 : 0) +
 				ptrSize + (env.CommandLine != null ? strSize + env.CommandLine.Length * 2 : 0) +
 				ptrSize + (env.AppVersion != null ? strSize + env.AppVersion.Length * 2 : 0) +
+				ptrSize + (env.AppAsmConfiguration != null ? strSize + env.AppAsmConfiguration.Length * 2 : 0) +
 				4 +
 				ptrSize + (env.ClrVersion != null ? strSize + env.ClrVersion.Length * 2 : 0) +
 				8 + 8 + 8 + 8 + 8 +
@@ -390,6 +396,7 @@ namespace Unclassified.FieldLog
 			writer.AddBuffer(ExecutablePath);
 			writer.AddBuffer(CommandLine);
 			writer.AddBuffer(AppVersion);
+			writer.AddBuffer(AppAsmConfiguration);
 			writer.AddBuffer(ClrVersion);
 			writer.AddBuffer((short) LocalTimeZoneOffset.TotalMinutes);
 			writer.AddBuffer(ProcessMemory);
@@ -448,6 +455,10 @@ namespace Unclassified.FieldLog
 			env.ExecutablePath = reader.ReadString();
 			env.CommandLine = reader.ReadString();
 			env.AppVersion = reader.ReadString();
+			if (reader.FormatVersion >= 2)
+			{
+				env.AppAsmConfiguration = reader.ReadString();
+			}
 			env.ClrVersion = reader.ReadString();
 			env.LocalTimeZoneOffset = TimeSpan.FromMinutes(reader.ReadInt16());
 			env.ProcessMemory = reader.ReadInt64();

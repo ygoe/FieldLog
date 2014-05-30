@@ -29,6 +29,8 @@ if (IsSelected("build-debug"))
 {
 	Build-Solution "FieldLog.sln" "Debug" "Any CPU" 6
 
+	Exec-File "PdbConvert\bin\Debug\PdbConvert.exe" "$sourcePath\FieldLogViewer\bin\Debug\* /srcbase $sourcePath /optimize /gz" 1
+
 	if (IsSelected("sign-lib"))
 	{
 		Sign-File "FieldLog\bin\DebugNET40\Unclassified.FieldLog.dll" "signkey.pfx" "@signkey.password" 1
@@ -46,6 +48,8 @@ if (IsSelected("build-debug"))
 if ((IsSelected("build-release")) -or (IsSelected("commit")))
 {
 	Build-Solution "FieldLog.sln" "Release" "Any CPU" 6
+
+	Exec-File "PdbConvert\bin\Release\PdbConvert.exe" "$sourcePath\FieldLogViewer\bin\Release\* /srcbase $sourcePath /optimize /gz" 1
 
 	if (IsSelected("sign-lib"))
 	{

@@ -177,6 +177,11 @@ namespace Unclassified.Util
 			if (args == null)
 			{
 				args = Environment.GetCommandLineArgs();
+				if (args.Length > 0)
+				{
+					// Skip myself (args[0])
+					args = args.Skip(1).ToArray();
+				}
 			}
 
 			// Clear/reset data

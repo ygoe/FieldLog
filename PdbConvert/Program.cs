@@ -19,6 +19,7 @@ namespace PdbConvert
 			List<string> assemblyFileNames = new List<string>();
 
 			CommandLineHelper cmdLine = new CommandLineHelper();
+			var debugOption = cmdLine.RegisterOption("debug").Alias("d");
 			var gzOption = cmdLine.RegisterOption("gz");
 			var helpOption = cmdLine.RegisterOption("help").Alias("h", "?");
 			var noNamesOption = cmdLine.RegisterOption("nonames");
@@ -59,6 +60,15 @@ namespace PdbConvert
 			if (assemblyFileNames.Count == 0)
 			{
 				return ConsoleHelper.ExitError("Missing argument: Input assembly file name", 2);
+			}
+
+			if (debugOption.IsSet)
+			{
+				ConsoleHelper.WriteLine("Input assemblies:", ConsoleColor.DarkGray);
+				foreach (string fileName in assemblyFileNames)
+				{
+					ConsoleHelper.WriteLine("  " + fileName, ConsoleColor.DarkGray);
+				}
 			}
 
 			XmlDocument doc = new XmlDocument();
@@ -120,6 +130,13 @@ namespace PdbConvert
 				Path.ChangeExtension(assemblyFileNames.OrderBy(a => Path.GetExtension(a).Equals(".dll", StringComparison.OrdinalIgnoreCase)).First(), ".pdb") +
 					".xml" +
 					(gzOption.IsSet ? ".gz" : "");
+
+			if (debugOption.IsSet)
+			{
+				ConsoleHelper.WriteLine("Output file:", ConsoleColor.DarkGray);
+				ConsoleHelper.WriteLine("  " + xmlFileName, ConsoleColor.DarkGray);
+			}
+
 			try
 			{
 				if (gzOption.IsSet)
@@ -169,6 +186,7 @@ Options:
   /optimize          Removes unnecessary elements (methods without source code, unreferenced source files) from the XML file.
   /o[utfile] <path>  Specifies the path of the generated XML file. If unset, the file name is derived from the input files, preferring .exe files.
   /srcbase <path>    Sets the source base path that is stripped from the beginning of the source file names. Set this to the project directory.
+  /d[ebug]           Shows debug information.
   /help, /h, /?      Shows this help information.", true);
 		}
 	}

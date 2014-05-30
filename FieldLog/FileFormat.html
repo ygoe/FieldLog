@@ -1,0 +1,793 @@
+﻿<!doctype html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>FieldLog file format specification</title>
+
+<style type="text/css">
+html
+{
+	font-size: 0.85em;
+}
+p
+{
+	line-height: 150%;
+}
+code
+{
+	font-size: 1.25em;
+}
+sup
+{
+	line-height: 0;
+}
+table.structure
+{
+	border-spacing: 0;
+	border-collapse: collapse;
+}
+table.structure th,
+table.structure td
+{
+	border: solid 1px silver;
+	padding: 2px 6px;
+	text-align: left;
+	vertical-align: top;
+}
+table.structure tr th:first-child,
+table.structure tr td:first-child
+{
+	text-align: right;
+}
+table.structure th
+{
+	background-color: #eeeeee;
+	font-weight: normal;
+}
+.conditional
+{
+	color: #D05000;
+	font-style: italic;
+}
+.versioned
+{
+	color: #00B000;
+	font-style: italic;
+}
+</style>
+</head>
+
+<body>
+<h1>FieldLog file format specification</h1>
+
+<p>
+FieldLog writes the log items in a binary format that minimises the amount of bytes per information and reuses any previous text strings for storage efficiency. This document describes the file structure for the current and past format versions.
+</p>
+
+<p>
+All integer values are stored in big endian format, independent of the underlying hardware architecture.
+</p>
+
+<p>
+Each record starts with its total length, so it can be quickly skipped when reading the file. This also works if the file reader does not know the exact internal structure of the record. Record length values are technically 32 bits long, but the first (most-significant) 4 bits are used as the record type indicator. So a record can effectively be no longer than <nobr>2<sup>28</sup> = 256 MiB.</nobr> Also, there can only be <nobr>2<sup>4</sup> &minus; 1 = 15</nobr> different record types (0 is reserved for the invalid value). The record type values are defined in the source file FieldLog\Enums.cs.
+</p>
+
+<h2>File header</h2>
+
+<p>
+The log file header is read and written in the <code>FieldLogFileWriter</code> constructor and also read in the <code>FieldLogFileReader</code> constructor.
+</p>
+
+<table class="structure">
+	<tr>
+		<th>Length</th>
+		<th>Data type</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>9</td>
+		<td>Text</td>
+		<td>Constant string "FieldLog\0", ASCII encoded, with final 0 byte.</td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>Integer</td>
+		<td>File format version, currently 2.</td>
+	</tr>
+</table>
+
+<p>
+File header length: 10 bytes.
+</p>
+
+<p>
+After the file header, the data records are stored. A record can be a shared string or a log item.
+</p>
+
+<h2>Shared strings</h2>
+
+<p>
+Shared strings store the actual string data used in log items. Each time a string should be stored, a shared string record is written and the file offset of its beginning is stored to reference the string in a log item. If a shared string already exists in the current file, it is reused. Strings cannot be shared across multiple files, so each file remains self-containing. To fetch the string data from a record field, a simple reader could just seek to the indicated position in the file and read the string record. The FieldLog library uses a cache to keep string instances that were already read and written.
+</p>
+
+<p>
+If a string in a data structure has the value <code>null</code>, it is stored with the offset -1 (FFFFFFFFh). No shared string record is created for <code>null</code> values, but a record may be created for an empty string.
+</p>
+
+<p>
+The text cache is read and written in the <code>FieldLogFileWriter.GetText</code> method and read in the <code>FieldLogFileWriter.ReadTextCache</code> and <code>FieldLogFileReader.ReadLogItem</code> methods.
+</p>
+
+<table class="structure">
+	<tr>
+		<th>Length</th>
+		<th>Data type</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>Integer</td>
+		<td>Record length. The first 4 bits indicate the string record type (value: 1).</td>
+	</tr>
+	<tr>
+		<td>var.</td>
+		<td>Text</td>
+		<td>String content, UTF-8 encoded.</td>
+	</tr>
+</table>
+
+<p>
+Record length: variable (depends on the string length).
+</p>
+
+<h2>Log items</h2>
+
+<p>
+Log items come in different types. The type is indicated in the first 4 bits, as introduced above. All log item records begin with a number of common fields, followed by the type-specific structure.
+</p>
+
+<p>
+The log item base data is written in the <code>FieldLogFileWriter.WriteBuffer</code> method and read in the <code>FieldLogItem.Read</code> method (called from <code>FieldLogFileReader.ReadLogItem</code>). The base data fields are prepared for the buffer in the <code>FieldLogItem.Write</code> method and read in the <code>FieldLogItem.ReadBaseData</code> method.
+</p>
+
+<table class="structure">
+	<tr>
+		<th>Length</th>
+		<th>Data type</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>Integer</td>
+		<td>Record length. The first 4 bits indicate the string record type (value: &gt; 1).</td>
+	</tr>
+	<tr>
+		<td>8</td>
+		<td>Integer</td>
+		<td>Ticks of the event time, from <code>DateTime.Ticks</code>.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>Integer</td>
+		<td>Event counter, sequence number within the session.</td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>Integer</td>
+		<td>Priority, defined in the <code>FieldLogPriority</code> enum in the source file FieldLog\Enums.cs.</td>
+	</tr>
+	<tr>
+		<td>16</td>
+		<td>GUID</td>
+		<td>Application session ID.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>Integer</td>
+		<td>Managed thread ID.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>Integer</td>
+		<td>Web request ID (unsigned), sequence number for each web request, 0 otherwise. <span class="versioned">Added in file format version 2.</span></td>
+	</tr>
+</table>
+
+<p>
+Record base length: 41 bytes.
+</p>
+
+<h3>Text log item</h3>
+
+<p>
+The type value for exception log items is 2.
+</p>
+
+<p>
+The text log item data is written in the <code>FieldLogTextItem.Write</code> method and read in the <code>FieldLogTextItem.Read</code> method.
+</p>
+
+<table class="structure">
+	<tr>
+		<th>Length</th>
+		<th>Data type</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Text.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Details.</td>
+	</tr>
+</table>
+
+<p>
+Record total length: 49 bytes.
+</p>
+
+<h3>Data log item</h3>
+
+<p>
+The type value for exception log items is 3.
+</p>
+
+<p>
+The data log item data is written in the <code>FieldLogDataItem.Write</code> method and read in the <code>FieldLogDataItem.Read</code> method.
+</p>
+
+<table class="structure">
+	<tr>
+		<th>Length</th>
+		<th>Data type</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Name.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Value.</td>
+	</tr>
+</table>
+
+<p>
+Record total length: 49 bytes.
+</p>
+
+<h3>Exception log item</h3>
+
+<p>
+The type value for exception log items is 4.
+</p>
+
+<p>
+The exception log item data is written in the <code>FieldLogExceptionItem.Write</code> method and read in the <code>FieldLogExceptionItem.Read</code> method.
+</p>
+
+<table class="structure">
+	<tr>
+		<th>Length</th>
+		<th>Data type</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>var.</td>
+		<td>Structure</td>
+		<td>Exception data, see below.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Context.</td>
+	</tr>
+	<tr>
+		<td>138</td>
+		<td>Structure</td>
+		<td>Environment data, see below.</td>
+	</tr>
+</table>
+
+<p>
+Record total length: variable (depends on the number of stack frames and inner exceptions).
+</p>
+
+<h3>Scope log item</h3>
+
+<p>
+The type value for scope log items is 5. If a scope item is repeated in a following log file, it is marked as repeated scope item with the type value 6. Such items are kept available as long as the scope is still relevant, in case a new log file was started in the middle of a scope and older log files (where the scope was originally started) were already purged away.
+</p>
+
+<p>
+The scope log item data is written in the <code>FieldLogScopeItem.Write</code> method and read in the <code>FieldLogScopeItem.Read</code> method.
+</p>
+
+<table class="structure">
+	<tr>
+		<th>Length</th>
+		<th>Data type</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>Integer</td>
+		<td>Scope type, defined in the <code>FieldLogScopeType</code> enum in the source file FieldLog\Enums.cs.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>Integer</td>
+		<td>Level, used for indenting.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Scope name.</td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>Integer</td>
+		<td><span class="conditional">Only for type <code>ThreadStart</code> (2):</span> Flags:<br>
+			1: Background thread<br>
+			2: Pool thread</td>
+	</tr>
+	<tr>
+		<td>138</td>
+		<td>Structure</td>
+		<td><span class="conditional">Only for type <code>LogStart</code> (4):</span> Environment data, see below.</td>
+	</tr>
+	<tr>
+		<td>44</td>
+		<td>Structure</td>
+		<td><span class="conditional">Only for type <code>WebRequestStart</code> (6):</span> Web request data, see below. <span class="versioned">Added in file format version 2.</span></td>
+	</tr>
+</table>
+
+<p>
+Record total length: variable (depends on the scope type).
+</p>
+
+<h2>Data structures</h2>
+
+<p>
+These data structures are always part of a log item structure. They are referenced from the tables above. Some structures may also contain other instances of themselves to store recursive data.
+</p>
+
+<h3>Exception data structure</h3>
+
+<p>
+The exception data is written in the <code>FieldLogException.Write</code> method and read in the <code>FieldLogException.Read</code> method.
+</p>
+
+<table class="structure">
+	<tr>
+		<th>Length</th>
+		<th>Data type</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Exception type name.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>Integer</td>
+		<td>Metadata token of the exception type. <span class="versioned">Added in file format version 2.</span></td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Exception message.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Error code.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Data.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>Integer</td>
+		<td>Number of stack frames.</td>
+	</tr>
+	<tr>
+		<td><em>Count</em> * 36</td>
+		<td>Structure</td>
+		<td>Stack frames data, see below.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>Integer</td>
+		<td>Number of inner exceptions on this level.</td>
+	</tr>
+	<tr>
+		<td><em>Count</em> * var.</td>
+		<td>Structure</td>
+		<td>Inner exceptions data (this structure).</td>
+	</tr>
+</table>
+
+<p>
+Structure length: variable (depends on the number of stack frames and inner exceptions).
+</p>
+
+<p>
+The stack frame and inner exception structures are repeated as often as is indicated by the count value in the previous field.
+</p>
+
+<h3>Stack frame structure</h3>
+
+<p>
+The stack frame data is written in the <code>FieldLogStackFrame.Write</code> method and read in the <code>FieldLogStackFrame.Read</code> method.
+</p>
+
+<table class="structure">
+	<tr>
+		<th>Length</th>
+		<th>Data type</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Module file name.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>Integer</td>
+		<td>Metadata token of the method. <span class="versioned">Added in file format version 2.</span></td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>Integer</td>
+		<td>IL offset in the method body. <span class="versioned">Added in file format version 2.</span></td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Type name of the executing method.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Method name.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Method signature.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Source code file name (this is only available if the .pdb file is present at runtime).</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>Integer</td>
+		<td>Line number in the source code file (this is only available if the .pdb file is present at runtime).</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>Integer</td>
+		<td>Column number in the source code file (this is only available if the .pdb file is present at runtime).</td>
+	</tr>
+</table>
+
+<p>
+Structure length: 36 bytes.
+</p>
+
+<h3>Environment data structure</h3>
+
+<p>
+The environment data is written in the <code>FieldLogEventEnvironment.Write</code> method and read in the <code>FieldLogEventEnvironment.Read</code> method.
+</p>
+
+<table class="structure">
+	<tr>
+		<th>Length</th>
+		<th>Data type</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>Integer</td>
+		<td>OS type, defined in the <code>OSType</code> enum in the source file FieldLog\OSInfo.cs.</td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>Integer</td>
+		<td>OS version, defined in the <code>OSVersion</code> enum in the source file FieldLog\OSInfo.cs.</td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>Integer</td>
+		<td>OS edition, defined in the <code>OSEdition</code> enum in the source file FieldLog\OSInfo.cs.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>OS service pack.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>Integer</td>
+		<td>OS build number.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>Integer</td>
+		<td>OS service pack build number.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>OS product name.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>OS language culture code.</td>
+	</tr>
+	<tr>
+		<td>8</td>
+		<td>Integer</td>
+		<td>Last system boot time, from <code>DateTime.Ticks</code>.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Application compatibility layer.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>CLR type. Either "Microsoft .NET" or "Mono".</td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>Integer</td>
+		<td>Number of mouse buttons.</td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>Integer</td>
+		<td>Number of touch points.</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>Integer</td>
+		<td>Screen resolution in dpi.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Current thread culture code.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Current working directory.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Environment variables.</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>Integer</td>
+		<td>Number of CPU cores.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Host name.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>User name.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Application executable file path.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Command line.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Application version.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Application assembly configuration. <span class="versioned">Added in file format version 2.</span></td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>CLR version.</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>Integer</td>
+		<td>Local time zone offset, in minutes from UTC.</td>
+	</tr>
+	<tr>
+		<td>8</td>
+		<td>Integer</td>
+		<td>Process memory, in bytes.</td>
+	</tr>
+	<tr>
+		<td>8</td>
+		<td>Integer</td>
+		<td>Peak process memory, in bytes.</td>
+	</tr>
+	<tr>
+		<td>8</td>
+		<td>Integer</td>
+		<td>Total installed memory, in bytes.</td>
+	</tr>
+	<tr>
+		<td>8</td>
+		<td>Integer</td>
+		<td>Available memory, in bytes.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>Integer</td>
+		<td>Process ID.</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>Integer</td>
+		<td>Primary screen width, in pixels.</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>Integer</td>
+		<td>Primary screen height, in pixels.</td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>Integer</td>
+		<td>Primary screen colour depth, in bits per pixel.</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>Integer</td>
+		<td>Primary screen working area left start, in pixels.</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>Integer</td>
+		<td>Primary screen working area top start, in pixels.</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>Integer</td>
+		<td>Primary screen working area width, in pixels.</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>Integer</td>
+		<td>Primary screen working area height, in pixels.</td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>Integer</td>
+		<td>Number of screens.</td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>Integer</td>
+		<td>Flags:<br>
+			1: OS is 64 bit<br>
+			2: OS is application server<br>
+			4: OS is booted in fail-safe mode<br>
+			8: Session is interactive<br>
+			16: Process is 64 bit<br>
+			32: User is local administrator</td>
+	</tr>
+</table>
+
+<p>
+Structure length: 138 bytes.
+</p>
+
+<h3>Web request data structure</h3>
+
+<p class="versioned">
+This data structure was added in file format version 2.
+</p>
+
+<p>
+The web request data is written in the <code>FieldLogWebRequestData.Write</code> method and read in the <code>FieldLogWebRequestData.Read</code> method.
+</p>
+
+<table class="structure">
+	<tr>
+		<th>Length</th>
+		<th>Data type</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Request URL.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>HTTP method.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Client address.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Client host name.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Referrer URL.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>User agent.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Accepted languages.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Accepted content types.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Web session ID.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Application-specific user ID.</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>String offset</td>
+		<td>Application-specific user name.</td>
+	</tr>
+</table>
+
+<p>
+Structure length: 44 bytes.
+</p>
+
+</body>
+</html>

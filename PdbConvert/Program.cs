@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Xml;
 using Unclassified.Util;
-using System.IO.Compression;
 
 namespace PdbConvert
 {
@@ -35,26 +35,24 @@ namespace PdbConvert
 				return ConsoleHelper.ExitError(ex.Message, 1);
 			}
 
-			foreach (var arg in cmdLine.Arguments)
+			if (helpOption.IsSet)
 			{
-				if (arg.Option == helpOption)
+				ShowHelp();
+				return 0;
+			}
+
+			foreach (var arg in cmdLine.FreeArguments)
+			{
+				if (arg.IndexOfAny(new[] { '?', '*' }) != -1)
 				{
-					ShowHelp();
-					return 0;
+					foreach (string foundFile in Directory.GetFiles(Path.GetDirectoryName(arg), Path.GetFileName(arg)))
+					{
+						CheckAddAssemblyFile(assemblyFileNames, foundFile);
+					}
 				}
-				else if (arg.Option == null)
+				else
 				{
-					if (arg.Value.IndexOfAny(new[] { '?', '*' }) != -1)
-					{
-						foreach (string foundFile in Directory.GetFiles(Path.GetDirectoryName(arg.Value), Path.GetFileName(arg.Value)))
-						{
-							CheckAddAssemblyFile(assemblyFileNames, foundFile);
-						}
-					}
-					else
-					{
-						CheckAddAssemblyFile(assemblyFileNames, arg.Value);
-					}
+					CheckAddAssemblyFile(assemblyFileNames, arg);
 				}
 			}
 
@@ -119,7 +117,8 @@ namespace PdbConvert
 
 			string xmlFileName =
 				outFileOption.Value ??
-				assemblyFileNames.OrderBy(a => Path.GetExtension(a).Equals(".dll", StringComparison.OrdinalIgnoreCase)).First() + ".xml" +
+				Path.ChangeExtension(assemblyFileNames.OrderBy(a => Path.GetExtension(a).Equals(".dll", StringComparison.OrdinalIgnoreCase)).First(), ".pdb") +
+					".xml" +
 					(gzOption.IsSet ? ".gz" : "");
 			try
 			{
@@ -165,12 +164,12 @@ Usage: PdbConvert [options] inputfile ...
 The input files must be either .exe or .dll assembly files. Only assemblies with an existing .pdb file are processed. Wildcards (? and *) are allowed for files within a directory. All files’ symbols are written to one XML file. Options and input files can be mixed.
 
 Options:
-  /gz            Compresses the output file with gzip. (Default file extension: .xml.gz)
-  /nonames       Does not include method names in the XML file.
-  /optimize      Removes unnecessary elements (methods without source code, unreferenced source files) from the XML file.
-  /outfile       Specifies the path of the generated XML file. If unset, the file is created in the path of the input files. A .exe input file is considered first.
-  /srcbase       Sets the source base path that is stripped from the beginning of the source file names. Set this to the project directory.
-  /help, /h, /?  Shows this help information.", true);
+  /gz                Compresses the output file with gzip. (Default file extension: .xml.gz)
+  /nonames           Does not include method names in the XML file.
+  /optimize          Removes unnecessary elements (methods without source code, unreferenced source files) from the XML file.
+  /o[utfile] <path>  Specifies the path of the generated XML file. If unset, the file name is derived from the input files, preferring .exe files.
+  /srcbase <path>    Sets the source base path that is stripped from the beginning of the source file names. Set this to the project directory.
+  /help, /h, /?      Shows this help information.", true);
 		}
 	}
 }

@@ -94,6 +94,9 @@
     <Compile Include="OSInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="FileFormat.html" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if not defined FASTBUILD "$(SolutionDir)\_tools\GitRevisionTool.exe" -si "$(ProjectDir)"</PostBuildEvent>

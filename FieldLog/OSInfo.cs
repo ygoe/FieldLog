@@ -463,7 +463,9 @@ namespace Unclassified.FieldLog
 
 					// Detect app compat by searching for own executable path in the registry at
 					// HKEY_CURRENT_USER\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers\
-					// Just make the entire string of it available for logging
+					// Just make the entire string of it available for logging.
+					// Flags description:
+					// http://www.verboon.info/2011/03/running-an-application-as-administrator-or-in-compatibility-mode/
 					try
 					{
 						if (Assembly.GetEntryAssembly() != null)

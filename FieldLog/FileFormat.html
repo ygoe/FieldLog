@@ -7,15 +7,16 @@
 <style type="text/css">
 html
 {
-	font-size: 0.85em;
+	font-family: Segoe UI, sans-serif;
+	font-size: 14px;
+}
+code
+{
+	font-family: Consolas, monospace;
 }
 p
 {
 	line-height: 150%;
-}
-code
-{
-	font-size: 1.25em;
 }
 sup
 {
@@ -38,6 +39,13 @@ table.structure tr th:first-child,
 table.structure tr td:first-child
 {
 	text-align: right;
+}
+table.structure tr th:first-child,
+table.structure tr th:nth-child(2),
+table.structure tr td:first-child,
+table.structure tr td:nth-child(2)
+{
+	white-space: nowrap;
 }
 table.structure th
 {
@@ -107,11 +115,11 @@ After the file header, the data records are stored. A record can be a shared str
 <h2>Shared strings</h2>
 
 <p>
-Shared strings store the actual string data used in log items. Each time a string should be stored, a shared string record is written and the file offset of its beginning is stored to reference the string in a log item. If a shared string already exists in the current file, it is reused. Strings cannot be shared across multiple files, so each file remains self-containing. To fetch the string data from a record field, a simple reader could just seek to the indicated position in the file and read the string record. The FieldLog library uses a cache to keep string instances that were already read and written.
+Shared strings store the actual string data used in log items. Each time a string should be stored, a shared string record is written and the file offset of its beginning is stored as an integer value to reference the string in a log item. If a shared string already exists in the current file, it is reused. Strings cannot be shared across multiple files, so each file remains self-containing. To fetch the string data from a record field, a simple reader could just seek to the indicated position in the file and read the string record from there. The FieldLog library uses a cache to keep string instances that were already read and written.
 </p>
 
 <p>
-If a string in a data structure has the value <code>null</code>, it is stored with the offset -1 (FFFFFFFFh). No shared string record is created for <code>null</code> values, but a record may be created for an empty string.
+If a string in a data structure has the value <code>null</code>, it is stored as the offset value -1 (FFFFFFFFh). No shared string record is created for <code>null</code> values, but a record may be created for an empty string.
 </p>
 
 <p>
@@ -147,7 +155,7 @@ Log items come in different types. The type is indicated in the first 4 bits, as
 </p>
 
 <p>
-The log item base data is written in the <code>FieldLogFileWriter.WriteBuffer</code> method and read in the <code>FieldLogItem.Read</code> method (called from <code>FieldLogFileReader.ReadLogItem</code>). The base data fields are prepared for the buffer in the <code>FieldLogItem.Write</code> method and read in the <code>FieldLogItem.ReadBaseData</code> method.
+The log item base data is written in the <code>FieldLogFileWriter.WriteBuffer</code> method and read in the <code>FieldLogFileReader.ReadLogItem</code> method (continued in <code>FieldLogItem.Read</code>). The base data fields are prepared for the buffer in the <code>FieldLogItem.Write</code> method and read in the <code>FieldLogItem.ReadBaseData</code> method.
 </p>
 
 <table class="structure">
@@ -179,12 +187,12 @@ The log item base data is written in the <code>FieldLogFileWriter.WriteBuffer</c
 	<tr>
 		<td>16</td>
 		<td>GUID</td>
-		<td>Application session ID.</td>
+		<td>Application session ID, uniquely identifies each execution of the application.</td>
 	</tr>
 	<tr>
 		<td>4</td>
 		<td>Integer</td>
-		<td>Managed thread ID.</td>
+		<td>Managed thread ID from which the log item was created.</td>
 	</tr>
 	<tr>
 		<td>4</td>
@@ -221,7 +229,7 @@ The text log item data is written in the <code>FieldLogTextItem.Write</code> met
 	<tr>
 		<td>4</td>
 		<td>String offset</td>
-		<td>Details.</td>
+		<td>Details, if specified.</td>
 	</tr>
 </table>
 
@@ -248,7 +256,7 @@ The data log item data is written in the <code>FieldLogDataItem.Write</code> met
 	<tr>
 		<td>4</td>
 		<td>String offset</td>
-		<td>Name.</td>
+		<td>Name of the variable being logged.</td>
 	</tr>
 	<tr>
 		<td>4</td>
@@ -285,7 +293,7 @@ The exception log item data is written in the <code>FieldLogExceptionItem.Write<
 	<tr>
 		<td>4</td>
 		<td>String offset</td>
-		<td>Context.</td>
+		<td>Context in which the exception occured, if specified.</td>
 	</tr>
 	<tr>
 		<td>138</td>
@@ -322,7 +330,7 @@ The scope log item data is written in the <code>FieldLogScopeItem.Write</code> m
 	<tr>
 		<td>4</td>
 		<td>Integer</td>
-		<td>Level, used for indenting.</td>
+		<td>New scope level after this log item, used for indenting. Only incremented and decremented for <code>Enter</code> and <code>Leave</code> scopes.</td>
 	</tr>
 	<tr>
 		<td>4</td>
@@ -333,8 +341,8 @@ The scope log item data is written in the <code>FieldLogScopeItem.Write</code> m
 		<td>1</td>
 		<td>Integer</td>
 		<td><span class="conditional">Only for type <code>ThreadStart</code> (2):</span> Flags:<br>
-			1: Background thread<br>
-			2: Pool thread</td>
+			1: Background thread.<br>
+			2: Pool thread.</td>
 	</tr>
 	<tr>
 		<td>138</td>
@@ -393,7 +401,7 @@ The exception data is written in the <code>FieldLogException.Write</code> method
 	<tr>
 		<td>4</td>
 		<td>String offset</td>
-		<td>Data.</td>
+		<td>Additional data from the exception object, formatted presentation of the <code>Data</code> dictionary and other public properties.</td>
 	</tr>
 	<tr>
 		<td>4</td>
@@ -548,7 +556,7 @@ The environment data is written in the <code>FieldLogEventEnvironment.Write</cod
 	<tr>
 		<td>4</td>
 		<td>String offset</td>
-		<td>Application compatibility layer.</td>
+		<td>Application compatibility layer, the entire string as read from the registry. Values explained in this <a href="http://www.verboon.info/2011/03/running-an-application-as-administrator-or-in-compatibility-mode/" rel="external">blog post</a>.</td>
 	</tr>
 	<tr>
 		<td>4</td>
@@ -568,7 +576,7 @@ The environment data is written in the <code>FieldLogEventEnvironment.Write</cod
 	<tr>
 		<td>2</td>
 		<td>Integer</td>
-		<td>Screen resolution in dpi.</td>
+		<td>Logical screen resolution in dpi.</td>
 	</tr>
 	<tr>
 		<td>4</td>
@@ -588,7 +596,7 @@ The environment data is written in the <code>FieldLogEventEnvironment.Write</cod
 	<tr>
 		<td>2</td>
 		<td>Integer</td>
-		<td>Number of CPU cores.</td>
+		<td>Number of CPU cores available on the system.</td>
 	</tr>
 	<tr>
 		<td>4</td>
@@ -598,7 +606,7 @@ The environment data is written in the <code>FieldLogEventEnvironment.Write</cod
 	<tr>
 		<td>4</td>
 		<td>String offset</td>
-		<td>User name.</td>
+		<td>User name, including domain.</td>
 	</tr>
 	<tr>
 		<td>4</td>
@@ -633,22 +641,22 @@ The environment data is written in the <code>FieldLogEventEnvironment.Write</cod
 	<tr>
 		<td>8</td>
 		<td>Integer</td>
-		<td>Process memory, in bytes.</td>
+		<td>Private memory currently used by the process, in bytes.</td>
 	</tr>
 	<tr>
 		<td>8</td>
 		<td>Integer</td>
-		<td>Peak process memory, in bytes.</td>
+		<td>Peak working set memory used by the process, in bytes.</td>
 	</tr>
 	<tr>
 		<td>8</td>
 		<td>Integer</td>
-		<td>Total installed memory, in bytes.</td>
+		<td>Total visible memory on the computer, in bytes.</td>
 	</tr>
 	<tr>
 		<td>8</td>
 		<td>Integer</td>
-		<td>Available memory, in bytes.</td>
+		<td>Available memory on the computer, in bytes.</td>
 	</tr>
 	<tr>
 		<td>4</td>
@@ -693,18 +701,18 @@ The environment data is written in the <code>FieldLogEventEnvironment.Write</cod
 	<tr>
 		<td>1</td>
 		<td>Integer</td>
-		<td>Number of screens.</td>
+		<td>Number of screens on the computer.</td>
 	</tr>
 	<tr>
 		<td>1</td>
 		<td>Integer</td>
 		<td>Flags:<br>
-			1: OS is 64 bit<br>
-			2: OS is application server<br>
-			4: OS is booted in fail-safe mode<br>
-			8: Session is interactive<br>
-			16: Process is 64 bit<br>
-			32: User is local administrator</td>
+			1: OS is 64 bit.<br>
+			2: OS is application server.<br>
+			4: OS is booted in fail-safe mode.<br>
+			8: Session is interactive.<br>
+			16: Process is 64 bit.<br>
+			32: User is local administrator.</td>
 	</tr>
 </table>
 
@@ -741,7 +749,7 @@ The web request data is written in the <code>FieldLogWebRequestData.Write</code>
 	<tr>
 		<td>4</td>
 		<td>String offset</td>
-		<td>Client address.</td>
+		<td>Client network address (IPv4 or IPv6, depending on connection type).</td>
 	</tr>
 	<tr>
 		<td>4</td>
@@ -751,22 +759,22 @@ The web request data is written in the <code>FieldLogWebRequestData.Write</code>
 	<tr>
 		<td>4</td>
 		<td>String offset</td>
-		<td>Referrer URL.</td>
+		<td>Referrer URL, from the HTTP request header.</td>
 	</tr>
 	<tr>
 		<td>4</td>
 		<td>String offset</td>
-		<td>User agent.</td>
+		<td>User agent, as in the HTTP request header.</td>
 	</tr>
 	<tr>
 		<td>4</td>
 		<td>String offset</td>
-		<td>Accepted languages.</td>
+		<td>Accepted languages, from the HTTP request header.</td>
 	</tr>
 	<tr>
 		<td>4</td>
 		<td>String offset</td>
-		<td>Accepted content types.</td>
+		<td>Accepted content types, from the HTTP request header.</td>
 	</tr>
 	<tr>
 		<td>4</td>

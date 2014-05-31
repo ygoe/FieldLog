@@ -468,11 +468,11 @@ namespace Unclassified.FieldLog
 					// http://www.verboon.info/2011/03/running-an-application-as-administrator-or-in-compatibility-mode/
 					try
 					{
-						if (Assembly.GetEntryAssembly() != null)
+						if (FL.EntryAssemblyLocation != null)
 						{
 							using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"))
 							{
-								AppCompatLayer = key.GetValue(Assembly.GetEntryAssembly().Location) as string;
+								AppCompatLayer = key.GetValue(FL.EntryAssemblyLocation) as string;
 							}
 						}
 					}

@@ -292,6 +292,20 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		private static int LastWebRequestId;
 
+		/// <summary>
+		/// Override configuration file name. Used for ASP.NET.
+		/// </summary>
+		private static string configFileNameOverride;
+		/// <summary>
+		/// Override default log file directory. Used for ASP.NET.
+		/// </summary>
+		private static string logDefaultDirOverride;
+		/// <summary>
+		/// Indicates whether the duplicate LogStart check on writing items to the log file has
+		/// been run. Used for ASP.NET.
+		/// </summary>
+		private static bool didDuplicateLogStartCheck;
+
 		#endregion Private static data
 
 		#region Internal static data
@@ -321,6 +335,17 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		[ThreadStatic]
 		internal static uint WebRequestId;
+
+		/// <summary>
+		/// A reference to the EntryAssembly. This is determined by other means for ASP.NET
+		/// applications.
+		/// </summary>
+		internal static Assembly EntryAssembly;
+		/// <summary>
+		/// The entry assembly's Location value. This is determined by other means for ASP.NET
+		/// applications.
+		/// </summary>
+		internal static string EntryAssemblyLocation;
 
 		#endregion Internal static data
 
@@ -381,6 +406,12 @@ namespace Unclassified.FieldLog
 
 			// Use default implementation to show an application error dialog
 			ShowAppErrorDialog = DefaultShowAppErrorDialog;
+
+			EntryAssembly = Assembly.GetEntryAssembly();
+			if (EntryAssembly != null)
+			{
+				EntryAssemblyLocation = EntryAssembly.Location;
+			}
 
 			LogScope(FieldLogScopeType.LogStart, null);
 			AppDomain.CurrentDomain.ProcessExit += AppDomain_ProcessExit;
@@ -2194,6 +2225,49 @@ namespace Unclassified.FieldLog
 
 #if ASPNET
 		/// <summary>
+		/// Starts logging for ASP.NET applications.
+		/// </summary>
+		private static void LogWebStart(Assembly callingAssembly)
+		{
+			if (EntryAssembly == null)
+			{
+				EntryAssembly = callingAssembly;
+				if (EntryAssembly != null)
+				{
+					string binDir = AppDomain.CurrentDomain.SetupInformation.PrivateBinPath;
+					string dllFileName = Path.GetFileName(EntryAssembly.Location);
+					if (!string.IsNullOrEmpty(binDir) && !string.IsNullOrEmpty(dllFileName))
+					{
+						EntryAssemblyLocation = Path.Combine(binDir, dllFileName);
+					}
+				}
+				// In ASP.NET, nothing must be changed in the bin directory, or the web application
+				// is immediately unloaded to be restarted for the next request. This includes log
+				// files and configuration that may be changed by the administrator.
+				logDefaultDirOverride = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
+			}
+			if (configFileNameOverride == null)
+			{
+				// In ASP.NET, nothing must be changed in the bin directory, or the web application
+				// is immediately unloaded to be restarted for the next request. This includes log
+				// files and configuration that may be changed by the administrator.
+				string baseDir = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
+				if (!string.IsNullOrEmpty(baseDir))
+				{
+					configFileNameOverride = Path.Combine(baseDir, "web" + logConfigExtension);
+					lock (sendThread)
+					{
+						configChanged = true;
+					}
+				}
+			}
+
+			// Log another LogStart scope item. If the previous item is still in the send buffer,
+			// it will be replaced with the new item.
+			LogScope(FieldLogScopeType.LogStart, null);
+		}
+
+		/// <summary>
 		/// Writes a web request start scope log item to the log file.
 		/// </summary>
 		/// <param name="useSession">true to access the Session, false to leave it alone.</param>
@@ -2483,6 +2557,10 @@ namespace Unclassified.FieldLog
 		{
 			if (prefix == null) throw new ArgumentNullException("prefix");
 
+#if ASPNET
+			LogWebStart(Assembly.GetCallingAssembly());
+#endif
+
 			lock (customLogPathLock)
 			{
 				if (customLogFileBasePathSet)
@@ -2507,6 +2585,10 @@ namespace Unclassified.FieldLog
 		{
 			if (path == null) throw new ArgumentNullException("path");
 
+#if ASPNET
+			LogWebStart(Assembly.GetCallingAssembly());
+#endif
+
 			lock (customLogPathLock)
 			{
 				if (customLogFileBasePathSet)
@@ -2529,6 +2611,10 @@ namespace Unclassified.FieldLog
 		/// </remarks>
 		public static void AcceptLogFileBasePath()
 		{
+#if ASPNET
+			LogWebStart(Assembly.GetCallingAssembly());
+#endif
+
 			lock (customLogPathLock)
 			{
 				customLogFileBasePathSet = true;
@@ -2544,8 +2630,20 @@ namespace Unclassified.FieldLog
 		{
 			if (logFileBasePathSet) return true;
 
-			string execPath = Assembly.GetEntryAssembly() != null ? Assembly.GetEntryAssembly().Location : null;
+			string execPath = EntryAssemblyLocation;
 			string execFile = execPath != null ? Path.GetFileNameWithoutExtension(execPath) : null;
+			if (logDefaultDirOverride != null)
+			{
+				execPath = logDefaultDirOverride;
+				if (EntryAssemblyLocation != null)
+				{
+					execFile = Path.GetFileNameWithoutExtension(EntryAssemblyLocation);
+				}
+				else
+				{
+					execFile = "web";
+				}
+			}
 			if (customLogFilePrefix != null)
 			{
 				execFile = customLogFilePrefix;
@@ -2654,6 +2752,23 @@ namespace Unclassified.FieldLog
 			// NOTE: HashSet<T> would be better here, but it's not supported in .NET 2.0, so we're
 			//       using a Dictionary instead. And it's just as fast anyway.
 
+			// Remove duplicate LogStart scope items when writing items the first time.
+			// For ASP.NET, a second LogStart item is generated when we have more information about
+			// the running application, so the first item can be removed from the buffer.
+			int skipLogStartItems = 0;
+			if (!didDuplicateLogStartCheck)
+			{
+				foreach (FieldLogItem logItem in logItems)
+				{
+					FieldLogScopeItem scopeItem = logItem as FieldLogScopeItem;
+					if (scopeItem != null && scopeItem.Type == FieldLogScopeType.LogStart)
+					{
+						skipLogStartItems++;
+					}
+				}
+				didDuplicateLogStartCheck = true;
+			}
+
 			foreach (FieldLogItem logItem in logItems)
 			{
 				//System.Diagnostics.Trace.WriteLine("FieldLog.AppendLogItemsToFile: Process item " + logItem.ToString());
@@ -2662,7 +2777,16 @@ namespace Unclassified.FieldLog
 				FieldLogScopeItem scopeItem = logItem as FieldLogScopeItem;
 				if (scopeItem != null)
 				{
-					if (scopeItem.Type == FieldLogScopeType.Enter)
+					if (scopeItem.Type == FieldLogScopeType.LogStart)
+					{
+						skipLogStartItems--;
+						if (skipLogStartItems > 0)
+						{
+							// Removed by deduplication
+							continue;
+						}
+					}
+					else if (scopeItem.Type == FieldLogScopeType.Enter)
 					{
 						Stack<FieldLogScopeItem> stack;
 						if (!CurrentScopes.TryGetValue(scopeItem.ThreadId, out stack))
@@ -2906,9 +3030,9 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		private static void ReadLogConfiguration()
 		{
-			if (Assembly.GetEntryAssembly() == null)
+			if (EntryAssemblyLocation == null && configFileNameOverride == null)
 			{
-				// No entry assembly available, config file not supported
+				// No entry assembly file name available, config file not supported
 				ResetLogConfiguration();
 				return;
 			}
@@ -2916,14 +3040,21 @@ namespace Unclassified.FieldLog
 			string configFileName = null;
 			try
 			{
-				string execPath = Assembly.GetEntryAssembly().Location;
-				string execDir = Path.GetDirectoryName(execPath);
-				string execFile = Path.GetFileNameWithoutExtension(execPath);
-				configFileName = Path.Combine(execDir, execFile + logConfigExtension);
+				if (configFileNameOverride != null)
+				{
+					configFileName = configFileNameOverride;
+				}
+				else
+				{
+					string execPath = EntryAssemblyLocation;
+					string execDir = Path.GetDirectoryName(execPath);
+					string execFile = Path.GetFileNameWithoutExtension(execPath);
+					configFileName = Path.Combine(execDir, execFile + logConfigExtension);
+				}
 
 				if (configFileWatcher == null)
 				{
-					configFileWatcher = new FileSystemWatcher(execDir, execFile + logConfigExtension);
+					configFileWatcher = new FileSystemWatcher(Path.GetDirectoryName(configFileName), Path.GetFileName(configFileName));
 					configFileWatcher.Changed += configFileWatcher_Event;
 					configFileWatcher.Created += configFileWatcher_Event;
 					configFileWatcher.EnableRaisingEvents = true;
@@ -2957,7 +3088,7 @@ namespace Unclassified.FieldLog
 									{
 										if (!Path.IsPathRooted(value))
 										{
-											value = Path.Combine(execDir, value);
+											value = Path.Combine(Path.GetDirectoryName(configFileName), value);
 										}
 										configLogPath = value;
 									}
@@ -3179,21 +3310,21 @@ namespace Unclassified.FieldLog
 		{
 			get
 			{
-				if (Assembly.GetEntryAssembly() == null)
+				if (EntryAssembly == null)
 				{
 					return null;
 				}
-				object[] customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
+				object[] customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
 					return ((AssemblyInformationalVersionAttribute) customAttributes[0]).InformationalVersion;
 				}
-				customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyVersionAttribute), false);
+				customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyVersionAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
 					return ((AssemblyVersionAttribute) customAttributes[0]).Version;
 				}
-				customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false);
+				customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
 					return ((AssemblyFileVersionAttribute) customAttributes[0]).Version;
@@ -3210,11 +3341,11 @@ namespace Unclassified.FieldLog
 		{
 			get
 			{
-				if (Assembly.GetEntryAssembly() == null)
+				if (EntryAssembly == null)
 				{
 					return null;
 				}
-				object[] customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyConfigurationAttribute), false);
+				object[] customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyConfigurationAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
 					return ((AssemblyConfigurationAttribute) customAttributes[0]).Configuration;
@@ -3231,16 +3362,16 @@ namespace Unclassified.FieldLog
 		{
 			get
 			{
-				if (Assembly.GetEntryAssembly() == null)
+				if (EntryAssembly == null)
 				{
 					return null;
 				}
-				object[] customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyProductAttribute), false);
+				object[] customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyProductAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
 					return ((AssemblyProductAttribute) customAttributes[0]).Product;
 				}
-				customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
+				customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
 					return ((AssemblyTitleAttribute) customAttributes[0]).Title;
@@ -3257,11 +3388,11 @@ namespace Unclassified.FieldLog
 		{
 			get
 			{
-				if (Assembly.GetEntryAssembly() == null)
+				if (EntryAssembly == null)
 				{
 					return null;
 				}
-				object[] customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false);
+				object[] customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
 					return ((AssemblyDescriptionAttribute) customAttributes[0]).Description;
@@ -3278,11 +3409,11 @@ namespace Unclassified.FieldLog
 		{
 			get
 			{
-				if (Assembly.GetEntryAssembly() == null)
+				if (EntryAssembly == null)
 				{
 					return null;
 				}
-				object[] customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
+				object[] customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
 					return ((AssemblyCopyrightAttribute) customAttributes[0]).Copyright;

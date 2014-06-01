@@ -69,7 +69,7 @@ table.structure th
 <h1>FieldLog file format specification</h1>
 
 <p>
-FieldLog writes the log items in a binary format that minimises the amount of bytes per information and reuses any previous text strings for storage efficiency. This document describes the file structure for the current and past format versions.
+<a href="http://dev.unclassified.de/source/fieldlog">FieldLog</a> writes the log items in a binary format that minimises the amount of bytes per information and reuses any previous text strings for storage efficiency. This document describes the file structure for the current and past format versions.
 </p>
 
 <p>
@@ -80,10 +80,18 @@ All integer values are stored in big endian format, independent of the underlyin
 Each record starts with its total length, so it can be quickly skipped when reading the file. This also works if the file reader does not know the exact internal structure of the record. Record length values are technically 32 bits long, but the first (most-significant) 4 bits are used as the record type indicator. So a record can effectively be no longer than <nobr>2<sup>28</sup> = 256 MiB.</nobr> Also, there can only be <nobr>2<sup>4</sup> &minus; 1 = 15</nobr> different record types (0 is reserved for the invalid value). The record type values are defined in the source file FieldLog\Enums.cs.
 </p>
 
+<p>
+Each log file cannot be larger than <nobr>2<sup>31</sup> = 2 GiB</nobr> due to the signed Int32 addressing of offsets. FieldLog limits the <code>maxfilesize</code> configuration option to 1 GiB. But normally such large single log files are not practical anyway.
+</p>
+
 <h2>File header</h2>
 
 <p>
 The log file header is read and written in the <code>FieldLogFileWriter</code> constructor and also read in the <code>FieldLogFileReader</code> constructor.
+</p>
+
+<p>
+The highest supported file format version, which is always the version for writing new files, is defined in the public <code>FL.FileFormatVersion</code> constant. The file format version of a file being read by the <code>FieldLogFileReader</code> class is available in its public <code>FormatVersion</code> property. If an existing file has a different format version than the current, it cannot be appended to and a new log file will be started.
 </p>
 
 <table class="structure">

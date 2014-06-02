@@ -143,7 +143,7 @@ The text cache is read and written in the <code>FieldLogFileWriter.GetText</code
 	<tr>
 		<td>4</td>
 		<td>Integer</td>
-		<td>Record length. The first 4 bits indicate the string record type (value: 1).</td>
+		<td>Record length, excluding the length value itself. The first 4 bits indicate the string record type (value: 1).</td>
 	</tr>
 	<tr>
 		<td>var.</td>
@@ -175,7 +175,7 @@ The log item base data is written in the <code>FieldLogFileWriter.WriteBuffer</c
 	<tr>
 		<td>4</td>
 		<td>Integer</td>
-		<td>Record length. The first 4 bits indicate the string record type (value: &gt; 1).</td>
+		<td>Record length, excluding the length value itself. The first 4 bits indicate the string record type (value: &gt; 1).</td>
 	</tr>
 	<tr>
 		<td>8</td>

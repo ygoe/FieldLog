@@ -363,6 +363,12 @@ namespace Unclassified.FieldLog
 			LogFirstChanceExceptions = true;
 			WaitForItemsBacklog = true;
 
+			EntryAssembly = Assembly.GetEntryAssembly();
+			if (EntryAssembly != null)
+			{
+				EntryAssemblyLocation = EntryAssembly.Location;
+			}
+
 			// Read or reset log configuration from file
 			ReadLogConfiguration();
 
@@ -407,12 +413,6 @@ namespace Unclassified.FieldLog
 			// Use default implementation to show an application error dialog
 			ShowAppErrorDialog = DefaultShowAppErrorDialog;
 
-			EntryAssembly = Assembly.GetEntryAssembly();
-			if (EntryAssembly != null)
-			{
-				EntryAssemblyLocation = EntryAssembly.Location;
-			}
-
 			LogScope(FieldLogScopeType.LogStart, null);
 			AppDomain.CurrentDomain.ProcessExit += AppDomain_ProcessExit;
 			AppDomain.CurrentDomain.DomainUnload += AppDomain_DomainUnload;
@@ -423,7 +423,8 @@ namespace Unclassified.FieldLog
 			}
 
 			// These methods are time-critical so call them once to ensure they're JITed when the
-			// application need them.
+			// application need them. Disabled for debugging to avoid additional breakpoint hits.
+#if !DEBUG
 			FL.StartTimer(EnsureJitTimerKey);
 			FL.StopTimer(EnsureJitTimerKey);
 			FL.ClearTimer(EnsureJitTimerKey);
@@ -433,6 +434,7 @@ namespace Unclassified.FieldLog
 			using (FL.Timer(EnsureJitTimerKey, true, true))
 			{
 			}
+#endif
 		}
 
 		/// <summary>
@@ -3094,7 +3096,17 @@ namespace Unclassified.FieldLog
 									}
 									break;
 								case "maxfilesize":
-									maxFileSize = (int) ParseConfigNumber(value, maxFileSize);
+									long lng = ParseConfigNumber(value, maxFileSize);
+									// Interpret too large value as maximum, don't ignore overflow
+									// and get any meaningless (possibly negative) value
+									if (lng <= int.MaxValue)
+									{
+										maxFileSize = (int) lng;
+									}
+									else
+									{
+										maxFileSize = int.MaxValue;
+									}
 									// Don't come near the technical limit of 2 GiB due to Int32 file addressing
 									const int maxMaxFileSize = 1 * 1024 * 1024 * 1024; /* GiB */
 									if (maxFileSize > maxMaxFileSize)

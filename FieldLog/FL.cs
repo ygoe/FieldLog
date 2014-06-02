@@ -124,6 +124,10 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Defines the log configuration file name extension.
 		/// </summary>
+		/// <remarks>
+		/// Don't set this to ".config" when using it with ASP.NET applications, or it will find
+		/// the Web.config file and try to read it.
+		/// </remarks>
 		private const string logConfigExtension = ".flconfig";
 
 		internal const string EnsureJitTimerKey = "FieldLog.EnsureJit";
@@ -2246,13 +2250,21 @@ namespace Unclassified.FieldLog
 				// In ASP.NET, nothing must be changed in the bin directory, or the web application
 				// is immediately unloaded to be restarted for the next request. This includes log
 				// files and configuration that may be changed by the administrator.
-				logDefaultDirOverride = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
+				// Instead we use the App_Data\log directory as default. Anything in the App_Data
+				// directory is not served out via HTTP so it should be secure from the public.
+				string baseDir = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
+				if (!string.IsNullOrEmpty(baseDir))
+				{
+					logDefaultDirOverride = Path.Combine(baseDir, "App_Data");
+				}
 			}
 			if (configFileNameOverride == null)
 			{
 				// In ASP.NET, nothing must be changed in the bin directory, or the web application
 				// is immediately unloaded to be restarted for the next request. This includes log
 				// files and configuration that may be changed by the administrator.
+				// Instead we put our config file where the common Web.config file is, in the
+				// application base directory, and use the same prefix: web.flconfig
 				string baseDir = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
 				if (!string.IsNullOrEmpty(baseDir))
 				{

@@ -34,6 +34,8 @@ namespace Unclassified.FieldLog
 		private string key;
 		private Stopwatch stopwatch;
 		private long counter;
+		private long prevTicks;
+		private long prevCounter;
 		private Timer timer;
 		private object syncLock = new object();
 		private bool writePending;
@@ -68,31 +70,59 @@ namespace Unclassified.FieldLog
 				return;
 			}
 			
-			long ticks, ticksPc, localCounter;
+			long ticks, ticksPc, ticksTt, localCounter;
 
 			lock (syncLock)
 			{
 				// Do nothing if the stopwatch was just started again or current data has already
 				// been written
-				if (stopwatch.IsRunning || writePending) return;
+				if (stopwatch.IsRunning || !writePending) return;
 				// Clear the flag while we're in the lock region
 				writePending = false;
 
 				// Fetch the data in the lock region
 				localCounter = counter;
 				// Subtract 4 ticks per measurement, determined by tests
-				long correction = localCounter * 4;
+				// TODO: 0-tick intervals have been observed many times. Is the correction needed at all?
+				long correction = localCounter * 0;
 				ticks = stopwatch.Elapsed.Ticks - correction;
 				if (ticks < 0)
 					ticks = 0;
-				ticksPc = ticks / localCounter;
+				if (localCounter > 0)
+				{
+					ticksPc = ticks / localCounter;
+				}
+				else
+				{
+					ticksPc = 0;
+				}
+
+				long counterTt = localCounter - prevCounter;
+				if (counterTt > 0)
+				{
+					ticksTt = (ticks - prevTicks) / counterTt;
+				}
+				else
+				{
+					ticksTt = 0;
+				}
+
+				prevTicks = ticks;
+				prevCounter = localCounter;
 			}
 				
 			// Total time
+			// (Add 5 ticks for simple microseconds rounding)
 			long roundTicks = ticks + 5;
 			int seconds = (int) (roundTicks / 10000000);
 			int ms = (int) ((roundTicks % 10000000) / 10000);
 			int us = (int) ((roundTicks % 10000) / 10);
+
+			// Per call, this time (since last item)
+			long roundTicksTt = ticksTt + 5;
+			int secondsTt = (int) (roundTicksTt / 10000000);
+			int msTt = (int) ((roundTicksTt % 10000000) / 10000);
+			int usTt = (int) ((roundTicksTt % 10000) / 10);
 
 			// Per call time
 			long roundTicksPc = ticksPc + 5;
@@ -106,6 +136,9 @@ namespace Unclassified.FieldLog
 				secondsPc.ToString() + "." +
 					msPc.ToString("000") + "\u2009" +
 					usPc.ToString("000") + " seconds per call (" + ticksPc + " ticks)\n" +
+				secondsTt.ToString() + "." +
+					msTt.ToString("000") + "\u2009" +
+					usTt.ToString("000") + " seconds per call since last item (" + ticksTt + " ticks)\n" +
 				seconds.ToString() + "." +
 					ms.ToString("000") + "\u2009" +
 					us.ToString("000") + " seconds total (" + ticks + " ticks)";

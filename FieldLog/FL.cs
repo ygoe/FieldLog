@@ -309,6 +309,12 @@ namespace Unclassified.FieldLog
 		/// been run. Used for ASP.NET.
 		/// </summary>
 		private static bool didDuplicateLogStartCheck;
+		/// <summary>
+		/// The level of first-chance exception handling. If this goes up, there is an exception
+		/// in the exception handler. If this goes uncontrolled, it leads to a
+		/// StackOverflowException that crashes the application.
+		/// </summary>
+		private static int firstChanceExceptionLevel;
 
 		#endregion Private static data
 
@@ -636,9 +642,24 @@ namespace Unclassified.FieldLog
 			AppDomain.CurrentDomain.FirstChanceException +=
 				delegate(object sender, System.Runtime.ExceptionServices.FirstChanceExceptionEventArgs e)
 				{
-					if (LogFirstChanceExceptions && !isShutdown)
+					if (e.Exception.GetType() == typeof(Microsoft.CSharp.RuntimeBinder.RuntimeBinderException))
 					{
-						FL.Exception(FieldLogPriority.Trace, e.Exception, "AppDomain.FirstChanceException", new StackTrace(1, true));
+						// This is normal for dynamic types, ignore it.
+						// (Trying to process exceptions on dynamic types only causes more pain.)
+						return;
+					}
+
+					int localLevel = Interlocked.Increment(ref firstChanceExceptionLevel);
+					try
+					{
+						if (localLevel <= 4 && LogFirstChanceExceptions && !isShutdown)
+						{
+							FL.Exception(FieldLogPriority.Trace, e.Exception, "AppDomain.FirstChanceException", new StackTrace(1, true));
+						}
+					}
+					finally
+					{
+						Interlocked.Decrement(ref firstChanceExceptionLevel);
 					}
 				};
 

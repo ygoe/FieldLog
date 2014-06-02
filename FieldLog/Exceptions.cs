@@ -300,10 +300,13 @@ namespace Unclassified.FieldLog
 		{
 			MethodBase method = stackFrame.GetMethod();
 
-			Module = method.DeclaringType.Module.FullyQualifiedName;
-			Token = method.MetadataToken;
-			ILOffset = stackFrame.GetILOffset();
-			TypeName = FormatTypeName(method.DeclaringType);
+			if (method.DeclaringType != null)
+			{
+				Module = method.DeclaringType.Module.FullyQualifiedName;
+				Token = method.MetadataToken;
+				ILOffset = stackFrame.GetILOffset();
+				TypeName = FormatTypeName(method.DeclaringType);
+			}
 			MethodName = method.Name;
 			if (method.IsGenericMethod)
 			{

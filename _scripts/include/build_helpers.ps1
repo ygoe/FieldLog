@@ -688,12 +688,17 @@ function Do-Sign-File($file, $keyFile, $password, $progressAfter)
 	Write-Host -ForegroundColor DarkCyan "Digitally signing file $file..."
 
 	# Find the signtool binary
-	$signtoolBin = Check-RegFilename "hklm:\SOFTWARE\Microsoft\Microsoft SDKs\Windows" "CurrentInstallFolder"
+	$signtoolBin = Check-RegFilename "hklm:\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.1A" "InstallationFolder"
 	$signtoolBin = Check-Filename "$signtoolBin\Bin\signtool.exe"
 	if ($signtoolBin -eq $null)
 	{
-		WaitError "signtool binary not found"
-		exit 1
+		$signtoolBin = Check-RegFilename "hklm:\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.0A" "InstallationFolder"
+		$signtoolBin = Check-Filename "$signtoolBin\Bin\signtool.exe"
+		if ($signtoolBin -eq $null)
+		{
+			WaitError "signtool binary not found"
+			exit 1
+		}
 	}
 	
 	# Check if the password is to be found in a separate file

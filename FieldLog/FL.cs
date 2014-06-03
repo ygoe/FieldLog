@@ -262,6 +262,12 @@ namespace Unclassified.FieldLog
 		/// Detects changes to the configuration file.
 		/// </summary>
 		private static FileSystemWatcher configFileWatcher;
+		/// <summary>
+		/// The path of the configuration file. This file does not necessarily exist, but it would
+		/// be the file to read. This is set after calling the <see cref="ReadLogConfiguration"/>
+		/// method.
+		/// </summary>
+		private static string configFileName;
 
 		/// <summary>
 		/// Keeps all buffers that still need to be sent. Used by the send thread only.
@@ -2484,6 +2490,7 @@ namespace Unclassified.FieldLog
 					SendBuffers();
 				}
 				bool localConfigChanged = false;
+				bool readResult = false;
 				lock (sendThread)
 				{
 					if (sendThreadCancellationPending) break;
@@ -2505,7 +2512,7 @@ namespace Unclassified.FieldLog
 						bool wasSet = customLogFileBasePathSet;
 						customLogFileBasePathSet = false;
 						// Now read the new configuration
-						ReadLogConfiguration();
+						readResult = ReadLogConfiguration();
 						// If the custom path was set before this event, set it again so that
 						// TestLogPaths isn't blocked by it.
 						customLogFileBasePathSet = wasSet;
@@ -2519,7 +2526,7 @@ namespace Unclassified.FieldLog
 				}
 				if (localConfigChanged)
 				{
-					FL.Trace("FieldLog configuration file re-read");
+					FL.Trace("FieldLog configuration file re-read", "File name: " + configFileName + "\nResult: " + readResult);
 				}
 			}
 			// Send remaining buffers
@@ -3072,16 +3079,16 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Reads the log configuration from the file next to the executable file.
 		/// </summary>
-		private static void ReadLogConfiguration()
+		private static bool ReadLogConfiguration()
 		{
 			if (EntryAssemblyLocation == null && configFileNameOverride == null)
 			{
 				// No entry assembly file name available, config file not supported
 				ResetLogConfiguration();
-				return;
+				return false;
 			}
 
-			string configFileName = null;
+			configFileName = null;
 			try
 			{
 				if (configFileNameOverride != null)
@@ -3108,7 +3115,7 @@ namespace Unclassified.FieldLog
 
 				if (!File.Exists(configFileName))
 				{
-					return;
+					return false;
 				}
 
 				string configLogPath = null;
@@ -3202,6 +3209,7 @@ namespace Unclassified.FieldLog
 						// Path already set elsewhere (close to impossible), ignore setting
 					}
 				}
+				return true;
 			}
 			catch (Exception ex)
 			{
@@ -3219,6 +3227,7 @@ namespace Unclassified.FieldLog
 				}
 				// Set all values to default
 				ResetLogConfiguration();
+				return false;
 			}
 		}
 

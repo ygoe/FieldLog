@@ -2669,7 +2669,6 @@ namespace Unclassified.FieldLog
 			string execFile = execPath != null ? Path.GetFileNameWithoutExtension(execPath) : null;
 			if (logDefaultDirOverride != null)
 			{
-				execPath = logDefaultDirOverride;
 				if (EntryAssemblyLocation != null)
 				{
 					execFile = Path.GetFileNameWithoutExtension(EntryAssemblyLocation);
@@ -2678,6 +2677,7 @@ namespace Unclassified.FieldLog
 				{
 					execFile = "web";
 				}
+				execPath = Path.Combine(logDefaultDirOverride, execFile);
 			}
 			if (customLogFilePrefix != null)
 			{
@@ -2763,10 +2763,19 @@ namespace Unclassified.FieldLog
 					System.Diagnostics.Trace.WriteLine("FieldLog info: Now writing to " + logFileBasePath);
 					return true;
 				}
+#if DEBUG
+				catch (Exception ex)
+				{
+					System.Diagnostics.Trace.WriteLine("FieldLog trace: Cannot write to " + logFileBasePath + ". " + ex.Message);
+					// Uncomment the following line to trace log path finding in the web server
+					//File.WriteAllText(@"c:\inetpub\wwwroot\test\App_Data\msg-" + FL.UtcNow.Ticks + "-error.txt", "execPath = " + execPath + "\n" + ex.ToString());
+				}
+#else
 				catch
 				{
 					// Something went wrong, we can't use this path. Try the next one.
 				}
+#endif
 				finally
 				{
 					i++;

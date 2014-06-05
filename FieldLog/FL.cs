@@ -337,6 +337,10 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Written and read in the send thread only.
 		/// </summary>
+		internal static readonly Dictionary<uint, FieldLogScopeItem> WebRequestScopes = new Dictionary<uint, FieldLogScopeItem>();
+		/// <summary>
+		/// Written and read in the send thread only.
+		/// </summary>
 		internal static readonly Dictionary<int, Stack<FieldLogScopeItem>> CurrentScopes = new Dictionary<int, Stack<FieldLogScopeItem>>();
 
 		[ThreadStatic]
@@ -2862,6 +2866,14 @@ namespace Unclassified.FieldLog
 					else if (scopeItem.Type == FieldLogScopeType.ThreadEnd)
 					{
 						ThreadScopes.Remove(scopeItem.ThreadId);
+					}
+					else if (scopeItem.Type == FieldLogScopeType.WebRequestStart)
+					{
+						WebRequestScopes[scopeItem.WebRequestId] = scopeItem;
+					}
+					else if (scopeItem.Type == FieldLogScopeType.WebRequestEnd)
+					{
+						WebRequestScopes.Remove(scopeItem.WebRequestId);
 					}
 				}
 

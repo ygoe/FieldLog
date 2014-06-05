@@ -360,12 +360,16 @@ The scope log item data is written in the <code>FieldLogScopeItem.Write</code> m
 	<tr>
 		<td>44</td>
 		<td>Structure</td>
-		<td><span class="conditional">Only for type <code>WebRequestStart</code> (6):</span> Web request data, see below. <span class="versioned">Added in file format version 2.</span></td>
+		<td><span class="conditional">Only for types <code>WebRequestStart</code> (6) and <code>WebRequestEnd</code> (7):</span> Web request data, see below. <span class="versioned">Added in file format version 2.</span></td>
 	</tr>
 </table>
 
 <p>
 Record total length: variable (depends on the scope type).
+</p>
+
+<p>
+The web request data is stored with each <code>WebRequestStart</code> type item. But some data is not yet available at the earliest request event, so it is stored at the request’s end event with the <code>WebRequestEnd</code> type item. This second item has some of the web request data fields set to null that were not null in the first item. Only those not null can update the request data.
 </p>
 
 <h2>Data structures</h2>

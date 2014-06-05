@@ -61,7 +61,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		public string EventCounterAndSourceFile
 		{
-			get { return EventCounter + " in " + System.IO.Path.GetFileName(LogItemSourceFileName); }
+			get { return EventCounter + " in " + System.IO.Path.GetFileName(LogItemSourceFileName) + " (v" + item.FileFormatVersion + ")"; }
 		}
 
 		public string PrioTitle

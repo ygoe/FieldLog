@@ -51,6 +51,10 @@ namespace Unclassified.FieldLog
 		/// Gets the name of the file from which this log item was read, if any.
 		/// </summary>
 		public string LogItemSourceFileName { get; private set; }
+		/// <summary>
+		/// Gets the file format version from which the item was read.
+		/// </summary>
+		public int FileFormatVersion { get; private set; }
 
 		/// <summary>
 		/// Initialises a new instance of the FieldLogItem class with Trace priority.
@@ -89,7 +93,7 @@ namespace Unclassified.FieldLog
 			}
 #endif
 
-			Size = 4 + 4 + 8 + 4 + 16 + 4 + 4;
+			Size = 4 + 4 + 8 + 4 + 16 + 4 + 4 + 4 + 4;
 		}
 
 		/// <summary>
@@ -140,6 +144,7 @@ namespace Unclassified.FieldLog
 		protected void ReadBaseData(FieldLogFileReader reader)
 		{
 			LogItemSourceFileName = reader.FileName;
+			FileFormatVersion = reader.FormatVersion;
 			Time = new DateTime(reader.ReadInt64(), DateTimeKind.Utc);
 			EventCounter = reader.ReadInt32();
 			Priority = (FieldLogPriority) reader.ReadByte();

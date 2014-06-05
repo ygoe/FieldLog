@@ -1602,9 +1602,26 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					if (scopeItem.IsRepeated)
 					{
 						// Find existing scope item
-						if (seenScopeItems.Any(si => si.SessionId == scopeItem.SessionId && si.EventCounter == scopeItem.EventCounter))
+						var originalScopeItem = seenScopeItems.FirstOrDefault(si => si.SessionId == scopeItem.SessionId && si.EventCounter == scopeItem.EventCounter);
+						if (originalScopeItem != null)
 						{
-							// Skip this item, we already have it from an earlier file
+							// Skip this item, we already have it from an earlier file.
+							// We can only update the original item's additional data from this
+							// repeated item in some case. Let's see...
+							if (scopeItem.Type == FieldLogScopeType.LogStart)
+							{
+								// TODO: Use this double-write-then-update mechanism instead of buffer stealing try-single-write
+							}
+							else if (scopeItem.Type == FieldLogScopeType.WebRequestStart)
+							{
+								// WebRequestStart items are repeated when more data is available
+								// in a later request lifecycle event. We can copy the
+								// WebRequestData contents from the new to the original item to
+								// make it available for the entire request. The instance cannot
+								// just be replaced though because the view model is created for
+								// the old instance and wouldn't be updated to the new target.
+								originalScopeItem.WebRequestData.UpdateFrom(scopeItem.WebRequestData);
+							}
 							continue;
 						}
 					}

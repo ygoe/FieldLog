@@ -118,7 +118,49 @@ namespace Unclassified.FieldLog
 		{
 		}
 
+		/// <summary>
+		/// Copy constructor.
+		/// </summary>
+		/// <param name="source">The FieldLogWebRequestData instance to copy from.</param>
+		public FieldLogWebRequestData(FieldLogWebRequestData source)
+		{
+			RequestUrl = source.RequestUrl;
+			Method = source.Method;
+			ClientAddress = source.ClientAddress;
+			ClientHostName = source.ClientHostName;
+			Referrer = source.Referrer;
+			UserAgent = source.UserAgent;
+			AcceptLanguages = source.AcceptLanguages;
+			Accept = source.Accept;
+			WebSessionId = source.WebSessionId;
+			AppUserId = source.AppUserId;
+			AppUserName = source.AppUserName;
+		}
+
 		#endregion Constructor
+
+		#region Copy method
+
+		/// <summary>
+		/// Updates the current instance with data from another instance.
+		/// </summary>
+		/// <param name="source">The FieldLogWebRequestData instance to copy from.</param>
+		public void UpdateFrom(FieldLogWebRequestData source)
+		{
+			RequestUrl = source.RequestUrl;
+			Method = source.Method;
+			ClientAddress = source.ClientAddress;
+			ClientHostName = source.ClientHostName;
+			Referrer = source.Referrer;
+			UserAgent = source.UserAgent;
+			AcceptLanguages = source.AcceptLanguages;
+			Accept = source.Accept;
+			WebSessionId = source.WebSessionId;
+			AppUserId = source.AppUserId;
+			AppUserName = source.AppUserName;
+		}
+
+		#endregion Copy method
 
 		#region Log file reading/writing
 

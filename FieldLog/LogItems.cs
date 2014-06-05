@@ -97,6 +97,23 @@ namespace Unclassified.FieldLog
 		}
 
 		/// <summary>
+		/// Copy constructor.
+		/// </summary>
+		/// <param name="source">The FieldLogItem instance to copy from.</param>
+		protected FieldLogItem(FieldLogItem source)
+		{
+			Size = source.Size;
+			EventCounter = source.EventCounter;
+			Time = source.Time;
+			Priority = source.Priority;
+			SessionId = source.SessionId;
+			ThreadId = source.ThreadId;
+			WebRequestId = source.WebRequestId;
+			LogItemSourceFileName = source.LogItemSourceFileName;
+			FileFormatVersion = source.FileFormatVersion;
+		}
+
+		/// <summary>
 		/// Converts the data of the current FieldLogItem object to its equivalent string
 		/// representation.
 		/// </summary>
@@ -583,8 +600,13 @@ namespace Unclassified.FieldLog
 		public bool IsPoolThread { get; private set; }
 		/// <summary>Gets the process static environment data. (Only valid when entering a process scope.)</summary>
 		public FieldLogEventEnvironment EnvironmentData { get; private set; }
-		/// <summary>Gets the web request data. (Only valid when starting a web request scope.)</summary>
-		public FieldLogWebRequestData WebRequestData { get; private set; }
+		/// <summary>Gets or sets the web request data. (Only valid when starting a web request scope.)</summary>
+		/// <remarks>
+		/// Write access is used in FL.UpdateWebRequestStart and in FieldLogViewer when updating
+		/// from a repeated scope item. The <see cref="FieldLogItem.Size"/> value is not updated
+		/// when this data is changed.
+		/// </remarks>
+		public FieldLogWebRequestData WebRequestData { get; set; }
 
 		/// <summary>
 		/// Gets or sets a value whether this item has already been written to a log file. Items
@@ -661,6 +683,25 @@ namespace Unclassified.FieldLog
 			Size += 4 + 4 +
 				(Name != null ? Name.Length * 2 : 0) +
 				4 + 4 + 4 + 4 + 4;
+		}
+
+		/// <summary>
+		/// Copy constructor.
+		/// </summary>
+		/// <param name="source">The FieldLogScopeItem instance to copy from.</param>
+		internal FieldLogScopeItem(FieldLogScopeItem source)
+			: base(source)
+		{
+			Type = source.Type;
+			Level = source.Level;
+			Name = source.Name;
+			IsBackgroundThread = source.IsBackgroundThread;
+			IsPoolThread = source.IsPoolThread;
+			EnvironmentData = source.EnvironmentData;
+			WebRequestData = source.WebRequestData;
+			WasWritten = source.WasWritten;
+			IsRepeated = source.IsRepeated;
+			Thread = source.Thread;
 		}
 
 		/// <summary>

@@ -301,6 +301,12 @@ namespace Unclassified.FieldLog
 		/// The last assigned web request ID. Synchronised by Interlocked access.
 		/// </summary>
 		private static int LastWebRequestId;
+		/// <summary>
+		/// The active WebRequestStart scope item. This can be updated to store new data that
+		/// becomes available in later events of the request lifecycle.
+		/// </summary>
+		[ThreadStatic]
+		private static FieldLogScopeItem currentWebRequestStartItem;
 
 		/// <summary>
 		/// Override configuration file name. Used for ASP.NET.
@@ -1496,6 +1502,7 @@ namespace Unclassified.FieldLog
 			{
 				Log(scopeItem);
 				WebRequestId = 0;
+				currentWebRequestStartItem = null;
 			}
 			else
 			{
@@ -1518,6 +1525,9 @@ namespace Unclassified.FieldLog
 				WebRequestId = unchecked((uint) Interlocked.Increment(ref LastWebRequestId));
 				FieldLogScopeItem scopeItem = new FieldLogScopeItem(FieldLogPriority.Trace, type, name, webRequestData);
 				Log(scopeItem);
+				// Remember this item so that we can "repeat" it later with more data when it
+				// becomes available
+				currentWebRequestStartItem = scopeItem;
 #if ASPNET
 				// Sometimes a request is ended in a different thread than it was started. Keep a
 				// backup copy of the web request ID value in the HttpContext for that case. As a
@@ -1571,8 +1581,15 @@ namespace Unclassified.FieldLog
 					System.Diagnostics.Trace.WriteLine(item.ToString());
 					return;
 				}
-				eventCounter++;
-				item.EventCounter = eventCounter;
+				// Repeated scope items for WebRequestStart already have an EventCounter value.
+				// Don't count this as a new item then, so it can match and replace the original
+				// log item which it is repeating (with more data).
+				if (item.EventCounter == 0)
+				{
+					eventCounter++;
+					item.EventCounter = eventCounter;
+				}
+				// Buffer works...
 				CheckAddBuffer(size);
 				currentBuffer.Add(item);
 				currentBufferSize += size;
@@ -2315,19 +2332,10 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Writes a web request start scope log item to the log file.
 		/// </summary>
-		/// <param name="useSession">true to access the Session, false to leave it alone.</param>
-		public static void LogWebRequestStart(bool useSession = true)
-		{
-			LogWebRequestStart(useSession, null, null);
-		}
-
-		/// <summary>
-		/// Writes a web request start scope log item to the log file.
-		/// </summary>
-		/// <param name="useSession">true to access the Session, false to leave it alone.</param>
+		/// <param name="useSession">true to access the Session, false to leave it alone. This is not available before the AcquireRequestState event.</param>
 		/// <param name="appUserId">The application-specific user ID, if available.</param>
 		/// <param name="appUserName">The application-specific user name, if available.</param>
-		public static void LogWebRequestStart(bool useSession, string appUserId, string appUserName)
+		public static void LogWebRequestStart(bool useSession = false, string appUserId = null, string appUserName = null)
 		{
 			FieldLogWebRequestData wrd = new FieldLogWebRequestData();
 			wrd.RequestUrl = HttpContext.Current.Request.Url.ToString();
@@ -2353,6 +2361,56 @@ namespace Unclassified.FieldLog
 			wrd.AppUserName = appUserName;
 
 			LogScope(FieldLogScopeType.WebRequestStart, null, wrd);
+		}
+
+		/// <summary>
+		/// Updates the active web request start scope log item with current data and writes it to
+		/// the log file.
+		/// </summary>
+		/// <param name="useSession">true to access the Session, false to leave it alone.</param>
+		/// <param name="appUserId">The application-specific user ID, if available. null does not update an existing value.</param>
+		/// <param name="appUserName">The application-specific user name, if available. null does not update an existing value.</param>
+		public static void UpdateWebRequestStart(bool useSession = false, string appUserId = null, string appUserName = null)
+		{
+			// Duplicate the previous scope item
+			FieldLogScopeItem newItem = new FieldLogScopeItem(currentWebRequestStartItem);
+			newItem.IsRepeated = true;
+			FieldLogWebRequestData newData = new FieldLogWebRequestData(currentWebRequestStartItem.WebRequestData);
+			newItem.WebRequestData = newData;
+			bool needRepeat = false;
+			
+			if (useSession)
+			{
+				string newSessionId = null;
+				try
+				{
+					newSessionId = HttpContext.Current.Session != null ? HttpContext.Current.Session.SessionID : null;
+				}
+				catch
+				{
+					// Sometimes it just throws. Ignore it.
+				}
+				needRepeat |= newData.WebSessionId != newSessionId;
+				newData.WebSessionId = newSessionId;
+			}
+			if (appUserId != null)
+			{
+				needRepeat |= newData.AppUserId != appUserId;
+				newData.AppUserId = appUserId;
+			}
+			if (appUserName != null)
+			{
+				needRepeat |= newData.AppUserName != appUserName;
+				newData.AppUserName = appUserName;
+			}
+
+			// Only write to the log file if we actually have something new to say
+			if (needRepeat)
+			{
+				LogInternal(newItem);
+				// Remember this to not lose any data in further updates
+				currentWebRequestStartItem = newItem;
+			}
 		}
 
 		/// <summary>

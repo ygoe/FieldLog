@@ -238,6 +238,26 @@ namespace Unclassified.UI
 		#region Overridden methods
 
 		/// <summary>
+		/// Handles mouse wheel events including acceleration support.
+		/// </summary>
+		/// <param name="args"></param>
+		protected override void OnMouseWheel(System.Windows.Input.MouseWheelEventArgs args)
+		{
+			for (int i = 0; i < Math.Abs(args.Delta); i += 120)
+			{
+				if (args.Delta < 0)
+				{
+					MouseWheelDown();
+				}
+				else if (args.Delta > 0)
+				{
+					MouseWheelUp();
+				}
+			}
+			args.Handled = true;
+		}
+
+		/// <summary>
 		/// Measures the child items in the panel.
 		/// </summary>
 		/// <param name="availableSize">The available size.</param>

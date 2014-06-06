@@ -67,6 +67,20 @@ namespace Unclassified.UI
 			obj.BeginAnimation(property, anim);
 		}
 
+		public static void StopDoubleAnimation(this UIElement obj, DependencyProperty property)
+		{
+			var anim = new DoubleAnimation(0, 0, new Duration());
+			anim.BeginTime = null;
+			obj.BeginAnimation(property, anim);
+		}
+
+		public static void StopDoubleAnimation(this Animatable obj, DependencyProperty property)
+		{
+			var anim = new DoubleAnimation(0, 0, new Duration());
+			anim.BeginTime = null;
+			obj.BeginAnimation(property, anim);
+		}
+
 		#endregion Double animations
 
 		#region Thickness animations

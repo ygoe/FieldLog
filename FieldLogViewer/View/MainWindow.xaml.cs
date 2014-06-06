@@ -299,15 +299,26 @@ namespace Unclassified.FieldLogViewer.View
 		private void logItemsScroll_ScrollChanged(object sender, ScrollChangedEventArgs e)
 		{
 			bool cond = logItemsScroll.VerticalOffset >= logItemsScroll.ScrollableHeight - 50;
-			if (e.VerticalChange >= 0)
+			// e.VerticalChange can actually be 0, so test for positive and negative values explicitly
+			if (e.VerticalChange > 0)
 			{
 				// Scrolled down, can only set flag if in range
 				logItemsScrolledNearEnd |= cond;
 			}
-			else
+			else if (e.VerticalChange < 0)
 			{
 				// Scrolled up, can only clear flag if out of range
 				logItemsScrolledNearEnd &= cond;
+
+				// Stop the scroll animation immediately when scrolling up
+				if (DependencyPropertyHelper.GetValueSource(logItemsScrollMediator, ScrollViewerOffsetMediator.VerticalOffsetProperty).IsAnimated)
+				{
+					if (logItemsScrollMediator != null)   // Should always be true here
+					{
+						logItemsScrollMediator.StopDoubleAnimation(ScrollViewerOffsetMediator.VerticalOffsetProperty);
+						logItemsScrollPixelDc.Fire();
+					}
+				}
 			}
 		}
 

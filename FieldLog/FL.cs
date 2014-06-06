@@ -148,6 +148,11 @@ namespace Unclassified.FieldLog
 		#region Private static data
 
 		/// <summary>
+		/// The version of the FieldLog assembly, if available.
+		/// </summary>
+		private static string fieldLogVersion;
+
+		/// <summary>
 		/// The UTC date and time at the start of the Stopwatch.
 		/// </summary>
 		private static DateTime startTime;
@@ -395,6 +400,18 @@ namespace Unclassified.FieldLog
 				EntryAssemblyLocation = EntryAssembly.Location;
 			}
 
+			// Try to get the version string from the FieldLog assembly. This may not be available
+			// if the assembly was merged or the source code was included in another assembly.
+			Assembly myAssembly = Assembly.GetExecutingAssembly();
+			if (myAssembly != null && myAssembly.GetName().Name.Equals("unclassified.fieldlog", StringComparison.OrdinalIgnoreCase))
+			{
+				object[] customAttributes = myAssembly.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
+				if (customAttributes != null && customAttributes.Length > 0)
+				{
+					fieldLogVersion = ((AssemblyInformationalVersionAttribute) customAttributes[0]).InformationalVersion;
+				}
+			}
+
 			// Read or reset log configuration from file
 			ReadLogConfiguration();
 
@@ -439,7 +456,7 @@ namespace Unclassified.FieldLog
 			// Use default implementation to show an application error dialog
 			ShowAppErrorDialog = DefaultShowAppErrorDialog;
 
-			LogScope(FieldLogScopeType.LogStart, null);
+			LogScope(FieldLogScopeType.LogStart, fieldLogVersion != null ? "FieldLog version: " + fieldLogVersion : null);
 			AppDomain.CurrentDomain.ProcessExit += AppDomain_ProcessExit;
 			AppDomain.CurrentDomain.DomainUnload += AppDomain_DomainUnload;
 
@@ -2326,7 +2343,7 @@ namespace Unclassified.FieldLog
 
 			// Log another LogStart scope item. If the previous item is still in the send buffer,
 			// it will be replaced with the new item.
-			LogScope(FieldLogScopeType.LogStart, null);
+			LogScope(FieldLogScopeType.LogStart, fieldLogVersion != null ? "FieldLog version: " + fieldLogVersion : null);
 		}
 
 		/// <summary>

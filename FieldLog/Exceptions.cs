@@ -86,8 +86,24 @@ namespace Unclassified.FieldLog
 
 			StringBuilder dataSb = new StringBuilder();
 			if (ex.Data != null)
+			{
 				foreach (DictionaryEntry x in ex.Data)
-					dataSb.Append("Data[" + x.Key + "]" + (x.Value != null ? " (" + x.Value.GetType().Name + "): " + x.Value.ToString() : ": null") + "\n");
+				{
+					dataSb.Append("Data[").Append(x.Key).Append("]");
+					if (x.Value != null)
+					{
+						dataSb.Append(" (")
+							.Append(x.Value.GetType().Name)
+							.Append("): ")
+							.Append(Convert.ToString(x.Value, CultureInfo.InvariantCulture));
+					}
+					else
+					{
+						dataSb.Append(": null");
+					}
+					dataSb.Append("\n");
+				}
+			}
 
 			// Find more properties through reflection
 			PropertyInfo[] props = ex.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -110,38 +126,38 @@ namespace Unclassified.FieldLog
 					dataSb.Append(prop.Name);
 					if (value != null)
 					{
-						dataSb.Append(" (" + value.GetType().Name + "): " + Convert.ToString(value, CultureInfo.InvariantCulture));
+						dataSb.Append(" (").Append(value.GetType().Name).Append("): ").Append(Convert.ToString(value, CultureInfo.InvariantCulture));
 						if (value is byte)
 						{
-							dataSb.Append(" (0x" + ((byte) value).ToString("X2") + ")");
+							dataSb.Append(" (0x").Append(((byte) value).ToString("X2")).Append(")");
 						}
 						if (value is sbyte)
 						{
-							dataSb.Append(" (0x" + ((sbyte) value).ToString("X2") + ")");
+							dataSb.Append(" (0x").Append(((sbyte) value).ToString("X2")).Append(")");
 						}
 						if (value is ushort)
 						{
-							dataSb.Append(" (0x" + ((ushort) value).ToString("X4") + ")");
+							dataSb.Append(" (0x").Append(((ushort) value).ToString("X4")).Append(")");
 						}
 						if (value is short)
 						{
-							dataSb.Append(" (0x" + ((short) value).ToString("X") + ")");
+							dataSb.Append(" (0x").Append(((short) value).ToString("X")).Append(")");
 						}
 						if (value is uint)
 						{
-							dataSb.Append(" (0x" + ((uint) value).ToString("X8") + ")");
+							dataSb.Append(" (0x").Append(((uint) value).ToString("X8")).Append(")");
 						}
 						if (value is int)
 						{
-							dataSb.Append(" (0x" + ((int) value).ToString("X8") + ")");
+							dataSb.Append(" (0x").Append(((int) value).ToString("X8")).Append(")");
 						}
 						if (value is ulong)
 						{
-							dataSb.Append(" (0x" + ((ulong) value).ToString("X16") + ")");
+							dataSb.Append(" (0x").Append(((ulong) value).ToString("X16")).Append(")");
 						}
 						if (value is long)
 						{
-							dataSb.Append(" (0x" + ((long) value).ToString("X16") + ")");
+							dataSb.Append(" (0x").Append(((long) value).ToString("X16")).Append(")");
 						}
 					}
 					else
@@ -152,7 +168,13 @@ namespace Unclassified.FieldLog
 				}
 				catch (Exception ex2)
 				{
-					dataSb.Append("Exception property \"" + prop.Name + "\" cannot be retrieved. (" + ex2.GetType().Name + ": " + ex2.Message + ")\n");
+					dataSb.Append("Exception property \"")
+						.Append(prop.Name)
+						.Append("\" cannot be retrieved. (")
+						.Append(ex2.GetType().Name)
+						.Append(": ")
+						.Append(ex2.Message)
+						.Append(")\n");
 				}
 			}
 			Data = dataSb.ToString().TrimEnd();

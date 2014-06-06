@@ -167,6 +167,18 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			get { return WebRequestId != 0 ? Visibility.Visible : Visibility.Collapsed; }
 		}
 
+		/// <summary>
+		/// Gets the last 4 digits of the web request ID, and an empty string instead of 0.
+		/// </summary>
+		public string WebRequestIdString
+		{
+			get
+			{
+				if (WebRequestId != 0) return (WebRequestId % 10000).ToString();
+				return "";
+			}
+		}
+
 		private bool isSelected;
 		public bool IsSelected
 		{

@@ -19,10 +19,11 @@
 	x:Name="_this">
 
 	<Window.Resources>
-		<c:ListItemsConverter x:Key="listItemsConverter"/>
 		<c:IndentLevelToWidthConverter x:Key="IndentLevelToWidthConverter"/>
-		<c:SameThreadBrushConverter x:Key="SameThreadBrushConverter"/>
+		<c:ListItemsConverter x:Key="listItemsConverter"/>
 		<c:RelativeTimeConverter x:Key="RelativeTimeConverter"/>
+		<c:SameThreadBrushConverter x:Key="SameThreadBrushConverter"/>
+		<c:SameWebRequestBrushConverter x:Key="SameWebRequestBrushConverter"/>
 	</Window.Resources>
 	<Window.InputBindings>
 	</Window.InputBindings>
@@ -201,7 +202,8 @@
 										<ColumnDefinition SharedSizeGroup="Time"/>
 										<ColumnDefinition SharedSizeGroup="TimeMsec"/>
 										<ColumnDefinition SharedSizeGroup="TimeUsec"/>
-										<ColumnDefinition Width="19"/>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="Auto"/>
 										<ColumnDefinition Width="*"/>
 									</Grid.ColumnDefinitions>
 
@@ -247,7 +249,11 @@
 											</MultiBinding>
 										</TextBlock.Text>
 									</TextBlock>
-									<TextBlock Grid.Column="6" Text="{Binding ThreadId}" TextTrimming="CharacterEllipsis" Margin="6,-1,0,-1" Padding="0,1">
+									<TextBlock
+										Grid.Column="6" Width="13"
+										Margin="6,-1,0,-1" Padding="0,1"
+										Text="{Binding ThreadId}" TextTrimming="CharacterEllipsis" TextAlignment="Right"
+										Visibility="{Binding DataContext.AppSettings.ShowThreadIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
 										<TextBlock.Background>
 											<MultiBinding Converter="{StaticResource SameThreadBrushConverter}">
 												<Binding Path="ThreadId" Mode="OneWay"/>
@@ -257,7 +263,21 @@
 											</MultiBinding>
 										</TextBlock.Background>
 									</TextBlock>
-									<Grid Grid.Column="7" Margin="8,0,0,0">
+									<TextBlock
+										Grid.Column="7" Width="26"
+										Margin="6,-1,0,-1" Padding="0,1"
+										Text="{Binding WebRequestIdString}" TextTrimming="CharacterEllipsis" TextAlignment="Right"
+										Visibility="{Binding DataContext.AppSettings.ShowWebRequestIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
+										<TextBlock.Background>
+											<MultiBinding Converter="{StaticResource SameWebRequestBrushConverter}">
+												<Binding Path="WebRequestId" Mode="OneWay"/>
+												<Binding Path="SelectedItem.WebRequestId" ElementName="LogItemsList" Mode="OneWay"/>
+												<Binding Path="SessionId" Mode="OneWay"/>
+												<Binding Path="SelectedItem.SessionId" ElementName="LogItemsList" Mode="OneWay"/>
+											</MultiBinding>
+										</TextBlock.Background>
+									</TextBlock>
+									<Grid Grid.Column="8" Margin="8,0,0,0">
 										<TextBlock Text="{Binding SimpleText}">
 											<TextBlock.Margin>
 												<MultiBinding Converter="{StaticResource IndentLevelToWidthConverter}">
@@ -282,7 +302,8 @@
 										<ColumnDefinition SharedSizeGroup="Time"/>
 										<ColumnDefinition SharedSizeGroup="TimeMsec"/>
 										<ColumnDefinition SharedSizeGroup="TimeUsec"/>
-										<ColumnDefinition Width="19"/>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="Auto"/>
 										<ColumnDefinition Width="*"/>
 									</Grid.ColumnDefinitions>
 
@@ -328,7 +349,11 @@
 											</MultiBinding>
 										</TextBlock.Text>
 									</TextBlock>
-									<TextBlock Grid.Column="6" Text="{Binding ThreadId}" TextTrimming="CharacterEllipsis" Margin="6,-1,0,-1" Padding="0,1">
+									<TextBlock
+										Grid.Column="6" Width="13"
+										Margin="6,-1,0,-1" Padding="0,1"
+										Text="{Binding ThreadId}" TextTrimming="CharacterEllipsis" TextAlignment="Right"
+										Visibility="{Binding DataContext.AppSettings.ShowThreadIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
 										<TextBlock.Background>
 											<MultiBinding Converter="{StaticResource SameThreadBrushConverter}">
 												<Binding Path="ThreadId" Mode="OneWay"/>
@@ -338,7 +363,21 @@
 											</MultiBinding>
 										</TextBlock.Background>
 									</TextBlock>
-									<Grid Grid.Column="7" Margin="8,0,0,0">
+									<TextBlock
+										Grid.Column="7" Width="26"
+										Margin="6,-1,0,-1" Padding="0,1"
+										Text="{Binding WebRequestIdString}" TextTrimming="CharacterEllipsis" TextAlignment="Right"
+										Visibility="{Binding DataContext.AppSettings.ShowWebRequestIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
+										<TextBlock.Background>
+											<MultiBinding Converter="{StaticResource SameWebRequestBrushConverter}">
+												<Binding Path="WebRequestId" Mode="OneWay"/>
+												<Binding Path="SelectedItem.WebRequestId" ElementName="LogItemsList" Mode="OneWay"/>
+												<Binding Path="SessionId" Mode="OneWay"/>
+												<Binding Path="SelectedItem.SessionId" ElementName="LogItemsList" Mode="OneWay"/>
+											</MultiBinding>
+										</TextBlock.Background>
+									</TextBlock>
+									<Grid Grid.Column="8" Margin="8,0,0,0">
 										<TextBlock Text="{Binding SimpleName}">
 											<TextBlock.Margin>
 												<MultiBinding Converter="{StaticResource IndentLevelToWidthConverter}">
@@ -363,7 +402,8 @@
 										<ColumnDefinition SharedSizeGroup="Time"/>
 										<ColumnDefinition SharedSizeGroup="TimeMsec"/>
 										<ColumnDefinition SharedSizeGroup="TimeUsec"/>
-										<ColumnDefinition Width="19"/>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="Auto"/>
 										<ColumnDefinition Width="*"/>
 									</Grid.ColumnDefinitions>
 
@@ -409,7 +449,11 @@
 											</MultiBinding>
 										</TextBlock.Text>
 									</TextBlock>
-									<TextBlock Grid.Column="6" Text="{Binding ThreadId}" TextTrimming="CharacterEllipsis" Margin="6,-1,0,-1" Padding="0,1">
+									<TextBlock
+										Grid.Column="6" Width="13"
+										Margin="6,-1,0,-1" Padding="0,1"
+										Text="{Binding ThreadId}" TextTrimming="CharacterEllipsis" TextAlignment="Right"
+										Visibility="{Binding DataContext.AppSettings.ShowThreadIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
 										<TextBlock.Background>
 											<MultiBinding Converter="{StaticResource SameThreadBrushConverter}">
 												<Binding Path="ThreadId" Mode="OneWay"/>
@@ -419,7 +463,21 @@
 											</MultiBinding>
 										</TextBlock.Background>
 									</TextBlock>
-									<Grid Grid.Column="7" Margin="8,0,0,0">
+									<TextBlock
+										Grid.Column="7" Width="26"
+										Margin="6,-1,0,-1" Padding="0,1"
+										Text="{Binding WebRequestIdString}" TextTrimming="CharacterEllipsis" TextAlignment="Right"
+										Visibility="{Binding DataContext.AppSettings.ShowWebRequestIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
+										<TextBlock.Background>
+											<MultiBinding Converter="{StaticResource SameWebRequestBrushConverter}">
+												<Binding Path="WebRequestId" Mode="OneWay"/>
+												<Binding Path="SelectedItem.WebRequestId" ElementName="LogItemsList" Mode="OneWay"/>
+												<Binding Path="SessionId" Mode="OneWay"/>
+												<Binding Path="SelectedItem.SessionId" ElementName="LogItemsList" Mode="OneWay"/>
+											</MultiBinding>
+										</TextBlock.Background>
+									</TextBlock>
+									<Grid Grid.Column="8" Margin="8,0,0,0">
 										<TextBlock Text="{Binding SimpleMessage}">
 											<TextBlock.Margin>
 												<MultiBinding Converter="{StaticResource IndentLevelToWidthConverter}">
@@ -444,7 +502,8 @@
 										<ColumnDefinition SharedSizeGroup="Time"/>
 										<ColumnDefinition SharedSizeGroup="TimeMsec"/>
 										<ColumnDefinition SharedSizeGroup="TimeUsec"/>
-										<ColumnDefinition Width="19"/>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="Auto"/>
 										<ColumnDefinition Width="*"/>
 									</Grid.ColumnDefinitions>
 
@@ -490,7 +549,11 @@
 											</MultiBinding>
 										</TextBlock.Text>
 									</TextBlock>
-									<TextBlock Grid.Column="6" Text="{Binding ThreadId}" TextTrimming="CharacterEllipsis" Margin="6,-1,0,-1" Padding="0,1">
+									<TextBlock
+										Grid.Column="6" Width="13"
+										Margin="6,-1,0,-1" Padding="0,1"
+										Text="{Binding ThreadId}" TextTrimming="CharacterEllipsis" TextAlignment="Right"
+										Visibility="{Binding DataContext.AppSettings.ShowThreadIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
 										<TextBlock.Background>
 											<MultiBinding Converter="{StaticResource SameThreadBrushConverter}">
 												<Binding Path="ThreadId" Mode="OneWay"/>
@@ -500,7 +563,21 @@
 											</MultiBinding>
 										</TextBlock.Background>
 									</TextBlock>
-									<Grid Grid.Column="7" Margin="8,0,0,0">
+									<TextBlock
+										Grid.Column="7" Width="26"
+										Margin="6,-1,0,-1" Padding="0,1"
+										Text="{Binding WebRequestIdString}" TextTrimming="CharacterEllipsis" TextAlignment="Right"
+										Visibility="{Binding DataContext.AppSettings.ShowWebRequestIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
+										<TextBlock.Background>
+											<MultiBinding Converter="{StaticResource SameWebRequestBrushConverter}">
+												<Binding Path="WebRequestId" Mode="OneWay"/>
+												<Binding Path="SelectedItem.WebRequestId" ElementName="LogItemsList" Mode="OneWay"/>
+												<Binding Path="SessionId" Mode="OneWay"/>
+												<Binding Path="SelectedItem.SessionId" ElementName="LogItemsList" Mode="OneWay"/>
+											</MultiBinding>
+										</TextBlock.Background>
+									</TextBlock>
+									<Grid Grid.Column="8" Margin="8,0,0,0">
 										<TextBlock Text="{Binding TypeAndName}">
 											<TextBlock.Margin>
 												<MultiBinding Converter="{StaticResource IndentLevelToWidthConverter}">
@@ -525,7 +602,8 @@
 										<ColumnDefinition SharedSizeGroup="Time"/>
 										<ColumnDefinition SharedSizeGroup="TimeMsec"/>
 										<ColumnDefinition SharedSizeGroup="TimeUsec"/>
-										<ColumnDefinition Width="19"/>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="Auto"/>
 										<ColumnDefinition Width="*"/>
 									</Grid.ColumnDefinitions>
 
@@ -571,7 +649,17 @@
 											</MultiBinding>
 										</TextBlock.Text>
 									</TextBlock>
-									<Grid Grid.Column="7" Margin="8,0,0,0">
+									<TextBlock
+										Grid.Column="6" Width="13"
+										Margin="6,-1,0,-1" Padding="0,1"
+										Visibility="{Binding DataContext.AppSettings.ShowThreadIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
+									</TextBlock>
+									<TextBlock
+										Grid.Column="7" Width="26"
+										Margin="6,-1,0,-1" Padding="0,1"
+										Visibility="{Binding DataContext.AppSettings.ShowWebRequestIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
+									</TextBlock>
+									<Grid Grid.Column="8" Margin="8,0,0,0">
 										<TextBlock Text="{Binding SimpleMessage}">
 											<TextBlock.Margin>
 												<MultiBinding Converter="{StaticResource IndentLevelToWidthConverter}">

@@ -107,6 +107,7 @@
     </Page>
     <Compile Include="AppSettings.cs" />
     <Compile Include="Converters\IndentLevelToWidthConverter.cs" />
+    <Compile Include="Converters\SameWebRequestBrushConverter.cs" />
     <Compile Include="Converters\ListItemsConverter.cs" />
     <Compile Include="Converters\RelativeTimeConverter.cs" />
     <Compile Include="Converters\SameThreadBrushConverter.cs" />

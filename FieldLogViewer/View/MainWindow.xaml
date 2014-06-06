@@ -14,6 +14,7 @@
 	Height="201" Width="756"
 	Icon="/Images/FieldLog.ico"
 	LocationChanged="Window_LocationChanged" SizeChanged="Window_SizeChanged"
+	Activated="Window_Activated" Deactivated="Window_Deactivated"
 	Loaded="Window_Loaded" Closed="Window_Closed" Closing="Window_Closing"
 	PreviewKeyDown="Window_PreviewKeyDown"
 	x:Name="_this">

@@ -141,6 +141,16 @@ namespace Unclassified.FieldLogViewer.View
 			InvalidateScrollmap();
 		}
 
+		private void Window_Activated(object sender, EventArgs e)
+		{
+			isFlashing = false;
+			this.StopFlashing();
+		}
+
+		private void Window_Deactivated(object sender, EventArgs e)
+		{
+		}
+
 		private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
 		{
 		}

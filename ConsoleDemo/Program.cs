@@ -18,8 +18,9 @@ namespace ConsoleDemo
 			Console.WriteLine("FieldLog writer demo application");
 			Console.WriteLine();
 
-			NormalActivity();
+			//NormalActivity();
 			//LoadTest();
+			BatchActivity();
 			//TestTimerPrecision();
 		}
 
@@ -190,6 +191,21 @@ namespace ConsoleDemo
 					"You can't do that!",
 					new ApplicationException("An inner message 1",
 						new ApplicationException("An inner message 2")));
+			}
+		}
+
+		private static void BatchActivity()
+		{
+			Console.WriteLine("Batch test pattern...");
+
+			for (int i = 1; i <= 200; i++)
+			{
+				FL.Trace("Batch test - " + i);
+
+				if ((i % 10) == 0)
+					Console.WriteLine("    now at " + i);
+
+				Thread.Sleep(8000);
 			}
 		}
 

@@ -103,13 +103,13 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					case FieldLogScopeType.WebRequestEnd:
 						if (LastWebRequestStartItem != null)
 						{
-							return TypeTitle + ": " + LastWebRequestStartItem.WebRequestDataVM.RequestDuration.TotalMilliseconds.ToString("0.0") + " ms";
+							return TypeTitle + ": " + Name + " (" + LastWebRequestStartItem.WebRequestDataVM.RequestDuration.TotalMilliseconds.ToString("0.0") + " ms)";
 						}
 						if (WebRequestId == 0)
 						{
-							return TypeTitle + " (orphan)";
+							return TypeTitle + ": " + Name + " (orphan)";
 						}
-						return TypeTitle;
+						return TypeTitle + ": " + Name;
 
 					default:
 						return TypeTitle;

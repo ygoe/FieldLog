@@ -132,6 +132,9 @@ namespace Unclassified.FieldLog
 
 		internal const string EnsureJitTimerKey = "FieldLog.EnsureJit";
 
+		internal const string HttpContextKey_WebRequestId = "FieldLog_WebRequestId";
+		internal const string HttpContextKey_WebRequestStartItem = "FieldLog_WebRequestStartItem";
+
 		#endregion Constants
 
 		#region Delegates
@@ -303,15 +306,10 @@ namespace Unclassified.FieldLog
 		private static List<FieldLogItem> threadBufferedItems;
 
 		/// <summary>
-		/// The last assigned web request ID. Synchronised by Interlocked access.
+		/// The last assigned web request ID, counted for each new request. Synchronised by
+		/// Interlocked access.
 		/// </summary>
 		private static int LastWebRequestId;
-		/// <summary>
-		/// The active WebRequestStart scope item. This can be updated to store new data that
-		/// becomes available in later events of the request lifecycle.
-		/// </summary>
-		[ThreadStatic]
-		private static FieldLogScopeItem currentWebRequestStartItem;
 
 		/// <summary>
 		/// Override configuration file name. Used for ASP.NET.
@@ -359,13 +357,6 @@ namespace Unclassified.FieldLog
 
 		[ThreadStatic]
 		internal static int ThreadId;
-
-		/// <summary>
-		/// The web request ID of the web request processed by the current thread. 0 if no web
-		/// request is currently processed in this thread.
-		/// </summary>
-		[ThreadStatic]
-		internal static uint WebRequestId;
 
 		/// <summary>
 		/// A reference to the EntryAssembly. This is determined by other means for ASP.NET
@@ -1517,9 +1508,11 @@ namespace Unclassified.FieldLog
 			}
 			else if (type == FieldLogScopeType.WebRequestEnd)
 			{
+#if ASPNET
 				Log(scopeItem);
-				WebRequestId = 0;
-				currentWebRequestStartItem = null;
+#else
+				throw new NotSupportedException("This build of the FieldLog assembly is not targeting the ASP.NET Framework.");
+#endif
 			}
 			else
 			{
@@ -1537,22 +1530,25 @@ namespace Unclassified.FieldLog
 		{
 			if (type == FieldLogScopeType.WebRequestStart)
 			{
+#if ASPNET
+				// The only reliable way to store data with a web request is to use the HttpContext.
+				// ThreadStatic won't work because a request may change threads between the events.
+				if (HttpContext.Current == null)
+				{
+					throw new InvalidOperationException("HttpContext.Current is not available, there is nowhere to store the request-tracking data.");
+				}
+
 				// Interlocked.Increment is only available for Int32 but it handles the overflow, so
 				// we can safely cast it to UInt32 to use the other half of the value space.
-				WebRequestId = unchecked((uint) Interlocked.Increment(ref LastWebRequestId));
+				uint newWebRequestId = unchecked((uint) Interlocked.Increment(ref LastWebRequestId));
+				HttpContext.Current.Items[HttpContextKey_WebRequestId] = newWebRequestId;
 				FieldLogScopeItem scopeItem = new FieldLogScopeItem(FieldLogPriority.Trace, type, name, webRequestData);
 				Log(scopeItem);
 				// Remember this item so that we can "repeat" it later with more data when it
 				// becomes available
-				currentWebRequestStartItem = scopeItem;
-#if ASPNET
-				// Sometimes a request is ended in a different thread than it was started. Keep a
-				// backup copy of the web request ID value in the HttpContext for that case. As a
-				// side effect, the value becomes available to the web application.
-				if (HttpContext.Current != null)
-				{
-					HttpContext.Current.Items["FieldLog_WebRequestId"] = WebRequestId;
-				}
+				HttpContext.Current.Items[HttpContextKey_WebRequestStartItem] = scopeItem;
+#else
+				throw new NotSupportedException("This build of the FieldLog assembly is not targeting the ASP.NET Framework.");
 #endif
 			}
 			else
@@ -2361,20 +2357,20 @@ namespace Unclassified.FieldLog
 			wrd.ClientAddress = HttpContext.Current.Request.UserHostAddress;
 			if (dnsLookup)
 			{
+				DateTime t0 = FL.UtcNow;
 				try
 				{
-					DateTime t0 = FL.UtcNow;
 					System.Net.IPHostEntry ent = System.Net.Dns.GetHostEntry(HttpContext.Current.Request.UserHostAddress);
-					TimeSpan ts = FL.UtcNow - t0;
-					if (ts.TotalMilliseconds > 10)
-					{
-						FL.Notice("DNS reverse lookup took " + ts.TotalMilliseconds.ToString("0") + " ms", "IP address: " + wrd.ClientAddress + "\nHost name: " + wrd.ClientHostName);
-					}
 					wrd.ClientHostName = ent.HostName;
 				}
 				catch
 				{
 					// Ignore errors and keep the IP address only
+				}
+				TimeSpan ts = FL.UtcNow - t0;
+				if (ts.TotalMilliseconds > 10)
+				{
+					FL.Notice("DNS reverse lookup took " + ts.TotalMilliseconds.ToString("0") + " ms", "IP address: " + wrd.ClientAddress + "\nHost name: " + wrd.ClientHostName);
 				}
 			}
 			wrd.Referrer = HttpContext.Current.Request.UrlReferrer != null ? HttpContext.Current.Request.UrlReferrer.ToString() : null;
@@ -2408,6 +2404,13 @@ namespace Unclassified.FieldLog
 		/// <param name="appUserName">The application-specific user name, if available. null does not update an existing value.</param>
 		public static void UpdateWebRequestStart(bool dnsLookup = false, bool useSession = false, string appUserId = null, string appUserName = null)
 		{
+			var currentWebRequestStartItem = HttpContext.Current.Items[HttpContextKey_WebRequestStartItem] as FieldLogScopeItem;
+			if (currentWebRequestStartItem == null)
+			{
+				FL.Error("FL.UpdateWebRequestStart: currentWebRequestStartItem = null; calling LogWebRequestStart instead");
+				LogWebRequestStart(dnsLookup, useSession, appUserId, appUserName);
+				return;
+			}
 			// Duplicate the previous scope item
 			FieldLogScopeItem newItem = new FieldLogScopeItem(currentWebRequestStartItem);
 			newItem.IsRepeated = true;
@@ -2417,21 +2420,21 @@ namespace Unclassified.FieldLog
 
 			if (dnsLookup)
 			{
+				DateTime t0 = FL.UtcNow;
 				try
 				{
-					DateTime t0 = FL.UtcNow;
 					System.Net.IPHostEntry ent = System.Net.Dns.GetHostEntry(HttpContext.Current.Request.UserHostAddress);
-					TimeSpan ts = FL.UtcNow - t0;
-					if (ts.TotalMilliseconds > 10)
-					{
-						FL.Notice("DNS reverse lookup took " + ts.TotalMilliseconds.ToString("0") + " ms", "IP address: " + newData.ClientAddress + "\nHost name: " + ent.HostName);
-					}
 					needRepeat |= newData.ClientHostName != ent.HostName;
 					newData.ClientHostName = ent.HostName;
 				}
 				catch
 				{
 					// Ignore errors and keep the IP address only
+				}
+				TimeSpan ts = FL.UtcNow - t0;
+				if (ts.TotalMilliseconds > 10)
+				{
+					FL.Notice("DNS reverse lookup took " + ts.TotalMilliseconds.ToString("0") + " ms", "IP address: " + newData.ClientAddress + "\nHost name: " + newData.ClientHostName);
 				}
 			}
 			if (useSession)
@@ -2464,7 +2467,7 @@ namespace Unclassified.FieldLog
 			{
 				LogInternal(newItem);
 				// Remember this to not lose any data in further updates
-				currentWebRequestStartItem = newItem;
+				HttpContext.Current.Items[HttpContextKey_WebRequestStartItem] = newItem;
 			}
 		}
 
@@ -2473,7 +2476,16 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		public static void LogWebRequestEnd()
 		{
-			LogScope(FieldLogScopeType.WebRequestEnd, null);
+			string status = null;
+			if (HttpContext.Current != null && HttpContext.Current.Response != null)
+			{
+				status = HttpContext.Current.Response.Status;
+				if (!HttpContext.Current.Response.IsClientConnected)
+				{
+					status += " - Client has gone away";
+				}
+			}
+			LogScope(FieldLogScopeType.WebRequestEnd, status);
 		}
 
 		/// <summary>

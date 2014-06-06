@@ -78,14 +78,10 @@ namespace Unclassified.FieldLog
 				FL.ThreadId = Thread.CurrentThread.ManagedThreadId;
 			}
 			ThreadId = FL.ThreadId;
-			WebRequestId = FL.WebRequestId;
 #if ASPNET
-			if (WebRequestId == 0 && HttpContext.Current != null)
+			if (HttpContext.Current != null)
 			{
-				// Sometimes a request is ended in a different thread than it was started. We have
-				// a backup copy of the web request ID value in the HttpContext items that we can
-				// use now.
-				object value = HttpContext.Current.Items["FieldLog_WebRequestId"];
+				object value = HttpContext.Current.Items[FL.HttpContextKey_WebRequestId];
 				if (value is uint)
 				{
 					WebRequestId = (uint) value;

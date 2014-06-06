@@ -2349,16 +2349,34 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Writes a web request start scope log item to the log file.
 		/// </summary>
+		/// <param name="dnsLookup">true to look up the DNS name of the client host.</param>
 		/// <param name="useSession">true to access the Session, false to leave it alone. This is not available before the AcquireRequestState event.</param>
 		/// <param name="appUserId">The application-specific user ID, if available.</param>
 		/// <param name="appUserName">The application-specific user name, if available.</param>
-		public static void LogWebRequestStart(bool useSession = false, string appUserId = null, string appUserName = null)
+		public static void LogWebRequestStart(bool dnsLookup = false, bool useSession = false, string appUserId = null, string appUserName = null)
 		{
 			FieldLogWebRequestData wrd = new FieldLogWebRequestData();
 			wrd.RequestUrl = HttpContext.Current.Request.Url.ToString();
 			wrd.Method = HttpContext.Current.Request.HttpMethod;
 			wrd.ClientAddress = HttpContext.Current.Request.UserHostAddress;
-			wrd.ClientHostName = HttpContext.Current.Request.UserHostName;
+			if (dnsLookup)
+			{
+				try
+				{
+					DateTime t0 = FL.UtcNow;
+					System.Net.IPHostEntry ent = System.Net.Dns.GetHostEntry(HttpContext.Current.Request.UserHostAddress);
+					TimeSpan ts = FL.UtcNow - t0;
+					if (ts.TotalMilliseconds > 10)
+					{
+						FL.Notice("DNS reverse lookup took " + ts.TotalMilliseconds.ToString("0") + " ms", "IP address: " + wrd.ClientAddress + "\nHost name: " + wrd.ClientHostName);
+					}
+					wrd.ClientHostName = ent.HostName;
+				}
+				catch
+				{
+					// Ignore errors and keep the IP address only
+				}
+			}
 			wrd.Referrer = HttpContext.Current.Request.UrlReferrer != null ? HttpContext.Current.Request.UrlReferrer.ToString() : null;
 			wrd.UserAgent = HttpContext.Current.Request.UserAgent;
 			wrd.AcceptLanguages = HttpContext.Current.Request.UserLanguages != null ? HttpContext.Current.Request.UserLanguages.Aggregate((a, b) => a + "," + b) : null;
@@ -2384,10 +2402,11 @@ namespace Unclassified.FieldLog
 		/// Updates the active web request start scope log item with current data and writes it to
 		/// the log file.
 		/// </summary>
+		/// <param name="dnsLookup">true to look up the DNS name of the client host.</param>
 		/// <param name="useSession">true to access the Session, false to leave it alone.</param>
 		/// <param name="appUserId">The application-specific user ID, if available. null does not update an existing value.</param>
 		/// <param name="appUserName">The application-specific user name, if available. null does not update an existing value.</param>
-		public static void UpdateWebRequestStart(bool useSession = false, string appUserId = null, string appUserName = null)
+		public static void UpdateWebRequestStart(bool dnsLookup = false, bool useSession = false, string appUserId = null, string appUserName = null)
 		{
 			// Duplicate the previous scope item
 			FieldLogScopeItem newItem = new FieldLogScopeItem(currentWebRequestStartItem);
@@ -2395,7 +2414,26 @@ namespace Unclassified.FieldLog
 			FieldLogWebRequestData newData = new FieldLogWebRequestData(currentWebRequestStartItem.WebRequestData);
 			newItem.WebRequestData = newData;
 			bool needRepeat = false;
-			
+
+			if (dnsLookup)
+			{
+				try
+				{
+					DateTime t0 = FL.UtcNow;
+					System.Net.IPHostEntry ent = System.Net.Dns.GetHostEntry(HttpContext.Current.Request.UserHostAddress);
+					TimeSpan ts = FL.UtcNow - t0;
+					if (ts.TotalMilliseconds > 10)
+					{
+						FL.Notice("DNS reverse lookup took " + ts.TotalMilliseconds.ToString("0") + " ms", "IP address: " + newData.ClientAddress + "\nHost name: " + ent.HostName);
+					}
+					needRepeat |= newData.ClientHostName != ent.HostName;
+					newData.ClientHostName = ent.HostName;
+				}
+				catch
+				{
+					// Ignore errors and keep the IP address only
+				}
+			}
 			if (useSession)
 			{
 				string newSessionId = null;

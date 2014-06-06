@@ -52,6 +52,7 @@ namespace Unclassified.FieldLogViewer.View
 		private bool isFlashing;
 		private bool isScrollAnimationPosted;
 		private DelayedCall updateScrollmapDc;
+		private bool scrollmapUpdatePending;
 
 		#endregion Private data
 
@@ -187,6 +188,11 @@ namespace Unclassified.FieldLogViewer.View
 		private void SmoothVirtualizingPanel_Loaded(object sender, RoutedEventArgs e)
 		{
 			logItemsHostPanel = sender as SmoothVirtualizingPanel;
+			if (scrollmapUpdatePending)
+			{
+				scrollmapUpdatePending = false;
+				UpdateScrollmap();
+			}
 		}
 
 		private void LogItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -349,7 +355,13 @@ namespace Unclassified.FieldLogViewer.View
 
 		private void UpdateScrollmap()
 		{
-			if (logItemsHostPanel == null) return;
+			if (logItemsHostPanel == null)
+			{
+				// SmoothVirtualizingPanel_Loaded wasn't called yet. Remember to update the scroll
+				// map when it will be called.
+				scrollmapUpdatePending = true;
+				return;
+			}
 			if (logItemsScroll == null) return;
 
 			bool showWarningsErrors = AppSettings.Instance.ShowWarningsErrorsInScrollBar;

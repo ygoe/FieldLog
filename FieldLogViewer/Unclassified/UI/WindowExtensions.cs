@@ -177,7 +177,7 @@ namespace Unclassified.UI
 			FLASHWINFO fInfo = new FLASHWINFO();
 			fInfo.cbSize = Convert.ToUInt32(Marshal.SizeOf(fInfo));
 			fInfo.hwnd = hWnd;
-			fInfo.dwFlags = FLASHW_STOP | FLASHW_TRAY;
+			fInfo.dwFlags = FLASHW_STOP;
 			fInfo.uCount = 0;
 			fInfo.dwTimeout = 0;
 			return FlashWindowEx(ref fInfo);

@@ -144,8 +144,11 @@ namespace Unclassified.FieldLogViewer.View
 
 		private void Window_Activated(object sender, EventArgs e)
 		{
-			isFlashing = false;
-			this.StopFlashing();
+			if (isFlashing)
+			{
+				this.StopFlashing();
+				isFlashing = false;
+			}
 		}
 
 		private void Window_Deactivated(object sender, EventArgs e)

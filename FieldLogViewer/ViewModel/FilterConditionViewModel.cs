@@ -1504,6 +1504,10 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		ThreadStart,
 		[Description("ThreadEnd")]
 		ThreadEnd,
+		[Description("WebRequestStart")]
+		WebRequestStart,
+		[Description("WebRequestEnd")]
+		WebRequestEnd,
 		[Description("LogStart")]
 		LogStart,
 		[Description("LogShutdown")]

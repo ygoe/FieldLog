@@ -418,7 +418,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		#region Log items list context menu
 
-		private FilterViewModel GetQuickFilter(out bool isNew)
+		private FilterViewModel GetQuickFilter(out bool isNew, bool leaveEmpty = false)
 		{
 			isNew = false;
 			var filter = SelectedFilter;
@@ -434,7 +434,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				filter = filter.GetDuplicate();
 				filter.QuickModifiedTime = DateTime.UtcNow;
 			}
-			if (filter.ConditionGroups.Count == 0)
+			if (filter.ConditionGroups.Count == 0 && !leaveEmpty)
 			{
 				filter.ConditionGroups.Add(new FilterConditionGroupViewModel(filter));
 			}
@@ -772,20 +772,39 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		private bool CanQuickFilterExcludeText()
 		{
-			return SelectedItems.Count == 1 && SelectedItems[0] is FieldLogTextItemViewModel;
+			return SelectedItems.Count == 1 &&
+				(SelectedItems[0] is FieldLogTextItemViewModel || SelectedItems[0] is FieldLogExceptionItemViewModel);
 		}
 
 		private void OnQuickFilterExcludeText()
 		{
 			bool isNew;
-			var filter = GetQuickFilter(out isNew);
+			var filter = GetQuickFilter(out isNew, true);
 			filter.DisplayName = "Exclude text";
-			string text = ((FieldLogTextItemViewModel) SelectedItems[0]).Text;
+			var textItem = SelectedItems[0] as FieldLogTextItemViewModel;
+			var exItem = SelectedItems[0] as FieldLogExceptionItemViewModel;
+			string text = null;
+			if (textItem != null)
+				text = textItem.Text;
+			else if (exItem != null)
+				text = exItem.ExceptionVM.Message;
+			if (text == null)
+				return;   // Should not happen
+
 			var cg = new FilterConditionGroupViewModel(filter);
 			cg.IsExclude = true;
 			cg.Conditions.Add(new FilterConditionViewModel(cg)
 			{
 				Column = FilterColumn.TextText,
+				Comparison = FilterComparison.Equals,
+				Value = text
+			});
+			filter.ConditionGroups.Add(cg);
+			cg = new FilterConditionGroupViewModel(filter);
+			cg.IsExclude = true;
+			cg.Conditions.Add(new FilterConditionViewModel(cg)
+			{
+				Column = FilterColumn.ExceptionMessage,
 				Comparison = FilterComparison.Equals,
 				Value = text
 			});

@@ -486,7 +486,7 @@ namespace Unclassified.FieldLogViewer.View
 			{
 				logItemsHostPanel.UpdateLayout();
 			}
-			ScrollToEnd();
+			CheckScrollToEnd();
 			logItemsSmoothScrollActive = true;
 		}
 

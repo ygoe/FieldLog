@@ -112,6 +112,7 @@
     <Compile Include="Converters\RelativeTimeConverter.cs" />
     <Compile Include="Converters\SameThreadBrushConverter.cs" />
     <Compile Include="SourceResolver.cs" />
+    <Compile Include="Unclassified\UI\ListBoxExtensions.cs" />
     <Compile Include="Unclassified\Util\GlobalMutex.cs" />
     <Compile Include="Unclassified\Util\DebugMonitor.cs" />
     <Compile Include="Unclassified\Util\DelayedCall.cs" />

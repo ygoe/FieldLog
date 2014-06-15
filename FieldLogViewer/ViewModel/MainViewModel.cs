@@ -1874,10 +1874,18 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			if (flItem != null)
 			{
 				// Check for new IndentLevel value
+				int currentIndentLevel = 0;
 				int tryIndentLevel;
 				if (flItem.TryGetIndentLevelData(out tryIndentLevel))
 				{
-					flItem.IndentLevel = tryIndentLevel;
+					item.IndentLevel = tryIndentLevel;
+					currentIndentLevel = tryIndentLevel;
+					FieldLogScopeItemViewModel scopeItem = flItem as FieldLogScopeItemViewModel;
+					if (scopeItem != null && scopeItem.Type == FieldLogScopeType.Enter)
+					{
+						// Enter scope items increase the level by 1 for the following items
+						currentIndentLevel++;
+					}
 				}
 				else
 				{
@@ -1899,6 +1907,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 							{
 								item.IndentLevel = prevFlItem.IndentLevel;
 							}
+							currentIndentLevel = item.IndentLevel;
 							break;
 						}
 						prevIndex--;
@@ -2008,7 +2017,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 							if (setIndentLevel)
 							{
 								// IndentLevel value should still be updated
-								nextFlItem.IndentLevel = flItem.IndentLevel;
+								nextFlItem.IndentLevel = currentIndentLevel;
 							}
 						}
 

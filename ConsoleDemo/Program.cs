@@ -183,7 +183,7 @@ namespace ConsoleDemo
 			{
 				for (int i = 1; i <= 10; i++)
 				{
-					FL.TraceData("i", i);
+					FL.InfoData("i", i);
 					Thread.Sleep(31);
 				}
 			}

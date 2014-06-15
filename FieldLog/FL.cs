@@ -396,6 +396,7 @@ namespace Unclassified.FieldLog
 
 			LogFirstChanceExceptions = true;
 			WaitForItemsBacklog = true;
+			CheckTimeThreshold = 100;
 
 			// Prevent warnings because these fields are never assigned anything in non-ASP.NET builds
 			configFileNameOverride = null;
@@ -583,6 +584,12 @@ namespace Unclassified.FieldLog
 				return startTime.AddTicks(stopwatch.Elapsed.Ticks);
 			}
 		}
+
+		/// <summary>
+		/// Gets or sets the threshold value in milliseconds above which discontinuities of the
+		/// system time will be logged. (Default: 100)
+		/// </summary>
+		public static int CheckTimeThreshold { get; set; }
 
 		/// <summary>
 		/// Gets the currently used log file base path. This is an absolute path to a directory and
@@ -3401,6 +3408,9 @@ namespace Unclassified.FieldLog
 									break;
 								case "keepcritical":
 									priorityKeepTimes[FieldLogPriority.Critical] = ParseConfigTimeSpan(value, priorityKeepTimes[FieldLogPriority.Critical]);
+									break;
+								case "checktimethreshold":
+									FL.CheckTimeThreshold = (int) ParseConfigNumber(value, FL.CheckTimeThreshold);
 									break;
 							}
 						}

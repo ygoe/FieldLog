@@ -8,3 +8,4 @@ keepnotice=21d
 keepwarning=30d
 keeperror=30d
 keepcritical=30d
+checktimethreshold=100

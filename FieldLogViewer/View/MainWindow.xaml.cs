@@ -53,8 +53,6 @@ namespace Unclassified.FieldLogViewer.View
 		private bool isScrollAnimationPosted;
 		private DelayedCall updateScrollmapDc;
 		private bool scrollmapUpdatePending;
-		private int visibleItemsCount;
-		private object lastFocusedItem;
 
 		#endregion Private data
 
@@ -204,61 +202,39 @@ namespace Unclassified.FieldLogViewer.View
 		{
 			InvalidateScrollmap(e.Action != NotifyCollectionChangedAction.Add);
 
-			if (e.Action == NotifyCollectionChangedAction.Add || e.Action == NotifyCollectionChangedAction.Reset)
+			if (e.Action == NotifyCollectionChangedAction.Add)
 			{
 				DateTime now = DateTime.UtcNow;
 
 				CheckScrollToEnd();
 
-				// Only flash and sound if the number of visible items has increased in this list change
-				CollectionView view = sender as CollectionView;
-				int newItemsCount = 0;
-				if (view != null)
+				// Flash window on new item, if window is inactive and not yet flashing
+				if (AppSettings.Instance.IsFlashingEnabled)
 				{
-					newItemsCount = view.Count;
-				}
-				if (newItemsCount > visibleItemsCount)
-				{
-					// Flash window on new item, if window is inactive and not yet flashing
-					if (AppSettings.Instance.IsFlashingEnabled)
+					if (!this.IsActive)
 					{
-						if (!this.IsActive)
+						if (!isFlashing)
 						{
-							if (!isFlashing)
-							{
-								this.Flash();
-								isFlashing = true;
-							}
-						}
-						else
-						{
-							isFlashing = false;
+							this.Flash();
+							isFlashing = true;
 						}
 					}
-
-					// Play sound on new item, with rate limiting
-					if (AppSettings.Instance.IsSoundEnabled)
+					else
 					{
-						if (now > prevItemTime.AddSeconds(1))
-						{
-							newItemMediaPlayer.Position = TimeSpan.Zero;
-							newItemMediaPlayer.Play();
-						}
+						isFlashing = false;
 					}
-					prevItemTime = DateTime.UtcNow;
-
-					visibleItemsCount = newItemsCount;
 				}
 
-				// TEST CODE:
-				if (e.Action == NotifyCollectionChangedAction.Reset && lastFocusedItem != null)
+				// Play sound on new item, with rate limiting
+				if (AppSettings.Instance.IsSoundEnabled)
 				{
-					if (LogItemsList.IsFocused)
+					if (now > prevItemTime.AddSeconds(1))
 					{
-						LogItemsList.FocusItem(lastFocusedItem);
+						newItemMediaPlayer.Position = TimeSpan.Zero;
+						newItemMediaPlayer.Play();
 					}
 				}
-				// END TEST CODE
+				prevItemTime = DateTime.UtcNow;
 			}
 		}
 
@@ -357,32 +333,6 @@ namespace Unclassified.FieldLogViewer.View
 		private void LogItemsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			MainViewModel.Instance.SelectedItems = LogItemsList.SelectedItems.OfType<LogItemViewModelBase>().ToList();
-
-			// TEST CODE:
-			lastFocusedItem = null;
-			foreach (object item in e.AddedItems)
-			{
-				var lbi = LogItemsList.ItemContainerGenerator.ContainerFromItem(item) as ListBoxItem;
-				if (lbi != null && lbi.IsFocused)
-				{
-					lastFocusedItem = item;
-					break;
-				}
-			}
-			if (lastFocusedItem == null)
-			{
-				foreach (object item in e.RemovedItems)
-				{
-					var lbi = LogItemsList.ItemContainerGenerator.ContainerFromItem(item) as ListBoxItem;
-					if (lbi != null && lbi.IsFocused)
-					{
-						lastFocusedItem = item;
-						break;
-					}
-				}
-			}
-			// END TEST CODE
-			
 			InvalidateScrollmap(false);
 		}
 
@@ -711,19 +661,6 @@ namespace Unclassified.FieldLogViewer.View
 				return dbgItem.Time;
 			}
 			throw new ArgumentException("Unsupported item type.");   // Should never happen
-		}
-
-		[ViewCommand]
-		public void UpdateDisplayTime()
-		{
-			if (LogItemsList.SelectedItems.Count == 1)
-			{
-				LogItemViewModelBase item = LogItemsList.SelectedItems[0] as LogItemViewModelBase;
-				if (item != null)
-				{
-					item.RaiseDisplayTimeChanged();
-				}
-			}
 		}
 
 		#endregion View commands

@@ -1472,6 +1472,16 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
+		/// <summary>
+		/// Called when a filter or the current filter selection has changed.
+		/// </summary>
+		/// <param name="affectsItems">true if the change affects the item filtering.</param>
+		/// <remarks>
+		/// The <paramref name="affectsItems"/> parameter is true when the definition of the
+		/// current filter has changed, or another filter was selected, so that other items may be
+		/// selected for display. The <paramref name="affectsItems"/> parameter is false mostly
+		/// when a filter has been renamed.
+		/// </remarks>
 		public void LogItemsFilterChanged(bool affectsItems)
 		{
 			if (sortedFilters.View != null)
@@ -1489,13 +1499,53 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				.ToArray();
 		}
 
+		/// <summary>
+		/// Refreshes the CollectionView of all filtered items.
+		/// </summary>
+		/// <remarks>
+		/// This causes a Reset type change notification on the list and clears the list item
+		/// focus. It should only be called when the list of filtered items has substantially
+		/// changed or we don't know how much of the list has changed at all.
+		/// </remarks>
 		public void RefreshLogItemsFilterView()
 		{
 			if (filteredLogItems.View != null)
 			{
 				filteredLogItems.View.Refresh();
 			}
-			ViewCommandManager.Invoke("UpdateDisplayTime");
+			if (SelectedItems != null)
+			{
+				foreach (var selectedItem in SelectedItems)
+				{
+					selectedItem.RaiseDisplayTimeChanged();
+				}
+			}
+		}
+
+		/// <summary>
+		/// Refreshes a single item in the CollectionView of all filtered items.
+		/// </summary>
+		/// <param name="item">The changed item.</param>
+		/// <remarks>
+		/// This makes use of the IEditableObject implementation of the log item. When an item is
+		/// edited through this mechanism, and the update is committed, the CollectionView will
+		/// re-evaluate the item and apply the filtering accordingly. This method must be called
+		/// for each item that may have been updated. Changes that are signalled through
+		/// INotifyPropertyChanged are not considered by a CollectionView. Updating each single
+		/// log item avoids the Reset type change notification and the focused item issue.
+		/// </remarks>
+		private void RefreshFilteredLogItem(LogItemViewModelBase item)
+		{
+			var ev = FilteredLogItemsView as IEditableCollectionView;
+			if (ev != null)
+			{
+				ev.EditItem(item);
+				ev.CommitEdit();
+			}
+			if (SelectedItems != null && SelectedItems.Contains(item))
+			{
+				item.RaiseDisplayTimeChanged();
+			}
 		}
 
 		#endregion Log items filter
@@ -1602,7 +1652,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				return;
 			}
 			logFileGroupReader.Error += logFileGroupReader_Error;
-			List<FieldLogScopeItem> seenScopeItems = new List<FieldLogScopeItem>();
+			List<FieldLogScopeItemViewModel> seenScopeItemVMs = new List<FieldLogScopeItemViewModel>();
 			while (true)
 			{
 				FieldLogItem item = logFileGroupReader.ReadLogItem();
@@ -1621,7 +1671,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					if (scopeItem.IsRepeated)
 					{
 						// Find existing scope item
-						var originalScopeItem = seenScopeItems.FirstOrDefault(si => si.SessionId == scopeItem.SessionId && si.EventCounter == scopeItem.EventCounter);
+						var originalScopeItem = seenScopeItemVMs.FirstOrDefault(si => si.SessionId == scopeItem.SessionId && si.EventCounter == scopeItem.EventCounter);
 						if (originalScopeItem != null)
 						{
 							// Skip this item, we already have it from an earlier file.
@@ -1639,12 +1689,16 @@ namespace Unclassified.FieldLogViewer.ViewModel
 								// make it available for the entire request. The instance cannot
 								// just be replaced though because the view model is created for
 								// the old instance and wouldn't be updated to the new target.
-								originalScopeItem.WebRequestData.UpdateFrom(scopeItem.WebRequestData);
+								originalScopeItem.WebRequestDataVM.WebRequestData.UpdateFrom(scopeItem.WebRequestData);
+								// Also notify the UI to refresh the updated item in the filter
+								// CollectionView so that the data change is actually regarded by
+								// an active filter.
+								dispatcher.BeginInvoke(new Action<LogItemViewModelBase>(RefreshFilteredLogItem), DispatcherPriority.Loaded, originalScopeItem);
 							}
 							continue;
 						}
 					}
-					seenScopeItems.Add(scopeItem);
+					seenScopeItemVMs.Add((FieldLogScopeItemViewModel) itemVM);
 				}
 
 				bool upgradedLock = false;
@@ -1765,6 +1819,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 			LoadedItemsCount = logItems.Count;
 
+			HashSet<LogItemViewModelBase> itemsToRefresh = new HashSet<LogItemViewModelBase>();
+
 			// LastLogStartItem, IndentLevel and UtcOffset source are only supported for FieldLog items
 			FieldLogItemViewModel flItem = item as FieldLogItemViewModel;
 			if (flItem != null)
@@ -1807,6 +1863,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				if (newUtcOffset)
 				{
 					item.UtcOffset = tryUtcOffset;
+					itemsToRefresh.Add(item);
 				}
 
 				FieldLogScopeItemViewModel scope = item as FieldLogScopeItemViewModel;
@@ -1816,6 +1873,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				{
 					// This is a LogStart item, don't look elsewhere
 					flItem.LastLogStartItem = scope;
+					itemsToRefresh.Add(flItem);
 				}
 				else
 				{
@@ -1831,6 +1889,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 							{
 								flItem.UtcOffset = prevFlItem.UtcOffset;
 							}
+							itemsToRefresh.Add(flItem);
 							break;
 						}
 						prevIndex--;
@@ -1842,6 +1901,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				{
 					// This is a WebRequestStart item, don't look elsewhere
 					flItem.LastWebRequestStartItem = scope;
+					itemsToRefresh.Add(flItem);
 				}
 				else
 				{
@@ -1854,6 +1914,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 							prevFlItem.WebRequestId == flItem.WebRequestId)
 						{
 							flItem.LastWebRequestStartItem = prevFlItem.LastWebRequestStartItem;
+							itemsToRefresh.Add(flItem);
 							break;
 						}
 						prevIndex--;
@@ -1867,6 +1928,15 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					{
 						flItem.LastWebRequestStartItem.WebRequestDataVM.RequestDuration =
 							flItem.Time - flItem.LastWebRequestStartItem.Time;
+						// Refresh all other items that share the same LastWebRequestStartItem
+						for (int i = 0; i < logItems.Count; i++)
+						{
+							var item2 = logItems[i] as FieldLogItemViewModel;
+							if (item2 != null && item2.LastWebRequestStartItem == flItem.LastWebRequestStartItem)
+							{
+								itemsToRefresh.Add(item2);
+							}
+						}
 					}
 				}
 
@@ -1898,6 +1968,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						{
 							// Same web request gets the LastWebRequestStartItem
 							nextFlItem.LastWebRequestStartItem = flItem.LastWebRequestStartItem;
+							// itemsToRefresh.Add(nextFlItem);
+							// ^-- Will always be set later on
 							
 							// Update web request processing time
 							FieldLogScopeItemViewModel nextScope = nextFlItem as FieldLogScopeItemViewModel;
@@ -1907,12 +1979,22 @@ namespace Unclassified.FieldLogViewer.ViewModel
 								{
 									nextFlItem.LastWebRequestStartItem.WebRequestDataVM.RequestDuration =
 										nextFlItem.Time - nextFlItem.LastWebRequestStartItem.Time;
+									// Refresh all other items that share the same LastWebRequestStartItem
+									for (int i = 0; i < logItems.Count; i++)
+									{
+										var item2 = logItems[i] as FieldLogItemViewModel;
+										if (item2 != null && item2.LastWebRequestStartItem == nextFlItem.LastWebRequestStartItem)
+										{
+											itemsToRefresh.Add(item2);
+										}
+									}
 								}
 							}
 						}
 
 						// All same session also get LastLogStartItem and UtcOffset
 						nextFlItem.LastLogStartItem = flItem.LastLogStartItem;
+						itemsToRefresh.Add(nextFlItem);
 
 						if (nextFlItem.TryGetUtcOffsetData(out tryUtcOffset))
 						{
@@ -1929,7 +2011,10 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 				// Update the filter now that the item has more data (LastLogStartItem and
 				// LastWebRequestStartItem) and potentially following items have been updated, too
-				RefreshLogItemsFilterView();
+				foreach (var i in itemsToRefresh)
+				{
+					RefreshFilteredLogItem(i);
+				}
 			}
 
 			// Ensure the items list is current when the queued counter is decremented

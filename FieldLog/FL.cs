@@ -135,6 +135,16 @@ namespace Unclassified.FieldLog
 		internal const string HttpContextKey_WebRequestId = "FieldLog_WebRequestId";
 		internal const string HttpContextKey_WebRequestStartItem = "FieldLog_WebRequestStartItem";
 
+		/// <summary>
+		/// Defines the exception context used for the LogStackTrace methods.
+		/// </summary>
+		public const string StackTraceOnlyExceptionContext = "FL.StackTraceOnly";
+		/// <summary>
+		/// Defines the exception context used for the LogStackTrace methods, including environment
+		/// data.
+		/// </summary>
+		public const string StackTraceEnvOnlyExceptionContext = "FL.StackTraceEnvOnly";
+
 		#endregion Constants
 
 		#region Delegates
@@ -1574,6 +1584,52 @@ namespace Unclassified.FieldLog
 		}
 
 		#endregion Scope log methods
+
+		#region Other specialised log methods
+
+		/// <summary>
+		/// Writes a stack trace through an exception log item of Trace priority to the log file.
+		/// </summary>
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+		public static void LogStackTrace()
+		{
+			FL.Log(new FieldLogExceptionItem(FieldLogPriority.Trace, new Exception("Now at…"), StackTraceOnlyExceptionContext, new StackTrace(1, true)));
+		}
+
+		/// <summary>
+		/// Writes a stack trace through an exception log item of Trace priority to the log file.
+		/// </summary>
+		/// <param name="text">The exception message text to log.</param>
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+		public static void LogStackTrace(string text)
+		{
+			FL.Log(new FieldLogExceptionItem(FieldLogPriority.Trace, new Exception(text), StackTraceOnlyExceptionContext, new StackTrace(1, true)));
+		}
+
+		/// <summary>
+		/// Writes a stack trace through an exception log item to the log file.
+		/// </summary>
+		/// <param name="prio">The priority of the log item.</param>
+		/// <param name="text">The exception message text to log.</param>
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+		public static void LogStackTrace(FieldLogPriority prio, string text)
+		{
+			FL.Log(new FieldLogExceptionItem(prio, new Exception(text), StackTraceOnlyExceptionContext, new StackTrace(1, true)));
+		}
+
+		/// <summary>
+		/// Writes a stack trace through an exception log item to the log file.
+		/// </summary>
+		/// <param name="prio">The priority of the log item.</param>
+		/// <param name="text">The exception message text to log.</param>
+		/// <param name="includeEnvironment">true to include the current environment data.</param>
+		[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+		public static void LogStackTrace(FieldLogPriority prio, string text, bool includeEnvironment)
+		{
+			FL.Log(new FieldLogExceptionItem(prio, new Exception(text), includeEnvironment ? StackTraceEnvOnlyExceptionContext : StackTraceOnlyExceptionContext, new StackTrace(1, true)));
+		}
+
+		#endregion Other specialised log methods
 
 		#region General log method
 

@@ -569,9 +569,11 @@ namespace Unclassified.FieldLog
 			Context = context;
 
 			bool includeEnvironment = true;
-			if (context == "AppDomain.FirstChanceException")
+			if (context == "AppDomain.FirstChanceException" ||
+				context == FL.StackTraceOnlyExceptionContext)
 			{
-				// This may lead to crashes at WMI requests, so it's disabled for now.
+				// First-chance exception logging with environment may lead to crashes at WMI
+				// requests, so it's disabled for now.
 				// Testcase: Inspect FieldLogViewer with Snoop while debugging.
 				includeEnvironment = false;
 			}

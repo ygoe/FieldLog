@@ -29,6 +29,13 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			get
 			{
+				if (Context == FL.StackTraceOnlyExceptionContext ||
+					Context == FL.StackTraceEnvOnlyExceptionContext)
+				{
+					return "Stack trace: " +
+						(this.Exception.Message != null ? this.Exception.Message.Trim().Replace("\r", "").Replace("\n", "↲") : "");
+				}
+				
 				string exType = this.Exception.Type;
 				int dotIndex = exType.LastIndexOf('.');
 				if (dotIndex > -1)

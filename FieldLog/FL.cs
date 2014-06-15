@@ -434,7 +434,7 @@ namespace Unclassified.FieldLog
 			AppErrorDialogContext = "Context:";
 			AppErrorDialogNote = "If the problem persists, please contact the application developer.";
 			AppErrorDialogLogPath = "The log file containing detailed error information is saved to {0}.";
-			AppErrorDialogNoLog = "The log file could not be written.";
+			AppErrorDialogNoLog = "The log file path is unknown. See http://u10d.de/flpath for the default log paths.";
 			AppErrorDialogConsoleAction = "Press the Enter key to continue, or Escape to quit the application.";
 			AppErrorDialogTimerNote = "The application will be terminated after {0} seconds without user response.";
 
@@ -505,6 +505,16 @@ namespace Unclassified.FieldLog
 			Trace("AppDomain.DomainUnload");
 			// Flush log files, if not already done by the application
 			Shutdown();
+		}
+
+		/// <summary>
+		/// Does nothing. By referencing the FL type with this method call, it is ensured that the
+		/// FL type initialiser (static constructor) is called. This method can be used if no other
+		/// FL member can reasonably be accessed directly at application startup, just to ensure
+		/// that the unhandled exception handling is active right from the start.
+		/// </summary>
+		public static void Use()
+		{
 		}
 
 		#endregion Static constructor

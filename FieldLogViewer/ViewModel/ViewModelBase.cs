@@ -42,6 +42,15 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 		}
 
+		public override string ToString()
+		{
+			if (DisplayName != null)
+			{
+				return GetType().Name + ": " + DisplayName;
+			}
+			return base.ToString();
+		}
+
 		#endregion Common view properties
 
 		#region Property update helpers

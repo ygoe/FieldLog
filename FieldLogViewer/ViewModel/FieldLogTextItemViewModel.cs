@@ -37,6 +37,11 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		public string TypeImageSource { get { return "/Images/TextItem_14.png"; } }
 
+		public override string ToString()
+		{
+			return GetType().Name + ": [" + PrioTitle + "] " + SimpleText;
+		}
+
 		/// <summary>
 		/// Gets a new UtcOffset value from the log item.
 		/// </summary>

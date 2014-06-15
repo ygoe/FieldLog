@@ -64,6 +64,11 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
+		public override string ToString()
+		{
+			return GetType().Name + ": [" + PrioTitle + "] " + SimpleMessage;
+		}
+
 		public override void Refresh()
 		{
 			ExceptionVM.Refresh();

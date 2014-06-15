@@ -39,5 +39,10 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		}
 
 		public string TypeImageSource { get { return "/Images/DataItem_14.png"; } }
+
+		public override string ToString()
+		{
+			return GetType().Name + ": [" + PrioTitle + "] " + SimpleName;
+		}
 	}
 }

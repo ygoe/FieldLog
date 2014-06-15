@@ -154,6 +154,11 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			return null;
 		}
 
+		public override string ToString()
+		{
+			return GetType().Name + ": " + Message;
+		}
+
 		#endregion Helper methods
 	}
 }

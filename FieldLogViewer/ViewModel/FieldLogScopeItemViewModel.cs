@@ -141,6 +141,39 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
+		public override string ToString()
+		{
+			switch (this.Type)
+			{
+				case FieldLogScopeType.Enter:
+				case FieldLogScopeType.Leave:
+				case FieldLogScopeType.ThreadStart:
+				case FieldLogScopeType.ThreadEnd:
+					return GetType().Name + ": [" + PrioTitle + "] " + TypeTitle + ": " + Name;
+
+				case FieldLogScopeType.WebRequestStart:
+				case FieldLogScopeType.WebRequestEnd:
+					int index = WebRequestDataVM.WebRequestData.RequestUrl.IndexOf("//");
+					if (index != -1)
+					{
+						index = WebRequestDataVM.WebRequestData.RequestUrl.IndexOf("/", index + 2);
+					}
+					if (index == -1)
+					{
+						index = 0;
+					}
+					string method = "";
+					if (WebRequestDataVM.WebRequestData.Method != "GET")
+					{
+						method = WebRequestDataVM.WebRequestData.Method + " ";
+					}
+					return GetType().Name + ": [" + PrioTitle + "] " + TypeTitle + ": " + method + WebRequestDataVM.WebRequestData.RequestUrl.Substring(index);
+
+				default:
+					return GetType().Name + ": [" + PrioTitle + "] " + TypeTitle;
+			}
+		}
+
 		/// <summary>
 		/// Gets a new UtcOffset value from the log item.
 		/// </summary>

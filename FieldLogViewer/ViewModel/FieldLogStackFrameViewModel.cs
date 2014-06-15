@@ -57,6 +57,11 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
+		public override string ToString()
+		{
+			return GetType().Name + ": " + FullMethodName;
+		}
+
 		public void Refresh()
 		{
 			string fileName;

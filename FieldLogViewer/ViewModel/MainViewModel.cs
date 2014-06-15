@@ -174,6 +174,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		#region Commands
 
+		#region Definition and initialisation
+
 		// Toolbar commands
 		public DelegateCommand LoadLogCommand { get; private set; }
 		public DelegateCommand StopLiveCommand { get; private set; }
@@ -254,6 +256,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			QuickFilterNotAfterCommand.RaiseCanExecuteChanged();
 			QuickFilterWebRequestCommand.RaiseCanExecuteChanged();
 		}
+
+		#endregion Definition and initialisation
 
 		#region Toolbar
 

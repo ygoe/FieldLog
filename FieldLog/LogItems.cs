@@ -357,17 +357,39 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		/// <param name="data">The object containing public properties and/or fields.</param>
 		/// <param name="level">Indenting level.</param>
+		/// <param name="seenObjects">Stack of objects already seen along this path. Used to break reference loops.</param>
 		/// <returns>The formatted values of the object.</returns>
-		public static string FormatValues(object data, int level = 0)
+		public static string FormatValues(object data, int level = 0, Stack seenObjects = null)
 		{
 			// NOTE: Nullable<T> values need no special handling because as soon as they're passed
 			//       in an object variable, they're either null or the value itself boxed as their
 			//       internal type. (Source: http://stackoverflow.com/a/5194550/143684)
 
+			if (seenObjects != null)
+			{
+				if (seenObjects.Contains(data))
+				{
+					return "<reference loop>";
+				}
+				if (seenObjects.Count >= 6)
+				{
+					return "<nesting too deep>";
+				}
+			}
 			if (data == null)
 			{
 				return "null";
 			}
+
+			// Block certain namespaces that contain types that are impossible to dump this way
+			string typeNamespace = data.GetType().Namespace;
+			if (typeNamespace == "System.Reflection" ||
+				typeNamespace == "System.Windows.Media")
+				// NOTE: This list of namespaces may not be complete.
+			{
+				return "<blocked type in " + typeNamespace + ">";
+			}
+
 			if (data is bool ||
 				data is byte || data is ushort || data is uint || data is ulong ||
 				data is sbyte || data is short || data is int || data is long ||
@@ -433,6 +455,8 @@ namespace Unclassified.FieldLog
 			}
 			sb.Append("{");
 			int count = 0;
+			if (seenObjects == null) seenObjects = new Stack();
+			seenObjects.Push(data);
 			NameValueCollection nvc = data as NameValueCollection;
 			if (nvc != null)
 			{
@@ -444,7 +468,14 @@ namespace Unclassified.FieldLog
 					sb.Append("\t");
 					sb.Append(key);
 					sb.Append(": ");
-					sb.Append(FormatValues(nvc[key], level + 1));
+					try
+					{
+						sb.Append(FormatValues(nvc[key], level + 1, seenObjects));
+					}
+					catch (Exception ex)
+					{
+						sb.Append("<").Append(ex.Message).Append(">");
+					}
 				}
 			}
 			else
@@ -455,10 +486,22 @@ namespace Unclassified.FieldLog
 					foreach (var item in ie)
 					{
 						if (count++ > 0) sb.Append(",");
-						sb.AppendLine();
-						sb.Append(indent);
-						sb.Append("\t");
-						sb.Append(FormatValues(item, level + 1));
+						string str;
+						try
+						{
+							str = FormatValues(item, level + 1, seenObjects);
+						}
+						catch (Exception ex)
+						{
+							str = "<" + ex.Message + ">";
+						}
+						if (!str.StartsWith(Environment.NewLine))
+						{
+							sb.AppendLine();
+							sb.Append(indent);
+							sb.Append("\t");
+						}
+						sb.Append(str);
 					}
 				}
 				else
@@ -471,7 +514,14 @@ namespace Unclassified.FieldLog
 						sb.Append("\t");
 						sb.Append(property.Name);
 						sb.Append(": ");
-						sb.Append(FormatValues(property.GetValue(data, null), level + 1));
+						try
+						{
+							sb.Append(FormatValues(property.GetValue(data, null), level + 1, seenObjects));
+						}
+						catch (Exception ex)
+						{
+							sb.Append("<").Append(ex.Message).Append(">");
+						}
 					}
 					foreach (var field in data.GetType().GetFields())
 					{
@@ -481,10 +531,18 @@ namespace Unclassified.FieldLog
 						sb.Append("\t");
 						sb.Append(field.Name);
 						sb.Append(": ");
-						sb.Append(FormatValues(field.GetValue(data), level + 1));
+						try
+						{
+							sb.Append(FormatValues(field.GetValue(data), level + 1, seenObjects));
+						}
+						catch (Exception ex)
+						{
+							sb.Append("<").Append(ex.Message).Append(">");
+						}
 					}
 				}
 			}
+			seenObjects.Pop();
 			sb.AppendLine();
 			sb.Append(indent);
 			sb.Append("}");

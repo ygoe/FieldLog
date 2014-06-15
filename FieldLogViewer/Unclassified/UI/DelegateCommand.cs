@@ -25,7 +25,7 @@ namespace Unclassified.UI
 			{
 				if (disabledCommand == null)
 				{
-					disabledCommand = new DelegateCommand(() => { }, () => false);
+					disabledCommand = new DelegateCommand(() => { }) { IsEnabled = false };
 				}
 				return disabledCommand;
 			}

@@ -32,6 +32,8 @@ namespace Unclassified.FieldLog
 
 		/// <summary>Gets the exception type name.</summary>
 		public string Type { get; private set; }
+		/// <summary>Gets the module that defines the exception type.</summary>
+		public string TypeModule { get; private set; }
 		/// <summary>Gets the metadata token of the exception type.</summary>
 		public int Token { get; private set; }
 		/// <summary>Gets the exception message.</summary>
@@ -69,9 +71,11 @@ namespace Unclassified.FieldLog
 		public FieldLogException(Exception ex, StackTrace customStackTrace)
 		{
 			Exception = ex;
-			
-			Type = ex.GetType().FullName;
-			Token = ex.GetType().MetadataToken;
+			Type exType = ex.GetType();
+
+			Type = exType.FullName;
+			TypeModule = exType.Module.FullyQualifiedName;
+			Token = exType.MetadataToken;
 			Message = ex.Message.TrimEnd();
 			StackTrace stackTrace = customStackTrace;
 			if (stackTrace == null)
@@ -106,7 +110,7 @@ namespace Unclassified.FieldLog
 			}
 
 			// Find more properties through reflection
-			PropertyInfo[] props = ex.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+			PropertyInfo[] props = exType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
 			foreach (PropertyInfo prop in props)
 			{
 				// Known properties, already handled
@@ -228,6 +232,7 @@ namespace Unclassified.FieldLog
 		internal void Write(FieldLogFileWriter writer)
 		{
 			writer.AddBuffer(Type);
+			writer.AddBuffer(TypeModule);
 			writer.AddBuffer(Token);
 			writer.AddBuffer(Message);
 			writer.AddBuffer(Code);
@@ -261,6 +266,7 @@ namespace Unclassified.FieldLog
 			ex.Type = reader.ReadString();
 			if (reader.FormatVersion >= 2)
 			{
+				ex.TypeModule = reader.ReadString();
 				ex.Token = reader.ReadInt32();
 			}
 			ex.Message = reader.ReadString();

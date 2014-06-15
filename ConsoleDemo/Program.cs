@@ -19,8 +19,8 @@ namespace ConsoleDemo
 			Console.WriteLine();
 
 			//LoadTest();
-			ConstantFlow();
-			//NormalActivity();
+			//ConstantFlow();
+			NormalActivity();
 			//BatchActivity();
 			//TestTimerPrecision();
 			//TestOutputDebugString();

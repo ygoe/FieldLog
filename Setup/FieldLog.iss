@@ -144,6 +144,10 @@ Source: "..\FieldLog\FL.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignor
 Source: "..\FieldLog\LogItems.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
 Source: "..\FieldLog\OSInfo.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
 
+; License files
+Source: "..\LICENSE-GPL"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\LICENSE-LGPL"; DestDir: "{app}"; Flags: ignoreversion
+
 [Dirs]
 Name: "{app}\log"; Permissions: users-modify
 

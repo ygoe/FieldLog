@@ -39,49 +39,49 @@
 		</Grid.ColumnDefinitions>
 
 		<ToolBar Name="ToolBar" Grid.Row="0" ToolBarTray.IsLocked="True">
-			<Button Command="{Binding LoadLogCommand}" ToolTip="Load log">
-				<Image Source="/Images/folder_open.png"/>
+			<Button Command="{Binding LoadLogCommand}" ToolTip="Load log" ToolTipService.ShowOnDisabled="True">
+				<ui:MenuIconImage Source="/Images/folder_open.png"/>
 			</Button>
-			<Button Command="{Binding StopLiveCommand}" ToolTip="Stop live">
-				<Image Source="/Images/stop.png"/>
+			<Button Command="{Binding StopLiveCommand}" ToolTip="Stop live" ToolTipService.ShowOnDisabled="True">
+				<ui:MenuIconImage Source="/Images/stop.png"/>
 			</Button>
-			<Button Command="{Binding ClearCommand}" ToolTip="Clear window content">
-				<Image Source="/Images/clearwindowcontent.png"/>
-			</Button>
-			<Separator/>
-			<Button Command="{Binding LoadSymbolsCommand}" ToolTip="Load source code symbols file">
-				<Image Source="/Images/pdb-file.png"/>
-			</Button>
-			<Button Command="{Binding LoadObfuscationMapCommand}" ToolTip="Load obfuscation map">
-				<Image Source="/Images/ghost.png"/>
+			<Button Command="{Binding ClearCommand}" ToolTip="Clear window content" ToolTipService.ShowOnDisabled="True">
+				<ui:MenuIconImage Source="/Images/clearwindowcontent.png"/>
 			</Button>
 			<Separator/>
-			<ToggleButton IsChecked="{Binding IsDebugMonitorActive}" ToolTip="Debug monitor">
-				<Image Source="/Images/event.png"/>
-			</ToggleButton>
-			<Separator/>
-			<ToggleButton IsChecked="{Binding AppSettings.ShowRelativeTime}" ToolTip="Show relative time">
-				<Image Source="/Images/timer.png"/>
-			</ToggleButton>
-			<Separator/>
-			<ToggleButton IsChecked="{Binding AppSettings.IsLiveScrollingEnabled}" ToolTip="Live scroll">
-				<Image Source="/Images/goto_bottom.png"/>
-			</ToggleButton>
-			<ToggleButton IsChecked="{Binding AppSettings.IsSoundEnabled}" ToolTip="Play sound on new item">
-				<Image Source="/Images/sound.png"/>
-			</ToggleButton>
-			<ToggleButton IsChecked="{Binding AppSettings.IsFlashingEnabled}" ToolTip="Flash window on new item">
-				<Image Source="/Images/flash.png"/>
-			</ToggleButton>
-			<ToggleButton IsChecked="{Binding AppSettings.IsWindowOnTop}" ToolTip="Keep window on top">
-				<Image Source="/Images/pin.png"/>
-			</ToggleButton>
-			<Separator/>
-			<Button Command="{Binding DecreaseIndentSizeCommand}" ToolTip="Decrease indent size">
-				<Image Source="/Images/indent_minus.png"/>
+			<Button Command="{Binding LoadSymbolsCommand}" ToolTip="Load source code symbols file" ToolTipService.ShowOnDisabled="True">
+				<ui:MenuIconImage Source="/Images/pdb-file.png"/>
 			</Button>
-			<Button Command="{Binding IncreaseIndentSizeCommand}" ToolTip="Increase indent size">
-				<Image Source="/Images/indent_plus.png"/>
+			<Button Command="{Binding LoadObfuscationMapCommand}" ToolTip="Load obfuscation map" ToolTipService.ShowOnDisabled="True">
+				<ui:MenuIconImage Source="/Images/ghost.png"/>
+			</Button>
+			<Separator/>
+			<ToggleButton IsChecked="{Binding IsDebugMonitorActive}" ToolTip="Debug monitor" ToolTipService.ShowOnDisabled="True">
+				<ui:MenuIconImage Source="/Images/event.png"/>
+			</ToggleButton>
+			<Separator/>
+			<ToggleButton IsChecked="{Binding AppSettings.ShowRelativeTime}" ToolTip="Show relative time" ToolTipService.ShowOnDisabled="True">
+				<ui:MenuIconImage Source="/Images/timer.png"/>
+			</ToggleButton>
+			<Separator/>
+			<ToggleButton IsChecked="{Binding AppSettings.IsLiveScrollingEnabled}" ToolTip="Live scroll" ToolTipService.ShowOnDisabled="True">
+				<ui:MenuIconImage Source="/Images/goto_bottom.png"/>
+			</ToggleButton>
+			<ToggleButton IsChecked="{Binding AppSettings.IsSoundEnabled}" ToolTip="Play sound on new item" ToolTipService.ShowOnDisabled="True">
+				<ui:MenuIconImage Source="/Images/sound.png"/>
+			</ToggleButton>
+			<ToggleButton IsChecked="{Binding AppSettings.IsFlashingEnabled}" ToolTip="Flash window on new item" ToolTipService.ShowOnDisabled="True">
+				<ui:MenuIconImage Source="/Images/flash.png"/>
+			</ToggleButton>
+			<ToggleButton IsChecked="{Binding AppSettings.IsWindowOnTop}" ToolTip="Keep window on top" ToolTipService.ShowOnDisabled="True">
+				<ui:MenuIconImage Source="/Images/pin.png"/>
+			</ToggleButton>
+			<Separator/>
+			<Button Command="{Binding DecreaseIndentSizeCommand}" ToolTip="Decrease indent size" ToolTipService.ShowOnDisabled="True">
+				<ui:MenuIconImage Source="/Images/indent_minus.png"/>
+			</Button>
+			<Button Command="{Binding IncreaseIndentSizeCommand}" ToolTip="Increase indent size" ToolTipService.ShowOnDisabled="True">
+				<ui:MenuIconImage Source="/Images/indent_plus.png"/>
 			</Button>
 			<Separator/>
 			<Image Source="/Images/filter.png"/>
@@ -90,19 +90,21 @@
 				Width="150"
 				Padding="0,1"
 				ToolTip="Select filter"
+				ToolTipService.ShowOnDisabled="True"
 				ItemsSource="{Binding SortedFilters}"
 				SelectedItem="{Binding SelectedFilter}"
 				DisplayMemberPath="DisplayName"/>
-			<Button Command="{Binding DeleteFilterCommand}" ToolTip="Delete selected filter">
-				<Image Source="/Images/filter_delete.png"/>
+			<Button Command="{Binding DeleteFilterCommand}" ToolTip="Delete selected filter" ToolTipService.ShowOnDisabled="True">
+				<ui:MenuIconImage Source="/Images/filter_delete.png"/>
 			</Button>
 			<TextBox
 				Name="SearchTextBox"
 				Width="150"
 				ToolTip="Search text within filtered items"
+				ToolTipService.ShowOnDisabled="True"
 				Text="{Binding AdhocSearchText}"
 				ui:TextBoxExtensions.UpdateDelay="500"/>
-			<Button Command="{Binding ClearSearchTextCommand}" Content="Õ" FontFamily="Wingdings" ToolTip="Clear search text"/>
+			<Button Command="{Binding ClearSearchTextCommand}" Content="Õ" FontFamily="Wingdings" ToolTip="Clear search text" ToolTipService.ShowOnDisabled="True"/>
 			<TextBlock Margin="4,0,0,0" VerticalAlignment="Center" TextAlignment="Right" MinWidth="45">
 				<Run Text="{Binding FilteredLogItemsView.Count, Mode=OneWay}"/>
 			</TextBlock>
@@ -111,8 +113,8 @@
 				<Run Text="{Binding LoadedItemsCount, Mode=OneWay}"/>
 			</TextBlock>
 			<Separator/>
-			<Button Command="{Binding SettingsCommand}" ToolTip="Settings">
-				<Image Source="/Images/gear.png"/>
+			<Button Command="{Binding SettingsCommand}" ToolTip="Settings" ToolTipService.ShowOnDisabled="True">
+				<ui:MenuIconImage Source="/Images/gear.png"/>
 			</Button>
 		</ToolBar>
 

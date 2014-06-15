@@ -310,10 +310,10 @@ namespace Unclassified.FieldLog
 #endif
 
 		/// <summary>
-		/// Contains all log items that are buffered in the current thread.
+		/// Contains all log items that are transiently buffered in the current thread.
 		/// </summary>
 		[ThreadStatic]
-		private static List<FieldLogItem> threadBufferedItems;
+		private static List<FieldLogItem> threadTransientItems;
 
 #if ASPNET
 		/// <summary>
@@ -969,6 +969,8 @@ namespace Unclassified.FieldLog
 
 		#region Text log methods for each priority
 
+		#region Normal logging
+
 		/// <summary>
 		/// Writes a text log item with Trace priority to the log file.
 		/// </summary>
@@ -1102,9 +1104,150 @@ namespace Unclassified.FieldLog
 			Text(FieldLogPriority.Critical, text, details);
 		}
 
+		#endregion Normal logging
+
+		#region Transient logging
+
+		/// <summary>
+		/// Writes a text log item with Trace priority to the transient buffer.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		public static void TraceTransient(string text)
+		{
+			TextTransient(FieldLogPriority.Trace, text);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Checkpoint priority to the transient buffer.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		public static void CheckpointTransient(string text)
+		{
+			TextTransient(FieldLogPriority.Checkpoint, text);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Info priority to the transient buffer.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		public static void InfoTransient(string text)
+		{
+			TextTransient(FieldLogPriority.Info, text);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Notice priority to the transient buffer.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		public static void NoticeTransient(string text)
+		{
+			TextTransient(FieldLogPriority.Notice, text);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Warning priority to the transient buffer.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		public static void WarningTransient(string text)
+		{
+			TextTransient(FieldLogPriority.Warning, text);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Error priority to the transient buffer.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		public static void ErrorTransient(string text)
+		{
+			TextTransient(FieldLogPriority.Error, text);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Critical priority to the transient buffer.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		public static void CriticalTransient(string text)
+		{
+			TextTransient(FieldLogPriority.Critical, text);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Trace priority to the transient buffer.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
+		public static void TraceTransient(string text, string details)
+		{
+			TextTransient(FieldLogPriority.Trace, text, details);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Checkpoint priority to the transient buffer.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
+		public static void CheckpointTransient(string text, string details)
+		{
+			TextTransient(FieldLogPriority.Checkpoint, text, details);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Info priority to the transient buffer.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
+		public static void InfoTransient(string text, string details)
+		{
+			TextTransient(FieldLogPriority.Info, text, details);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Notice priority to the transient buffer.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
+		public static void NoticeTransient(string text, string details)
+		{
+			TextTransient(FieldLogPriority.Notice, text, details);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Warning priority to the transient buffer.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
+		public static void WarningTransient(string text, string details)
+		{
+			TextTransient(FieldLogPriority.Warning, text, details);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Error priority to the transient buffer.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
+		public static void ErrorTransient(string text, string details)
+		{
+			TextTransient(FieldLogPriority.Error, text, details);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Critical priority to the transient buffer.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
+		public static void CriticalTransient(string text, string details)
+		{
+			TextTransient(FieldLogPriority.Critical, text, details);
+		}
+
+		#endregion Transient logging
+
 		#endregion Text log methods for each priority
 
 		#region Data log methods for each priority
+
+		#region Normal logging
 
 		/// <summary>
 		/// Writes a data log item with Trace priority to the log file.
@@ -1175,6 +1318,82 @@ namespace Unclassified.FieldLog
 		{
 			Data(FieldLogPriority.Critical, name, value);
 		}
+
+		#endregion Normal logging
+
+		#region Transient logging
+
+		/// <summary>
+		/// Writes a data log item with Trace priority to the transient buffer.
+		/// </summary>
+		/// <param name="name">The name of the data item.</param>
+		/// <param name="value">The value of the data item.</param>
+		public static void TraceDataTransient(string name, object value)
+		{
+			DataTransient(FieldLogPriority.Trace, name, value);
+		}
+
+		/// <summary>
+		/// Writes a data log item with Checkpoint priority to the transient buffer.
+		/// </summary>
+		/// <param name="name">The name of the data item.</param>
+		/// <param name="value">The value of the data item.</param>
+		public static void CheckpointDataTransient(string name, object value)
+		{
+			DataTransient(FieldLogPriority.Checkpoint, name, value);
+		}
+
+		/// <summary>
+		/// Writes a data log item with Info priority to the transient buffer.
+		/// </summary>
+		/// <param name="name">The name of the data item.</param>
+		/// <param name="value">The value of the data item.</param>
+		public static void InfoDataTransient(string name, object value)
+		{
+			DataTransient(FieldLogPriority.Info, name, value);
+		}
+
+		/// <summary>
+		/// Writes a data log item with Notice priority to the transient buffer.
+		/// </summary>
+		/// <param name="name">The name of the data item.</param>
+		/// <param name="value">The value of the data item.</param>
+		public static void NoticeDataTransient(string name, object value)
+		{
+			DataTransient(FieldLogPriority.Notice, name, value);
+		}
+
+		/// <summary>
+		/// Writes a data log item with Warning priority to the transient buffer.
+		/// </summary>
+		/// <param name="name">The name of the data item.</param>
+		/// <param name="value">The value of the data item.</param>
+		public static void WarningDataTransient(string name, object value)
+		{
+			DataTransient(FieldLogPriority.Warning, name, value);
+		}
+
+		/// <summary>
+		/// Writes a data log item with Error priority to the transient buffer.
+		/// </summary>
+		/// <param name="name">The name of the data item.</param>
+		/// <param name="value">The value of the data item.</param>
+		public static void ErrorDataTransient(string name, object value)
+		{
+			DataTransient(FieldLogPriority.Error, name, value);
+		}
+
+		/// <summary>
+		/// Writes a data log item with Critical priority to the transient buffer.
+		/// </summary>
+		/// <param name="name">The name of the data item.</param>
+		/// <param name="value">The value of the data item.</param>
+		public static void CriticalDataTransient(string name, object value)
+		{
+			DataTransient(FieldLogPriority.Critical, name, value);
+		}
+
+		#endregion Transient logging
 
 		#endregion Data log methods for each priority
 
@@ -1416,6 +1635,27 @@ namespace Unclassified.FieldLog
 		}
 
 		/// <summary>
+		/// Writes a text log item to the transient buffer.
+		/// </summary>
+		/// <param name="priority">The priority of the log item.</param>
+		/// <param name="text">The text message.</param>
+		public static void TextTransient(FieldLogPriority priority, string text)
+		{
+			LogTransient(new FieldLogTextItem(priority, text));
+		}
+
+		/// <summary>
+		/// Writes a text log item to the transient buffer.
+		/// </summary>
+		/// <param name="priority">The priority of the log item.</param>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
+		public static void TextTransient(FieldLogPriority priority, string text, string details)
+		{
+			LogTransient(new FieldLogTextItem(priority, text, details));
+		}
+
+		/// <summary>
 		/// Writes a data log item to the log file.
 		/// </summary>
 		/// <param name="priority">The priority of the log item.</param>
@@ -1424,6 +1664,17 @@ namespace Unclassified.FieldLog
 		public static void Data(FieldLogPriority priority, string name, object value)
 		{
 			Log(new FieldLogDataItem(priority, name, value));
+		}
+
+		/// <summary>
+		/// Writes a data log item to the transient buffer.
+		/// </summary>
+		/// <param name="priority">The priority of the log item.</param>
+		/// <param name="name">The name of the data item.</param>
+		/// <param name="value">The value of the data item.</param>
+		public static void DataTransient(FieldLogPriority priority, string name, object value)
+		{
+			LogTransient(new FieldLogDataItem(priority, name, value));
 		}
 
 		/// <summary>
@@ -1638,7 +1889,7 @@ namespace Unclassified.FieldLog
 
 		#endregion Other specialised log methods
 
-		#region General log method
+		#region General log methods
 
 		/// <summary>
 		/// Writes a log item to the log file.
@@ -1646,15 +1897,15 @@ namespace Unclassified.FieldLog
 		/// <param name="item">The log item to write.</param>
 		public static void Log(FieldLogItem item)
 		{
-			// First write any buffered items for the current thread
-			if (threadBufferedItems != null)
+			// First write any transiently buffered items for the current thread
+			if (threadTransientItems != null)
 			{
-				foreach (var bufferedItem in threadBufferedItems)
+				foreach (var transientItem in threadTransientItems)
 				{
-					LogInternal(bufferedItem);
+					LogInternal(transientItem);
 				}
 				// Clear buffer after writing it
-				threadBufferedItems = null;
+				threadTransientItems = null;
 			}
 
 			LogInternal(item);
@@ -1690,34 +1941,51 @@ namespace Unclassified.FieldLog
 			sendTimeout.Change(200, Timeout.Infinite);
 		}
 
-		#endregion General log method
-
-		#region Buffer log method
+		/// <summary>
+		/// Writes a log item to the transient buffer for the current thread. All buffered log
+		/// items are only written to the log file if a non-transient (normal) log item is written
+		/// through another log method. The transient buffer can be cleared before it was written.
+		/// </summary>
+		/// <param name="item">The log item to add to the transient buffer.</param>
+		public static void LogTransient(FieldLogItem item)
+		{
+			if (threadTransientItems == null)
+			{
+				threadTransientItems = new List<FieldLogItem>();
+			}
+			threadTransientItems.Add(item);
+		}
 
 		/// <summary>
-		/// Writes a log item to the buffer for the current thread. All buffered log items are only
-		/// written to the log file if an unbuffered (normal) log item is written through another
-		/// log method. The buffer can be cleared before it was written.
+		/// Writes a log item to the transient buffer for the current thread. All buffered log
+		/// items are only written to the log file if a non-transient (normal) log item is written
+		/// through another log method. The transient buffer can be cleared before it was written.
 		/// </summary>
-		/// <param name="item">The log item to add to the buffer.</param>
+		/// <param name="item">The log item to add to the transient buffer.</param>
+		[Obsolete("Use the LogTransient or one of the specialised *Transient methods instead.")]
 		public static void LogBuffer(FieldLogItem item)
 		{
-			if (threadBufferedItems == null)
-			{
-				threadBufferedItems = new List<FieldLogItem>();
-			}
-			threadBufferedItems.Add(item);
+			LogTransient(item);
 		}
 
 		/// <summary>
-		/// Clears the log items buffer for the current thread.
+		/// Clears the transient log items buffer for the current thread.
 		/// </summary>
-		public static void ClearLogBuffer()
+		public static void ClearTransient()
 		{
-			threadBufferedItems = null;
+			threadTransientItems = null;
 		}
 
-		#endregion Buffer log method
+		/// <summary>
+		/// Clears the transient log items buffer for the current thread.
+		/// </summary>
+		[Obsolete("Use the ClearTransient method instead.")]
+		public static void ClearLogBuffer()
+		{
+			ClearTransient();
+		}
+
+		#endregion General log methods
 
 		#region Timeout log methods
 

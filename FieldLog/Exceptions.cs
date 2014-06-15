@@ -32,6 +32,10 @@ namespace Unclassified.FieldLog
 
 		/// <summary>Gets the exception type name.</summary>
 		public string Type { get; private set; }
+		/// <summary>Gets the module that defines the exception type.</summary>
+		public string TypeModule { get; private set; }
+		/// <summary>Gets the metadata token of the exception type.</summary>
+		public int Token { get; private set; }
 		/// <summary>Gets the exception message.</summary>
 		public string Message { get; private set; }
 		/// <summary>Gets the exception code.</summary>
@@ -67,8 +71,11 @@ namespace Unclassified.FieldLog
 		public FieldLogException(Exception ex, StackTrace customStackTrace)
 		{
 			Exception = ex;
-			
-			Type = ex.GetType().FullName;
+			Type exType = ex.GetType();
+
+			Type = exType.FullName;
+			TypeModule = exType.Module.FullyQualifiedName;
+			Token = exType.MetadataToken;
 			Message = ex.Message.TrimEnd();
 			StackTrace stackTrace = customStackTrace;
 			if (stackTrace == null)
@@ -83,11 +90,27 @@ namespace Unclassified.FieldLog
 
 			StringBuilder dataSb = new StringBuilder();
 			if (ex.Data != null)
+			{
 				foreach (DictionaryEntry x in ex.Data)
-					dataSb.Append("Data[" + x.Key + "]" + (x.Value != null ? " (" + x.Value.GetType().Name + "): " + x.Value.ToString() : ": null") + "\n");
+				{
+					dataSb.Append("Data[").Append(x.Key).Append("]");
+					if (x.Value != null)
+					{
+						dataSb.Append(" (")
+							.Append(x.Value.GetType().Name)
+							.Append("): ")
+							.Append(Convert.ToString(x.Value, CultureInfo.InvariantCulture));
+					}
+					else
+					{
+						dataSb.Append(": null");
+					}
+					dataSb.Append("\n");
+				}
+			}
 
 			// Find more properties through reflection
-			PropertyInfo[] props = ex.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+			PropertyInfo[] props = exType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
 			foreach (PropertyInfo prop in props)
 			{
 				// Known properties, already handled
@@ -107,38 +130,38 @@ namespace Unclassified.FieldLog
 					dataSb.Append(prop.Name);
 					if (value != null)
 					{
-						dataSb.Append(" (" + value.GetType().Name + "): " + Convert.ToString(value, CultureInfo.InvariantCulture));
+						dataSb.Append(" (").Append(value.GetType().Name).Append("): ").Append(Convert.ToString(value, CultureInfo.InvariantCulture));
 						if (value is byte)
 						{
-							dataSb.Append(" (0x" + ((byte) value).ToString("X2") + ")");
+							dataSb.Append(" (0x").Append(((byte) value).ToString("X2")).Append(")");
 						}
 						if (value is sbyte)
 						{
-							dataSb.Append(" (0x" + ((sbyte) value).ToString("X2") + ")");
+							dataSb.Append(" (0x").Append(((sbyte) value).ToString("X2")).Append(")");
 						}
 						if (value is ushort)
 						{
-							dataSb.Append(" (0x" + ((ushort) value).ToString("X4") + ")");
+							dataSb.Append(" (0x").Append(((ushort) value).ToString("X4")).Append(")");
 						}
 						if (value is short)
 						{
-							dataSb.Append(" (0x" + ((short) value).ToString("X") + ")");
+							dataSb.Append(" (0x").Append(((short) value).ToString("X")).Append(")");
 						}
 						if (value is uint)
 						{
-							dataSb.Append(" (0x" + ((uint) value).ToString("X8") + ")");
+							dataSb.Append(" (0x").Append(((uint) value).ToString("X8")).Append(")");
 						}
 						if (value is int)
 						{
-							dataSb.Append(" (0x" + ((int) value).ToString("X8") + ")");
+							dataSb.Append(" (0x").Append(((int) value).ToString("X8")).Append(")");
 						}
 						if (value is ulong)
 						{
-							dataSb.Append(" (0x" + ((ulong) value).ToString("X16") + ")");
+							dataSb.Append(" (0x").Append(((ulong) value).ToString("X16")).Append(")");
 						}
 						if (value is long)
 						{
-							dataSb.Append(" (0x" + ((long) value).ToString("X16") + ")");
+							dataSb.Append(" (0x").Append(((long) value).ToString("X16")).Append(")");
 						}
 					}
 					else
@@ -149,7 +172,13 @@ namespace Unclassified.FieldLog
 				}
 				catch (Exception ex2)
 				{
-					dataSb.Append("Exception property \"" + prop.Name + "\" cannot be retrieved. (" + ex2.GetType().Name + ": " + ex2.Message + ")\n");
+					dataSb.Append("Exception property \"")
+						.Append(prop.Name)
+						.Append("\" cannot be retrieved. (")
+						.Append(ex2.GetType().Name)
+						.Append(": ")
+						.Append(ex2.Message)
+						.Append(")\n");
 				}
 			}
 			Data = dataSb.ToString().TrimEnd();
@@ -179,6 +208,7 @@ namespace Unclassified.FieldLog
 			}
 
 			Size = (Type != null ? Type.Length * 2 : 0) +
+				4 +
 				(Message != null ? Message.Length * 2 : 0) +
 				4 +
 				(Data != null ? Data.Length * 2 : 0);
@@ -202,6 +232,8 @@ namespace Unclassified.FieldLog
 		internal void Write(FieldLogFileWriter writer)
 		{
 			writer.AddBuffer(Type);
+			writer.AddBuffer(TypeModule);
+			writer.AddBuffer(Token);
 			writer.AddBuffer(Message);
 			writer.AddBuffer(Code);
 			writer.AddBuffer(Data);
@@ -232,6 +264,11 @@ namespace Unclassified.FieldLog
 		{
 			FieldLogException ex = new FieldLogException();
 			ex.Type = reader.ReadString();
+			if (reader.FormatVersion >= 2)
+			{
+				ex.TypeModule = reader.ReadString();
+				ex.Token = reader.ReadInt32();
+			}
 			ex.Message = reader.ReadString();
 			ex.Code = reader.ReadInt32();
 			ex.Data = reader.ReadString();
@@ -265,8 +302,6 @@ namespace Unclassified.FieldLog
 		public int Token { get; private set; }
 		/// <summary>Gets the IL code offset of the executed instruction in the method body.</summary>
 		public int ILOffset { get; private set; }
-		/// <summary>Gets the native code offset of the executed instruction in the method body.</summary>
-		public int NativeOffset { get; private set; }
 		/// <summary>Gets the defining type name.</summary>
 		public string TypeName { get; private set; }
 		/// <summary>Gets the executed method name.</summary>
@@ -293,11 +328,13 @@ namespace Unclassified.FieldLog
 		{
 			MethodBase method = stackFrame.GetMethod();
 
-			Module = method.DeclaringType.Module.FullyQualifiedName;
-			Token = method.MetadataToken;
-			ILOffset = stackFrame.GetILOffset();
-			NativeOffset = stackFrame.GetNativeOffset();
-			TypeName = FormatTypeName(method.DeclaringType);
+			if (method.DeclaringType != null)
+			{
+				Module = method.DeclaringType.Module.FullyQualifiedName;
+				Token = method.MetadataToken;
+				ILOffset = stackFrame.GetILOffset();
+				TypeName = FormatTypeName(method.DeclaringType);
+			}
 			MethodName = method.Name;
 			if (method.IsGenericMethod)
 			{
@@ -319,21 +356,6 @@ namespace Unclassified.FieldLog
 			FileName = stackFrame.GetFileName();
 			Line = stackFrame.GetFileLineNumber();
 			Column = stackFrame.GetFileColumnNumber();
-
-			// TODO: Add separate fields for these - file format v2
-			if (!string.IsNullOrEmpty(FileName))
-			{
-				FileName = "; " + FileName;
-			}
-			if (NativeOffset != StackFrame.OFFSET_UNKNOWN)
-			{
-				FileName = "(+" + NativeOffset.ToString("x") + ")" + FileName;
-			}
-			if (ILOffset != StackFrame.OFFSET_UNKNOWN)
-			{
-				FileName = "+" + ILOffset.ToString("x") + FileName;
-			}
-			FileName = "@" + Token.ToString("x8") + FileName;
 
 			Size = (Module != null ? Module.Length * 2 : 0) +
 				(TypeName != null ? TypeName.Length * 2 : 0) +
@@ -420,6 +442,8 @@ namespace Unclassified.FieldLog
 		internal void Write(FieldLogFileWriter writer)
 		{
 			writer.AddBuffer(Module);
+			writer.AddBuffer(Token);
+			writer.AddBuffer(ILOffset);
 			writer.AddBuffer(TypeName);
 			writer.AddBuffer(MethodName);
 			writer.AddBuffer(MethodSignature);
@@ -436,6 +460,11 @@ namespace Unclassified.FieldLog
 		{
 			FieldLogStackFrame frame = new FieldLogStackFrame();
 			frame.Module = reader.ReadString();
+			if (reader.FormatVersion >= 2)
+			{
+				frame.Token = reader.ReadInt32();
+				frame.ILOffset = reader.ReadInt32();
+			}
 			frame.TypeName = reader.ReadString();
 			frame.MethodName = reader.ReadString();
 			frame.MethodSignature = reader.ReadString();

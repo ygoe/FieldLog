@@ -22,6 +22,7 @@
 					<Grid.RowDefinitions>
 						<RowDefinition Height="Auto"/>
 						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
 					</Grid.RowDefinitions>
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="Auto"/>
@@ -37,8 +38,14 @@
 						SelectedValue="{Binding AppSettings.ItemTimeMode}"
 						SelectedValuePath="Value"/>
 
-					<TextBlock Grid.Row="1" Grid.Column="0" Margin="0,6,0,0" VerticalAlignment="Center" Text="Scroll bar markers:"/>
+					<TextBlock Grid.Row="1" Grid.Column="0" Margin="0,6,0,0" VerticalAlignment="Center" Text="ID column:"/>
 					<StackPanel Grid.Row="1" Grid.Column="1" Margin="8,6,0,0" Orientation="Horizontal">
+						<CheckBox Content="Thread ID" IsChecked="{Binding AppSettings.ShowThreadIdColumn}"/>
+						<CheckBox Margin="8,0,0,0" Content="Web request ID" IsChecked="{Binding AppSettings.ShowWebRequestIdColumn}"/>
+					</StackPanel>
+
+					<TextBlock Grid.Row="2" Grid.Column="0" Margin="0,6,0,0" VerticalAlignment="Center" Text="Scroll bar markers:"/>
+					<StackPanel Grid.Row="2" Grid.Column="1" Margin="8,6,0,0" Orientation="Horizontal">
 						<CheckBox Content="Warnings and errors" IsChecked="{Binding AppSettings.ShowWarningsErrorsInScrollBar}"/>
 						<CheckBox Margin="8,0,0,0" Content="Current selection" IsChecked="{Binding AppSettings.ShowSelectionInScrollBar}"/>
 					</StackPanel>

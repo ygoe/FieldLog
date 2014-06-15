@@ -106,8 +106,25 @@ namespace Unclassified.FieldLogViewer
 			AddPropertyHandler("Filters");
 			AddPropertyHandler("SelectedFilter");
 			AddPropertyHandler("ItemTimeMode");
+			AddPropertyHandler("ShowThreadIdColumn");
+			AddPropertyHandler("ShowWebRequestIdColumn");
 			AddPropertyHandler("ShowWarningsErrorsInScrollBar");
 			AddPropertyHandler("ShowSelectionInScrollBar");
+
+			AddHandler(
+				"ShowThreadIdColumn",
+				(key, oldValue, newValue) =>
+				{
+					if (newValue is bool && (bool) newValue == true) ShowWebRequestIdColumn = false;
+				},
+				true);
+			AddHandler(
+				"ShowWebRequestIdColumn",
+				(key, oldValue, newValue) =>
+				{
+					if (newValue is bool && (bool) newValue == true) ShowThreadIdColumn = false;
+				},
+				true);
 		}
 
 		#endregion Constructors
@@ -221,6 +238,24 @@ namespace Unclassified.FieldLogViewer
 		{
 			get { return (ItemTimeType) GetInt("ItemTimeMode", (int) ItemTimeType.Remote); }
 			set { Set("ItemTimeMode", (int) value); }
+		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether the thread ID column is visible.
+		/// </summary>
+		public bool ShowThreadIdColumn
+		{
+			get { return GetBool("ShowThreadIdColumn", true); }
+			set { Set("ShowThreadIdColumn", value); }
+		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether the web request ID column is visible.
+		/// </summary>
+		public bool ShowWebRequestIdColumn
+		{
+			get { return GetBool("ShowWebRequestIdColumn", false); }
+			set { Set("ShowWebRequestIdColumn", value); }
 		}
 
 		/// <summary>

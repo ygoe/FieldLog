@@ -18,9 +18,12 @@ namespace ConsoleDemo
 			Console.WriteLine("FieldLog writer demo application");
 			Console.WriteLine();
 
-			NormalActivity();
 			//LoadTest();
+			//ConstantFlow();
+			NormalActivity();
+			//BatchActivity();
 			//TestTimerPrecision();
+			//TestOutputDebugString();
 		}
 
 		static void LoadTest()
@@ -35,6 +38,26 @@ namespace ConsoleDemo
 				
 				if ((i % 10000) == 0)
 					Console.WriteLine("    now at " + i);
+			}
+		}
+
+		static void ConstantFlow()
+		{
+			Console.WriteLine("Constant item flow pattern...");
+
+			Random rnd = new Random();
+			for (int i = 1; i <= 100; i++)
+			{
+				int itemCount = rnd.Next(1, 10);
+				while (itemCount-- > 0)
+				{
+					FL.Trace("Test item - " + i);
+				}
+
+				if ((i % 10) == 0)
+					Console.WriteLine("    now at " + i);
+
+				Thread.Sleep(rnd.Next(400, 600));
 			}
 		}
 
@@ -193,6 +216,21 @@ namespace ConsoleDemo
 			}
 		}
 
+		private static void BatchActivity()
+		{
+			Console.WriteLine("Batch test pattern...");
+
+			for (int i = 1; i <= 200; i++)
+			{
+				FL.Trace("Batch test - " + i);
+
+				if ((i % 10) == 0)
+					Console.WriteLine("    now at " + i);
+
+				Thread.Sleep(8000);
+			}
+		}
+
 		private static void TestTimerPrecision()
 		{
 			Console.WriteLine("Timer precision test...");
@@ -217,6 +255,21 @@ namespace ConsoleDemo
 						}
 					}
 				}
+			}
+		}
+
+		private static void TestOutputDebugString()
+		{
+			Console.WriteLine("OutputDebugString only test...");
+
+			for (int i = 1; i <= 200; i++)
+			{
+				System.Diagnostics.Trace.WriteLine("OutputDebugString test - " + i);
+
+				if ((i % 10) == 0)
+					Console.WriteLine("    now at " + i);
+
+				Thread.Sleep(8000);
 			}
 		}
 	}

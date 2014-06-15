@@ -24,6 +24,10 @@ using System.Threading;
 #if !NET20
 using System.Windows.Threading;
 #endif
+#if ASPNET
+using System.Linq;
+using System.Web;
+#endif
 
 namespace Unclassified.FieldLog
 {
@@ -103,7 +107,7 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Defines the format version of log files.
 		/// </summary>
-		public const byte FileFormatVersion = 1;
+		public const byte FileFormatVersion = 2;
 
 		/// <summary>
 		/// Defines the maximum buffer size to keep.
@@ -120,9 +124,16 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Defines the log configuration file name extension.
 		/// </summary>
+		/// <remarks>
+		/// Don't set this to ".config" when using it with ASP.NET applications, or it will find
+		/// the Web.config file and try to read it.
+		/// </remarks>
 		private const string logConfigExtension = ".flconfig";
 
 		internal const string EnsureJitTimerKey = "FieldLog.EnsureJit";
+
+		internal const string HttpContextKey_WebRequestId = "FieldLog_WebRequestId";
+		internal const string HttpContextKey_WebRequestStartItem = "FieldLog_WebRequestStartItem";
 
 		#endregion Constants
 
@@ -138,6 +149,11 @@ namespace Unclassified.FieldLog
 		#endregion Delegates
 
 		#region Private static data
+
+		/// <summary>
+		/// The version of the FieldLog assembly, if available.
+		/// </summary>
+		private static string fieldLogVersion;
 
 		/// <summary>
 		/// The UTC date and time at the start of the Stopwatch.
@@ -254,6 +270,12 @@ namespace Unclassified.FieldLog
 		/// Detects changes to the configuration file.
 		/// </summary>
 		private static FileSystemWatcher configFileWatcher;
+		/// <summary>
+		/// The path of the configuration file. This file does not necessarily exist, but it would
+		/// be the file to read. This is set after calling the <see cref="ReadLogConfiguration"/>
+		/// method.
+		/// </summary>
+		private static string configFileName;
 
 		/// <summary>
 		/// Keeps all buffers that still need to be sent. Used by the send thread only.
@@ -283,6 +305,32 @@ namespace Unclassified.FieldLog
 		[ThreadStatic]
 		private static List<FieldLogItem> threadBufferedItems;
 
+		/// <summary>
+		/// The last assigned web request ID, counted for each new request. Synchronised by
+		/// Interlocked access.
+		/// </summary>
+		private static int LastWebRequestId;
+
+		/// <summary>
+		/// Override configuration file name. Used for ASP.NET.
+		/// </summary>
+		private static string configFileNameOverride;
+		/// <summary>
+		/// Override default log file directory. Used for ASP.NET.
+		/// </summary>
+		private static string logDefaultDirOverride;
+		/// <summary>
+		/// Indicates whether the duplicate LogStart check on writing items to the log file has
+		/// been run. Used for ASP.NET.
+		/// </summary>
+		private static bool didDuplicateLogStartCheck;
+		/// <summary>
+		/// The level of first-chance exception handling. If this goes up, there is an exception
+		/// in the exception handler. If this goes uncontrolled, it leads to a
+		/// StackOverflowException that crashes the application.
+		/// </summary>
+		private static int firstChanceExceptionLevel;
+
 		#endregion Private static data
 
 		#region Internal static data
@@ -298,6 +346,10 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Written and read in the send thread only.
 		/// </summary>
+		internal static readonly Dictionary<uint, FieldLogScopeItem> WebRequestScopes = new Dictionary<uint, FieldLogScopeItem>();
+		/// <summary>
+		/// Written and read in the send thread only.
+		/// </summary>
 		internal static readonly Dictionary<int, Stack<FieldLogScopeItem>> CurrentScopes = new Dictionary<int, Stack<FieldLogScopeItem>>();
 
 		[ThreadStatic]
@@ -305,6 +357,17 @@ namespace Unclassified.FieldLog
 
 		[ThreadStatic]
 		internal static int ThreadId;
+
+		/// <summary>
+		/// A reference to the EntryAssembly. This is determined by other means for ASP.NET
+		/// applications.
+		/// </summary>
+		internal static Assembly EntryAssembly;
+		/// <summary>
+		/// The entry assembly's Location value. This is determined by other means for ASP.NET
+		/// applications.
+		/// </summary>
+		internal static string EntryAssemblyLocation;
 
 		#endregion Internal static data
 
@@ -321,6 +384,24 @@ namespace Unclassified.FieldLog
 
 			LogFirstChanceExceptions = true;
 			WaitForItemsBacklog = true;
+
+			EntryAssembly = Assembly.GetEntryAssembly();
+			if (EntryAssembly != null)
+			{
+				EntryAssemblyLocation = EntryAssembly.Location;
+			}
+
+			// Try to get the version string from the FieldLog assembly. This may not be available
+			// if the assembly was merged or the source code was included in another assembly.
+			Assembly myAssembly = Assembly.GetExecutingAssembly();
+			if (myAssembly != null && myAssembly.GetName().Name.Equals("unclassified.fieldlog", StringComparison.OrdinalIgnoreCase))
+			{
+				object[] customAttributes = myAssembly.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
+				if (customAttributes != null && customAttributes.Length > 0)
+				{
+					fieldLogVersion = ((AssemblyInformationalVersionAttribute) customAttributes[0]).InformationalVersion;
+				}
+			}
 
 			// Read or reset log configuration from file
 			ReadLogConfiguration();
@@ -353,7 +434,7 @@ namespace Unclassified.FieldLog
 			AppErrorDialogContext = "Context:";
 			AppErrorDialogNote = "If the problem persists, please contact the application developer.";
 			AppErrorDialogLogPath = "The log file containing detailed error information is saved to {0}.";
-			AppErrorDialogNoLog = "The log file could not be written.";
+			AppErrorDialogNoLog = "The log file path is unknown. See http://u10d.de/flpath for the default log paths.";
 			AppErrorDialogConsoleAction = "Press the Enter key to continue, or Escape to quit the application.";
 			AppErrorDialogTimerNote = "The application will be terminated after {0} seconds without user response.";
 
@@ -366,7 +447,7 @@ namespace Unclassified.FieldLog
 			// Use default implementation to show an application error dialog
 			ShowAppErrorDialog = DefaultShowAppErrorDialog;
 
-			LogScope(FieldLogScopeType.LogStart, null);
+			LogScope(FieldLogScopeType.LogStart, fieldLogVersion != null ? "FieldLog version: " + fieldLogVersion : null);
 			AppDomain.CurrentDomain.ProcessExit += AppDomain_ProcessExit;
 			AppDomain.CurrentDomain.DomainUnload += AppDomain_DomainUnload;
 
@@ -376,7 +457,8 @@ namespace Unclassified.FieldLog
 			}
 
 			// These methods are time-critical so call them once to ensure they're JITed when the
-			// application need them.
+			// application need them. Disabled for debugging to avoid additional breakpoint hits.
+#if !DEBUG
 			FL.StartTimer(EnsureJitTimerKey);
 			FL.StopTimer(EnsureJitTimerKey);
 			FL.ClearTimer(EnsureJitTimerKey);
@@ -386,6 +468,7 @@ namespace Unclassified.FieldLog
 			using (FL.Timer(EnsureJitTimerKey, true, true))
 			{
 			}
+#endif
 		}
 
 		/// <summary>
@@ -422,6 +505,16 @@ namespace Unclassified.FieldLog
 			Trace("AppDomain.DomainUnload");
 			// Flush log files, if not already done by the application
 			Shutdown();
+		}
+
+		/// <summary>
+		/// Does nothing. By referencing the FL type with this method call, it is ensured that the
+		/// FL type initialiser (static constructor) is called. This method can be used if no other
+		/// FL member can reasonably be accessed directly at application startup, just to ensure
+		/// that the unhandled exception handling is active right from the start.
+		/// </summary>
+		public static void Use()
+		{
 		}
 
 		#endregion Static constructor
@@ -583,9 +676,24 @@ namespace Unclassified.FieldLog
 			AppDomain.CurrentDomain.FirstChanceException +=
 				delegate(object sender, System.Runtime.ExceptionServices.FirstChanceExceptionEventArgs e)
 				{
-					if (LogFirstChanceExceptions && !isShutdown)
+					if (e.Exception.GetType() == typeof(Microsoft.CSharp.RuntimeBinder.RuntimeBinderException))
 					{
-						FL.Exception(FieldLogPriority.Trace, e.Exception, "AppDomain.FirstChanceException", new StackTrace(1, true));
+						// This is normal for dynamic types, ignore it.
+						// (Trying to process exceptions on dynamic types only causes more pain.)
+						return;
+					}
+
+					int localLevel = Interlocked.Increment(ref firstChanceExceptionLevel);
+					try
+					{
+						if (localLevel <= 4 && LogFirstChanceExceptions && !isShutdown)
+						{
+							FL.Exception(FieldLogPriority.Trace, e.Exception, "AppDomain.FirstChanceException", new StackTrace(1, true));
+						}
+					}
+					finally
+					{
+						Interlocked.Decrement(ref firstChanceExceptionLevel);
 					}
 				};
 
@@ -1355,7 +1463,7 @@ namespace Unclassified.FieldLog
 		/// <param name="name">The scope name. Should be application-unique and hierarchical for easier analysis.</param>
 		public static void Enter(string name)
 		{
-			FL.ScopeLevel++;
+			ScopeLevel++;
 			Log(new FieldLogScopeItem(FieldLogScopeType.Enter, name));
 		}
 
@@ -1365,7 +1473,7 @@ namespace Unclassified.FieldLog
 		/// <param name="name">The scope name. Should be the same as the corresponding Enter scope name.</param>
 		public static void Leave(string name)
 		{
-			FL.ScopeLevel--;
+			ScopeLevel--;
 			Log(new FieldLogScopeItem(FieldLogScopeType.Leave, name));
 		}
 
@@ -1396,17 +1504,66 @@ namespace Unclassified.FieldLog
 			}
 			else if (type == FieldLogScopeType.Enter)
 			{
-				FL.ScopeLevel++;
+				ScopeLevel++;
 				Log(scopeItem);
 			}
 			else if (type == FieldLogScopeType.Leave)
 			{
-				FL.ScopeLevel--;
+				ScopeLevel--;
 				Log(scopeItem);
+			}
+			else if (type == FieldLogScopeType.WebRequestStart)
+			{
+				throw new ArgumentException("Missing FieldLogWebRequestData instance. Use the other overloaded method", "type");
+			}
+			else if (type == FieldLogScopeType.WebRequestEnd)
+			{
+#if ASPNET
+				Log(scopeItem);
+#else
+				throw new NotSupportedException("This build of the FieldLog assembly is not targeting the ASP.NET Framework.");
+#endif
 			}
 			else
 			{
-				throw new ArgumentException("Invalid value.", "type");
+				throw new ArgumentException("Invalid scope type value.", "type");
+			}
+		}
+
+		/// <summary>
+		/// Writes a scope log item to the log file.
+		/// </summary>
+		/// <param name="type">The scope type.</param>
+		/// <param name="name">The scope name. Should be application-unique and hierarchical for easier analysis.</param>
+		/// <param name="webRequestData">The web request data. This parameter is required for the WebRequestStart scope type.</param>
+		public static void LogScope(FieldLogScopeType type, string name, FieldLogWebRequestData webRequestData)
+		{
+			if (type == FieldLogScopeType.WebRequestStart)
+			{
+#if ASPNET
+				// The only reliable way to store data with a web request is to use the HttpContext.
+				// ThreadStatic won't work because a request may change threads between the events.
+				if (HttpContext.Current == null)
+				{
+					throw new InvalidOperationException("HttpContext.Current is not available, there is nowhere to store the request-tracking data.");
+				}
+
+				// Interlocked.Increment is only available for Int32 but it handles the overflow, so
+				// we can safely cast it to UInt32 to use the other half of the value space.
+				uint newWebRequestId = unchecked((uint) Interlocked.Increment(ref LastWebRequestId));
+				HttpContext.Current.Items[HttpContextKey_WebRequestId] = newWebRequestId;
+				FieldLogScopeItem scopeItem = new FieldLogScopeItem(FieldLogPriority.Trace, type, name, webRequestData);
+				Log(scopeItem);
+				// Remember this item so that we can "repeat" it later with more data when it
+				// becomes available
+				HttpContext.Current.Items[HttpContextKey_WebRequestStartItem] = scopeItem;
+#else
+				throw new NotSupportedException("This build of the FieldLog assembly is not targeting the ASP.NET Framework.");
+#endif
+			}
+			else
+			{
+				throw new ArgumentException("Invalid scope type value for this overloaded method.", "type");
 			}
 		}
 
@@ -1447,8 +1604,15 @@ namespace Unclassified.FieldLog
 					System.Diagnostics.Trace.WriteLine(item.ToString());
 					return;
 				}
-				eventCounter++;
-				item.EventCounter = eventCounter;
+				// Repeated scope items for WebRequestStart already have an EventCounter value.
+				// Don't count this as a new item then, so it can match and replace the original
+				// log item which it is repeating (with more data).
+				if (item.EventCounter == 0)
+				{
+					eventCounter++;
+					item.EventCounter = eventCounter;
+				}
+				// Buffer works...
 				CheckAddBuffer(size);
 				currentBuffer.Add(item);
 				currentBufferSize += size;
@@ -2134,6 +2298,221 @@ namespace Unclassified.FieldLog
 
 		#endregion WPF Dispatcher log methods
 
+		#region ASP.NET log methods
+
+#if ASPNET
+		/// <summary>
+		/// Starts logging for ASP.NET applications.
+		/// </summary>
+		private static void LogWebStart(Assembly callingAssembly)
+		{
+			if (EntryAssembly == null)
+			{
+				EntryAssembly = callingAssembly;
+				if (EntryAssembly != null)
+				{
+					string binDir = AppDomain.CurrentDomain.SetupInformation.PrivateBinPath;
+					string dllFileName = Path.GetFileName(EntryAssembly.Location);
+					if (!string.IsNullOrEmpty(binDir) && !string.IsNullOrEmpty(dllFileName))
+					{
+						EntryAssemblyLocation = Path.Combine(binDir, dllFileName);
+					}
+				}
+				// In ASP.NET, nothing must be changed in the bin directory, or the web application
+				// is immediately unloaded to be restarted for the next request. This includes log
+				// files and configuration that may be changed by the administrator.
+				// Instead we use the App_Data\log directory as default. Anything in the App_Data
+				// directory is not served out via HTTP so it should be secure from the public.
+				string baseDir = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
+				if (!string.IsNullOrEmpty(baseDir))
+				{
+					logDefaultDirOverride = Path.Combine(baseDir, "App_Data");
+				}
+			}
+			if (configFileNameOverride == null)
+			{
+				// In ASP.NET, nothing must be changed in the bin directory, or the web application
+				// is immediately unloaded to be restarted for the next request. This includes log
+				// files and configuration that may be changed by the administrator.
+				// Instead we put our config file where the common Web.config file is, in the
+				// application base directory, and use the same prefix: web.flconfig
+				string baseDir = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
+				if (!string.IsNullOrEmpty(baseDir))
+				{
+					configFileNameOverride = Path.Combine(baseDir, "web" + logConfigExtension);
+					lock (sendThread)
+					{
+						configChanged = true;
+					}
+				}
+			}
+
+			// Log another LogStart scope item. If the previous item is still in the send buffer,
+			// it will be replaced with the new item.
+			LogScope(FieldLogScopeType.LogStart, fieldLogVersion != null ? "FieldLog version: " + fieldLogVersion : null);
+		}
+
+		/// <summary>
+		/// Writes a web request start scope log item to the log file.
+		/// </summary>
+		/// <param name="dnsLookup">true to look up the DNS name of the client host.</param>
+		/// <param name="useSession">true to access the Session, false to leave it alone. This is not available before the AcquireRequestState event.</param>
+		/// <param name="appUserId">The application-specific user ID, if available.</param>
+		/// <param name="appUserName">The application-specific user name, if available.</param>
+		public static void LogWebRequestStart(bool dnsLookup = false, bool useSession = false, string appUserId = null, string appUserName = null)
+		{
+			FieldLogWebRequestData wrd = new FieldLogWebRequestData();
+			wrd.RequestUrl = HttpContext.Current.Request.Url.ToString();
+			wrd.Method = HttpContext.Current.Request.HttpMethod;
+			wrd.ClientAddress = HttpContext.Current.Request.UserHostAddress;
+			if (dnsLookup)
+			{
+				DateTime t0 = FL.UtcNow;
+				try
+				{
+					System.Net.IPHostEntry ent = System.Net.Dns.GetHostEntry(HttpContext.Current.Request.UserHostAddress);
+					wrd.ClientHostName = ent.HostName;
+				}
+				catch
+				{
+					// Ignore errors and keep the IP address only
+				}
+				TimeSpan ts = FL.UtcNow - t0;
+				if (ts.TotalMilliseconds > 10)
+				{
+					FL.Notice("DNS reverse lookup took " + ts.TotalMilliseconds.ToString("0") + " ms", "IP address: " + wrd.ClientAddress + "\nHost name: " + wrd.ClientHostName);
+				}
+			}
+			wrd.Referrer = HttpContext.Current.Request.UrlReferrer != null ? HttpContext.Current.Request.UrlReferrer.ToString() : null;
+			wrd.UserAgent = HttpContext.Current.Request.UserAgent;
+			wrd.AcceptLanguages = HttpContext.Current.Request.UserLanguages != null ? HttpContext.Current.Request.UserLanguages.Aggregate((a, b) => a + "," + b) : null;
+			wrd.Accept = HttpContext.Current.Request.AcceptTypes != null ? HttpContext.Current.Request.AcceptTypes.Aggregate((a, b) => a + "," + b) : null;
+			if (useSession)
+			{
+				try
+				{
+					wrd.WebSessionId = HttpContext.Current.Session != null ? HttpContext.Current.Session.SessionID : null;
+				}
+				catch
+				{
+					// Sometimes it just throws. Ignore it.
+				}
+			}
+			wrd.AppUserId = appUserId;
+			wrd.AppUserName = appUserName;
+
+			LogScope(FieldLogScopeType.WebRequestStart, null, wrd);
+		}
+
+		/// <summary>
+		/// Updates the active web request start scope log item with current data and writes it to
+		/// the log file.
+		/// </summary>
+		/// <param name="dnsLookup">true to look up the DNS name of the client host.</param>
+		/// <param name="useSession">true to access the Session, false to leave it alone.</param>
+		/// <param name="appUserId">The application-specific user ID, if available. null does not update an existing value.</param>
+		/// <param name="appUserName">The application-specific user name, if available. null does not update an existing value.</param>
+		public static void UpdateWebRequestStart(bool dnsLookup = false, bool useSession = false, string appUserId = null, string appUserName = null)
+		{
+			var currentWebRequestStartItem = HttpContext.Current.Items[HttpContextKey_WebRequestStartItem] as FieldLogScopeItem;
+			if (currentWebRequestStartItem == null)
+			{
+				FL.Error("FL.UpdateWebRequestStart: currentWebRequestStartItem = null; calling LogWebRequestStart instead");
+				LogWebRequestStart(dnsLookup, useSession, appUserId, appUserName);
+				return;
+			}
+			// Duplicate the previous scope item
+			FieldLogScopeItem newItem = new FieldLogScopeItem(currentWebRequestStartItem);
+			newItem.IsRepeated = true;
+			FieldLogWebRequestData newData = new FieldLogWebRequestData(currentWebRequestStartItem.WebRequestData);
+			newItem.WebRequestData = newData;
+			bool needRepeat = false;
+
+			if (dnsLookup)
+			{
+				DateTime t0 = FL.UtcNow;
+				try
+				{
+					System.Net.IPHostEntry ent = System.Net.Dns.GetHostEntry(HttpContext.Current.Request.UserHostAddress);
+					needRepeat |= newData.ClientHostName != ent.HostName;
+					newData.ClientHostName = ent.HostName;
+				}
+				catch
+				{
+					// Ignore errors and keep the IP address only
+				}
+				TimeSpan ts = FL.UtcNow - t0;
+				if (ts.TotalMilliseconds > 10)
+				{
+					FL.Notice("DNS reverse lookup took " + ts.TotalMilliseconds.ToString("0") + " ms", "IP address: " + newData.ClientAddress + "\nHost name: " + newData.ClientHostName);
+				}
+			}
+			if (useSession)
+			{
+				string newSessionId = null;
+				try
+				{
+					newSessionId = HttpContext.Current.Session != null ? HttpContext.Current.Session.SessionID : null;
+				}
+				catch
+				{
+					// Sometimes it just throws. Ignore it.
+				}
+				needRepeat |= newData.WebSessionId != newSessionId;
+				newData.WebSessionId = newSessionId;
+			}
+			if (appUserId != null)
+			{
+				needRepeat |= newData.AppUserId != appUserId;
+				newData.AppUserId = appUserId;
+			}
+			if (appUserName != null)
+			{
+				needRepeat |= newData.AppUserName != appUserName;
+				newData.AppUserName = appUserName;
+			}
+
+			// Only write to the log file if we actually have something new to say
+			if (needRepeat)
+			{
+				LogInternal(newItem);
+				// Remember this to not lose any data in further updates
+				HttpContext.Current.Items[HttpContextKey_WebRequestStartItem] = newItem;
+			}
+		}
+
+		/// <summary>
+		/// Writes a web request end scope log item to the log file.
+		/// </summary>
+		public static void LogWebRequestEnd()
+		{
+			string status = null;
+			if (HttpContext.Current != null && HttpContext.Current.Response != null)
+			{
+				status = HttpContext.Current.Response.Status;
+				if (!HttpContext.Current.Response.IsClientConnected)
+				{
+					status += " - Client has gone away";
+				}
+			}
+			LogScope(FieldLogScopeType.WebRequestEnd, status);
+		}
+
+		/// <summary>
+		/// Writes the HTTP POST data sent from the client to the log file, if the request method is
+		/// "POST".
+		/// </summary>
+		public static void LogWebPostData()
+		{
+			if (HttpContext.Current.Request.HttpMethod == "POST")
+			{
+				TraceData("POST data", HttpContext.Current.Request.Form);
+			}
+		}
+#endif
+
+		#endregion ASP.NET log methods
+
 		#region Item buffer methods
 
 		/// <summary>
@@ -2250,6 +2629,7 @@ namespace Unclassified.FieldLog
 					SendBuffers();
 				}
 				bool localConfigChanged = false;
+				bool readResult = false;
 				lock (sendThread)
 				{
 					if (sendThreadCancellationPending) break;
@@ -2271,7 +2651,7 @@ namespace Unclassified.FieldLog
 						bool wasSet = customLogFileBasePathSet;
 						customLogFileBasePathSet = false;
 						// Now read the new configuration
-						ReadLogConfiguration();
+						readResult = ReadLogConfiguration();
 						// If the custom path was set before this event, set it again so that
 						// TestLogPaths isn't blocked by it.
 						customLogFileBasePathSet = wasSet;
@@ -2285,7 +2665,7 @@ namespace Unclassified.FieldLog
 				}
 				if (localConfigChanged)
 				{
-					FL.Trace("FieldLog configuration file re-read");
+					FL.Trace("FieldLog configuration file re-read", "File name: " + configFileName + "\nResult: " + readResult);
 				}
 			}
 			// Send remaining buffers
@@ -2358,6 +2738,10 @@ namespace Unclassified.FieldLog
 		{
 			if (prefix == null) throw new ArgumentNullException("prefix");
 
+#if ASPNET
+			LogWebStart(Assembly.GetCallingAssembly());
+#endif
+
 			lock (customLogPathLock)
 			{
 				if (customLogFileBasePathSet)
@@ -2382,6 +2766,10 @@ namespace Unclassified.FieldLog
 		{
 			if (path == null) throw new ArgumentNullException("path");
 
+#if ASPNET
+			LogWebStart(Assembly.GetCallingAssembly());
+#endif
+
 			lock (customLogPathLock)
 			{
 				if (customLogFileBasePathSet)
@@ -2404,6 +2792,10 @@ namespace Unclassified.FieldLog
 		/// </remarks>
 		public static void AcceptLogFileBasePath()
 		{
+#if ASPNET
+			LogWebStart(Assembly.GetCallingAssembly());
+#endif
+
 			lock (customLogPathLock)
 			{
 				customLogFileBasePathSet = true;
@@ -2419,8 +2811,20 @@ namespace Unclassified.FieldLog
 		{
 			if (logFileBasePathSet) return true;
 
-			string execPath = Assembly.GetEntryAssembly() != null ? Assembly.GetEntryAssembly().Location : null;
+			string execPath = EntryAssemblyLocation;
 			string execFile = execPath != null ? Path.GetFileNameWithoutExtension(execPath) : null;
+			if (logDefaultDirOverride != null)
+			{
+				if (EntryAssemblyLocation != null)
+				{
+					execFile = Path.GetFileNameWithoutExtension(EntryAssemblyLocation);
+				}
+				else
+				{
+					execFile = "web";
+				}
+				execPath = Path.Combine(logDefaultDirOverride, execFile);
+			}
 			if (customLogFilePrefix != null)
 			{
 				execFile = customLogFilePrefix;
@@ -2505,10 +2909,19 @@ namespace Unclassified.FieldLog
 					System.Diagnostics.Trace.WriteLine("FieldLog info: Now writing to " + logFileBasePath);
 					return true;
 				}
+#if DEBUG
+				catch (Exception ex)
+				{
+					System.Diagnostics.Trace.WriteLine("FieldLog trace: Cannot write to " + logFileBasePath + ". " + ex.Message);
+					// Uncomment the following line to trace log path finding in the web server
+					//File.WriteAllText(@"c:\inetpub\wwwroot\test\App_Data\msg-" + FL.UtcNow.Ticks + "-error.txt", "execPath = " + execPath + "\n" + ex.ToString());
+				}
+#else
 				catch
 				{
 					// Something went wrong, we can't use this path. Try the next one.
 				}
+#endif
 				finally
 				{
 					i++;
@@ -2529,6 +2942,23 @@ namespace Unclassified.FieldLog
 			// NOTE: HashSet<T> would be better here, but it's not supported in .NET 2.0, so we're
 			//       using a Dictionary instead. And it's just as fast anyway.
 
+			// Remove duplicate LogStart scope items when writing items the first time.
+			// For ASP.NET, a second LogStart item is generated when we have more information about
+			// the running application, so the first item can be removed from the buffer.
+			int skipLogStartItems = 0;
+			if (!didDuplicateLogStartCheck)
+			{
+				foreach (FieldLogItem logItem in logItems)
+				{
+					FieldLogScopeItem scopeItem = logItem as FieldLogScopeItem;
+					if (scopeItem != null && scopeItem.Type == FieldLogScopeType.LogStart)
+					{
+						skipLogStartItems++;
+					}
+				}
+				didDuplicateLogStartCheck = true;
+			}
+
 			foreach (FieldLogItem logItem in logItems)
 			{
 				//System.Diagnostics.Trace.WriteLine("FieldLog.AppendLogItemsToFile: Process item " + logItem.ToString());
@@ -2537,7 +2967,16 @@ namespace Unclassified.FieldLog
 				FieldLogScopeItem scopeItem = logItem as FieldLogScopeItem;
 				if (scopeItem != null)
 				{
-					if (scopeItem.Type == FieldLogScopeType.Enter)
+					if (scopeItem.Type == FieldLogScopeType.LogStart)
+					{
+						skipLogStartItems--;
+						if (skipLogStartItems > 0)
+						{
+							// Removed by deduplication
+							continue;
+						}
+					}
+					else if (scopeItem.Type == FieldLogScopeType.Enter)
 					{
 						Stack<FieldLogScopeItem> stack;
 						if (!CurrentScopes.TryGetValue(scopeItem.ThreadId, out stack))
@@ -2562,6 +3001,14 @@ namespace Unclassified.FieldLog
 					else if (scopeItem.Type == FieldLogScopeType.ThreadEnd)
 					{
 						ThreadScopes.Remove(scopeItem.ThreadId);
+					}
+					else if (scopeItem.Type == FieldLogScopeType.WebRequestStart)
+					{
+						WebRequestScopes[scopeItem.WebRequestId] = scopeItem;
+					}
+					else if (scopeItem.Type == FieldLogScopeType.WebRequestEnd)
+					{
+						WebRequestScopes.Remove(scopeItem.WebRequestId);
 					}
 				}
 
@@ -2779,26 +3226,33 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Reads the log configuration from the file next to the executable file.
 		/// </summary>
-		private static void ReadLogConfiguration()
+		private static bool ReadLogConfiguration()
 		{
-			if (Assembly.GetEntryAssembly() == null)
+			if (EntryAssemblyLocation == null && configFileNameOverride == null)
 			{
-				// No entry assembly available, config file not supported
+				// No entry assembly file name available, config file not supported
 				ResetLogConfiguration();
-				return;
+				return false;
 			}
 
-			string configFileName = null;
+			configFileName = null;
 			try
 			{
-				string execPath = Assembly.GetEntryAssembly().Location;
-				string execDir = Path.GetDirectoryName(execPath);
-				string execFile = Path.GetFileNameWithoutExtension(execPath);
-				configFileName = Path.Combine(execDir, execFile + logConfigExtension);
+				if (configFileNameOverride != null)
+				{
+					configFileName = configFileNameOverride;
+				}
+				else
+				{
+					string execPath = EntryAssemblyLocation;
+					string execDir = Path.GetDirectoryName(execPath);
+					string execFile = Path.GetFileNameWithoutExtension(execPath);
+					configFileName = Path.Combine(execDir, execFile + logConfigExtension);
+				}
 
 				if (configFileWatcher == null)
 				{
-					configFileWatcher = new FileSystemWatcher(execDir, execFile + logConfigExtension);
+					configFileWatcher = new FileSystemWatcher(Path.GetDirectoryName(configFileName), Path.GetFileName(configFileName));
 					configFileWatcher.Changed += configFileWatcher_Event;
 					configFileWatcher.Created += configFileWatcher_Event;
 					configFileWatcher.EnableRaisingEvents = true;
@@ -2808,7 +3262,7 @@ namespace Unclassified.FieldLog
 
 				if (!File.Exists(configFileName))
 				{
-					return;
+					return false;
 				}
 
 				string configLogPath = null;
@@ -2832,13 +3286,23 @@ namespace Unclassified.FieldLog
 									{
 										if (!Path.IsPathRooted(value))
 										{
-											value = Path.Combine(execDir, value);
+											value = Path.Combine(Path.GetDirectoryName(configFileName), value);
 										}
 										configLogPath = value;
 									}
 									break;
 								case "maxfilesize":
-									maxFileSize = (int) ParseConfigNumber(value, maxFileSize);
+									long lng = ParseConfigNumber(value, maxFileSize);
+									// Interpret too large value as maximum, don't ignore overflow
+									// and get any meaningless (possibly negative) value
+									if (lng <= int.MaxValue)
+									{
+										maxFileSize = (int) lng;
+									}
+									else
+									{
+										maxFileSize = int.MaxValue;
+									}
 									// Don't come near the technical limit of 2 GiB due to Int32 file addressing
 									const int maxMaxFileSize = 1 * 1024 * 1024 * 1024; /* GiB */
 									if (maxFileSize > maxMaxFileSize)
@@ -2892,6 +3356,7 @@ namespace Unclassified.FieldLog
 						// Path already set elsewhere (close to impossible), ignore setting
 					}
 				}
+				return true;
 			}
 			catch (Exception ex)
 			{
@@ -2909,6 +3374,7 @@ namespace Unclassified.FieldLog
 				}
 				// Set all values to default
 				ResetLogConfiguration();
+				return false;
 			}
 		}
 
@@ -3054,24 +3520,45 @@ namespace Unclassified.FieldLog
 		{
 			get
 			{
-				if (Assembly.GetEntryAssembly() == null)
+				if (EntryAssembly == null)
 				{
 					return null;
 				}
-				object[] customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
+				object[] customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
 					return ((AssemblyInformationalVersionAttribute) customAttributes[0]).InformationalVersion;
 				}
-				customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyVersionAttribute), false);
+				customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyVersionAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
 					return ((AssemblyVersionAttribute) customAttributes[0]).Version;
 				}
-				customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false);
+				customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
 					return ((AssemblyFileVersionAttribute) customAttributes[0]).Version;
+				}
+				return null;
+			}
+		}
+
+		/// <summary>
+		/// Gets the assembly configuration of the current application from the
+		/// AssemblyConfigurationAttribute value, or null if none is set.
+		/// </summary>
+		public static string AppAsmConfiguration
+		{
+			get
+			{
+				if (EntryAssembly == null)
+				{
+					return null;
+				}
+				object[] customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyConfigurationAttribute), false);
+				if (customAttributes != null && customAttributes.Length > 0)
+				{
+					return ((AssemblyConfigurationAttribute) customAttributes[0]).Configuration;
 				}
 				return null;
 			}
@@ -3085,16 +3572,16 @@ namespace Unclassified.FieldLog
 		{
 			get
 			{
-				if (Assembly.GetEntryAssembly() == null)
+				if (EntryAssembly == null)
 				{
 					return null;
 				}
-				object[] customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyProductAttribute), false);
+				object[] customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyProductAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
 					return ((AssemblyProductAttribute) customAttributes[0]).Product;
 				}
-				customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
+				customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
 					return ((AssemblyTitleAttribute) customAttributes[0]).Title;
@@ -3111,11 +3598,11 @@ namespace Unclassified.FieldLog
 		{
 			get
 			{
-				if (Assembly.GetEntryAssembly() == null)
+				if (EntryAssembly == null)
 				{
 					return null;
 				}
-				object[] customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false);
+				object[] customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
 					return ((AssemblyDescriptionAttribute) customAttributes[0]).Description;
@@ -3132,11 +3619,11 @@ namespace Unclassified.FieldLog
 		{
 			get
 			{
-				if (Assembly.GetEntryAssembly() == null)
+				if (EntryAssembly == null)
 				{
 					return null;
 				}
-				object[] customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
+				object[] customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
 					return ((AssemblyCopyrightAttribute) customAttributes[0]).Copyright;

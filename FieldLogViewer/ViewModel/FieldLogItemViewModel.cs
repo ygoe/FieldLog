@@ -53,13 +53,15 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public FieldLogPriority Priority { get { return this.Item.Priority; } }
 		public Guid SessionId { get { return this.Item.SessionId; } }
 		public int ThreadId { get { return this.Item.ThreadId; } }
+		public uint WebRequestId { get { return this.Item.WebRequestId; } }
 		public string LogItemSourceFileName { get { return this.Item.LogItemSourceFileName; } }
 
 		public FieldLogScopeItemViewModel LastLogStartItem { get; set; }
+		public FieldLogScopeItemViewModel LastWebRequestStartItem { get; set; }
 
 		public string EventCounterAndSourceFile
 		{
-			get { return EventCounter + " in " + System.IO.Path.GetFileName(LogItemSourceFileName); }
+			get { return EventCounter + " in " + System.IO.Path.GetFileName(LogItemSourceFileName) + " (v" + item.FileFormatVersion + ")"; }
 		}
 
 		public string PrioTitle
@@ -157,6 +159,23 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				{
 					return Brushes.White;
 				}
+			}
+		}
+
+		public Visibility WebRequestIdVisibility
+		{
+			get { return WebRequestId != 0 ? Visibility.Visible : Visibility.Collapsed; }
+		}
+
+		/// <summary>
+		/// Gets the last 4 digits of the web request ID, and an empty string instead of 0.
+		/// </summary>
+		public string WebRequestIdString
+		{
+			get
+			{
+				if (WebRequestId != 0) return (WebRequestId % 10000).ToString();
+				return "";
 			}
 		}
 

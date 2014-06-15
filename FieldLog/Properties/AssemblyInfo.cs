@@ -31,10 +31,26 @@ using System.Runtime.InteropServices;
 // Informational version string, used for the About dialog, error reports and the setup script.
 // Can be any freely formatted string containing punctuation, letters and revision codes.
 // Should be set to the same value as AssemblyVersion if only the basic numbering scheme is applied.
-#if DEBUG
-[assembly: AssemblyInformationalVersion("{bmin:2014:4}.{commit:6}{!:+}-d")]
-#else
 [assembly: AssemblyInformationalVersion("{bmin:2014:4}.{commit:6}{!:+}")]
+
+#if NET20
+#if DEBUG
+[assembly: AssemblyConfiguration("Debug, NET20")]
+#else
+[assembly: AssemblyConfiguration("Release, NET20")]
+#endif
+#elif ASPNET
+#if DEBUG
+[assembly: AssemblyConfiguration("Debug, ASPNET40")]
+#else
+[assembly: AssemblyConfiguration("Release, ASPNET40")]
+#endif
+#else
+#if DEBUG
+[assembly: AssemblyConfiguration("Debug, NET40")]
+#else
+[assembly: AssemblyConfiguration("Release, NET40")]
+#endif
 #endif
 
 [assembly: ComVisible(false)]

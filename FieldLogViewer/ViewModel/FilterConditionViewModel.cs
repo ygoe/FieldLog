@@ -82,7 +82,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						"AvailableComparisons",
 						"ValueTextVisibility", "ValueListVisibility");
 					enableFilterChangedEvent = false;
-					// Set value to an acceptable default
+					// Set value to an acceptable default for enum columns
 					switch (column)
 					{
 						case FilterColumn.Type:
@@ -187,6 +187,17 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					case FilterColumn.EnvironmentUserName:
 					case FilterColumn.EnvironmentHostName:
 					case FilterColumn.EnvironmentEnvironmentVariables:
+					case FilterColumn.WebRequestRequestUrl:
+					case FilterColumn.WebRequestMethod:
+					case FilterColumn.WebRequestClientAddress:
+					case FilterColumn.WebRequestClientHostName:
+					case FilterColumn.WebRequestReferrer:
+					case FilterColumn.WebRequestUserAgent:
+					case FilterColumn.WebRequestAcceptLanguages:
+					case FilterColumn.WebRequestAccept:
+					case FilterColumn.WebRequestWebSessionId:
+					case FilterColumn.WebRequestAppUserId:
+					case FilterColumn.WebRequestAppUserName:
 						return new EnumerationExtension<FilterComparison>(typeof(UseForStringColumnAttribute)).ProvideTypedValue();
 
 					case FilterColumn.Type:
@@ -199,6 +210,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 					case FilterColumn.Priority:
 					case FilterColumn.ThreadId:
+					case FilterColumn.WebRequestId:
 					case FilterColumn.ExceptionCode:
 					case FilterColumn.ScopeLevel:
 					case FilterColumn.EnvironmentProcessId:
@@ -209,6 +221,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					case FilterColumn.EnvironmentTotalMemory:
 					case FilterColumn.EnvironmentAvailableMemory:
 					case FilterColumn.EnvironmentScreenDpi:
+					case FilterColumn.WebRequestDuration:
 						return new EnumerationExtension<FilterComparison>(typeof(UseForNumberColumnAttribute)).ProvideTypedValue();
 
 					case FilterColumn.ScopeIsBackgroundThread:
@@ -232,6 +245,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					case FilterColumn.Time:
 					case FilterColumn.SessionId:
 					case FilterColumn.ThreadId:
+					case FilterColumn.WebRequestId:
 					case FilterColumn.AnyText:
 					case FilterColumn.TextText:
 					case FilterColumn.TextDetails:
@@ -258,6 +272,18 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					case FilterColumn.EnvironmentAvailableMemory:
 					case FilterColumn.EnvironmentScreenDpi:
 					case FilterColumn.EnvironmentEnvironmentVariables:
+					case FilterColumn.WebRequestRequestUrl:
+					case FilterColumn.WebRequestMethod:
+					case FilterColumn.WebRequestClientAddress:
+					case FilterColumn.WebRequestClientHostName:
+					case FilterColumn.WebRequestReferrer:
+					case FilterColumn.WebRequestUserAgent:
+					case FilterColumn.WebRequestAcceptLanguages:
+					case FilterColumn.WebRequestAccept:
+					case FilterColumn.WebRequestWebSessionId:
+					case FilterColumn.WebRequestAppUserId:
+					case FilterColumn.WebRequestAppUserName:
+					case FilterColumn.WebRequestDuration:
 						return Visibility.Visible;
 					default:
 						return Visibility.Hidden;
@@ -366,6 +392,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			DebugMessageViewModel dbgMsg = null;
 			FieldLogEventEnvironment env = null;
 			FieldLogEventEnvironment envFallback = null;
+			FieldLogWebRequestData webRequestData = null;
 
 			// Negation must be handled after all field comparisons are done because the negation
 			// may need logical parentheses around the rest of the expression. All type-specific
@@ -416,6 +443,11 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					if (flItem != null)
 						result = CompareInt(flItem.ThreadId);
 					break;
+				case FilterColumn.WebRequestId:
+					flItem = item as FieldLogItemViewModel;
+					if (flItem != null)
+						result = CompareLong(flItem.WebRequestId);
+					break;
 				case FilterColumn.AnyText:
 					textItem = item as FieldLogTextItemViewModel;
 					if (textItem == null)
@@ -428,6 +460,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						dbgMsg = item as DebugMessageViewModel;
 					env = GetEnvironmentFromItem(item, false);
 					envFallback = GetEnvironmentFromItem(item, true);
+					webRequestData = GetWebRequestDataFromItem(item);
 
 					bool envFallbackResult = envFallback != null &&
 						(CompareString(envFallback.ProcessId.ToString()) ||
@@ -436,16 +469,30 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						CompareString(envFallback.UserName) ||
 						CompareString(envFallback.HostName));
 
+					bool webRequestDataResult = webRequestData != null &&
+						(CompareString(webRequestData.RequestUrl) ||
+						CompareString(webRequestData.ClientAddress) ||
+						CompareString(webRequestData.ClientHostName) ||
+						CompareString(webRequestData.Referrer) ||
+						CompareString(webRequestData.UserAgent) ||
+						CompareString(webRequestData.AcceptLanguages) ||
+						CompareString(webRequestData.Accept) ||
+						CompareString(webRequestData.WebSessionId) ||
+						CompareString(webRequestData.AppUserId) ||
+						CompareString(webRequestData.AppUserName));
+
 					if (textItem != null)
 						result = CompareString(textItem.SessionId.ToString("D")) ||
 							CompareString(textItem.Text) ||
 							CompareString(textItem.Details) ||
-							envFallbackResult;
+							envFallbackResult ||
+							webRequestDataResult;
 					else if (dataItem != null)
 						result = CompareString(dataItem.SessionId.ToString("D")) ||
 							CompareString(dataItem.Name) ||
 							CompareString(dataItem.Value) ||
-							envFallbackResult;
+							envFallbackResult ||
+							webRequestDataResult;
 					else if (exItem != null)
 						result = CompareString(exItem.SessionId.ToString("D")) ||
 							CompareString(exItem.Context) ||
@@ -456,7 +503,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 								(CompareString(env.CurrentDirectory) ||
 								CompareString(env.CultureName) ||
 								CompareString(env.EnvironmentVariables)) ||
-							envFallbackResult;
+							envFallbackResult ||
+							webRequestDataResult;
 					else if (scopeItem != null)
 						result = CompareString(scopeItem.SessionId.ToString("D")) ||
 							CompareString(scopeItem.Name) ||
@@ -464,7 +512,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 								(CompareString(env.CurrentDirectory) ||
 								CompareString(env.CultureName) ||
 								CompareString(env.EnvironmentVariables)) ||
-							envFallbackResult;
+							envFallbackResult ||
+							webRequestDataResult;
 					else if (dbgMsg != null)
 						result = CompareString(dbgMsg.Message);
 					break;
@@ -638,6 +687,69 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					if (env != null)
 						result = CompareString(env.EnvironmentVariables);
 					break;
+
+				case FilterColumn.WebRequestRequestUrl:
+					webRequestData = GetWebRequestDataFromItem(item);
+					if (webRequestData != null)
+						result = CompareString(webRequestData.RequestUrl);
+					break;
+				case FilterColumn.WebRequestMethod:
+					webRequestData = GetWebRequestDataFromItem(item);
+					if (webRequestData != null)
+						result = CompareString(webRequestData.Method);
+					break;
+				case FilterColumn.WebRequestClientAddress:
+					webRequestData = GetWebRequestDataFromItem(item);
+					if (webRequestData != null)
+						result = CompareString(webRequestData.ClientAddress);
+					break;
+				case FilterColumn.WebRequestClientHostName:
+					webRequestData = GetWebRequestDataFromItem(item);
+					if (webRequestData != null)
+						result = CompareString(webRequestData.ClientHostName);
+					break;
+				case FilterColumn.WebRequestReferrer:
+					webRequestData = GetWebRequestDataFromItem(item);
+					if (webRequestData != null)
+						result = CompareString(webRequestData.Referrer);
+					break;
+				case FilterColumn.WebRequestUserAgent:
+					webRequestData = GetWebRequestDataFromItem(item);
+					if (webRequestData != null)
+						result = CompareString(webRequestData.UserAgent);
+					break;
+				case FilterColumn.WebRequestAcceptLanguages:
+					webRequestData = GetWebRequestDataFromItem(item);
+					if (webRequestData != null)
+						result = CompareString(webRequestData.AcceptLanguages);
+					break;
+				case FilterColumn.WebRequestAccept:
+					webRequestData = GetWebRequestDataFromItem(item);
+					if (webRequestData != null)
+						result = CompareString(webRequestData.Accept);
+					break;
+				case FilterColumn.WebRequestWebSessionId:
+					webRequestData = GetWebRequestDataFromItem(item);
+					if (webRequestData != null)
+						result = CompareString(webRequestData.WebSessionId);
+					break;
+				case FilterColumn.WebRequestAppUserId:
+					webRequestData = GetWebRequestDataFromItem(item);
+					if (webRequestData != null)
+						result = CompareString(webRequestData.AppUserId);
+					break;
+				case FilterColumn.WebRequestAppUserName:
+					webRequestData = GetWebRequestDataFromItem(item);
+					if (webRequestData != null)
+						result = CompareString(webRequestData.AppUserName);
+					break;
+				case FilterColumn.WebRequestDuration:
+					flItem = item as FieldLogItemViewModel;
+					if (flItem != null && flItem.LastWebRequestStartItem != null)
+					{
+						result = CompareInt((int) Math.Round(flItem.LastWebRequestStartItem.WebRequestDataVM.RequestDuration.TotalMilliseconds));
+					}
+					break;
 			}
 
 			if (negate)
@@ -681,6 +793,33 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			if (FieldLogEventEnvironment.IsNullOrEmpty(env))
 				env = null;
 			return env;
+		}
+
+		/// <summary>
+		/// Finds the web request data instance in the specified item.
+		/// </summary>
+		/// <param name="item">The item to search.</param>
+		/// <returns>The FieldLogWebRequestData instance if it is not null or Empty; otherwise, null.</returns>
+		private FieldLogWebRequestData GetWebRequestDataFromItem(object item)
+		{
+			FieldLogItemViewModel flItem = null;
+			FieldLogScopeItemViewModel scopeItem = null;
+
+			scopeItem = item as FieldLogScopeItemViewModel;
+			if (scopeItem == null || FieldLogWebRequestData.IsNullOrEmpty(scopeItem.WebRequestDataVM.WebRequestData))
+			{
+				flItem = item as FieldLogItemViewModel;
+				if (flItem != null)
+					scopeItem = flItem.LastWebRequestStartItem;
+			}
+
+			FieldLogWebRequestData webRequestData = null;
+			if (scopeItem != null && !FieldLogWebRequestData.IsNullOrEmpty(scopeItem.WebRequestDataVM.WebRequestData))
+				webRequestData = scopeItem.WebRequestDataVM.WebRequestData;
+
+			if (FieldLogWebRequestData.IsNullOrEmpty(webRequestData))
+				webRequestData = null;
+			return webRequestData;
 		}
 
 		private bool CompareTime(DateTime time, int utcOffset)
@@ -1144,6 +1283,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		SessionId,
 		[Description("Thread ID")]
 		ThreadId,
+		[Description("Web request ID")]
+		WebRequestId,
 
 		[Description("Text: Text message")]
 		TextText,
@@ -1213,6 +1354,31 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		EnvironmentScreenDpi,
 		[Description("Env: Environment vars")]
 		EnvironmentEnvironmentVariables,
+
+		[Description("Web: Request URL")]
+		WebRequestRequestUrl,
+		[Description("Web: Method")]
+		WebRequestMethod,
+		[Description("Web: Client address")]
+		WebRequestClientAddress,
+		[Description("Web: Client host name")]
+		WebRequestClientHostName,
+		[Description("Web: Referrer")]
+		WebRequestReferrer,
+		[Description("Web: User agent")]
+		WebRequestUserAgent,
+		[Description("Web: Languages")]
+		WebRequestAcceptLanguages,
+		[Description("Web: Accepted types")]
+		WebRequestAccept,
+		[Description("Web: Session ID")]
+		WebRequestWebSessionId,
+		[Description("Web: App user ID")]
+		WebRequestAppUserId,
+		[Description("Web: App user name")]
+		WebRequestAppUserName,
+		[Description("Web: Request duration [ms]")]
+		WebRequestDuration,
 	}
 
 	enum FilterComparison
@@ -1338,6 +1504,10 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		ThreadStart,
 		[Description("ThreadEnd")]
 		ThreadEnd,
+		[Description("WebRequestStart")]
+		WebRequestStart,
+		[Description("WebRequestEnd")]
+		WebRequestEnd,
 		[Description("LogStart")]
 		LogStart,
 		[Description("LogShutdown")]

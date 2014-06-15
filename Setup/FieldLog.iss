@@ -110,14 +110,23 @@ Source: "..\FieldLogViewer\bin\Release\FieldLogViewer.exe"; DestDir: "{app}"; Fl
 Source: "..\FieldLogViewer\bin\Release\InTheHand.Net.Personal.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\FieldLogViewer\bin\Release\TaskDialog.dll"; DestDir: "{app}"; Flags: ignoreversion
 ;Source: "..\FieldLog Documentation.pdf"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\FieldLogViewer\bin\Release\Unclassified.FieldLog.dll"; DestDir: "{app}"; Flags: ignoreversion
+; This is the signed version of the DLL:
+Source: "..\FieldLog\bin\ReleaseNET40\Unclassified.FieldLog.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\FieldLog\FileFormat.html"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\FieldLogViewer\bin\Release\Sounds\*.mp3"; DestDir: "{app}\Sounds"; Flags: ignoreversion
+; Include the converted .pdb symbols to keep them archived and available for future analysis (not required on the target system though)
+Source: "..\FieldLogViewer\bin\Release\FieldLogViewer.pdb.xml.gz"; DestDir: "{app}"; Flags: ignoreversion
+
+; PdbConvert tool
+Source: "..\PdbConvert\bin\Release\PdbConvert.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 ; FieldLog assembly
-Source: "..\FieldLog\bin\Release\Unclassified.FieldLog.dll"; DestDir: "{app}\FieldLog assembly (.NET 4.0)"; Flags: ignoreversion
-Source: "..\FieldLog\bin\Release\Unclassified.FieldLog.xml"; DestDir: "{app}\FieldLog assembly (.NET 4.0)"; Flags: ignoreversion
+Source: "..\FieldLog\bin\ReleaseNET40\Unclassified.FieldLog.dll"; DestDir: "{app}\FieldLog assembly (.NET 4.0)"; Flags: ignoreversion
+Source: "..\FieldLog\bin\ReleaseNET40\Unclassified.FieldLog.xml"; DestDir: "{app}\FieldLog assembly (.NET 4.0)"; Flags: ignoreversion
 Source: "..\FieldLog\bin\ReleaseNET20\Unclassified.FieldLog.dll"; DestDir: "{app}\FieldLog assembly (.NET 2.0)"; Flags: ignoreversion
 Source: "..\FieldLog\bin\ReleaseNET20\Unclassified.FieldLog.xml"; DestDir: "{app}\FieldLog assembly (.NET 2.0)"; Flags: ignoreversion
+Source: "..\FieldLog\bin\ReleaseASPNET40\Unclassified.FieldLog.dll"; DestDir: "{app}\FieldLog assembly (ASP.NET 4.0)"; Flags: ignoreversion
+Source: "..\FieldLog\bin\ReleaseASPNET40\Unclassified.FieldLog.xml"; DestDir: "{app}\FieldLog assembly (ASP.NET 4.0)"; Flags: ignoreversion
 
 ; FieldLog source code
 Source: "..\FieldLog\CheckTimeThread.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
@@ -130,6 +139,7 @@ Source: "..\FieldLog\FieldLogFileGroupReader.cs"; DestDir: "{app}\FieldLog sourc
 Source: "..\FieldLog\FieldLogFileReader.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
 Source: "..\FieldLog\FieldLogFileWriter.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
 Source: "..\FieldLog\FieldLogTraceListener.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
+Source: "..\FieldLog\FieldLogWebRequestData.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
 Source: "..\FieldLog\FL.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
 Source: "..\FieldLog\LogItems.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
 Source: "..\FieldLog\OSInfo.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
@@ -161,6 +171,7 @@ Name: "{group}\FieldLogViewer"; Filename: "{app}\FieldLogViewer.exe"; IconFilena
 Name: "{group}\FieldLog website"; Filename: "http://dev.unclassified.de/source/fieldlog"
 Name: "{group}\FieldLog assembly (.NET 4.0)"; Filename: "{app}\FieldLog assembly (.NET 4.0)\"
 Name: "{group}\FieldLog assembly (.NET 2.0)"; Filename: "{app}\FieldLog assembly (.NET 2.0)\"
+Name: "{group}\FieldLog assembly (ASP.NET 4.0)"; Filename: "{app}\FieldLog assembly (ASP.NET 4.0)\"
 Name: "{group}\FieldLog source code"; Filename: "{app}\FieldLog source code\"
 
 [Run]

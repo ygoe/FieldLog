@@ -72,12 +72,12 @@ namespace Unclassified.FieldLog
 
 				// Check for UTC time changes
 				TimeSpan offset = DateTime.UtcNow - FL.UtcNow;
-				if (Math.Abs(offset.TotalMilliseconds) > 100)
+				if (Math.Abs(offset.TotalMilliseconds) >= 250)
 				{
 					FL.RebaseTime();
 
 					string msg = "System time changed by " + offset.TotalMilliseconds.ToString("0.0", CultureInfo.InvariantCulture) + " ms";
-					FL.Notice(msg);
+					FL.Notice(msg, "Changes less than 250 ms are not reported.");
 					Debug.WriteLine(msg);
 				}
 				

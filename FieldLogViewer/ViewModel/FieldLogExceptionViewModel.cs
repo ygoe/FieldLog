@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using Unclassified.FieldLog;
+using Unclassified.Util;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
@@ -14,11 +15,11 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			this.Exception = exception;
 			if (this.Exception.StackFrames != null)
 			{
-				this.StackFrameVMs = this.Exception.StackFrames.Select(sf => new FieldLogStackFrameViewModel(sf));
+				this.StackFrameVMs = this.Exception.StackFrames.Select(sf => new FieldLogStackFrameViewModel(sf)).ToList();
 			}
 			if (this.Exception.InnerExceptions != null)
 			{
-				this.InnerExceptionVMs = this.Exception.InnerExceptions.Select(ie => new FieldLogExceptionViewModel(ie));
+				this.InnerExceptionVMs = this.Exception.InnerExceptions.Select(ie => new FieldLogExceptionViewModel(ie)).ToList();
 			}
 		}
 
@@ -45,6 +46,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			{
 				return this.Exception.InnerExceptions.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
 			}
+		}
+
+		public void Refresh()
+		{
+			if (StackFrameVMs != null) StackFrameVMs.ForEach(vm => vm.Refresh());
+			if (InnerExceptionVMs != null) InnerExceptionVMs.ForEach(vm => vm.Refresh());
 		}
 	}
 }

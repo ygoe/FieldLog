@@ -107,14 +107,16 @@
     </Page>
     <Compile Include="AppSettings.cs" />
     <Compile Include="Converters\IndentLevelToWidthConverter.cs" />
+    <Compile Include="Converters\SameWebRequestBrushConverter.cs" />
     <Compile Include="Converters\ListItemsConverter.cs" />
     <Compile Include="Converters\RelativeTimeConverter.cs" />
     <Compile Include="Converters\SameThreadBrushConverter.cs" />
-    <Compile Include="Extensions.cs" />
+    <Compile Include="SourceResolver.cs" />
     <Compile Include="Unclassified\Util\GlobalMutex.cs" />
     <Compile Include="Unclassified\Util\DebugMonitor.cs" />
     <Compile Include="Unclassified\Util\DelayedCall.cs" />
     <Compile Include="Unclassified\Util\ListExtensions.cs" />
+    <Compile Include="Unclassified\Util\MediaExtensions.cs" />
     <Compile Include="Unclassified\Util\PropertyExtensions.cs" />
     <Compile Include="Unclassified\Util\Settings.cs" />
     <Compile Include="Unclassified\Util\StringExtensions.cs" />
@@ -144,6 +146,7 @@
     <Compile Include="ViewModel\FilterConditionViewModel.cs" />
     <Compile Include="ViewModel\FilterViewModel.cs" />
     <Compile Include="ViewModel\FieldLogEnvironmentViewModel.cs" />
+    <Compile Include="ViewModel\FieldLogWebRequestDataViewModel.cs" />
     <Compile Include="ViewModel\LogItemViewModelBase.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\SettingsViewModel.cs" />
@@ -168,6 +171,9 @@
     </Compile>
     <Compile Include="View\FieldLogEnvironmentView.xaml.cs">
       <DependentUpon>FieldLogEnvironmentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\FieldLogWebRequestDataView.xaml.cs">
+      <DependentUpon>FieldLogWebRequestDataView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -219,6 +225,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="View\FieldLogWebRequestDataView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="View\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -256,12 +266,6 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\FieldLog\FieldLog.csproj">
-      <Project>{5024F0F3-092C-414A-94C6-36764C4D42EA}</Project>
-      <Name>FieldLog</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\DataItem_14.png" />
@@ -317,9 +321,6 @@
     <Resource Include="Images\event.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\association.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\pin.png" />
   </ItemGroup>
   <ItemGroup>
@@ -330,6 +331,10 @@
     <Resource Include="Images\indent_plus.png" />
     <Resource Include="Images\flash.png" />
     <Resource Include="Images\filter_delete.png" />
+    <Resource Include="Images\ScopeItem_WebRequestEnd_14.png" />
+    <Resource Include="Images\ScopeItem_WebRequestStart_14.png" />
+    <Resource Include="Images\ghost.png" />
+    <Resource Include="Images\pdb-file.png" />
     <Content Include="Sounds\high.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -343,7 +348,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\FieldLog\FieldLog.NET40.csproj">
+      <Project>{5024F0F3-092C-414A-94C6-36764C4D42EA}</Project>
+      <Name>FieldLog.NET40</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>if not defined FASTBUILD "$(SolutionDir)\_tools\GitRevisionTool.exe" -ai "$(ProjectDir)"</PreBuildEvent>

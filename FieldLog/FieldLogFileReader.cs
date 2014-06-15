@@ -79,10 +79,10 @@ namespace Unclassified.FieldLog
 			bytes = ReadBytes(1);
 			if (bytes == null)
 				throw new FormatException("Invalid log file. Header too short.");
-			int formatVersion = bytes[0];
-			if (formatVersion != FL.FileFormatVersion)
+			FormatVersion = bytes[0];
+			if (FormatVersion > FL.FileFormatVersion)
 			{
-				throw new FormatException("Invalid log file. Unsupported file format version " + formatVersion + ", expecting " + FL.FileFormatVersion + ".");
+				throw new FormatException("Invalid log file. Unsupported file format version " + FormatVersion + ", expecting at most " + FL.FileFormatVersion + ".");
 			}
 
 			startPosition = fileStream.Position;
@@ -96,6 +96,11 @@ namespace Unclassified.FieldLog
 		/// Gets the name of the log file.
 		/// </summary>
 		public string FileName { get; private set; }
+
+		/// <summary>
+		/// Gets the format version of the log file.
+		/// </summary>
+		public int FormatVersion { get; private set; }
 
 		/// <summary>
 		/// Gets or sets a value indicating whether a read operation should wait until all

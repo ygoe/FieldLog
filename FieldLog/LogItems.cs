@@ -13,10 +13,14 @@
 // library. If not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Threading;
+#if ASPNET
+using System.Web;
+#endif
 
 namespace Unclassified.FieldLog
 {
@@ -40,11 +44,17 @@ namespace Unclassified.FieldLog
 		public Guid SessionId { get; private set; }
 		/// <summary>Gets the current thread ID of the log item.</summary>
 		public int ThreadId { get; private set; }
+		/// <summary>Gets the current web request ID of the log item.</summary>
+		public uint WebRequestId { get; private set; }
 
 		/// <summary>
 		/// Gets the name of the file from which this log item was read, if any.
 		/// </summary>
 		public string LogItemSourceFileName { get; private set; }
+		/// <summary>
+		/// Gets the file format version from which the item was read.
+		/// </summary>
+		public int FileFormatVersion { get; private set; }
 
 		/// <summary>
 		/// Initialises a new instance of the FieldLogItem class with Trace priority.
@@ -68,8 +78,35 @@ namespace Unclassified.FieldLog
 				FL.ThreadId = Thread.CurrentThread.ManagedThreadId;
 			}
 			ThreadId = FL.ThreadId;
+#if ASPNET
+			if (HttpContext.Current != null)
+			{
+				object value = HttpContext.Current.Items[FL.HttpContextKey_WebRequestId];
+				if (value is uint)
+				{
+					WebRequestId = (uint) value;
+				}
+			}
+#endif
 
-			Size = 4 + 4 + 8 + 4 + 16 + 4;
+			Size = 4 + 4 + 8 + 4 + 16 + 4 + 4 + 4 + 4;
+		}
+
+		/// <summary>
+		/// Copy constructor.
+		/// </summary>
+		/// <param name="source">The FieldLogItem instance to copy from.</param>
+		protected FieldLogItem(FieldLogItem source)
+		{
+			Size = source.Size;
+			EventCounter = source.EventCounter;
+			Time = source.Time;
+			Priority = source.Priority;
+			SessionId = source.SessionId;
+			ThreadId = source.ThreadId;
+			WebRequestId = source.WebRequestId;
+			LogItemSourceFileName = source.LogItemSourceFileName;
+			FileFormatVersion = source.FileFormatVersion;
 		}
 
 		/// <summary>
@@ -93,6 +130,7 @@ namespace Unclassified.FieldLog
 			writer.AddBuffer((byte) Priority);
 			writer.AddBuffer(SessionId.ToByteArray());
 			writer.AddBuffer(ThreadId);
+			writer.AddBuffer(WebRequestId);
 		}
 
 		internal static FieldLogItem Read(FieldLogFileReader reader, FieldLogItemType type)
@@ -119,11 +157,16 @@ namespace Unclassified.FieldLog
 		protected void ReadBaseData(FieldLogFileReader reader)
 		{
 			LogItemSourceFileName = reader.FileName;
+			FileFormatVersion = reader.FormatVersion;
 			Time = new DateTime(reader.ReadInt64(), DateTimeKind.Utc);
 			EventCounter = reader.ReadInt32();
 			Priority = (FieldLogPriority) reader.ReadByte();
 			SessionId = new Guid(reader.ReadBytes(16));
 			ThreadId = reader.ReadInt32();
+			if (reader.FormatVersion >= 2)
+			{
+				WebRequestId = reader.ReadUInt32();
+			}
 		}
 	}
 
@@ -352,25 +395,42 @@ namespace Unclassified.FieldLog
 			}
 			sb.Append("{");
 			int count = 0;
-			foreach (var property in data.GetType().GetProperties())
+			NameValueCollection nvc = data as NameValueCollection;
+			if (nvc != null)
 			{
-				if (count++ > 0) sb.Append(",");
-				sb.AppendLine();
-				sb.Append(indent);
-				sb.Append("\t");
-				sb.Append(property.Name);
-				sb.Append(": ");
-				sb.Append(FormatValues(property.GetValue(data, null), level + 1));
+				foreach (var key in nvc.AllKeys)
+				{
+					if (count++ > 0) sb.Append(",");
+					sb.AppendLine();
+					sb.Append(indent);
+					sb.Append("\t");
+					sb.Append(key);
+					sb.Append(": ");
+					sb.Append(FormatValues(nvc[key], level + 1));
+				}
 			}
-			foreach (var field in data.GetType().GetFields())
+			else
 			{
-				if (count++ > 0) sb.Append(",");
-				sb.AppendLine();
-				sb.Append(indent);
-				sb.Append("\t");
-				sb.Append(field.Name);
-				sb.Append(": ");
-				sb.Append(FormatValues(field.GetValue(data), level + 1));
+				foreach (var property in data.GetType().GetProperties())
+				{
+					if (count++ > 0) sb.Append(",");
+					sb.AppendLine();
+					sb.Append(indent);
+					sb.Append("\t");
+					sb.Append(property.Name);
+					sb.Append(": ");
+					sb.Append(FormatValues(property.GetValue(data, null), level + 1));
+				}
+				foreach (var field in data.GetType().GetFields())
+				{
+					if (count++ > 0) sb.Append(",");
+					sb.AppendLine();
+					sb.Append(indent);
+					sb.Append("\t");
+					sb.Append(field.Name);
+					sb.Append(": ");
+					sb.Append(FormatValues(field.GetValue(data), level + 1));
+				}
 			}
 			sb.AppendLine();
 			sb.Append(indent);
@@ -536,6 +596,13 @@ namespace Unclassified.FieldLog
 		public bool IsPoolThread { get; private set; }
 		/// <summary>Gets the process static environment data. (Only valid when entering a process scope.)</summary>
 		public FieldLogEventEnvironment EnvironmentData { get; private set; }
+		/// <summary>Gets or sets the web request data. (Only valid when starting a web request scope.)</summary>
+		/// <remarks>
+		/// Write access is used in FL.UpdateWebRequestStart and in FieldLogViewer when updating
+		/// from a repeated scope item. The <see cref="FieldLogItem.Size"/> value is not updated
+		/// when this data is changed.
+		/// </remarks>
+		public FieldLogWebRequestData WebRequestData { get; set; }
 
 		/// <summary>
 		/// Gets or sets a value whether this item has already been written to a log file. Items
@@ -572,6 +639,18 @@ namespace Unclassified.FieldLog
 		/// <param name="type">The scope type.</param>
 		/// <param name="name">The scope name.</param>
 		public FieldLogScopeItem(FieldLogPriority priority, FieldLogScopeType type, string name)
+			: this(FieldLogPriority.Trace, type, name, null)
+		{
+		}
+
+		/// <summary>
+		/// Initialises a new instance of the FieldLogExceptionItem class.
+		/// </summary>
+		/// <param name="priority">The priority of the new log item.</param>
+		/// <param name="type">The scope type.</param>
+		/// <param name="name">The scope name.</param>
+		/// <param name="webRequestData">The web request data. This parameter is required for the WebRequestStart scope type.</param>
+		public FieldLogScopeItem(FieldLogPriority priority, FieldLogScopeType type, string name, FieldLogWebRequestData webRequestData)
 			: base(priority)
 		{
 			Type = type;
@@ -590,10 +669,35 @@ namespace Unclassified.FieldLog
 				EnvironmentData = FieldLogEventEnvironment.Current();
 				Size += EnvironmentData.Size;
 			}
+			if (Type == FieldLogScopeType.WebRequestStart)
+			{
+				if (webRequestData == null) throw new ArgumentNullException("webRequestData", "The webRequestData parameter is required for the WebRequestStart scope type.");
+				WebRequestData = webRequestData;
+				Size += WebRequestData.Size;
+			}
 
 			Size += 4 + 4 +
 				(Name != null ? Name.Length * 2 : 0) +
 				4 + 4 + 4 + 4 + 4;
+		}
+
+		/// <summary>
+		/// Copy constructor.
+		/// </summary>
+		/// <param name="source">The FieldLogScopeItem instance to copy from.</param>
+		internal FieldLogScopeItem(FieldLogScopeItem source)
+			: base(source)
+		{
+			Type = source.Type;
+			Level = source.Level;
+			Name = source.Name;
+			IsBackgroundThread = source.IsBackgroundThread;
+			IsPoolThread = source.IsPoolThread;
+			EnvironmentData = source.EnvironmentData;
+			WebRequestData = source.WebRequestData;
+			WasWritten = source.WasWritten;
+			IsRepeated = source.IsRepeated;
+			Thread = source.Thread;
 		}
 
 		/// <summary>
@@ -629,6 +733,10 @@ namespace Unclassified.FieldLog
 			{
 				EnvironmentData.Write(writer);
 			}
+			if (Type == FieldLogScopeType.WebRequestStart)
+			{
+				WebRequestData.Write(writer);
+			}
 
 			writer.WriteBuffer();
 		}
@@ -656,6 +764,10 @@ namespace Unclassified.FieldLog
 			if (item.Type == FieldLogScopeType.LogStart)
 			{
 				item.EnvironmentData = FieldLogEventEnvironment.Read(reader);
+			}
+			if (item.Type == FieldLogScopeType.WebRequestStart && reader.FormatVersion >= 2)
+			{
+				item.WebRequestData = FieldLogWebRequestData.Read(reader);
 			}
 			return item;
 		}

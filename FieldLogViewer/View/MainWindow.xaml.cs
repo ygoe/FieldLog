@@ -52,6 +52,7 @@ namespace Unclassified.FieldLogViewer.View
 		private bool isFlashing;
 		private bool isScrollAnimationPosted;
 		private DelayedCall updateScrollmapDc;
+		private bool scrollmapUpdatePending;
 
 		#endregion Private data
 
@@ -141,6 +142,19 @@ namespace Unclassified.FieldLogViewer.View
 			InvalidateScrollmap();
 		}
 
+		private void Window_Activated(object sender, EventArgs e)
+		{
+			if (isFlashing)
+			{
+				this.StopFlashing();
+				isFlashing = false;
+			}
+		}
+
+		private void Window_Deactivated(object sender, EventArgs e)
+		{
+		}
+
 		private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
 		{
 		}
@@ -177,6 +191,11 @@ namespace Unclassified.FieldLogViewer.View
 		private void SmoothVirtualizingPanel_Loaded(object sender, RoutedEventArgs e)
 		{
 			logItemsHostPanel = sender as SmoothVirtualizingPanel;
+			if (scrollmapUpdatePending)
+			{
+				scrollmapUpdatePending = false;
+				UpdateScrollmap();
+			}
 		}
 
 		private void LogItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -215,7 +234,6 @@ namespace Unclassified.FieldLogViewer.View
 						newItemMediaPlayer.Play();
 					}
 				}
-				
 				prevItemTime = DateTime.UtcNow;
 			}
 		}
@@ -289,15 +307,26 @@ namespace Unclassified.FieldLogViewer.View
 		private void logItemsScroll_ScrollChanged(object sender, ScrollChangedEventArgs e)
 		{
 			bool cond = logItemsScroll.VerticalOffset >= logItemsScroll.ScrollableHeight - 50;
-			if (e.VerticalChange >= 0)
+			// e.VerticalChange can actually be 0, so test for positive and negative values explicitly
+			if (e.VerticalChange > 0)
 			{
 				// Scrolled down, can only set flag if in range
 				logItemsScrolledNearEnd |= cond;
 			}
-			else
+			else if (e.VerticalChange < 0)
 			{
 				// Scrolled up, can only clear flag if out of range
 				logItemsScrolledNearEnd &= cond;
+
+				// Stop the scroll animation immediately when scrolling up
+				if (DependencyPropertyHelper.GetValueSource(logItemsScrollMediator, ScrollViewerOffsetMediator.VerticalOffsetProperty).IsAnimated)
+				{
+					if (logItemsScrollMediator != null)   // Should always be true here
+					{
+						logItemsScrollMediator.StopDoubleAnimation(ScrollViewerOffsetMediator.VerticalOffsetProperty);
+						logItemsScrollPixelDc.Fire();
+					}
+				}
 			}
 		}
 
@@ -328,7 +357,13 @@ namespace Unclassified.FieldLogViewer.View
 
 		private void UpdateScrollmap()
 		{
-			if (logItemsHostPanel == null) return;
+			if (logItemsHostPanel == null)
+			{
+				// SmoothVirtualizingPanel_Loaded wasn't called yet. Remember to update the scroll
+				// map when it will be called.
+				scrollmapUpdatePending = true;
+				return;
+			}
 			if (logItemsScroll == null) return;
 
 			bool showWarningsErrors = AppSettings.Instance.ShowWarningsErrorsInScrollBar;
@@ -450,7 +485,7 @@ namespace Unclassified.FieldLogViewer.View
 			{
 				logItemsHostPanel.UpdateLayout();
 			}
-			ScrollToEnd();
+			CheckScrollToEnd();
 			logItemsSmoothScrollActive = true;
 		}
 
@@ -626,19 +661,6 @@ namespace Unclassified.FieldLogViewer.View
 				return dbgItem.Time;
 			}
 			throw new ArgumentException("Unsupported item type.");   // Should never happen
-		}
-
-		[ViewCommand]
-		public void UpdateDisplayTime()
-		{
-			if (LogItemsList.SelectedItems.Count == 1)
-			{
-				LogItemViewModelBase item = LogItemsList.SelectedItems[0] as LogItemViewModelBase;
-				if (item != null)
-				{
-					item.RaiseDisplayTimeChanged();
-				}
-			}
 		}
 
 		#endregion View commands

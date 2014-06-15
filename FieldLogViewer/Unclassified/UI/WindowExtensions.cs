@@ -165,5 +165,22 @@ namespace Unclassified.UI
 			fInfo.dwTimeout = 0;
 			return FlashWindowEx(ref fInfo);
 		}
+
+		/// <summary>
+		/// Stops flashing the window in the task bar.
+		/// </summary>
+		/// <param name="w">The Window instance.</param>
+		/// <returns></returns>
+		public static bool StopFlashing(this Window w)
+		{
+			IntPtr hWnd = new WindowInteropHelper(w).Handle;
+			FLASHWINFO fInfo = new FLASHWINFO();
+			fInfo.cbSize = Convert.ToUInt32(Marshal.SizeOf(fInfo));
+			fInfo.hwnd = hWnd;
+			fInfo.dwFlags = FLASHW_STOP;
+			fInfo.uCount = 0;
+			fInfo.dwTimeout = 0;
+			return FlashWindowEx(ref fInfo);
+		}
 	}
 }

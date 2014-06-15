@@ -56,5 +56,10 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					Visibility.Visible : Visibility.Collapsed;
 			}
 		}
+
+		public override void Refresh()
+		{
+			ExceptionVM.Refresh();
+		}
 	}
 }

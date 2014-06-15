@@ -46,6 +46,7 @@
 							<Grid.RowDefinitions>
 								<RowDefinition Height="Auto"/>
 								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="Auto"/>
 							</Grid.RowDefinitions>
 							<Grid.ColumnDefinitions>
 								<ColumnDefinition Width="10"/>
@@ -64,6 +65,12 @@
 								Style="{StaticResource ReadOnlyTextBoxStyle}"
 								Foreground="Gray"
 								Visibility="{Binding SourceVisibility}"/>
+							<TextBox
+								Grid.Row="2" Grid.Column="1"
+								Text="{Binding FullMeta, Mode=OneWay}"
+								Style="{StaticResource ReadOnlyTextBoxStyle}"
+								Foreground="Gray"
+								Visibility="{Binding MetaVisibility}"/>
 						</Grid>
 					</DataTemplate>
 				</ItemsControl.ItemTemplate>

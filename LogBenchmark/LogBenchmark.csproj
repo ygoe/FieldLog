@@ -79,9 +79,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FieldLog\FieldLog.csproj">
+    <ProjectReference Include="..\FieldLog\FieldLog.NET40.csproj">
       <Project>{5024F0F3-092C-414A-94C6-36764C4D42EA}</Project>
-      <Name>FieldLog</Name>
+      <Name>FieldLog.NET40</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

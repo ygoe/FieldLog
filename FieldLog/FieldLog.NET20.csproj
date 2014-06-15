@@ -87,11 +87,15 @@
     <Compile Include="FieldLogEventEnvironment.cs" />
     <Compile Include="FieldLogFileEnumerator.cs" />
     <Compile Include="FieldLogFileReader.cs" />
+    <Compile Include="FieldLogWebRequestData.cs" />
     <Compile Include="FL.cs" />
     <Compile Include="FieldLogFileWriter.cs" />
     <Compile Include="LogItems.cs" />
     <Compile Include="OSInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="FileFormat.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

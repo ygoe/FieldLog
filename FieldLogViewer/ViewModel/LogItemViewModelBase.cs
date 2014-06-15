@@ -1,15 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
-	class LogItemViewModelBase : ViewModelBase, IComparable<LogItemViewModelBase>
+	class LogItemViewModelBase : ViewModelBase, IComparable<LogItemViewModelBase>, IEditableObject
 	{
 		public int EventCounter { get; set; }
 		public DateTime Time { get; set; }
-		public int UtcOffset { get; set; }
+
+		private int utcOffset;
+		public int UtcOffset
+		{
+			get { return utcOffset; }
+			set { CheckUpdate(value, ref utcOffset, "UtcOffset"); }
+		}
 
 		private int indentLevel;
 		public int IndentLevel
@@ -63,5 +70,35 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 			return EventCounter.CompareTo(other.EventCounter);
 		}
+
+		/// <summary>
+		/// Refreshes all data in the item that can be resolved from other sources. Deriving
+		/// classes override this method to refresh the relevant item data.
+		/// </summary>
+		public virtual void Refresh()
+		{
+		}
+
+		#region IEditableObject members
+
+		public void BeginEdit()
+		{
+			// Does nothing. IEditableObject is just used for signalling the CollectionView to
+			// update the item.
+		}
+
+		public void CancelEdit()
+		{
+			// Does nothing. IEditableObject is just used for signalling the CollectionView to
+			// update the item.
+		}
+
+		public void EndEdit()
+		{
+			// Does nothing. IEditableObject is just used for signalling the CollectionView to
+			// update the item.
+		}
+
+		#endregion IEditableObject members
 	}
 }

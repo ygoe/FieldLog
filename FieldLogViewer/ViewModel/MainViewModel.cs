@@ -39,6 +39,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		private DateTime insertingItemsSince;
 		private Task readerTask;
 		private FilterConditionViewModel adhocFilterCondition;
+		private SourceResolver sourceResolver = new SourceResolver();
 		
 		/// <summary>
 		/// Buffer for all read items that are collected in the separate Task thread and then
@@ -166,6 +167,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		public string LoadedBasePath { get { return loadedBasePath; } }
 
+		public SourceResolver SourceResolver { get { return sourceResolver; } }
+
 		#endregion Public properties
 
 		#region Commands
@@ -174,7 +177,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public DelegateCommand LoadLogCommand { get; private set; }
 		public DelegateCommand StopLiveCommand { get; private set; }
 		public DelegateCommand ClearCommand { get; private set; }
-		public DelegateCommand LoadMapCommand { get; private set; }
+		public DelegateCommand LoadSymbolsCommand { get; private set; }
+		public DelegateCommand LoadObfuscationMapCommand { get; private set; }
 		public DelegateCommand DecreaseIndentSizeCommand { get; private set; }
 		public DelegateCommand IncreaseIndentSizeCommand { get; private set; }
 		public DelegateCommand DeleteFilterCommand { get; private set; }
@@ -188,18 +192,30 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public DelegateCommand QuickFilterMinPrioCommand { get; private set; }
 		public DelegateCommand QuickFilterNotBeforeCommand { get; private set; }
 		public DelegateCommand QuickFilterNotAfterCommand { get; private set; }
+		public DelegateCommand QuickFilterExcludeTextCommand { get; private set; }
+		public DelegateCommand QuickFilterDataNameCommand { get; private set; }
+		public DelegateCommand QuickFilterExceptionTypeCommand { get; private set; }
+		public DelegateCommand QuickFilterWebRequestCommand { get; private set; }
+		public DelegateCommand QuickFilterWebRequestUrlCommand { get; private set; }
+		public DelegateCommand QuickFilterWebClientAddressCommand { get; private set; }
+		public DelegateCommand QuickFilterWebUserAgentCommand { get; private set; }
+		public DelegateCommand QuickFilterWebSessionCommand { get; private set; }
+		public DelegateCommand QuickFilterWebUserCommand { get; private set; }
 
 		private void InitializeCommands()
 		{
 			LoadLogCommand = new DelegateCommand(OnLoadLog, CanLoadLog);
 			StopLiveCommand = new DelegateCommand(OnStopLive, CanStopLive);
 			ClearCommand = new DelegateCommand(OnClear, CanClear);
-			LoadMapCommand = new DelegateCommand(OnLoadMap);
+			LoadSymbolsCommand = new DelegateCommand(OnLoadSymbols);
+			LoadObfuscationMapCommand = new DelegateCommand(OnLoadObfuscationMap);
 			DecreaseIndentSizeCommand = new DelegateCommand(OnDecreaseIndentSize, CanDecreaseIndentSize);
 			IncreaseIndentSizeCommand = new DelegateCommand(OnIncreaseIndentSize, CanIncreaseIndentSize);
 			DeleteFilterCommand = new DelegateCommand(OnDeleteFilter, CanDeleteFilter);
 			ClearSearchTextCommand = new DelegateCommand(OnClearSearchText);
 			SettingsCommand = new DelegateCommand(OnSettings);
+
+			LoadObfuscationMapCommand.IsEnabled = false;   // Not implemented yet
 
 			QuickFilterSessionCommand = new DelegateCommand(OnQuickFilterSession, CanQuickFilterSession);
 			QuickFilterThreadCommand = new DelegateCommand(OnQuickFilterThread, CanQuickFilterThread);
@@ -207,6 +223,15 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			QuickFilterMinPrioCommand = new DelegateCommand(OnQuickFilterMinPrio, CanQuickFilterMinPrio);
 			QuickFilterNotBeforeCommand = new DelegateCommand(OnQuickFilterNotBefore, CanQuickFilterNotBefore);
 			QuickFilterNotAfterCommand = new DelegateCommand(OnQuickFilterNotAfter, CanQuickFilterNotAfter);
+			QuickFilterExcludeTextCommand = new DelegateCommand(OnQuickFilterExcludeText, CanQuickFilterExcludeText);
+			QuickFilterDataNameCommand = new DelegateCommand(OnQuickFilterDataName, CanQuickFilterDataName);
+			QuickFilterExceptionTypeCommand = new DelegateCommand(OnQuickFilterExceptionType, CanQuickFilterExceptionType);
+			QuickFilterWebRequestCommand = new DelegateCommand(OnQuickFilterWebRequest, CanQuickFilterWebRequest);
+			QuickFilterWebRequestUrlCommand = new DelegateCommand(OnQuickFilterWebRequestUrl, CanQuickFilterWebRequestUrl);
+			QuickFilterWebClientAddressCommand = new DelegateCommand(OnQuickFilterWebClientAddress, CanQuickFilterWebClientAddress);
+			QuickFilterWebUserAgentCommand = new DelegateCommand(OnQuickFilterWebUserAgent, CanQuickFilterWebUserAgent);
+			QuickFilterWebSessionCommand = new DelegateCommand(OnQuickFilterWebSession, CanQuickFilterWebSession);
+			QuickFilterWebUserCommand = new DelegateCommand(OnQuickFilterWebUser, CanQuickFilterWebUser);
 		}
 
 		private void InvalidateToolbarCommandsLoading()
@@ -214,7 +239,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			LoadLogCommand.RaiseCanExecuteChanged();
 			StopLiveCommand.RaiseCanExecuteChanged();
 			ClearCommand.RaiseCanExecuteChanged();
-			LoadMapCommand.RaiseCanExecuteChanged();
+			LoadObfuscationMapCommand.RaiseCanExecuteChanged();
 			SettingsCommand.RaiseCanExecuteChanged();
 		}
 
@@ -226,6 +251,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			QuickFilterMinPrioCommand.RaiseCanExecuteChanged();
 			QuickFilterNotBeforeCommand.RaiseCanExecuteChanged();
 			QuickFilterNotAfterCommand.RaiseCanExecuteChanged();
+			QuickFilterWebRequestCommand.RaiseCanExecuteChanged();
 		}
 
 		#region Toolbar
@@ -238,6 +264,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		private void OnLoadLog()
 		{
 			OpenFileDialog dlg = new OpenFileDialog();
+			dlg.Filter = "FieldLog files|*.fl|All files|*.*";
+			dlg.Title = "Select a file from the log file group to load";
 			if (dlg.ShowDialog() == true)
 			{
 				string prefix = GetPrefixFromPath(dlg.FileName);
@@ -279,8 +307,28 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			logItems.Clear();
 		}
 
-		private void OnLoadMap()
+		private void OnLoadSymbols()
 		{
+			OpenFileDialog dlg = new OpenFileDialog();
+			dlg.Filter = "Symbol files|*.xml;*.xml.gz|All files|*.*";
+			dlg.InitialDirectory = Path.GetDirectoryName(loadedBasePath);
+			dlg.Multiselect = true;
+			dlg.Title = "Select the symbol file(s) to load";
+			if (dlg.ShowDialog() == true)
+			{
+				foreach (string fileName in dlg.FileNames)
+				{
+					sourceResolver.AddFile(fileName);
+				}
+
+				logItems.ForEach(i => i.Refresh());
+				RefreshLogItemsFilterView();
+			}
+		}
+
+		private void OnLoadObfuscationMap()
+		{
+			// When implementing this, remove static disabling of the LoadObfuscationMapCommand above
 		}
 
 		private bool CanDecreaseIndentSize()
@@ -370,7 +418,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		#region Log items list context menu
 
-		private FilterViewModel GetQuickFilter(out bool isNew)
+		private FilterViewModel GetQuickFilter(out bool isNew, bool leaveEmpty = false)
 		{
 			isNew = false;
 			var filter = SelectedFilter;
@@ -386,11 +434,78 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				filter = filter.GetDuplicate();
 				filter.QuickModifiedTime = DateTime.UtcNow;
 			}
-			if (filter.ConditionGroups.Count == 0)
+			if (filter.ConditionGroups.Count == 0 && !leaveEmpty)
 			{
 				filter.ConditionGroups.Add(new FilterConditionGroupViewModel(filter));
 			}
 			return filter;
+		}
+
+		/// <summary>
+		/// Sets up a quick filter for a single filter column and one or multiple values.
+		/// </summary>
+		/// <typeparam name="T">The type of the values to use in the filter.</typeparam>
+		/// <param name="values">The values to use in the filter.</param>
+		/// <param name="singlePrefix">The filter name prefix for a single value.</param>
+		/// <param name="multiPrefix">The filter name prefix for multiple values.</param>
+		/// <param name="filterColumn">The filter column to set.</param>
+		/// <param name="useRegex">true to use the Regex comparison for multiple values (required for strings), false to use the InList comparison (for numbers).</param>
+		private void MultiValueQuickFilter<T>(IEnumerable<T> values, string singlePrefix, string multiPrefix, FilterColumn filterColumn, bool useRegex)
+		{
+			bool isNew;
+			var filter = GetQuickFilter(out isNew);
+			int typeCount = values.Count();
+			switch (typeCount)
+			{
+				case 1:
+					filter.DisplayName = singlePrefix + values.First();
+					break;
+				default:
+					filter.DisplayName = multiPrefix + values.Aggregate(", ", " and ");
+					break;
+			}
+			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
+			{
+				// Remove all existing conditions
+				cg.Conditions.Filter(c => c.Column != filterColumn);
+				if (!cg.IsExclude)
+				{
+					if (typeCount == 1)
+					{
+						cg.Conditions.Add(new FilterConditionViewModel(cg)
+						{
+							Column = filterColumn,
+							Comparison = FilterComparison.Equals,
+							Value = values.First().ToString()
+						});
+					}
+					else if (useRegex)
+					{
+						cg.Conditions.Add(new FilterConditionViewModel(cg)
+						{
+							Column = filterColumn,
+							Comparison = FilterComparison.Regex,
+							Value = "^(" + values.Aggregate("|") + ")$"
+							// TODO: Make values regex-safe
+						});
+					}
+					else
+					{
+						cg.Conditions.Add(new FilterConditionViewModel(cg)
+						{
+							Column = filterColumn,
+							Comparison = FilterComparison.InList,
+							Value = values.Aggregate(";")
+						});
+					}
+				}
+			}
+			if (isNew)
+			{
+				filter.QuickPreviousFilter = SelectedFilter;
+				Filters.Add(filter);
+				SelectedFilter = filter;
+			}
 		}
 
 		private bool CanQuickFilterSession()
@@ -518,7 +633,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			filter.DisplayName = "Type " + EnumerationExtension<FilterItemType>.GetDescription(SelectedItemFilterItemType);
 			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
 			{
-				// Remove all session and thread ID conditions
+				// Remove all type conditions
 				cg.Conditions.Filter(c => c.Column != FilterColumn.Type);
 				if (!cg.IsExclude)
 				{
@@ -551,7 +666,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			filter.DisplayName = "Priority " + flItem.PrioTitle + " or higher";
 			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
 			{
-				// Remove all session and thread ID conditions
+				// Remove all priority conditions
 				cg.Conditions.Filter(c => c.Column != FilterColumn.Priority);
 				if (!cg.IsExclude)
 				{
@@ -583,7 +698,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			filter.DisplayName = "Not before...";
 			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
 			{
-				// Remove all session and thread ID conditions
+				// Remove all time conditions
 				cg.Conditions.Filter(c => c.Column != FilterColumn.Time);
 				if (!cg.IsExclude)
 				{
@@ -625,7 +740,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			filter.DisplayName = "Not after...";
 			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
 			{
-				// Remove all session and thread ID conditions
+				// Remove all time conditions
 				cg.Conditions.Filter(c => c.Column != FilterColumn.Time);
 				if (!cg.IsExclude)
 				{
@@ -653,6 +768,183 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				Filters.Add(filter);
 				SelectedFilter = filter;
 			}
+		}
+
+		private bool CanQuickFilterExcludeText()
+		{
+			return SelectedItems.Count == 1 &&
+				(SelectedItems[0] is FieldLogTextItemViewModel || SelectedItems[0] is FieldLogExceptionItemViewModel);
+		}
+
+		private void OnQuickFilterExcludeText()
+		{
+			bool isNew;
+			var filter = GetQuickFilter(out isNew, true);
+			filter.DisplayName = "Exclude text";
+			var textItem = SelectedItems[0] as FieldLogTextItemViewModel;
+			var exItem = SelectedItems[0] as FieldLogExceptionItemViewModel;
+			string text = null;
+			if (textItem != null)
+				text = textItem.Text;
+			else if (exItem != null)
+				text = exItem.ExceptionVM.Message;
+			if (text == null)
+				return;   // Should not happen
+
+			var cg = new FilterConditionGroupViewModel(filter);
+			cg.IsExclude = true;
+			cg.Conditions.Add(new FilterConditionViewModel(cg)
+			{
+				Column = FilterColumn.TextText,
+				Comparison = FilterComparison.Equals,
+				Value = text
+			});
+			filter.ConditionGroups.Add(cg);
+			cg = new FilterConditionGroupViewModel(filter);
+			cg.IsExclude = true;
+			cg.Conditions.Add(new FilterConditionViewModel(cg)
+			{
+				Column = FilterColumn.ExceptionMessage,
+				Comparison = FilterComparison.Equals,
+				Value = text
+			});
+			filter.ConditionGroups.Add(cg);
+			if (isNew)
+			{
+				filter.QuickPreviousFilter = SelectedFilter;
+				Filters.Add(filter);
+				SelectedFilter = filter;
+			}
+		}
+
+		private bool CanQuickFilterDataName()
+		{
+			return SelectedItemsDataNames.Any();
+		}
+
+		private void OnQuickFilterDataName()
+		{
+			MultiValueQuickFilter(SelectedItemsDataNames, "Data name ", "Data names ", FilterColumn.DataName, true);
+		}
+
+		private bool CanQuickFilterExceptionType()
+		{
+			return SelectedItemsExceptionTypes.Any();
+		}
+
+		private void OnQuickFilterExceptionType()
+		{
+			MultiValueQuickFilter(SelectedItemsExceptionTypes, "Exception type ", "Exception types ", FilterColumn.ExceptionType, true);
+		}
+
+		private bool CanQuickFilterWebRequest()
+		{
+			return SelectedItemsWebRequestIds.Any();
+		}
+
+		private void OnQuickFilterWebRequest()
+		{
+			bool isNew;
+			var filter = GetQuickFilter(out isNew);
+			int webRequestCount = SelectedItemsWebRequestIds.Count();
+			switch (webRequestCount)
+			{
+				case 1:
+					filter.DisplayName = "Web request " + SelectedItemsWebRequestIds.First();
+					break;
+				default:
+					filter.DisplayName = "Web requests " + SelectedItemsWebRequestIds.Aggregate(", ", " and ");
+					break;
+			}
+			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
+			{
+				// Remove all session and web request ID conditions
+				cg.Conditions.Filter(c => c.Column != FilterColumn.SessionId);
+				cg.Conditions.Filter(c => c.Column != FilterColumn.WebRequestId);
+				if (!cg.IsExclude)
+				{
+					cg.Conditions.Add(new FilterConditionViewModel(cg)
+					{
+						Column = FilterColumn.SessionId,
+						Comparison = FilterComparison.Equals,
+						Value = SelectedItemsSessionIds.First().ToString("D")
+					});
+					if (webRequestCount == 1)
+					{
+						cg.Conditions.Add(new FilterConditionViewModel(cg)
+						{
+							Column = FilterColumn.WebRequestId,
+							Comparison = FilterComparison.Equals,
+							Value = SelectedItemsWebRequestIds.First().ToString()
+						});
+					}
+					else
+					{
+						cg.Conditions.Add(new FilterConditionViewModel(cg)
+						{
+							Column = FilterColumn.WebRequestId,
+							Comparison = FilterComparison.InList,
+							Value = SelectedItemsWebRequestIds.Aggregate(";")
+						});
+					}
+				}
+			}
+			if (isNew)
+			{
+				filter.QuickPreviousFilter = SelectedFilter;
+				Filters.Add(filter);
+				SelectedFilter = filter;
+			}
+		}
+
+		private bool CanQuickFilterWebRequestUrl()
+		{
+			return SelectedItemsWebRequestUrls.Any();
+		}
+
+		private void OnQuickFilterWebRequestUrl()
+		{
+			MultiValueQuickFilter(SelectedItemsWebRequestUrls, "Request URL ", "Request URLs ", FilterColumn.WebRequestRequestUrl, true);
+		}
+
+		private bool CanQuickFilterWebClientAddress()
+		{
+			return SelectedItemsWebClientAddresses.Any();
+		}
+
+		private void OnQuickFilterWebClientAddress()
+		{
+			MultiValueQuickFilter(SelectedItemsWebClientAddresses, "Client ", "Clients ", FilterColumn.WebRequestClientAddress, true);
+		}
+
+		private bool CanQuickFilterWebUserAgent()
+		{
+			return SelectedItemsWebUserAgents.Any();
+		}
+
+		private void OnQuickFilterWebUserAgent()
+		{
+			MultiValueQuickFilter(SelectedItemsWebUserAgents, "User agent ", "User agents ", FilterColumn.WebRequestUserAgent, true);
+		}
+
+		private bool CanQuickFilterWebSession()
+		{
+			return SelectedItemsWebSessionIds.Any();
+		}
+
+		private void OnQuickFilterWebSession()
+		{
+			MultiValueQuickFilter(SelectedItemsWebSessionIds, "Web session ", "Web sessions ", FilterColumn.WebRequestWebSessionId, true);
+		}
+
+		private bool CanQuickFilterWebUser()
+		{
+			return SelectedItemsWebUserIds.Any();
+		}
+
+		private void OnQuickFilterWebUser()
+		{
+			MultiValueQuickFilter(SelectedItemsWebUserIds, "Web user ", "Web users ", FilterColumn.WebRequestAppUserId, true);
 		}
 
 		#endregion Log items list context menu
@@ -956,6 +1248,207 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
+		private IEnumerable<string> SelectedItemsDataNames
+		{
+			get
+			{
+				if (SelectedItems != null)
+				{
+					return SelectedItems
+						.OfType<FieldLogDataItemViewModel>()
+						.Select(vm => vm.Name)
+						.Distinct()
+						.OrderBy(name => name);
+				}
+				return new string[0];
+			}
+		}
+
+		private IEnumerable<string> SelectedItemsExceptionTypes
+		{
+			get
+			{
+				if (SelectedItems != null)
+				{
+					return SelectedItems
+						.OfType<FieldLogExceptionItemViewModel>()
+						.Select(vm => vm.ExceptionVM.Type)
+						.Distinct()
+						.OrderBy(type => type);
+				}
+				return new string[0];
+			}
+		}
+
+		private IEnumerable<uint> SelectedItemsWebRequestIds
+		{
+			get
+			{
+				if (SelectedItems != null)
+				{
+					return SelectedItems
+						.OfType<FieldLogItemViewModel>()
+						.Select(vm => vm.WebRequestId)
+						.Distinct()
+						.OrderBy(tid => tid);
+				}
+				return new uint[0];
+			}
+		}
+
+		private IEnumerable<string> SelectedItemsWebRequestUrls
+		{
+			get
+			{
+				if (SelectedItems != null)
+				{
+					return SelectedItems
+						.OfType<FieldLogItemViewModel>()
+						.Where(i => i.LastWebRequestStartItem != null)
+						.Select(vm => vm.LastWebRequestStartItem.WebRequestDataVM.WebRequestData.RequestUrl)
+						.Distinct()
+						.OrderBy(url => url);
+				}
+				return new string[0];
+			}
+		}
+
+		private IEnumerable<string> SelectedItemsWebClientAddresses
+		{
+			get
+			{
+				if (SelectedItems != null)
+				{
+					return SelectedItems
+						.OfType<FieldLogItemViewModel>()
+						.Where(i => i.LastWebRequestStartItem != null)
+						.Select(vm => vm.LastWebRequestStartItem.WebRequestDataVM.WebRequestData.ClientAddress)
+						.Distinct()
+						.OrderBy(address => address);
+				}
+				return new string[0];
+			}
+		}
+
+		private IEnumerable<string> SelectedItemsWebUserAgents
+		{
+			get
+			{
+				if (SelectedItems != null)
+				{
+					return SelectedItems
+						.OfType<FieldLogItemViewModel>()
+						.Where(i => i.LastWebRequestStartItem != null)
+						.Select(vm => vm.LastWebRequestStartItem.WebRequestDataVM.WebRequestData.UserAgent)
+						.Distinct()
+						.OrderBy(ua => ua);
+				}
+				return new string[0];
+			}
+		}
+
+		private IEnumerable<string> SelectedItemsWebSessionIds
+		{
+			get
+			{
+				if (SelectedItems != null)
+				{
+					return SelectedItems
+						.OfType<FieldLogItemViewModel>()
+						.Where(i => i.LastWebRequestStartItem != null)
+						.Select(vm => vm.LastWebRequestStartItem.WebRequestDataVM.WebRequestData.WebSessionId)
+						.Distinct()
+						.OrderBy(sid => sid);
+				}
+				return new string[0];
+			}
+		}
+
+		private IEnumerable<string> SelectedItemsWebUserIds
+		{
+			get
+			{
+				if (SelectedItems != null)
+				{
+					return SelectedItems
+						.OfType<FieldLogItemViewModel>()
+						.Where(i => i.LastWebRequestStartItem != null)
+						.Select(vm => vm.LastWebRequestStartItem.WebRequestDataVM.WebRequestData.AppUserId)
+						.Distinct()
+						.OrderBy(uid => uid);
+				}
+				return new string[0];
+			}
+		}
+
+		public Visibility QuickFilterDataVisibility
+		{
+			get
+			{
+				return SelectedItems != null && SelectedItems.OfType<FieldLogDataItemViewModel>().Any() ?
+					Visibility.Visible :
+					Visibility.Collapsed;
+			}
+		}
+
+		public Visibility QuickFilterExcludeTextVisibility
+		{
+			get
+			{
+				return CanQuickFilterExcludeText() ?
+					Visibility.Visible :
+					Visibility.Collapsed;
+			}
+		}
+
+		public Visibility QuickFilterExceptionVisibility
+		{
+			get
+			{
+				return SelectedItems != null && SelectedItems.OfType<FieldLogExceptionItemViewModel>().Any() ?
+					Visibility.Visible :
+					Visibility.Collapsed;
+			}
+		}
+
+		public Visibility QuickFilterWebVisibility
+		{
+			get
+			{
+				return SelectedItems != null && SelectedItems.OfType<FieldLogItemViewModel>().Any(i => i.WebRequestId != 0) ?
+					Visibility.Visible :
+					Visibility.Collapsed;
+			}
+		}
+
+		public Visibility QuickFilterWebSessionVisibility
+		{
+			get
+			{
+				return SelectedItems != null &&
+					SelectedItems
+						.OfType<FieldLogItemViewModel>()
+						.Any(i => i.LastWebRequestStartItem != null &&
+							!string.IsNullOrEmpty(i.LastWebRequestStartItem.WebRequestDataVM.WebRequestData.WebSessionId)) ?
+					Visibility.Visible :
+					Visibility.Collapsed;
+			}
+		}
+
+		public Visibility QuickFilterWebUserVisibility
+		{
+			get
+			{
+				return SelectedItems != null &&
+					SelectedItems
+						.OfType<FieldLogItemViewModel>()
+						.Any(i => i.LastWebRequestStartItem != null &&
+							!string.IsNullOrEmpty(i.LastWebRequestStartItem.WebRequestDataVM.WebRequestData.AppUserId)) ?
+					Visibility.Visible :
+					Visibility.Collapsed;
+			}
+		}
+
 		#endregion Quick filter
 
 		#endregion Data properties
@@ -979,6 +1472,16 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			}
 		}
 
+		/// <summary>
+		/// Called when a filter or the current filter selection has changed.
+		/// </summary>
+		/// <param name="affectsItems">true if the change affects the item filtering.</param>
+		/// <remarks>
+		/// The <paramref name="affectsItems"/> parameter is true when the definition of the
+		/// current filter has changed, or another filter was selected, so that other items may be
+		/// selected for display. The <paramref name="affectsItems"/> parameter is false mostly
+		/// when a filter has been renamed.
+		/// </remarks>
 		public void LogItemsFilterChanged(bool affectsItems)
 		{
 			if (sortedFilters.View != null)
@@ -996,13 +1499,53 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				.ToArray();
 		}
 
+		/// <summary>
+		/// Refreshes the CollectionView of all filtered items.
+		/// </summary>
+		/// <remarks>
+		/// This causes a Reset type change notification on the list and clears the list item
+		/// focus. It should only be called when the list of filtered items has substantially
+		/// changed or we don't know how much of the list has changed at all.
+		/// </remarks>
 		public void RefreshLogItemsFilterView()
 		{
 			if (filteredLogItems.View != null)
 			{
 				filteredLogItems.View.Refresh();
 			}
-			ViewCommandManager.Invoke("UpdateDisplayTime");
+			if (SelectedItems != null)
+			{
+				foreach (var selectedItem in SelectedItems)
+				{
+					selectedItem.RaiseDisplayTimeChanged();
+				}
+			}
+		}
+
+		/// <summary>
+		/// Refreshes a single item in the CollectionView of all filtered items.
+		/// </summary>
+		/// <param name="item">The changed item.</param>
+		/// <remarks>
+		/// This makes use of the IEditableObject implementation of the log item. When an item is
+		/// edited through this mechanism, and the update is committed, the CollectionView will
+		/// re-evaluate the item and apply the filtering accordingly. This method must be called
+		/// for each item that may have been updated. Changes that are signalled through
+		/// INotifyPropertyChanged are not considered by a CollectionView. Updating each single
+		/// log item avoids the Reset type change notification and the focused item issue.
+		/// </remarks>
+		private void RefreshFilteredLogItem(LogItemViewModelBase item)
+		{
+			var ev = FilteredLogItemsView as IEditableCollectionView;
+			if (ev != null)
+			{
+				ev.EditItem(item);
+				ev.CommitEdit();
+			}
+			if (SelectedItems != null && SelectedItems.Contains(item))
+			{
+				item.RaiseDisplayTimeChanged();
+			}
 		}
 
 		#endregion Log items filter
@@ -1109,7 +1652,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				return;
 			}
 			logFileGroupReader.Error += logFileGroupReader_Error;
-			List<FieldLogScopeItem> seenScopeItems = new List<FieldLogScopeItem>();
+			List<FieldLogScopeItemViewModel> seenScopeItemVMs = new List<FieldLogScopeItemViewModel>();
 			while (true)
 			{
 				FieldLogItem item = logFileGroupReader.ReadLogItem();
@@ -1128,13 +1671,34 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					if (scopeItem.IsRepeated)
 					{
 						// Find existing scope item
-						if (seenScopeItems.Any(si => si.SessionId == scopeItem.SessionId && si.EventCounter == scopeItem.EventCounter))
+						var originalScopeItem = seenScopeItemVMs.FirstOrDefault(si => si.SessionId == scopeItem.SessionId && si.EventCounter == scopeItem.EventCounter);
+						if (originalScopeItem != null)
 						{
-							// Skip this item, we already have it from an earlier file
+							// Skip this item, we already have it from an earlier file.
+							// We can only update the original item's additional data from this
+							// repeated item in some case. Let's see...
+							if (scopeItem.Type == FieldLogScopeType.LogStart)
+							{
+								// TODO: Use this double-write-then-update mechanism instead of buffer stealing try-single-write
+							}
+							else if (scopeItem.Type == FieldLogScopeType.WebRequestStart)
+							{
+								// WebRequestStart items are repeated when more data is available
+								// in a later request lifecycle event. We can copy the
+								// WebRequestData contents from the new to the original item to
+								// make it available for the entire request. The instance cannot
+								// just be replaced though because the view model is created for
+								// the old instance and wouldn't be updated to the new target.
+								originalScopeItem.WebRequestDataVM.WebRequestData.UpdateFrom(scopeItem.WebRequestData);
+								// Also notify the UI to refresh the updated item in the filter
+								// CollectionView so that the data change is actually regarded by
+								// an active filter.
+								dispatcher.BeginInvoke(new Action<LogItemViewModelBase>(RefreshFilteredLogItem), DispatcherPriority.Loaded, originalScopeItem);
+							}
 							continue;
 						}
 					}
-					seenScopeItems.Add(scopeItem);
+					seenScopeItemVMs.Add((FieldLogScopeItemViewModel) itemVM);
 				}
 
 				bool upgradedLock = false;
@@ -1255,6 +1819,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 			LoadedItemsCount = logItems.Count;
 
+			HashSet<LogItemViewModelBase> itemsToRefresh = new HashSet<LogItemViewModelBase>();
+
 			// LastLogStartItem, IndentLevel and UtcOffset source are only supported for FieldLog items
 			FieldLogItemViewModel flItem = item as FieldLogItemViewModel;
 			if (flItem != null)
@@ -1297,24 +1863,81 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				if (newUtcOffset)
 				{
 					item.UtcOffset = tryUtcOffset;
+					itemsToRefresh.Add(item);
 				}
 
+				FieldLogScopeItemViewModel scope = item as FieldLogScopeItemViewModel;
+
 				// Use LastLogStartItem and UtcOffset of the previous item from the same session
-				prevIndex = newIndex - 1;
-				while (prevIndex >= 0)
+				if (scope != null && scope.Type == FieldLogScopeType.LogStart)
 				{
-					FieldLogItemViewModel prevFlItem = logItems[prevIndex] as FieldLogItemViewModel;
-					if (prevFlItem != null &&
-						prevFlItem.SessionId == flItem.SessionId)
+					// This is a LogStart item, don't look elsewhere
+					flItem.LastLogStartItem = scope;
+					itemsToRefresh.Add(flItem);
+				}
+				else
+				{
+					prevIndex = newIndex - 1;
+					while (prevIndex >= 0)
 					{
-						flItem.LastLogStartItem = prevFlItem.LastLogStartItem;
-						if (!newUtcOffset)
+						FieldLogItemViewModel prevFlItem = logItems[prevIndex] as FieldLogItemViewModel;
+						if (prevFlItem != null &&
+							prevFlItem.SessionId == flItem.SessionId)
 						{
-							flItem.UtcOffset = prevFlItem.UtcOffset;
+							flItem.LastLogStartItem = prevFlItem.LastLogStartItem;
+							if (!newUtcOffset)
+							{
+								flItem.UtcOffset = prevFlItem.UtcOffset;
+							}
+							itemsToRefresh.Add(flItem);
+							break;
 						}
-						break;
+						prevIndex--;
 					}
-					prevIndex--;
+				}
+
+				// Use LastWebRequestStartItem of the previous item from the same session and web request
+				if (scope != null && scope.Type == FieldLogScopeType.WebRequestStart)
+				{
+					// This is a WebRequestStart item, don't look elsewhere
+					flItem.LastWebRequestStartItem = scope;
+					itemsToRefresh.Add(flItem);
+				}
+				else
+				{
+					prevIndex = newIndex - 1;
+					while (prevIndex >= 0)
+					{
+						FieldLogItemViewModel prevFlItem = logItems[prevIndex] as FieldLogItemViewModel;
+						if (prevFlItem != null &&
+							prevFlItem.SessionId == flItem.SessionId &&
+							prevFlItem.WebRequestId == flItem.WebRequestId)
+						{
+							flItem.LastWebRequestStartItem = prevFlItem.LastWebRequestStartItem;
+							itemsToRefresh.Add(flItem);
+							break;
+						}
+						prevIndex--;
+					}
+				}
+
+				// Update web request processing time
+				if (scope != null && scope.Type == FieldLogScopeType.WebRequestEnd)
+				{
+					if (flItem.LastWebRequestStartItem != null)
+					{
+						flItem.LastWebRequestStartItem.WebRequestDataVM.RequestDuration =
+							flItem.Time - flItem.LastWebRequestStartItem.Time;
+						// Refresh all other items that share the same LastWebRequestStartItem
+						for (int i = 0; i < logItems.Count; i++)
+						{
+							var item2 = logItems[i] as FieldLogItemViewModel;
+							if (item2 != null && item2.LastWebRequestStartItem == flItem.LastWebRequestStartItem)
+							{
+								itemsToRefresh.Add(item2);
+							}
+						}
+					}
 				}
 
 				// Update all items after the inserted item
@@ -1341,8 +1964,37 @@ namespace Unclassified.FieldLogViewer.ViewModel
 							}
 						}
 
+						if (nextFlItem.WebRequestId == flItem.WebRequestId)
+						{
+							// Same web request gets the LastWebRequestStartItem
+							nextFlItem.LastWebRequestStartItem = flItem.LastWebRequestStartItem;
+							// itemsToRefresh.Add(nextFlItem);
+							// ^-- Will always be set later on
+							
+							// Update web request processing time
+							FieldLogScopeItemViewModel nextScope = nextFlItem as FieldLogScopeItemViewModel;
+							if (nextScope != null && nextScope.Type == FieldLogScopeType.WebRequestEnd)
+							{
+								if (nextFlItem.LastWebRequestStartItem != null)
+								{
+									nextFlItem.LastWebRequestStartItem.WebRequestDataVM.RequestDuration =
+										nextFlItem.Time - nextFlItem.LastWebRequestStartItem.Time;
+									// Refresh all other items that share the same LastWebRequestStartItem
+									for (int i = 0; i < logItems.Count; i++)
+									{
+										var item2 = logItems[i] as FieldLogItemViewModel;
+										if (item2 != null && item2.LastWebRequestStartItem == nextFlItem.LastWebRequestStartItem)
+										{
+											itemsToRefresh.Add(item2);
+										}
+									}
+								}
+							}
+						}
+
 						// All same session also get LastLogStartItem and UtcOffset
 						nextFlItem.LastLogStartItem = flItem.LastLogStartItem;
+						itemsToRefresh.Add(nextFlItem);
 
 						if (nextFlItem.TryGetUtcOffsetData(out tryUtcOffset))
 						{
@@ -1355,6 +2007,13 @@ namespace Unclassified.FieldLogViewer.ViewModel
 							nextFlItem.UtcOffset = flItem.UtcOffset;
 						}
 					}
+				}
+
+				// Update the filter now that the item has more data (LastLogStartItem and
+				// LastWebRequestStartItem) and potentially following items have been updated, too
+				foreach (var i in itemsToRefresh)
+				{
+					RefreshFilteredLogItem(i);
 				}
 			}
 
@@ -1453,6 +2112,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				// Apply scope-based indenting and UtcOffset to all items now
 				Dictionary<int, int> threadLevels = new Dictionary<int, int>();
 				Dictionary<Guid, FieldLogScopeItemViewModel> logStartItems = new Dictionary<Guid, FieldLogScopeItemViewModel>();
+				Dictionary<Tuple<Guid, uint>, FieldLogScopeItemViewModel> webRequestStartItems = new Dictionary<Tuple<Guid, uint>, FieldLogScopeItemViewModel>();
 				int utcOffset = 0;
 				foreach (var item in localLogItems)
 				{
@@ -1485,6 +2145,10 @@ namespace Unclassified.FieldLogViewer.ViewModel
 							{
 								logStartItems[scope.SessionId] = scope;
 							}
+							if (scope.Type == FieldLogScopeType.WebRequestStart)
+							{
+								webRequestStartItems[new Tuple<Guid, uint>(scope.SessionId, scope.WebRequestId)] = scope;
+							}
 						}
 						else
 						{
@@ -1500,6 +2164,23 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						{
 							flItem.LastLogStartItem = tryLastLogStartScope;
 						}
+
+						FieldLogScopeItemViewModel tryLastWebRequestStartScope;
+						if (webRequestStartItems.TryGetValue(new Tuple<Guid, uint>(flItem.SessionId, flItem.WebRequestId), out tryLastWebRequestStartScope))
+						{
+							flItem.LastWebRequestStartItem = tryLastWebRequestStartScope;
+						}
+
+						// Update web request processing time
+						if (scope != null && scope.Type == FieldLogScopeType.WebRequestEnd)
+						{
+							if (flItem.LastWebRequestStartItem != null)
+							{
+								flItem.LastWebRequestStartItem.WebRequestDataVM.RequestDuration =
+									flItem.Time - flItem.LastWebRequestStartItem.Time;
+							}
+						}
+
 					}
 				}
 

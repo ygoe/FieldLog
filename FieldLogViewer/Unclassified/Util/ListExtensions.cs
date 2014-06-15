@@ -258,15 +258,15 @@ namespace Unclassified.Util
 		/// </summary>
 		/// <typeparam name="T">Type of the list items.</typeparam>
 		/// <param name="list">The list to insert the new item to.</param>
-		/// <param name="vm">New item to insert into the list.</param>
+		/// <param name="newItem">New item to insert into the list.</param>
 		/// <param name="comparison">The comparison for sorting the items.</param>
 		/// <returns>The index of the inserted item in the list.</returns>
-		public static int InsertSorted<T>(this IList<T> list, T vm, Comparison<T> comparison)
+		public static int InsertSorted<T>(this IList<T> list, T newItem, Comparison<T> comparison)
 		{
 			if (list.Count == 0)
 			{
 				// Easy...
-				list.Add((T) vm);
+				list.Add((T) newItem);
 				return list.Count - 1;
 			}
 
@@ -278,7 +278,7 @@ namespace Unclassified.Util
 			while (lower <= upper)
 			{
 				// As long as lower <= upper, index is valid and can be used for comparison
-				int cmp = comparison(list[index], vm);
+				int cmp = comparison(list[index], newItem);
 
 				if (cmp == 0)
 				{
@@ -311,7 +311,7 @@ namespace Unclassified.Util
 				index++;
 			}
 
-			list.Insert(index, (T) vm);
+			list.Insert(index, (T) newItem);
 			return index;
 		}
 

@@ -110,6 +110,14 @@ namespace Unclassified.FieldLog
 						item.Write(this);
 					}
 				}
+				foreach (FieldLogScopeItem item in new List<FieldLogScopeItem>(FL.WebRequestScopes.Values))
+				{
+					if (item.Priority == prio && item.WasWritten)
+					{
+						item.IsRepeated = true;
+						item.Write(this);
+					}
+				}
 				foreach (var stack in FL.CurrentScopes.Values)
 				{
 					foreach (FieldLogScopeItem item in stack.ToArray())

@@ -13,6 +13,7 @@
 // library. If not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.Collections;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Globalization;
@@ -308,14 +309,7 @@ namespace Unclassified.FieldLog
 			: base(priority)
 		{
 			Name = name;
-			if (value == null)
-			{
-				Value = "";
-			}
-			else
-			{
-				Value = FormatValues(value);
-			}
+			Value = FormatValues(value);
 
 			Size += (Name != null ? Name.Length * 2 : 0) +
 				(Value != null ? Value.Length * 2 : 0);
@@ -366,6 +360,10 @@ namespace Unclassified.FieldLog
 		/// <returns>The formatted values of the object.</returns>
 		public static string FormatValues(object data, int level = 0)
 		{
+			// NOTE: Nullable<T> values need no special handling because as soon as they're passed
+			//       in an object variable, they're either null or the value itself boxed as their
+			//       internal type. (Source: http://stackoverflow.com/a/5194550/143684)
+
 			if (data == null)
 			{
 				return "null";
@@ -384,6 +382,46 @@ namespace Unclassified.FieldLog
 			if (data is string)
 			{
 				return "\"" + ((string) data).Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
+			}
+			if (data is DateTime)
+			{
+				return ((DateTime) data).ToString("yyyy-MM-dd'T'HH:mm:ss.ffffff");
+			}
+			if (data is DateTimeOffset)
+			{
+				return ((DateTimeOffset) data).ToString("yyyy-MM-dd'T'HH:mm:ss.ffffffK");
+			}
+			if (data is TimeSpan)
+			{
+				return ((TimeSpan) data).ToString();
+			}
+			if (data is DBNull)
+			{
+				return "DBNull";
+			}
+			if (data is Enum)
+			{
+				return ((Enum) data).ToString("G") + " (" + ((Enum) data).ToString("D") + ")";
+			}
+			if (data is Guid)
+			{
+				return ((Guid) data).ToString("B");
+			}
+			if (data is IntPtr)
+			{
+				if (IntPtr.Size == 4)
+					return "0x" + ((IntPtr) data).ToInt32().ToString("X4");
+				return "0x" + ((IntPtr) data).ToInt64().ToString("X8");
+			}
+			if (data is UIntPtr)
+			{
+				if (UIntPtr.Size == 4)
+					return "0x" + ((UIntPtr) data).ToUInt32().ToString("X4");
+				return "0x" + ((UIntPtr) data).ToUInt64().ToString("X8");
+			}
+			if (data is StringBuilder)
+			{
+				return "\"" + ((StringBuilder) data).ToString().Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
 			}
 
 			string indent = new string('\t', level);
@@ -411,25 +449,40 @@ namespace Unclassified.FieldLog
 			}
 			else
 			{
-				foreach (var property in data.GetType().GetProperties())
+				IEnumerable ie = data as IEnumerable;
+				if (ie != null)
 				{
-					if (count++ > 0) sb.Append(",");
-					sb.AppendLine();
-					sb.Append(indent);
-					sb.Append("\t");
-					sb.Append(property.Name);
-					sb.Append(": ");
-					sb.Append(FormatValues(property.GetValue(data, null), level + 1));
+					foreach (var item in ie)
+					{
+						if (count++ > 0) sb.Append(",");
+						sb.AppendLine();
+						sb.Append(indent);
+						sb.Append("\t");
+						sb.Append(FormatValues(item, level + 1));
+					}
 				}
-				foreach (var field in data.GetType().GetFields())
+				else
 				{
-					if (count++ > 0) sb.Append(",");
-					sb.AppendLine();
-					sb.Append(indent);
-					sb.Append("\t");
-					sb.Append(field.Name);
-					sb.Append(": ");
-					sb.Append(FormatValues(field.GetValue(data), level + 1));
+					foreach (var property in data.GetType().GetProperties())
+					{
+						if (count++ > 0) sb.Append(",");
+						sb.AppendLine();
+						sb.Append(indent);
+						sb.Append("\t");
+						sb.Append(property.Name);
+						sb.Append(": ");
+						sb.Append(FormatValues(property.GetValue(data, null), level + 1));
+					}
+					foreach (var field in data.GetType().GetFields())
+					{
+						if (count++ > 0) sb.Append(",");
+						sb.AppendLine();
+						sb.Append(indent);
+						sb.Append("\t");
+						sb.Append(field.Name);
+						sb.Append(": ");
+						sb.Append(FormatValues(field.GetValue(data), level + 1));
+					}
 				}
 			}
 			sb.AppendLine();

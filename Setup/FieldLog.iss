@@ -107,7 +107,6 @@ Name: DeleteConfig; Description: "{cm:Task_DeleteConfig}"; Flags: unchecked
 [Files]
 ; FieldLogViewer application files
 Source: "..\FieldLogViewer\bin\Release\FieldLogViewer.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\FieldLogViewer\bin\Release\InTheHand.Net.Personal.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\FieldLogViewer\bin\Release\TaskDialog.dll"; DestDir: "{app}"; Flags: ignoreversion
 ;Source: "..\FieldLog Documentation.pdf"; DestDir: "{app}"; Flags: ignoreversion
 ; This is the signed version of the DLL:

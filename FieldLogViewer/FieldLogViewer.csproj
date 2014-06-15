@@ -78,9 +78,6 @@
     <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="InTheHand.Net.Personal">
-      <HintPath>lib\InTheHand.Net.Personal.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -182,7 +179,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Bluetooth.cs" />
     <Compile Include="View\FieldLogTextItemView.xaml.cs">
       <DependentUpon>FieldLogTextItemView.xaml</DependentUpon>
     </Compile>

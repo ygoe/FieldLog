@@ -305,11 +305,13 @@ namespace Unclassified.FieldLog
 		[ThreadStatic]
 		private static List<FieldLogItem> threadBufferedItems;
 
+#if ASPNET
 		/// <summary>
 		/// The last assigned web request ID, counted for each new request. Synchronised by
 		/// Interlocked access.
 		/// </summary>
 		private static int LastWebRequestId;
+#endif
 
 		/// <summary>
 		/// Override configuration file name. Used for ASP.NET.
@@ -384,6 +386,10 @@ namespace Unclassified.FieldLog
 
 			LogFirstChanceExceptions = true;
 			WaitForItemsBacklog = true;
+
+			// Prevent warnings because these fields are never assigned anything in non-ASP.NET builds
+			configFileNameOverride = null;
+			logDefaultDirOverride = null;
 
 			EntryAssembly = Assembly.GetEntryAssembly();
 			if (EntryAssembly != null)

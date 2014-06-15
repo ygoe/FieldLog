@@ -40,6 +40,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		private Task readerTask;
 		private FilterConditionViewModel adhocFilterCondition;
 		private SourceResolver sourceResolver = new SourceResolver();
+		private SettingsWindow openSettingsWindow;
 		
 		/// <summary>
 		/// Buffer for all read items that are collected in the separate Task thread and then
@@ -407,11 +408,19 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		private void OnSettings()
 		{
-			SettingsWindow win = new SettingsWindow();
-			SettingsViewModel vm = new SettingsViewModel();
-			win.DataContext = vm;
-			win.Owner = MainWindow.Instance;
-			win.Show();
+			if (openSettingsWindow == null || !openSettingsWindow.IsVisible)
+			{
+				SettingsWindow win = new SettingsWindow();
+				SettingsViewModel vm = new SettingsViewModel();
+				win.DataContext = vm;
+				win.Owner = MainWindow.Instance;
+				win.Show();
+				openSettingsWindow = win;
+			}
+			else
+			{
+				openSettingsWindow.Focus();
+			}
 		}
 
 		#endregion Toolbar
@@ -434,11 +443,33 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				filter = filter.GetDuplicate();
 				filter.QuickModifiedTime = DateTime.UtcNow;
 			}
-			if (filter.ConditionGroups.Count == 0 && !leaveEmpty)
+			if (filter.ConditionGroups.Count(c => !c.IsExclude) == 0 && !leaveEmpty)
 			{
 				filter.ConditionGroups.Add(new FilterConditionGroupViewModel(filter));
 			}
 			return filter;
+		}
+
+		/// <summary>
+		/// Makes the name of the filter unique by adding a counter.
+		/// </summary>
+		/// <param name="filter">The new filter that may have a generated name that already exists.</param>
+		/// <remarks>
+		/// While a filter does not technically require a unique name, it can be confusing to the
+		/// user to see two or more filters with the same name. Also, when deleting a quick filter,
+		/// the previous filter is automatically selected, and it can be irritating when that name
+		/// does not change. So after a filter is created and added to the Filters list, its name
+		/// can be made unique by calling this method.
+		/// </remarks>
+		private void MakeFilterNameUnique(FilterViewModel filter)
+		{
+			string baseFilterName = filter.DisplayName;
+			int counter = 1;
+			while (Filters.Count(f => f.DisplayName == filter.DisplayName) > 1)
+			{
+				counter++;
+				filter.DisplayName = baseFilterName + " (" + counter + ")";
+			}
 		}
 
 		/// <summary>
@@ -485,8 +516,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						{
 							Column = filterColumn,
 							Comparison = FilterComparison.Regex,
-							Value = "^(" + values.Aggregate("|") + ")$"
-							// TODO: Make values regex-safe
+							Value = "^(" + values.Select(v => Regex.Escape(v.ToString())).Aggregate("|") + ")$"
 						});
 					}
 					else
@@ -500,10 +530,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					}
 				}
 			}
+			filter.ReorderCommand.TryExecute();
 			if (isNew)
 			{
 				filter.QuickPreviousFilter = SelectedFilter;
 				Filters.Add(filter);
+				MakeFilterNameUnique(filter);
 				SelectedFilter = filter;
 			}
 		}
@@ -553,10 +585,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					}
 				}
 			}
+			filter.ReorderCommand.TryExecute();
 			if (isNew)
 			{
 				filter.QuickPreviousFilter = SelectedFilter;
 				Filters.Add(filter);
+				MakeFilterNameUnique(filter);
 				SelectedFilter = filter;
 			}
 		}
@@ -613,10 +647,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					}
 				}
 			}
+			filter.ReorderCommand.TryExecute();
 			if (isNew)
 			{
 				filter.QuickPreviousFilter = SelectedFilter;
 				Filters.Add(filter);
+				MakeFilterNameUnique(filter);
 				SelectedFilter = filter;
 			}
 		}
@@ -645,10 +681,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					});
 				}
 			}
+			filter.ReorderCommand.TryExecute();
 			if (isNew)
 			{
 				filter.QuickPreviousFilter = SelectedFilter;
 				Filters.Add(filter);
+				MakeFilterNameUnique(filter);
 				SelectedFilter = filter;
 			}
 		}
@@ -678,10 +716,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					});
 				}
 			}
+			filter.ReorderCommand.TryExecute();
 			if (isNew)
 			{
 				filter.QuickPreviousFilter = SelectedFilter;
 				Filters.Add(filter);
+				MakeFilterNameUnique(filter);
 				SelectedFilter = filter;
 			}
 		}
@@ -720,10 +760,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					});
 				}
 			}
+			filter.ReorderCommand.TryExecute();
 			if (isNew)
 			{
 				filter.QuickPreviousFilter = SelectedFilter;
 				Filters.Add(filter);
+				MakeFilterNameUnique(filter);
 				SelectedFilter = filter;
 			}
 		}
@@ -762,10 +804,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					});
 				}
 			}
+			filter.ReorderCommand.TryExecute();
 			if (isNew)
 			{
 				filter.QuickPreviousFilter = SelectedFilter;
 				Filters.Add(filter);
+				MakeFilterNameUnique(filter);
 				SelectedFilter = filter;
 			}
 		}
@@ -809,10 +853,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				Value = text
 			});
 			filter.ConditionGroups.Add(cg);
+			filter.ReorderCommand.TryExecute();
 			if (isNew)
 			{
 				filter.QuickPreviousFilter = SelectedFilter;
 				Filters.Add(filter);
+				MakeFilterNameUnique(filter);
 				SelectedFilter = filter;
 			}
 		}
@@ -889,10 +935,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					}
 				}
 			}
+			filter.ReorderCommand.TryExecute();
 			if (isNew)
 			{
 				filter.QuickPreviousFilter = SelectedFilter;
 				Filters.Add(filter);
+				MakeFilterNameUnique(filter);
 				SelectedFilter = filter;
 			}
 		}

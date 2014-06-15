@@ -38,7 +38,7 @@
 			<ColumnDefinition Width="*"/>
 		</Grid.ColumnDefinitions>
 
-		<ToolBar Grid.Row="0" ToolBarTray.IsLocked="True">
+		<ToolBar Name="ToolBar" Grid.Row="0" ToolBarTray.IsLocked="True">
 			<Button Command="{Binding LoadLogCommand}" ToolTip="Load log">
 				<Image Source="/Images/folder_open.png"/>
 			</Button>
@@ -86,6 +86,7 @@
 			<Separator/>
 			<Image Source="/Images/filter.png"/>
 			<ComboBox
+				Name="FilterComboBox"
 				Width="150"
 				Padding="0,1"
 				ToolTip="Select filter"
@@ -96,6 +97,7 @@
 				<Image Source="/Images/filter_delete.png"/>
 			</Button>
 			<TextBox
+				Name="SearchTextBox"
 				Width="150"
 				ToolTip="Search text within filtered items"
 				Text="{Binding AdhocSearchText}"

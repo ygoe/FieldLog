@@ -29,11 +29,11 @@
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
 
-			<TextBlock Grid.Row="0" Grid.Column="0" Margin="0,8,0,0" Text="Exception type:"/>
-			<TextBox Grid.Row="0" Grid.Column="1" Margin="0,8,0,0" Text="{Binding Type, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+			<TextBlock Grid.Row="0" Grid.Column="0" Margin="0,8,0,0" Text="Message:"/>
+			<TextBox Grid.Row="0" Grid.Column="1" Margin="0,8,0,0" Text="{Binding Message, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
-			<TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,0,0" Text="Message:"/>
-			<TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Message, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+			<TextBlock Grid.Row="1" Grid.Column="0" Margin="0,8,0,0" Text="Exception type:"/>
+			<TextBox Grid.Row="1" Grid.Column="1" Margin="0,8,0,0" Text="{Binding Type, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
 			<TextBlock Grid.Row="2" Grid.Column="0" Margin="0,8,0,0" Text="Stack frames:"/>
 			<ItemsControl

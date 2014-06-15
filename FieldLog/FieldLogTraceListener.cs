@@ -180,7 +180,10 @@ namespace Unclassified.FieldLog
 			msgSb.Append(message);
 			var final = msgSb.ToString();
 			msgSb.Length = 0;
-			FL.Trace(sourceName + ": " + final);
+			if (!FL.IsShutdown)
+			{
+				FL.Trace(sourceName + ": " + final);
+			}
 		}
 
 		#endregion Overridden trace methods
@@ -258,7 +261,10 @@ namespace Unclassified.FieldLog
 					break;
 			}
 
-			FL.Text(prio, sourceName + ": " + shortMsg, msg + "\n\nEvent ID: " + id);
+			if (!FL.IsShutdown)
+			{
+				FL.Text(prio, sourceName + ": " + shortMsg, msg + "\n\nEvent ID: " + id);
+			}
 		}
 
 		#endregion FieldLog writing

@@ -3376,11 +3376,12 @@ namespace Unclassified.FieldLog
 					string logFile = Path.GetFileName(logFileBasePath);
 					DateTime latestFileTime = DateTime.MinValue;
 					string latestFileName = null;
+					long minFileSize = 20 * 1024;   // 20 KiB
 					foreach (string fileName in Directory.GetFiles(logDir, logFile + "-" + (int) logItem.Priority + "-*.fl"))
 					{
 						FileInfo fi = new FileInfo(fileName);
 						if (fi.Length >= maxFileSize) continue;   // File is already large enough
-						if (fi.CreationTime.Date < DateTime.Today) continue;   // File is from yesterday or older
+						if (fi.CreationTime.Date < DateTime.Today && fi.Length >= minFileSize) continue;   // File is from yesterday or older and large enough
 						if (fi.CreationTimeUtc > latestFileTime)
 						{
 							// Remember the latest file

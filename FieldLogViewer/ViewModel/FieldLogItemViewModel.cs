@@ -213,5 +213,47 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			indentLevel = 0;
 			return false;
 		}
+
+		public override int CompareTo(LogItemViewModelBase other)
+		{
+			// Only stay here if both objects are a FieldLog item
+			FieldLogItemViewModel flOther = other as FieldLogItemViewModel;
+			if (flOther == null)
+			{
+				return base.CompareTo(other);
+			}
+
+			// First compare the items by time (close is equal)
+			const long closeTicks = 10000000;   // 1 second
+			long timeDiff = this.Time.Ticks - other.Time.Ticks;
+			if (timeDiff > closeTicks)
+			{
+				return 1;
+			}
+			if (timeDiff < -closeTicks)
+			{
+				return -1;
+			}
+
+			// If the time is close and the session is equal, consider the event counter value and handle overflows
+			if (SessionId == flOther.SessionId)
+			{
+				const int range = 10000;
+				if (EventCounter > int.MaxValue - range && other.EventCounter < int.MinValue + range)
+				{
+					// Overflow, other is newer
+					return -1;
+				}
+				if (EventCounter < int.MinValue + range && other.EventCounter > int.MaxValue - range)
+				{
+					// Overflow, other is older
+					return 1;
+				}
+				return EventCounter.CompareTo(other.EventCounter);
+			}
+
+			// Otherwise stay with the time
+			return this.Time.CompareTo(other.Time);
+		}
 	}
 }

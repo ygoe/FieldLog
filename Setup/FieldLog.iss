@@ -191,6 +191,7 @@ Type: dirifempty; Name: "{userappdata}\Unclassified"
 
 ; Delete log files
 Type: files; Name: "{app}\log\FieldLogViewer-*.fl"
+Type: files; Name: "{app}\log\!README.txt"
 
 [Code]
 var

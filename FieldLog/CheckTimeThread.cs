@@ -33,6 +33,7 @@ namespace Unclassified.FieldLog
 		private static bool cancelPending;
 		private static int localOffset;
 		private static long nextOffsetCheck;
+		private static double prevLoggedOffset;
 
 		/// <summary>
 		/// Starts the time checking thread.
@@ -77,8 +78,15 @@ namespace Unclassified.FieldLog
 					FL.RebaseTime();
 
 					string msg = "System time changed by " + offset.TotalMilliseconds.ToString("0.0", CultureInfo.InvariantCulture) + " ms";
-					FL.Notice(msg, "Changes less than " + FL.CheckTimeThreshold + " ms are not reported.");
+					FL.Info(msg, "Changes less than " + FL.CheckTimeThreshold + " ms are not reported.");
 					Debug.WriteLine(msg);
+					prevLoggedOffset = 0;
+				}
+				else if (FL.LogTimeThreshold >= 0 &&
+					Math.Abs(offset.TotalMilliseconds - prevLoggedOffset) > FL.LogTimeThreshold)
+				{
+					FL.TraceData("System time offset", offset.TotalMilliseconds);
+					prevLoggedOffset = offset.TotalMilliseconds;
 				}
 				
 				// Check for local time zone changes

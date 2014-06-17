@@ -397,6 +397,7 @@ namespace Unclassified.FieldLog
 			LogFirstChanceExceptions = true;
 			WaitForItemsBacklog = true;
 			CheckTimeThreshold = 100;
+			LogTimeThreshold = -1;
 
 			// Prevent warnings because these fields are never assigned anything in non-ASP.NET builds
 			configFileNameOverride = null;
@@ -587,9 +588,16 @@ namespace Unclassified.FieldLog
 
 		/// <summary>
 		/// Gets or sets the threshold value in milliseconds above which discontinuities of the
-		/// system time will be logged. (Default: 100)
+		/// system time will be recalibrated. This event is logged at Notice priority. (Default: 100)
 		/// </summary>
 		public static int CheckTimeThreshold { get; set; }
+
+		/// <summary>
+		/// Experimental. Gets or sets the value in milliseconds above which discontinuities of the
+		/// system time will be logged. No calibration takes place for this event.
+		/// (Default: -1, do not log)
+		/// </summary>
+		public static int LogTimeThreshold { get; set; }
 
 		/// <summary>
 		/// Gets the currently used log file base path. This is an absolute path to a directory and
@@ -2961,7 +2969,8 @@ namespace Unclassified.FieldLog
 		{
 			while (true)
 			{
-				if (newBufferEvent.WaitOne())
+				// Handle configChanged after no longer than 5 seconds
+				if (newBufferEvent.WaitOne(5000))
 				{
 					SendBuffers();
 				}

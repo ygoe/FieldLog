@@ -227,8 +227,13 @@ namespace Unclassified.UI
 				int itemIndex = ItemContainerGenerator.IndexFromGeneratorPosition(childPos);
 				if (itemIndex < minDesiredGenerated || itemIndex > maxDesiredGenerated)
 				{
-					ItemContainerGenerator.Remove(childPos, 1);
-					RemoveInternalChildRange(i, 1);
+					// Never remove the focused item to keep keyboard navigation working when the
+					// focused item goes off the viewport
+					if (!InternalChildren[i].IsKeyboardFocusWithin)
+					{
+						ItemContainerGenerator.Remove(childPos, 1);
+						RemoveInternalChildRange(i, 1);
+					}
 				}
 			}
 		}
@@ -265,7 +270,7 @@ namespace Unclassified.UI
 		protected override Size MeasureOverride(Size availableSize)
 		{
 			if (ItemContainerGenerator == null) return availableSize;   // Nothing to do
-			
+
 			// Our children should be as wide as we are but as tall as item height.
 
 			Size childSize = GetChildSize(availableSize);
@@ -283,7 +288,7 @@ namespace Unclassified.UI
 			//Debug.WriteLine("itemCount = " + itemCount + "; firstGeneratedIndex = " + firstGeneratedIndex + "; lastGeneratedIndex = " + lastGeneratedIndex);
 
 			// TODO: For the Home and End keys to work, the first and last item must be realized. Do that every time and don't clean them up?
-			
+
 			// Get the generator position of the first visible data item
 			GeneratorPosition startPos = ItemContainerGenerator.GeneratorPositionFromIndex(firstGeneratedIndex);
 

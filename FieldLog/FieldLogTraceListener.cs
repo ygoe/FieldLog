@@ -263,7 +263,7 @@ namespace Unclassified.FieldLog
 
 			if (!FL.IsShutdown)
 			{
-				FL.Text(prio, sourceName + ": " + shortMsg, msg + "\n\nEvent ID: " + id);
+				FL.Text(prio, sourceName + ": " + shortMsg, msg + "\n\nEvent ID: " + id + "\nEvent type: " + eventType);
 			}
 		}
 

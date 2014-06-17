@@ -22,10 +22,6 @@ namespace Unclassified.FieldLogViewer.View
 		{
 			InitializeComponent();
 
-			// TODO: This seems to work in a test case application, but not here and not in TxEditor
-			this.HideIcon();
-			this.HideMinimizeAndMaximizeBoxes();
-
 			WindowStartupLocation = WindowStartupLocation.Manual;
 			Left = AppSettings.Instance.Window.SettingsLeft;
 			Top = AppSettings.Instance.Window.SettingsTop;
@@ -36,6 +32,14 @@ namespace Unclassified.FieldLogViewer.View
 		#endregion Constructors
 
 		#region Window event handlers
+
+		protected override void OnSourceInitialized(EventArgs e)
+		{
+			base.OnSourceInitialized(e);
+
+			this.HideIcon();
+			this.HideMinimizeAndMaximizeBoxes();
+		}
 
 		private void Window_LocationChanged(object sender, EventArgs e)
 		{

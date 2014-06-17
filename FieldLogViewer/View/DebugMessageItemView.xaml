@@ -36,12 +36,15 @@
 				<TextBlock Grid.Row="2" Grid.Column="0" Margin="0,8,0,0" Text="Text:"/>
 				<TextBox Grid.Row="2" Grid.Column="1" Margin="0,8,0,0" Text="{Binding Message, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 				
-				<Button
+				<TextBlock
 					Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
-					Margin="0,16,0,0" HorizontalAlignment="Left" Padding="6,1"
-					Visibility="{Binding OpenLogFileButtonVisibility}"
-					Content="Open log files from this path"
-					Command="{Binding OpenLogFileCommand}"/>
+					Margin="0,16,0,0" HorizontalAlignment="Left"
+					Visibility="{Binding OpenLogFileButtonVisibility}">
+					<Image Source="/Images/folder_open.png" Width="16" Height="16" Margin="0,0,0,-2" />
+					<Hyperlink Command="{Binding OpenLogFileCommand}">
+						<Run Text="Open log files from this path"/>
+					</Hyperlink>
+				</TextBlock>
 			</Grid>
 		</ScrollViewer>
 	</Grid>

@@ -13,7 +13,8 @@
 	Title="Settings"
 	Height="300" Width="600"
 	LocationChanged="Window_LocationChanged" SizeChanged="Window_SizeChanged"
-	Closed="Window_Closed">
+	Closed="Window_Closed"
+	Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
 	
 	<Grid>
 		<TabControl Margin="10">
@@ -93,9 +94,15 @@
 
 					<ScrollViewer
 						Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5"
-						Margin="0,8,0,0"
+						Margin="0,8,0,0" VerticalScrollBarVisibility="Auto" Focusable="False"
 						Visibility="{Binding SelectedFilter.AcceptAll, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}">
-						<Grid Margin="0,0,4,0">
+						<ScrollViewer.Resources>
+							<Style TargetType="ScrollBar">
+								<Setter Property="Margin" Value="8,0,0,0"/>
+							</Style>
+						</ScrollViewer.Resources>
+
+						<Grid>
 							<Grid.RowDefinitions>
 								<RowDefinition Height="Auto"/>
 								<RowDefinition Height="Auto"/>

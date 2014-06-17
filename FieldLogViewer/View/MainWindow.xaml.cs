@@ -86,22 +86,6 @@ namespace Unclassified.FieldLogViewer.View
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
-			// Disable overflow on the toolbar
-			// Source: http://stackoverflow.com/a/1051264/143684
-			foreach (var item in ToolBar.Items.OfType<FrameworkElement>())
-			{
-				ToolBar.SetOverflowMode(item, OverflowMode.Never);
-			}
-			var overflowGrid = ToolBar.Template.FindName("OverflowGrid", ToolBar) as FrameworkElement;
-			if (overflowGrid != null)
-			{
-				overflowGrid.Visibility = Visibility.Collapsed;
-			}
-			var mainPanelBorder = ToolBar.Template.FindName("MainPanelBorder", ToolBar) as FrameworkElement;
-			if (mainPanelBorder != null)
-			{
-				mainPanelBorder.Margin = new Thickness();
-			}
 		}
 
 		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -156,23 +140,6 @@ namespace Unclassified.FieldLogViewer.View
 			}
 
 			InvalidateScrollmap();
-
-			// Make the longer toolbar elements fill all remaining space
-			double toolbarWidth = ToolBar.ActualWidth;
-			double toolbarFixedWidth = 11;   // Guesstimated value for padding, etc.
-			foreach (var item in ToolBar.Items.OfType<FrameworkElement>())
-			{
-				if (item != FilterComboBox &&
-					item != SearchTextBox)
-				{
-					toolbarFixedWidth += item.DesiredSize.Width;
-				}
-			}
-			if (toolbarWidth > 0 && toolbarFixedWidth > 0)
-			{
-				FilterComboBox.Width = Math.Max(60, (toolbarWidth - toolbarFixedWidth) / 2);
-				SearchTextBox.Width = Math.Max(60, (toolbarWidth - toolbarFixedWidth) / 2);
-			}
 		}
 
 		private void Window_Activated(object sender, EventArgs e)

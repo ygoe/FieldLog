@@ -29,4 +29,14 @@
 		<Setter Property="Background" Value="Transparent"/>
 		<Setter Property="BorderBrush" Value="Transparent"/>
 	</Style>
+	
+	<Style x:Key="ToolBarSeparator" TargetType="Separator">
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate>
+					<Border BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" BorderThickness="1,0,0,0" Margin="4,0" Opacity="0.7"/>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
 </ResourceDictionary>

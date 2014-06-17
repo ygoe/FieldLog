@@ -32,7 +32,7 @@ Any version of Microsoft Windows supported by the .NET framework should do. The 
 
 The Microsoft .NET Framework 4.0 Client Profile is required for complete support of all packages. If your application is targeting .NET 2.0, you can still use the FieldLog assembly in your project to write log files. The log submit tool is currently also planned to support .NET 2.0 as well. So you can deploy FieldLog with your .NET 2.0 project but need .NET 4.0 to view the log files.
 
-The solution and project files are created by Microsoft Visual Studio 2010 SP1. Any edition (Professional, Premium, Ultimate) should do. IIRC, newer versions of Visual Studio use the same file format so you should be able to open the solution in Visual Studio 2012/2013 as well.
+The solution and project files are created by Microsoft Visual Studio 2010 SP1. Any edition (Professional, Premium, Ultimate) should do. Newer versions of Visual Studio use the same file format so you can seamlessly work with the solution in Visual Studio 2012/2013 as well.
 
 The setup is built using InnoSetup. It requires the InnoSetup preprocessor which is included in the Inno Setup QuickStart Pack. Version 5.5 has been tested to work.
 
@@ -40,9 +40,9 @@ The build script is implemented in PowerShell and has been tested with PowerShel
 
 BUILDING
 
-There is a number of entry scripts for the automated build process. These scripts are located in the "_scripts" directory and starting with "build". The scripts start the common build script with certain section names that are pretty much described by the file name. "build_all.cmd", for example, builds everything there is to build. "build_release.cmd" only builds the solution in the Release configuration and "build_release_setup.cmd" additionally creates a setup executable in the "Setup" directory. The assembly and setup version are determined from the currently checked out Git revision. The common build script is implemented in PowerShell and is smart enough to find all installed tools automatically.
+There is a number of entry scripts for the automated build process. These scripts are located in the "_scripts" directory and starting with "build". The scripts start the common build script with certain section names that are pretty much described by the file name. "build_all.cmd", for example, builds everything there is to build. "build_release.cmd" only builds the solution in the Release configuration and "build_release_setup.cmd" additionally creates a setup executable in the "Setup\bin" directory. The assembly and setup version are determined from the currently checked out Git revision. The common build script is implemented in PowerShell and is smart enough to find all installed tools automatically.
 
-It is also possible to open the solution file in the repository's root directory with Visual Studio and work with it as usual. You probably need to unload the project "FieldLog.NET20" first to avoid compiler confusion. To create the setup executable, you need a current version of InnoSetup (use the Unicode Inno Setup QuickStart Pack download).
+It is also possible to open the solution file in the repository's root directory with Visual Studio and work with it as usual. You probably need to unload the projects "FieldLog.NET20" and "FieldLog.ASPNET40" first to avoid compiler confusion. To create the setup executable, you need a current version of InnoSetup (use the Unicode Inno Setup QuickStart Pack download).
 
 THE NAME
 
@@ -51,30 +51,6 @@ The name "FieldLog" was originally supposed to refer to "out in the field loggin
 Another interpretation might refer to the structured log items that distinguishes FieldLog from plain text log files that actually only store a single line of raw text about each event. Being able to access and understand each bit of information allows for filtering the data masses to actually see the interesting parts.
 
 The logo merges the capital letters F and L into a combined shape (which happens to look like an E), using different colours for the parts distinct from both letters and the shared part. The horizontal bars also depict "good" and "error" rows in a log list, which is basically what you can see with FieldLog.
-
-PERFORMANCE
-
-A benchmark application is included in the solution. It allows you to run your own tests. Here are the numbers I determined on a 2013 office PC, using minimum values of multiple benchmark runs.
-
-FieldLog text message              :     427 ns/call
-FieldLog scope helper              :     935 ns/call
-Synchronised StreamWriter.WriteLine:    1215 ns/call
-Trace.WriteLine (no listener)      :    2852 ns/call
-FieldLog scope helper w/ reflection:    5944 ns/call
-NLog 2.1 async file                :    6305 ns/call
-Synchronised File.AppendAllText SSD:  110484 ns/call
-Trace.WriteLine (VS/DbgView)       :  272942 ns/call
-Synchronised File.AppendAllText HDD: 2232278 ns/call
-
-Flushing 1 million FieldLog text messages: 6352 ms / 7440 ms with NTFS compression
-Flushing 1 million StreamWriter.WriteLine:    2 ms
-Flushing 500000 FieldLog scope messages  : 4130 ms
-Flushing 500000 FieldLog scope messages  : 1607 ms (with reflection)
-Flushing 1 million NLog messages         : 1950 ms
-
-The scope logging helper generates an Enter and a Leave message and takes about twice the time of writing a single text message. So you can calculate something around one microsecond for each logged method or other scope. Determining the method name through reflection takes considerably longer though and may not be an option in performance-critical loops.
-
-Flushing FieldLog items to the log files happens on a separate thread. That is why submitting the log messages is so fast. But if large amounts of log items are submitted in a very short time, like in this benchmark which actually doesn't do anything else, flushing can take a moment to complete. The longer the logging methods take in advance, the more items have already been written and the less time the final flush takes. So these numbers are just informative but normally not relevant.
 
 LICENCE
 

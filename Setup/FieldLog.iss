@@ -113,8 +113,6 @@ Source: "..\FieldLogViewer\bin\Release\TaskDialog.dll"; DestDir: "{app}"; Flags:
 Source: "..\FieldLog\bin\ReleaseNET40\Unclassified.FieldLog.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\FieldLog\FileFormat.html"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\FieldLogViewer\bin\Release\Sounds\*.mp3"; DestDir: "{app}\Sounds"; Flags: ignoreversion
-; Include the converted .pdb symbols to keep them archived and available for future analysis (not required on the target system though)
-Source: "..\FieldLogViewer\bin\Release\FieldLogViewer.pdb.xml.gz"; DestDir: "{app}"; Flags: ignoreversion
 
 ; PdbConvert tool
 Source: "..\PdbConvert\bin\Release\PdbConvert.exe"; DestDir: "{app}"; Flags: ignoreversion

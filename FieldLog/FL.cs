@@ -98,7 +98,7 @@ namespace Unclassified.FieldLog
 		/// <param name="hWnd">A handle to the window to be tested.</param>
 		/// <returns></returns>
 		[DllImport("user32.dll")]
-		static extern bool IsWindowVisible(IntPtr hWnd);
+		private static extern bool IsWindowVisible(IntPtr hWnd);
 
 		#endregion Native interop
 

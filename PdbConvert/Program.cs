@@ -42,19 +42,26 @@ namespace PdbConvert
 				return 0;
 			}
 
-			foreach (var arg in cmdLine.FreeArguments)
+			try
 			{
-				if (arg.IndexOfAny(new[] { '?', '*' }) != -1)
+				foreach (var arg in cmdLine.FreeArguments)
 				{
-					foreach (string foundFile in Directory.GetFiles(Path.GetDirectoryName(arg), Path.GetFileName(arg)))
+					if (arg.IndexOfAny(new[] { '?', '*' }) != -1)
 					{
-						CheckAddAssemblyFile(assemblyFileNames, foundFile);
+						foreach (string foundFile in Directory.GetFiles(Path.GetDirectoryName(arg), Path.GetFileName(arg)))
+						{
+							CheckAddAssemblyFile(assemblyFileNames, foundFile);
+						}
+					}
+					else
+					{
+						CheckAddAssemblyFile(assemblyFileNames, arg);
 					}
 				}
-				else
-				{
-					CheckAddAssemblyFile(assemblyFileNames, arg);
-				}
+			}
+			catch (Exception ex)
+			{
+				return ConsoleHelper.ExitError("Cannot load input files. " + ex.Message, 5);
 			}
 
 			if (assemblyFileNames.Count == 0)
@@ -81,6 +88,18 @@ namespace PdbConvert
 			try
 			{
 				reader.Convert();
+			}
+			catch (System.Reflection.ReflectionTypeLoadException ex)
+			{
+				if (ex.LoaderExceptions != null)
+				{
+					ConsoleHelper.WriteLine("ReflectionTypeLoadException.LoaderExceptions:", ConsoleColor.Red);
+					foreach (var ex2 in ex.LoaderExceptions)
+					{
+						ConsoleHelper.WriteWrapped("- " + ex2.Message);
+					}
+				}
+				return ConsoleHelper.ExitError("Cannot convert symbols. " + ex.Message, 3);
 			}
 			catch (Exception ex)
 			{

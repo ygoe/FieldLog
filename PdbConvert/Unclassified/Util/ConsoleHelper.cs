@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using System.Runtime.InteropServices;
 
 namespace Unclassified.Util
 {
@@ -31,6 +32,155 @@ namespace Unclassified.Util
 
 		#endregion Encoding
 
+		#region Environment
+
+		#region Native interop
+
+		/// <summary>
+		/// Defines values returned by the GetFileType function.
+		/// </summary>
+		private enum FileType : uint
+		{
+			/// <summary>The specified file is a character file, typically an LPT device or a console.</summary>
+			FileTypeChar = 0x0002,
+			/// <summary>The specified file is a disk file.</summary>
+			FileTypeDisk = 0x0001,
+			/// <summary>The specified file is a socket, a named pipe, or an anonymous pipe.</summary>
+			FileTypePipe = 0x0003,
+			/// <summary>Unused.</summary>
+			FileTypeRemote = 0x8000,
+			/// <summary>Either the type of the specified file is unknown, or the function failed.</summary>
+			FileTypeUnknown = 0x0000,
+		}
+
+		/// <summary>
+		/// Defines standard device handles for the GetStdHandle function.
+		/// </summary>
+		private enum StdHandle : int
+		{
+			/// <summary>The standard input device. Initially, this is the console input buffer, CONIN$.</summary>
+			Input = -10,
+			/// <summary>The standard output device. Initially, this is the active console screen buffer, CONOUT$.</summary>
+			Output = -11,
+			/// <summary>The standard error device. Initially, this is the active console screen buffer, CONOUT$.</summary>
+			Error = -12,
+		}
+
+		/// <summary>
+		/// Retrieves the file type of the specified file.
+		/// </summary>
+		/// <param name="hFile">A handle to the file.</param>
+		/// <returns></returns>
+		[DllImport("kernel32.dll")]
+		private static extern FileType GetFileType(IntPtr hFile);
+
+		/// <summary>
+		/// Retrieves a handle to the specified standard device (standard input, standard output,
+		/// or standard error).
+		/// </summary>
+		/// <param name="nStdHandle">The standard device.</param>
+		/// <returns></returns>
+		[DllImport("kernel32.dll", SetLastError = true)]
+		private static extern IntPtr GetStdHandle(StdHandle nStdHandle);
+
+		/// <summary>
+		/// Retrieves the window handle used by the console associated with the calling process.
+		/// </summary>
+		/// <returns></returns>
+		[DllImport("kernel32.dll", SetLastError = true)]
+		private static extern IntPtr GetConsoleWindow();
+
+		/// <summary>
+		/// Determines the visibility state of the specified window.
+		/// </summary>
+		/// <param name="hWnd">A handle to the window to be tested.</param>
+		/// <returns></returns>
+		[DllImport("user32.dll")]
+		private static extern bool IsWindowVisible(IntPtr hWnd);
+
+		#endregion Native interop
+
+		/// <summary>
+		/// Gets a value indicating whether the current application has an interactive console and
+		/// is able to interact with the user through it.
+		/// </summary>
+		public static bool IsInteractiveAndVisible
+		{
+			get
+			{
+				IntPtr consoleWnd = GetConsoleWindow();
+				return Environment.UserInteractive &&
+					consoleWnd != IntPtr.Zero &&
+					IsWindowVisible(consoleWnd) &&
+					!IsInputRedirected &&
+					!IsOutputRedirected &&
+					!IsErrorRedirected;
+			}
+		}
+
+		private static bool? isInputRedirected;
+		private static bool? isOutputRedirected;
+		private static bool? isErrorRedirected;
+
+		/// <summary>
+		/// Gets a value that indicates whether input has been redirected from the standard input
+		/// stream.
+		/// </summary>
+		/// <remarks>
+		/// The value is cached after the first access.
+		/// </remarks>
+		public static bool IsInputRedirected
+		{
+			get
+			{
+				if (isInputRedirected == null)
+				{
+					isInputRedirected = GetFileType(GetStdHandle(StdHandle.Input)) != FileType.FileTypeChar;
+				}
+				return isInputRedirected == true;
+			}
+		}
+
+		/// <summary>
+		/// Gets a value that indicates whether output has been redirected from the standard output
+		/// stream.
+		/// </summary>
+		/// <remarks>
+		/// The value is cached after the first access.
+		/// </remarks>
+		public static bool IsOutputRedirected
+		{
+			get
+			{
+				if (isOutputRedirected == null)
+				{
+					isOutputRedirected = GetFileType(GetStdHandle(StdHandle.Output)) != FileType.FileTypeChar;
+				}
+				return isOutputRedirected == true;
+			}
+		}
+
+		/// <summary>
+		/// Gets a value that indicates whether the error output stream has been redirected from the
+		/// standard error stream.
+		/// </summary>
+		/// <remarks>
+		/// The value is cached after the first access.
+		/// </remarks>
+		public static bool IsErrorRedirected
+		{
+			get
+			{
+				if (isErrorRedirected == null)
+				{
+					isErrorRedirected = GetFileType(GetStdHandle(StdHandle.Error)) != FileType.FileTypeChar;
+				}
+				return isErrorRedirected == true;
+			}
+		}
+
+		#endregion Environment
+
 		#region Cursor
 
 		/// <summary>
@@ -39,16 +189,19 @@ namespace Unclassified.Util
 		/// <param name="count">The number of characters to move the cursor. Positive values move to the right, negative to the left.</param>
 		public static void MoveCursor(int count)
 		{
-			int x = Console.CursorLeft + count;
-			if (x < 0)
+			if (!IsOutputRedirected)
 			{
-				x = 0;
+				int x = Console.CursorLeft + count;
+				if (x < 0)
+				{
+					x = 0;
+				}
+				if (x >= Console.BufferWidth)
+				{
+					x = Console.BufferWidth - 1;
+				}
+				Console.CursorLeft = x;
 			}
-			if (x >= Console.BufferWidth)
-			{
-				x = Console.BufferWidth - 1;
-			}
-			Console.CursorLeft = x;
 		}
 
 		/// <summary>
@@ -56,14 +209,21 @@ namespace Unclassified.Util
 		/// </summary>
 		public static void ClearLine()
 		{
-			Console.CursorLeft = 0;
-			Console.Write(new string(' ', Console.BufferWidth - 1));
-			Console.CursorLeft = 0;
+			if (!IsOutputRedirected)
+			{
+				Console.CursorLeft = 0;
+				Console.Write(new string(' ', Console.BufferWidth - 1));
+				Console.CursorLeft = 0;
+			}
+			else
+			{
+				Console.WriteLine();
+			}
 		}
 
 		#endregion Cursor
 
-		#region Color
+		#region Color output
 
 		/// <summary>
 		/// Writes a text in a different color. The previous color is restored.
@@ -125,7 +285,7 @@ namespace Unclassified.Util
 			Console.BackgroundColor = oldBackColor;
 		}
 
-		#endregion Color
+		#endregion Color output
 
 		#region Progress bar
 
@@ -259,7 +419,11 @@ namespace Unclassified.Util
 				Console.Write(progressTitle + " " + value.ToString().PadLeft(progressTotal.ToString().Length) + "/" + progressTotal + " ");
 
 				// Use almost the entire remaining visible space for the progress bar
-				int graphLength = Console.WindowWidth - Console.CursorLeft - 4;
+				int graphLength = 80;
+				if (!IsOutputRedirected)
+				{
+					graphLength = Console.WindowWidth - Console.CursorLeft - 4;
+				}
 				int graphPart = progressTotal > 0 ? (int) Math.Round((double) value / progressTotal * graphLength) : 0;
 
 				ConsoleColor graphColor;
@@ -286,9 +450,10 @@ namespace Unclassified.Util
 		/// <param name="tableMode">Indents to the last occurence of two spaces; otherwise indents to leading spaces.</param>
 		public static void WriteWrapped(string text, bool tableMode = false)
 		{
+			int width = !IsOutputRedirected ? Console.WindowWidth : 80;
 			foreach (string line in text.Split('\n'))
 			{
-				Console.Write(FormatWrapped(line.TrimEnd(), Console.WindowWidth, tableMode));
+				Console.Write(FormatWrapped(line.TrimEnd(), width, tableMode));
 			}
 		}
 
@@ -374,9 +539,12 @@ namespace Unclassified.Util
 		/// </summary>
 		public static void ClearKeyBuffer()
 		{
-			while (Console.KeyAvailable)
+			if (!IsInputRedirected)
 			{
-				Console.ReadKey(true);
+				while (Console.KeyAvailable)
+				{
+					Console.ReadKey(true);
+				}
 			}
 		}
 
@@ -424,14 +592,14 @@ namespace Unclassified.Util
 		}
 
 		/// <summary>
-		/// Waits for the user to press any key if in interactive mode.
+		/// Waits for the user to press any key if in interactive mode and input is not redirected.
 		/// </summary>
 		/// <param name="message">The message to display. If null, a standard message is displayed.</param>
 		/// <param name="timeout">The time in seconds until the method returns even if no key was pressed. If -1, the timeout is infinite.</param>
 		/// <param name="showDots">true to show a dot for every second of the timeout, removing one dot each second.</param>
 		public static void Wait(string message = null, int timeout = -1, bool showDots = false)
 		{
-			if (Environment.UserInteractive)
+			if (Environment.UserInteractive && !IsInputRedirected)
 			{
 				if (message == null)
 				{

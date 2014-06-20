@@ -31,8 +31,11 @@ namespace PdbConvert
 
 			AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomain_ReflectionOnlyAssemblyResolve;
 
+			string currDir = Environment.CurrentDirectory;
 			foreach (string fileName in assemblyFileNames)
 			{
+				// Change to the file's directory so that we can find referenced assemblies
+				Environment.CurrentDirectory = Path.GetDirectoryName(fileName);
 				ISymbolReader reader = SymbolAccess.GetReaderForFile(fileName);
 				assembly = Assembly.ReflectionOnlyLoadFrom(fileName);
 
@@ -47,6 +50,7 @@ namespace PdbConvert
 
 				xmlWriter.WriteEndElement();   // </module>
 			}
+			Environment.CurrentDirectory = currDir;
 
 			AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve -= CurrentDomain_ReflectionOnlyAssemblyResolve;
 
@@ -165,8 +169,20 @@ namespace PdbConvert
 		{
 			xmlWriter.WriteStartElement("methods");
 
-			// Use reflection to enumerate all methods
-			foreach (Type t in assembly.GetTypes())
+			// Use reflection to enumerate all methods.
+			// Skip all types that cannot be loaded.
+			// Source: http://stackoverflow.com/a/7889272/143684
+			List<Type> types;
+			try
+			{
+				types = assembly.GetTypes().ToList();
+			}
+			catch (ReflectionTypeLoadException ex)
+			{
+				types = ex.Types.Where(t => t != null).ToList();
+			}
+
+			foreach (Type t in types)
 			{
 				foreach (MethodInfo methodReflection in t.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly))
 				{

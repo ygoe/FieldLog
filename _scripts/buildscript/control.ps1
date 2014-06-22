@@ -19,14 +19,16 @@ if (IsSelected("build-debug"))
 
 	if (IsSelected("sign-lib"))
 	{
-		Sign-File "FieldLog\bin\DebugNET40\Unclassified.FieldLog.dll" "signkey.pfx" "@signkey.password" 1
-		Sign-File "FieldLog\bin\DebugNET20\Unclassified.FieldLog.dll" "signkey.pfx" "@signkey.password" 1
-		Sign-File "FieldLog\bin\DebugASPNET40\Unclassified.FieldLog.dll" "signkey.pfx" "@signkey.password" 1
+		. "$sourcePath\.local\sign_config.ps1"
+		Sign-File "FieldLog\bin\DebugNET40\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword" 1
+		Sign-File "FieldLog\bin\DebugNET20\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword" 1
+		Sign-File "FieldLog\bin\DebugASPNET40\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword" 1
 	}
 	if (IsSelected("sign-app"))
 	{
-		Sign-File "FieldLogViewer\bin\Debug\FieldLogViewer.exe" "signkey.pfx" "@signkey.password" 1
-		Sign-File "PdbConvert\bin\Debug\PdbConvert.exe" "signkey.pfx" "@signkey.password" 1
+		. "$sourcePath\.local\sign_config.ps1"
+		Sign-File "FieldLogViewer\bin\Debug\FieldLogViewer.exe" "$signKeyFile" "$signPassword" 1
+		Sign-File "PdbConvert\bin\Debug\PdbConvert.exe" "$signKeyFile" "$signPassword" 1
 	}
 }
 
@@ -38,14 +40,16 @@ if ((IsSelected("build-release")) -or (IsSelected("commit")))
 
 	if (IsSelected("sign-lib"))
 	{
-		Sign-File "FieldLog\bin\ReleaseNET40\Unclassified.FieldLog.dll" "signkey.pfx" "@signkey.password" 1
-		Sign-File "FieldLog\bin\ReleaseNET20\Unclassified.FieldLog.dll" "signkey.pfx" "@signkey.password" 1
-		Sign-File "FieldLog\bin\ReleaseASPNET40\Unclassified.FieldLog.dll" "signkey.pfx" "@signkey.password" 1
+		. "$sourcePath\.local\sign_config.ps1"
+		Sign-File "FieldLog\bin\ReleaseNET40\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword" 1
+		Sign-File "FieldLog\bin\ReleaseNET20\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword" 1
+		Sign-File "FieldLog\bin\ReleaseASPNET40\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword" 1
 	}
 	if (IsSelected("sign-app"))
 	{
-		Sign-File "FieldLogViewer\bin\Release\FieldLogViewer.exe" "signkey.pfx" "@signkey.password" 1
-		Sign-File "PdbConvert\bin\Release\PdbConvert.exe" "signkey.pfx" "@signkey.password" 1
+		. "$sourcePath\.local\sign_config.ps1"
+		Sign-File "FieldLogViewer\bin\Release\FieldLogViewer.exe" "$signKeyFile" "$signPassword" 1
+		Sign-File "PdbConvert\bin\Release\PdbConvert.exe" "$signKeyFile" "$signPassword" 1
 	}
 }
 
@@ -56,7 +60,8 @@ if ((IsSelected("setup-release")) -or (IsSelected("commit")))
 
 	if (IsSelected("sign-setup"))
 	{
-		Sign-File "Setup\bin\FieldLogSetup-$revId.exe" "signkey.pfx" "@signkey.password" 1
+		. "$sourcePath\.local\sign_config.ps1"
+		Sign-File "Setup\bin\FieldLogSetup-$revId.exe" "$signKeyFile" "$signPassword" 1
 	}
 }
 
@@ -70,6 +75,7 @@ if (IsSelected("install"))
 if (IsSelected("commit"))
 {
 	Delete-File "Setup\bin\FieldLogSetup-$revId.exe" 0
+	Delete-File ".local\FieldLog-$revId.pdb.xml.gz" 0
 	Git-Commit 1
 }
 

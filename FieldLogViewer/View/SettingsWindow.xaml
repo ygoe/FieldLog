@@ -24,6 +24,7 @@
 						<RowDefinition Height="Auto"/>
 						<RowDefinition Height="Auto"/>
 						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
 					</Grid.RowDefinitions>
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="Auto"/>
@@ -50,6 +51,11 @@
 						<CheckBox Content="Warnings and errors" IsChecked="{Binding AppSettings.ShowWarningsErrorsInScrollBar}"/>
 						<CheckBox Margin="8,0,0,0" Content="Current selection" IsChecked="{Binding AppSettings.ShowSelectionInScrollBar}"/>
 					</StackPanel>
+
+					<CheckBox
+						Grid.Row="3" Grid.ColumnSpan="2" Margin="0,6,0,0"
+						Content="Show main window tool bar in the window frame (applied after restart)"
+						IsChecked="{Binding AppSettings.Window.ToolBarInWindowFrame}"/>
 				</Grid>
 			</TabItem>
 

@@ -111,6 +111,7 @@
     <Compile Include="SourceResolver.cs" />
     <Compile Include="Unclassified\UI\MenuIconExtension.cs" />
     <Compile Include="Unclassified\UI\MenuIconImage.cs" />
+    <Compile Include="Unclassified\UI\WindowManager.cs" />
     <Compile Include="Unclassified\Util\GlobalMutex.cs" />
     <Compile Include="Unclassified\Util\DebugMonitor.cs" />
     <Compile Include="Unclassified\Util\DelayedCall.cs" />

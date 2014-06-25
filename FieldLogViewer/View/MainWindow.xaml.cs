@@ -18,6 +18,8 @@ using Unclassified.FieldLog;
 using Unclassified.FieldLogViewer.ViewModel;
 using Unclassified.UI;
 using Unclassified.Util;
+using System.Runtime.InteropServices;
+using System.Windows.Interop;
 
 namespace Unclassified.FieldLogViewer.View
 {
@@ -86,6 +88,15 @@ namespace Unclassified.FieldLogViewer.View
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
+			if (AppSettings.Instance.Window.ToolBarInWindowFrame &&
+				WindowManager.ExtendFrameIntoClientArea(this, 0, (int) ToolBar.ActualHeight, 0, 0))
+			{
+				Background = Brushes.Transparent;
+				ToolBar.Background = null;
+				ToolBarGrid.Margin = new Thickness(0, 0, 0, 4);
+				ToolBarBorder.Visibility = Visibility.Collapsed;
+				MainLayout.Margin = new Thickness();
+			}
 		}
 
 		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

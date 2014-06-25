@@ -383,6 +383,15 @@ namespace Unclassified.FieldLogViewer
 			set { Set("SettingsHeight", value); }
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether the toolbar is in the window frame.
+		/// </summary>
+		public bool ToolBarInWindowFrame
+		{
+			get { return GetBool("ToolBarInWindowFrame", false); }
+			set { Set("ToolBarInWindowFrame", value); }
+		}
+
 		#endregion Data properties
 	}
 

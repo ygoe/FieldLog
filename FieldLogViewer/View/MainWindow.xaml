@@ -38,8 +38,8 @@
 			<ColumnDefinition Width="*"/>
 		</Grid.ColumnDefinitions>
 
-		<Border Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-			<Grid Margin="2">
+		<Border Name="ToolBar" Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+			<Grid Name="ToolBarGrid" Margin="2">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="Auto"/>
 					<ColumnDefinition Width="Auto"/>
@@ -208,9 +208,9 @@
 			</Grid>
 		</Border>
 
-		<Border Grid.Row="1" BorderThickness="0,1,0,0" BorderBrush="#40000000"/>
-		
-		<Grid Grid.Row="1" Name="MainLayout" Margin="0,1,0,0">
+		<Border Name="ToolBarBorder" Grid.Row="1" BorderThickness="0,1,0,0" BorderBrush="#40000000"/>
+
+		<Grid Name="MainLayout" Grid.Row="1" Margin="0,1,0,0" Background="White">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="*"/>
 				<RowDefinition Height="0"/>

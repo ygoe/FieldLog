@@ -219,7 +219,7 @@
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
-		
+
 			<ListBox
 				Name="LogItemsList"
 				ItemsSource="{Binding FilteredLogItemsView}"
@@ -768,7 +768,7 @@
 					</DataTemplate>
 				</ListBox.Resources>
 			</ListBox>
-				
+
 			<Canvas HorizontalAlignment="Right" Margin="0,0,13,0" IsHitTestVisible="False">
 				<Path Name="WarningMap" Fill="#e0c720"/>
 				<Path Name="ErrorMap" Fill="#fa6400"/>
@@ -821,7 +821,7 @@
 					</ContentControl.Resources>
 				</ContentControl>
 			</Border>
-			
+
 			<StackPanel
 				Grid.Column="0" Grid.ColumnSpan="2"
 				VerticalAlignment="Center" HorizontalAlignment="Center"

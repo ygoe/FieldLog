@@ -19,7 +19,7 @@ using Unclassified.Util;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
-	class MainViewModel : ViewModelBase, IViewCommandSource
+	internal class MainViewModel : ViewModelBase, IViewCommandSource
 	{
 		#region Static data
 
@@ -41,7 +41,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		private FilterConditionViewModel adhocFilterCondition;
 		private SourceResolver sourceResolver = new SourceResolver();
 		private SettingsWindow openSettingsWindow;
-		
+
 		/// <summary>
 		/// Buffer for all read items that are collected in the separate Task thread and then
 		/// pushed to the UI thread as a new ObservableCollection instance.
@@ -129,7 +129,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				// Only the "show all" filter is present
 				CreateBasicFilters();
 			}
-			
+
 			// Restore filter selection
 			FilterViewModel selectedFilterVM = Filters.FirstOrDefault(f => f.DisplayName == AppSettings.SelectedFilter);
 			if (selectedFilterVM != null)
@@ -265,7 +265,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			return !IsLoadingFiles && !IsLoadingFilesAgain;
 		}
-		
+
 		private void OnLoadLog()
 		{
 			OpenFileDialog dlg = new OpenFileDialog();
@@ -1685,7 +1685,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		{
 			// Set current thread name to aid debugging
 			Thread.CurrentThread.Name = "MainViewModel.ReadTask";
-			
+
 			// Setup and connect the wait handle that is set when all data has been read and we're
 			// now waiting for more items to be written to the log files.
 			EventWaitHandle readWaitHandle = new AutoResetEvent(false);
@@ -1774,7 +1774,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 							localLogItemsLock.EnterWriteLock();
 							upgradedLock = true;
-							
+
 							// Setup everything as if we were still reading an initial set of log
 							// files and the the read Task thread use its local buffer again.
 							using (FL.Scope("Copying logItems to localLogItems"))
@@ -1811,7 +1811,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 							FL.Trace("Already too many items queued, waiting...");
 							Thread.Sleep(10);
 						}
-						
+
 						Interlocked.Increment(ref queuedNewItemsCount);
 						dispatcher.BeginInvoke(
 							new Action<LogItemViewModelBase>(this.InsertNewLogItem),
@@ -2031,7 +2031,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 							nextFlItem.LastWebRequestStartItem = flItem.LastWebRequestStartItem;
 							// itemsToRefresh.Add(nextFlItem);
 							// ^-- Will always be set later on
-							
+
 							// Update web request processing time
 							FieldLogScopeItemViewModel nextScope = nextFlItem as FieldLogScopeItemViewModel;
 							if (nextScope != null && nextScope.Type == FieldLogScopeType.WebRequestEnd)
@@ -2132,7 +2132,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			if (returnToLocalLogItemsList.WaitOne(0))
 			{
 				FL.Trace("OnReadWaiting: returnToLocalLogItemsList was set", "Reverting UI state, not touching log items lists.");
-				
+
 				// The UI thread has been busy inserting queued new items and has detected a long
 				// blocking period. It has then decided to signal the read thread to go back to
 				// inserting more items into a local List instead of the main ObservableCollection.
@@ -2149,7 +2149,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				ViewCommandManager.Invoke("FinishedReadingFiles");
 				return;
 			}
-			
+
 			// Lock the local list so that no item loaded directly afterwards will get lost
 			// while we're still preparing the loaded items list to be pushed to the UI
 			localLogItemsLock.EnterReadLock();
@@ -2241,7 +2241,6 @@ namespace Unclassified.FieldLogViewer.ViewModel
 									flItem.Time - flItem.LastWebRequestStartItem.Time;
 							}
 						}
-
 					}
 				}
 

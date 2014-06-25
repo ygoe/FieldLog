@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Text;
 using System.Windows.Threading;
 using Unclassified.UI;
 using Unclassified.Util;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
-	class FilterViewModel : ViewModelBase
+	internal class FilterViewModel : ViewModelBase
 	{
 		#region Private data
 
@@ -161,7 +160,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		public void LoadFromString(string data)
 		{
 			isLoading = true;
-			
+
 			ConditionGroups.Clear();
 			IEnumerable<string> lines = data.Split('\n').Select(s => s.Trim('\r'));
 			List<string> lineBuffer = new List<string>();
@@ -209,14 +208,14 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			grp2.IsExclude = lineBufferIsExclude;
 			grp2.IsEnabled = lineBufferIsEnabled;
 			ConditionGroups.Add(grp2);
-			
+
 			isLoading = false;
 		}
 
 		public string SaveToString()
 		{
 			if (!ConditionGroups.Any()) return null;   // Intermediate state, should not be saved
-			
+
 			return (IsQuickFilter ? "qf" : "") + "," + DisplayName + Environment.NewLine +
 				ConditionGroups.Select(c => c.SaveToString()).Aggregate((a, b) => a + Environment.NewLine + b);
 		}

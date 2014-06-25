@@ -6,7 +6,7 @@ using Unclassified.FieldLog;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
-	class FieldLogEnvironmentViewModel : ViewModelBase
+	internal class FieldLogEnvironmentViewModel : ViewModelBase
 	{
 		public FieldLogEnvironmentViewModel(FieldLogEventEnvironment environment, FieldLogItemViewModel itemVM)
 		{

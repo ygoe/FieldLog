@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Unclassified.FieldLog;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
-	class FieldLogDataItemViewModel : FieldLogItemViewModel
+	internal class FieldLogDataItemViewModel : FieldLogItemViewModel
 	{
 		public FieldLogDataItemViewModel(FieldLogDataItem item)
 		{
@@ -30,7 +28,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 						" = " +
 						string.Join(" ", this.Value.Replace("\r", "").Split('\n').Select(a => a.Trim()));
 				}
-				
+
 				return
 					(this.Name == null ? "(null)" : this.Name.Trim().Replace("\r", "").Replace("\n", "↲")) +
 					" = " +

@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Data;
-using Unclassified.FieldLogViewer.ViewModel;
 
 namespace Unclassified.FieldLogViewer.Converters
 {
-	class RelativeTimeConverter : IMultiValueConverter
+	internal class RelativeTimeConverter : IMultiValueConverter
 	{
 		public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
 		{
@@ -72,7 +69,7 @@ namespace Unclassified.FieldLogViewer.Converters
 							itemTime = itemTime.AddMinutes(utcOffset);
 							break;
 					}
-					
+
 					if (parameter as string == "ms")
 					{
 						return "." + itemTime.Millisecond.ToString().PadLeft(3, '0');

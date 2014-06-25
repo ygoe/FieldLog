@@ -1,8 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Diagnostics;
 
 namespace Unclassified.Util
 {
@@ -90,7 +90,7 @@ namespace Unclassified.Util
 
 		[DllImport("kernel32", SetLastError = true, ExactSpelling = true)]
 		private static extern Int32 WaitForSingleObject(IntPtr handle, uint milliseconds);
-		
+
 		#endregion Win32 API imports
 
 		#region Constructor

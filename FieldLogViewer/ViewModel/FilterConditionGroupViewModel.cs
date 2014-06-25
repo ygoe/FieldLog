@@ -12,7 +12,7 @@ using Unclassified.Util;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
-	class FilterConditionGroupViewModel : ViewModelBase
+	internal class FilterConditionGroupViewModel : ViewModelBase
 	{
 		#region Private data
 
@@ -55,7 +55,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					c.PropertyChanged += condition_PropertyChanged;
 				}
 			}
-			
+
 			if (Conditions.Count > 0)
 			{
 				UpdateFirstStatus();
@@ -108,7 +108,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			isReordering = true;
 
 			Conditions.Sort(c => c.Column);
-			
+
 			isReordering = false;
 
 			OnFilterChanged(false);

@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Unclassified.FieldLog;
 using System.Windows;
+using Unclassified.FieldLog;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
-	class FieldLogScopeItemViewModel : FieldLogItemViewModel
+	internal class FieldLogScopeItemViewModel : FieldLogItemViewModel
 	{
 		public FieldLogScopeItemViewModel(FieldLogScopeItem item)
 		{
@@ -46,7 +44,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				}
 			}
 		}
-		
+
 		public string TypeImageSource
 		{
 			get

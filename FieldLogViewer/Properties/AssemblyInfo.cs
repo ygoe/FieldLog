@@ -5,7 +5,6 @@ using System.Windows;
 [assembly: AssemblyProduct("FieldLogViewer")]
 [assembly: AssemblyTitle("FieldLogViewer")]
 [assembly: AssemblyDescription("FieldLog Viewer")]
-
 [assembly: AssemblyCopyright("© Yves Goergen, GNU GPL v3")]
 [assembly: AssemblyCompany("unclassified software development")]
 
@@ -20,7 +19,6 @@ using System.Windows;
 // Can be any freely formatted string containing punctuation, letters and revision codes.
 // Should be set to the same value as AssemblyVersion if only the basic numbering scheme is applied.
 [assembly: AssemblyInformationalVersion("{bmin:2014:4}.{commit:6}{!:+}")]
-
 #if DEBUG
 [assembly: AssemblyConfiguration("Debug")]
 #else

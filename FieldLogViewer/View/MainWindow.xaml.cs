@@ -2,24 +2,16 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Unclassified.FieldLog;
 using Unclassified.FieldLogViewer.ViewModel;
 using Unclassified.UI;
 using Unclassified.Util;
-using System.Runtime.InteropServices;
-using System.Windows.Interop;
 
 namespace Unclassified.FieldLogViewer.View
 {
@@ -63,7 +55,7 @@ namespace Unclassified.FieldLogViewer.View
 		public MainWindow()
 		{
 			Instance = this;
-			
+
 			InitializeComponent();
 
 			WindowStartupLocation = WindowStartupLocation.Manual;
@@ -357,7 +349,7 @@ namespace Unclassified.FieldLogViewer.View
 				ClearScrollmap();
 			updateScrollmapDc.Reset();
 		}
-		
+
 		private void ClearScrollmap()
 		{
 			WarningMap.Data = null;
@@ -381,7 +373,7 @@ namespace Unclassified.FieldLogViewer.View
 			bool showSelection = AppSettings.Instance.ShowSelectionInScrollBar;
 
 			if (!showWarningsErrors && !showSelection) return;   // Nothing to do
-			
+
 			double itemOffset = 0;
 			double itemHeight = logItemsHostPanel.ItemHeight;
 

@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Unclassified.FieldLog;
 using System.Windows;
+using Unclassified.FieldLog;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
-	class FieldLogExceptionItemViewModel : FieldLogItemViewModel
+	internal class FieldLogExceptionItemViewModel : FieldLogItemViewModel
 	{
 		public FieldLogExceptionItemViewModel(FieldLogExceptionItem item)
 		{
@@ -35,7 +33,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					return "Stack trace: " +
 						(this.Exception.Message != null ? this.Exception.Message.Trim().Replace("\r", "").Replace("\n", "↲") : "");
 				}
-				
+
 				string exType = this.Exception.Type;
 				int dotIndex = exType.LastIndexOf('.');
 				if (dotIndex > -1)
@@ -43,7 +41,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				if (exType.EndsWith("Exception", StringComparison.InvariantCultureIgnoreCase) &&
 					!exType.Equals("Exception", StringComparison.InvariantCultureIgnoreCase))
 					exType = exType.Substring(0, exType.Length - "Exception".Length + 2);
-				
+
 				return exType + ": " +
 					(this.Exception.Message != null ? this.Exception.Message.Trim().Replace("\r", "").Replace("\n", "↲") : "");
 			}

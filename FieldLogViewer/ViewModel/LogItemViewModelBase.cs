@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
-	class LogItemViewModelBase : ViewModelBase, IComparable<LogItemViewModelBase>, IEditableObject
+	internal class LogItemViewModelBase : ViewModelBase, IComparable<LogItemViewModelBase>, IEditableObject
 	{
 		public int EventCounter { get; set; }
 		public DateTime Time { get; set; }

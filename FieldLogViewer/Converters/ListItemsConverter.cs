@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows.Data;
 using Unclassified.FieldLogViewer.ViewModel;
-using Unclassified.FieldLog;
 
 namespace Unclassified.FieldLogViewer.Converters
 {
-	class ListItemsConverter : IMultiValueConverter
+	internal class ListItemsConverter : IMultiValueConverter
 	{
 		#region IMultiValueConverter Member
 
@@ -77,6 +74,6 @@ namespace Unclassified.FieldLogViewer.Converters
 			throw new NotImplementedException();
 		}
 
-		#endregion
+		#endregion IMultiValueConverter Member
 	}
 }

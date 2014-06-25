@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Media;
 using Unclassified.FieldLog;
@@ -9,7 +7,7 @@ using Unclassified.UI;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
-	class DebugMessageViewModel : LogItemViewModelBase
+	internal class DebugMessageViewModel : LogItemViewModelBase
 	{
 		#region Constructor
 
@@ -96,7 +94,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				return GetLogFileBasePath() != null ? Visibility.Visible : Visibility.Collapsed;
 			}
 		}
-		
+
 		#endregion Properties
 
 		#region Commands

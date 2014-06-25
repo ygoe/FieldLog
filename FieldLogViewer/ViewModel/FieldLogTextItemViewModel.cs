@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Unclassified.FieldLog;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
-	class FieldLogTextItemViewModel : FieldLogItemViewModel
+	internal class FieldLogTextItemViewModel : FieldLogItemViewModel
 	{
 		public FieldLogTextItemViewModel(FieldLogTextItem item)
 		{

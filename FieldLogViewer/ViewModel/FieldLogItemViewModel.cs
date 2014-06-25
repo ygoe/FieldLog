@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Media;
 using Unclassified.FieldLog;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
-	class FieldLogItemViewModel : LogItemViewModelBase
+	internal class FieldLogItemViewModel : LogItemViewModelBase
 	{
 		public static FieldLogItemViewModel Create(FieldLogItem item)
 		{
@@ -81,7 +79,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 				}
 			}
 		}
-		
+
 		public string PrioImageSource
 		{
 			get

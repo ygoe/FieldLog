@@ -10,7 +10,7 @@ using Unclassified.UI;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
-	class FilterConditionViewModel : ViewModelBase
+	internal class FilterConditionViewModel : ViewModelBase
 	{
 		#region Private data
 
@@ -517,7 +517,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					else if (dbgMsg != null)
 						result = CompareString(dbgMsg.Message);
 					break;
-				
+
 				case FilterColumn.TextText:
 					textItem = item as FieldLogTextItemViewModel;
 					if (textItem == null)
@@ -533,7 +533,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					if (textItem != null)
 						result = CompareString(textItem.Details);
 					break;
-				
+
 				case FilterColumn.DataName:
 					dataItem = item as FieldLogDataItemViewModel;
 					if (dataItem != null)
@@ -544,7 +544,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					if (dataItem != null)
 						result = CompareString(dataItem.Value);
 					break;
-				
+
 				case FilterColumn.ExceptionType:
 					exItem = item as FieldLogExceptionItemViewModel;
 					if (exItem != null)
@@ -570,7 +570,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 					if (exItem != null)
 						result = CompareString(exItem.Context);
 					break;
-				
+
 				case FilterColumn.ScopeType:
 					scopeItem = item as FieldLogScopeItemViewModel;
 					if (scopeItem != null)
@@ -1002,7 +1002,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 							case FilterItemType.Data:
 								return item is FieldLogDataItemViewModel;
 							case FilterItemType.Exception:
-							//case FilterItemType.ExceptionRecursive:   // TODO: ???
+								//case FilterItemType.ExceptionRecursive:   // TODO: ???
 								return item is FieldLogExceptionItemViewModel;
 							case FilterItemType.Scope:
 								return item is FieldLogScopeItemViewModel;
@@ -1268,7 +1268,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 	#region Filter definition enums
 
-	enum FilterColumn
+	internal enum FilterColumn
 	{
 		[Description("Any text content")]
 		AnyText,
@@ -1381,7 +1381,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		WebRequestDuration,
 	}
 
-	enum FilterComparison
+	internal enum FilterComparison
 	{
 		[UseForEnumColumn, UseForNumberColumn, UseForStringColumn]
 		[Description("=")]
@@ -1454,7 +1454,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		NotInList,
 	}
 
-	enum FilterItemType
+	internal enum FilterItemType
 	{
 		[Description("Any item type")]
 		Any,
@@ -1476,7 +1476,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		DebugOutput,
 	}
 
-	enum FilterPriority
+	internal enum FilterPriority
 	{
 		[Description("Trace")]
 		Trace,
@@ -1494,7 +1494,7 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		Critical
 	}
 
-	enum FilterScopeType
+	internal enum FilterScopeType
 	{
 		[Description("Enter")]
 		Enter,
@@ -1518,23 +1518,23 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 	#region Filter comparison usage attributes
 
-	class UseForEnumColumnAttribute : Attribute
+	internal class UseForEnumColumnAttribute : Attribute
 	{
 	}
 
-	class UseForStringColumnAttribute : Attribute
+	internal class UseForStringColumnAttribute : Attribute
 	{
 	}
 
-	class UseForNumberColumnAttribute : Attribute
+	internal class UseForNumberColumnAttribute : Attribute
 	{
 	}
 
-	class UseForBoolColumnAttribute : Attribute
+	internal class UseForBoolColumnAttribute : Attribute
 	{
 	}
 
-	class UseForTimeColumnAttribute : Attribute
+	internal class UseForTimeColumnAttribute : Attribute
 	{
 	}
 

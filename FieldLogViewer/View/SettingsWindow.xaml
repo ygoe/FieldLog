@@ -15,7 +15,7 @@
 	LocationChanged="Window_LocationChanged" SizeChanged="Window_SizeChanged"
 	Closed="Window_Closed"
 	Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-	
+
 	<Grid>
 		<TabControl Margin="10">
 			<TabItem Header="General">
@@ -30,7 +30,7 @@
 						<ColumnDefinition Width="Auto"/>
 						<ColumnDefinition Width="*"/>
 					</Grid.ColumnDefinitions>
-					
+
 					<TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Log item time zone:"/>
 					<ComboBox
 						Grid.Row="0" Grid.Column="1"
@@ -72,17 +72,17 @@
 						<ColumnDefinition Width="Auto"/>
 						<ColumnDefinition Width="Auto"/>
 					</Grid.ColumnDefinitions>
-					
+
 					<TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Filter:"/>
-					
+
 					<ComboBox
 						Grid.Row="0" Grid.Column="1" Margin="4,0,0,0"
 						IsEditable="True" IsTextSearchEnabled="False"
 						ItemsSource="{Binding SortedFilters}"
 						SelectedItem="{Binding SelectedFilter}"
 						DisplayMemberPath="DisplayName"
-						Text="{Binding SelectedFilter.DisplayName, Mode=TwoWay}" SelectionChanged="ComboBox_SelectionChanged" />
-					
+						Text="{Binding SelectedFilter.DisplayName, Mode=TwoWay}" SelectionChanged="ComboBox_SelectionChanged"/>
+
 					<Button
 						Grid.Row="0" Grid.Column="2" Margin="6,0,0,0" Padding="6,1"
 						Command="{Binding CreateFilterCommand}"
@@ -151,7 +151,7 @@
 												Margin="4,0,0,0"
 												Background="{Binding Background}"
 												Opacity="{Binding Opacity}"/>
-											
+
 											<ItemsControl
 												Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" Margin="6,2,2,0"
 												ItemsSource="{Binding Conditions}"
@@ -177,7 +177,7 @@
 																Text="AND"
 																Visibility="{Binding AndLabelVisibility}"
 																Opacity="{Binding Opacity}"/>
-													
+
 															<ComboBox
 																Grid.Column="2" Margin="4,0,0,0"
 																ItemsSource="{Binding Source={ui:Enumeration {x:Type vm:FilterColumn}}}"
@@ -186,7 +186,7 @@
 																SelectedValuePath="Value"
 																Style="{StaticResource LightComboBoxStyle}"
 																Opacity="{Binding Opacity}"/>
-															
+
 															<ComboBox
 																Grid.Column="3" Margin="4,0,0,0"
 																ItemsSource="{Binding AvailableComparisons}"
@@ -195,7 +195,7 @@
 																SelectedValuePath="Value"
 																Style="{StaticResource LightComboBoxStyle}"
 																Opacity="{Binding Opacity}"/>
-															
+
 															<TextBox
 																Grid.Column="4" Margin="4,0,0,0"
 																Visibility="{Binding ValueTextVisibility}"
@@ -212,7 +212,7 @@
 																SelectedValuePath="Value"
 																Style="{StaticResource LightComboBoxStyle}"
 																Opacity="{Binding Opacity}"/>
-																
+
 															<Button
 																Grid.Column="5" Margin="4,0,0,0" Padding="6,1"
 																Command="{Binding DeleteCommand}"

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using Unclassified.FieldLog;
 using Unclassified.Util;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
-	class FieldLogExceptionViewModel : ViewModelBase
+	internal class FieldLogExceptionViewModel : ViewModelBase
 	{
 		public FieldLogExceptionViewModel(FieldLogException exception)
 		{

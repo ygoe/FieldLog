@@ -34,12 +34,12 @@
 //   http://blogs.msdn.com/search/searchresults.aspx?q=iscrollinfo&sections=3253
 
 using System;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using System.Collections.Specialized;
 
 namespace Unclassified.UI
 {
@@ -57,7 +57,7 @@ namespace Unclassified.UI
 		/// Transform for use in scrolling.
 		/// </summary>
 		private TranslateTransform trans = new TranslateTransform();
-		
+
 		/// <summary>
 		/// The number of items that are visible in the current viewport.
 		/// </summary>

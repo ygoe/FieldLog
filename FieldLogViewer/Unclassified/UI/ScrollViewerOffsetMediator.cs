@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -28,7 +26,7 @@ namespace Unclassified.UI
 			typeof(ScrollViewer),
 			typeof(ScrollViewerOffsetMediator),
 			new PropertyMetadata(OnScrollViewerChanged));
-		
+
 		private static void OnScrollViewerChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
 		{
 			var mediator = (ScrollViewerOffsetMediator) o;

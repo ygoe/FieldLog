@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Windows.Data;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Media;
 
 namespace Unclassified.FieldLogViewer.Converters
 {
-	class SameWebRequestBrushConverter : IMultiValueConverter
+	internal class SameWebRequestBrushConverter : IMultiValueConverter
 	{
 		public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
 		{

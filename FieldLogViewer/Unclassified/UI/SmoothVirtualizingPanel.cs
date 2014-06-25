@@ -63,7 +63,7 @@ namespace Unclassified.UI
 		/// Transform for use in scrolling.
 		/// </summary>
 		private TranslateTransform trans = new TranslateTransform();
-		
+
 		/// <summary>
 		/// The number of items that are visible in the current viewport.
 		/// </summary>
@@ -518,7 +518,7 @@ namespace Unclassified.UI
 			{
 				verticalOffset = Math.Round(verticalOffset);
 			}
-			
+
 			offset.Y = verticalOffset;
 			if (scrollOwner != null)
 			{

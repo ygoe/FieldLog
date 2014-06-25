@@ -1,21 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using Unclassified.FieldLog;
 using System.Windows;
-using System.IO;
+using Unclassified.FieldLog;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
-	class FieldLogStackFrameViewModel : ViewModelBase
+	internal class FieldLogStackFrameViewModel : ViewModelBase
 	{
 		public FieldLogStackFrameViewModel(FieldLogStackFrame stackFrame)
 		{
 			this.StackFrame = stackFrame;
 
 			FullMethodName = StackFrame.TypeName + "." + StackFrame.MethodName + "(" + StackFrame.MethodSignature + ")";
-			
+
 			StringBuilder sb = new StringBuilder();
 			if (!string.IsNullOrEmpty(StackFrame.Module))
 			{

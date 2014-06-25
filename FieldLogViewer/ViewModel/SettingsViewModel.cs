@@ -8,7 +8,7 @@ using Unclassified.Util;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
-	class SettingsViewModel : ViewModelBase
+	internal class SettingsViewModel : ViewModelBase
 	{
 		#region Constructor
 

@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
-using System.Text;
 using Unclassified.FieldLog;
 
 namespace Unclassified.FieldLogViewer.ViewModel
 {
-	class FieldLogWebRequestDataViewModel : ViewModelBase
+	internal class FieldLogWebRequestDataViewModel : ViewModelBase
 	{
 		public FieldLogWebRequestDataViewModel(FieldLogWebRequestData webRequestData, FieldLogItemViewModel itemVM)
 		{

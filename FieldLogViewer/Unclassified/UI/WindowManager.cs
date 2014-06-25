@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
@@ -14,14 +12,15 @@ namespace Unclassified.UI
 		[StructLayout(LayoutKind.Sequential)]
 		public struct MARGINS
 		{
-			public int cxLeftWidth;      // width of left border that retains its size 
-			public int cxRightWidth;     // width of right border that retains its size 
-			public int cyTopHeight;      // height of top border that retains its size 
+			public int cxLeftWidth;      // width of left border that retains its size
+			public int cxRightWidth;     // width of right border that retains its size
+			public int cyTopHeight;      // height of top border that retains its size
 			public int cyBottomHeight;   // height of bottom border that retains its size
 		};
 
 		[DllImport("dwmapi.dll")]
 		private static extern void DwmIsCompositionEnabled(ref bool pfEnabled);
+
 		[DllImport("dwmapi.dll")]
 		private static extern int DwmExtendFrameIntoClientArea(IntPtr hWnd, ref MARGINS pMargins);
 
@@ -55,7 +54,7 @@ namespace Unclassified.UI
 				// Set Margins
 				MARGINS margins = new MARGINS();
 
-				// Extend frame into client area 
+				// Extend frame into client area
 				// (The default desktop dpi is 96. The margins are adjusted for the system dpi.)
 				margins.cxLeftWidth = Convert.ToInt32(leftMargin * (desktopDpiX / 96));
 				margins.cxRightWidth = Convert.ToInt32(rightMargin * (desktopDpiX / 96));

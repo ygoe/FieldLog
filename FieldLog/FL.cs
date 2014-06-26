@@ -3452,23 +3452,30 @@ namespace Unclassified.FieldLog
 		private static void WriteLogReadmeFile()
 		{
 			if (logFileBasePath == null) return;
-			string logDir = Path.GetDirectoryName(logFileBasePath);
-			string readmeFilePath = Path.Combine(logDir, readmeFileName);
-			using (StreamWriter sw = new StreamWriter(readmeFilePath, false, Encoding.Default))
+			try
 			{
-				// columns:  0----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
-				sw.WriteLine("This directory contains log files managed by FieldLog.");
-				sw.WriteLine();
-				sw.WriteLine("All files with the same prefix (excluding the last two numbers) belong to");
-				sw.WriteLine("the same group. To view the contents of the log files, you need to install");
-				sw.WriteLine("the FieldLogViewer application available from:");
-				sw.WriteLine();
-				sw.WriteLine("http://dev.unclassified.de/source/fieldlog");
-				sw.WriteLine();
-				sw.WriteLine("After installation, double-click on one file to open the entire group.");
-				sw.WriteLine();
-				sw.WriteLine("For further information about FieldLog or the log viewer, please consult");
-				sw.WriteLine("the above website.");
+				string logDir = Path.GetDirectoryName(logFileBasePath);
+				string readmeFilePath = Path.Combine(logDir, readmeFileName);
+				using (StreamWriter sw = new StreamWriter(readmeFilePath, false, Encoding.Default))
+				{
+					// columns:  0----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
+					sw.WriteLine("This directory contains log files managed by FieldLog.");
+					sw.WriteLine();
+					sw.WriteLine("All files with the same prefix (excluding the last two numbers) belong to");
+					sw.WriteLine("the same group. To view the contents of the log files, you need to install");
+					sw.WriteLine("the FieldLogViewer application available from:");
+					sw.WriteLine();
+					sw.WriteLine("http://dev.unclassified.de/source/fieldlog");
+					sw.WriteLine();
+					sw.WriteLine("After installation, double-click on one file to open the entire group.");
+					sw.WriteLine();
+					sw.WriteLine("For further information about FieldLog or the log viewer, please consult");
+					sw.WriteLine("the above website.");
+				}
+			}
+			catch (Exception ex)
+			{
+				FL.Warning(ex, "Writing FieldLog readme file to log directory");
 			}
 		}
 

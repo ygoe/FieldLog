@@ -97,7 +97,11 @@ namespace Unclassified.FieldLogViewer.View
 
 		private void Window_Closed(object sender, EventArgs e)
 		{
-			DebugMonitor.Stop();
+			MainViewModel vm = DataContext as MainViewModel;
+			if (vm != null)
+			{
+				vm.StopDebugMonitors();
+			}
 		}
 
 		private void Window_LocationChanged(object sender, EventArgs e)

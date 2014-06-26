@@ -13,7 +13,7 @@ namespace Unclassified.Util
 	/// <param name="text">The message text.</param>
 	public delegate void OutputDebugStringHandler(int pid, string text);
 
-	// Source: http://stackoverflow.com/a/1542782/143684
+	// Based on: http://stackoverflow.com/a/1542782/143684
 	/// <summary>
 	/// Provides a monitor for messages sent from applications through the Windows API function
 	/// OutputDebugString.
@@ -95,8 +95,13 @@ namespace Unclassified.Util
 
 		#region Constructor
 
-		private DebugMonitor()
+		/// <summary>
+		/// Initialises a new instance of the DebugMonitor class.
+		/// </summary>
+		/// <param name="isGlobal">true to capture global messages, false for local messages.</param>
+		public DebugMonitor(bool isGlobal)
 		{
+			this.isGlobal = isGlobal;
 		}
 
 		#endregion Constructor
@@ -106,19 +111,20 @@ namespace Unclassified.Util
 		/// <summary>
 		/// Raised when a new message is available on the debug communication interface.
 		/// </summary>
-		public static event OutputDebugStringHandler MessageReceived;
+		public event OutputDebugStringHandler MessageReceived;
 
 		#endregion Events
 
 		#region Private fields
 
-		private static readonly object syncRoot = new object();
-		private static IntPtr ackEvent;
-		private static IntPtr readyEvent;
-		private static IntPtr sharedFile;
-		private static IntPtr sharedMem;
-		private static Thread monitorThread;
-		private static bool cancelRequested;
+		private readonly object syncRoot = new object();
+		private bool isGlobal;
+		private IntPtr ackEvent;
+		private IntPtr readyEvent;
+		private IntPtr sharedFile;
+		private IntPtr sharedMem;
+		private Thread monitorThread;
+		private bool cancelRequested;
 
 		#endregion Private fields
 
@@ -127,7 +133,7 @@ namespace Unclassified.Util
 		/// <summary>
 		/// Gets a value indicating whether the debug monitor is currently running.
 		/// </summary>
-		public static bool IsActive
+		public bool IsActive
 		{
 			get
 			{
@@ -145,7 +151,7 @@ namespace Unclassified.Util
 		/// <summary>
 		/// Starts the debug monitor if it is not currently running.
 		/// </summary>
-		public static void TryStart()
+		public void TryStart()
 		{
 			lock (syncRoot)
 			{
@@ -159,12 +165,14 @@ namespace Unclassified.Util
 		/// <summary>
 		/// Starts the debug monitor in a separate thread.
 		/// </summary>
-		public static void Start()
+		public void Start()
 		{
 			// Don't activate this thing of the devil if Visual Studio is debugging the process.
 			// If anything happens, this will blow up the debugger and you will have to restart
 			// Visual Studio and other processes to be able to debug anything again.
 			if (Debugger.IsAttached) return;
+
+			string prefix = isGlobal ? @"Global\" : "";
 
 			lock (syncRoot)
 			{
@@ -175,19 +183,19 @@ namespace Unclassified.Util
 
 				SECURITY_ATTRIBUTES sa = new SECURITY_ATTRIBUTES();
 
-				ackEvent = CreateEvent(ref sa, false, false, "DBWIN_BUFFER_READY");
+				ackEvent = CreateEvent(ref sa, false, false, prefix + "DBWIN_BUFFER_READY");
 				if (ackEvent == IntPtr.Zero)
 				{
 					throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to create event 'DBWIN_BUFFER_READY'");
 				}
 
-				readyEvent = CreateEvent(ref sa, false, false, "DBWIN_DATA_READY");
+				readyEvent = CreateEvent(ref sa, false, false, prefix + "DBWIN_DATA_READY");
 				if (readyEvent == IntPtr.Zero)
 				{
 					throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to create event 'DBWIN_DATA_READY'");
 				}
 
-				sharedFile = CreateFileMapping(new IntPtr(-1), ref sa, PageProtection.ReadWrite, 0, 4096, "DBWIN_BUFFER");
+				sharedFile = CreateFileMapping(new IntPtr(-1), ref sa, PageProtection.ReadWrite, 0, 4096, prefix + "DBWIN_BUFFER");
 				if (sharedFile == IntPtr.Zero)
 				{
 					throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to create a file mapping to slot 'DBWIN_BUFFER'");
@@ -207,7 +215,7 @@ namespace Unclassified.Util
 		/// <summary>
 		/// Stops the debug monitor thread.
 		/// </summary>
-		public static void Stop()
+		public void Stop()
 		{
 			lock (syncRoot)
 			{
@@ -228,7 +236,7 @@ namespace Unclassified.Util
 		/// <summary>
 		/// Monitor thread method.
 		/// </summary>
-		private static void MonitorThread()
+		private void MonitorThread()
 		{
 			try
 			{
@@ -262,7 +270,7 @@ namespace Unclassified.Util
 		/// </summary>
 		/// <param name="pid">The process ID of the message sender.</param>
 		/// <param name="text">The message text.</param>
-		private static void OnMessageReceived(int pid, string text)
+		private void OnMessageReceived(int pid, string text)
 		{
 			if (MessageReceived != null)
 			{
@@ -273,7 +281,7 @@ namespace Unclassified.Util
 		/// <summary>
 		/// Frees all native resources.
 		/// </summary>
-		private static void Dispose()
+		private void Dispose()
 		{
 			if (ackEvent != IntPtr.Zero)
 			{

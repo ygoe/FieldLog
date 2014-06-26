@@ -41,6 +41,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 		private FilterConditionViewModel adhocFilterCondition;
 		private SourceResolver sourceResolver = new SourceResolver();
 		private SettingsWindow openSettingsWindow;
+		private DebugMonitor localDebugMonitor = new DebugMonitor(false);
+		private DebugMonitor globalDebugMonitor = new DebugMonitor(true);
 
 		/// <summary>
 		/// Buffer for all read items that are collected in the separate Task thread and then
@@ -71,7 +73,8 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			UpdateWindowTitle();
 
 			// Setup toolbar and settings events
-			this.BindProperty(vm => vm.IsDebugMonitorActive, AppSettings, s => s.IsDebugMonitorActive);
+			this.BindProperty(vm => vm.IsLocalDebugMonitorActive, AppSettings, s => s.IsLocalDebugMonitorActive);
+			this.BindProperty(vm => vm.IsGlobalDebugMonitorActive, AppSettings, s => s.IsGlobalDebugMonitorActive);
 			AppSettings.OnPropertyChanged(
 				s => s.IsLiveScrollingEnabled,
 				v => { if (v) ViewCommandManager.Invoke("ScrollToEnd"); });
@@ -151,7 +154,17 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			filteredLogItems.Filter += filteredLogItems_Filter;
 
 			// Setup debug message monitor events
-			DebugMonitor.MessageReceived += (pid, text) =>
+			// TODO: Separate the messages by local and global source
+			localDebugMonitor.MessageReceived += (pid, text) =>
+			{
+				var itemVM = new DebugMessageViewModel(pid, text);
+
+				Interlocked.Increment(ref queuedNewItemsCount);
+				dispatcher.BeginInvoke(
+					new Action<LogItemViewModelBase>(this.InsertNewLogItem),
+					itemVM);
+			};
+			globalDebugMonitor.MessageReceived += (pid, text) =>
 			{
 				var itemVM = new DebugMessageViewModel(pid, text);
 
@@ -1012,20 +1025,37 @@ namespace Unclassified.FieldLogViewer.ViewModel
 
 		#region Toolbar and settings
 
-		public bool IsDebugMonitorActive
+		public bool IsLocalDebugMonitorActive
 		{
-			get { return DebugMonitor.IsActive; }
+			get { return localDebugMonitor.IsActive; }
 			set
 			{
 				if (value)
 				{
-					DebugMonitor.TryStart();
+					localDebugMonitor.TryStart();
 				}
 				else
 				{
-					DebugMonitor.Stop();
+					localDebugMonitor.Stop();
 				}
-				OnPropertyChanged("IsDebugMonitorActive");
+				OnPropertyChanged("IsLocalDebugMonitorActive");
+			}
+		}
+
+		public bool IsGlobalDebugMonitorActive
+		{
+			get { return globalDebugMonitor.IsActive; }
+			set
+			{
+				if (value)
+				{
+					globalDebugMonitor.TryStart();
+				}
+				else
+				{
+					globalDebugMonitor.Stop();
+				}
+				OnPropertyChanged("IsGlobalDebugMonitorActive");
 			}
 		}
 
@@ -2386,6 +2416,12 @@ namespace Unclassified.FieldLogViewer.ViewModel
 			{
 				DisplayName = "FieldLogViewer";
 			}
+		}
+
+		internal void StopDebugMonitors()
+		{
+			localDebugMonitor.Stop();
+			globalDebugMonitor.Stop();
 		}
 
 		#endregion Other methods

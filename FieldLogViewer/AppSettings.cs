@@ -95,7 +95,8 @@ namespace Unclassified.FieldLogViewer
 			Window = new WindowSettingsView(this);
 
 			AddPropertyHandler("LastAppVersion");
-			AddPropertyHandler("IsDebugMonitorActive");
+			AddPropertyHandler("IsLocalDebugMonitorActive");
+			AddPropertyHandler("IsGlobalDebugMonitorActive");
 			AddPropertyHandler("ShowRelativeTime");
 			AddPropertyHandler("IsLiveScrollingEnabled");
 			AddPropertyHandler("IsFlashingEnabled");
@@ -149,12 +150,21 @@ namespace Unclassified.FieldLogViewer
 		}
 
 		/// <summary>
-		/// Gets or sets a value indicating whether the DebugOutputString monitor is active.
+		/// Gets or sets a value indicating whether the local DebugOutputString monitor is active.
 		/// </summary>
-		public bool IsDebugMonitorActive
+		public bool IsLocalDebugMonitorActive
 		{
-			get { return GetBool("IsDebugMonitorActive"); }
-			set { Set("IsDebugMonitorActive", value); }
+			get { return GetBool("IsLocalDebugMonitorActive"); }
+			set { Set("IsLocalDebugMonitorActive", value); }
+		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether the global DebugOutputString monitor is active.
+		/// </summary>
+		public bool IsGlobalDebugMonitorActive
+		{
+			get { return GetBool("IsGlobalDebugMonitorActive"); }
+			set { Set("IsGlobalDebugMonitorActive", value); }
 		}
 
 		/// <summary>

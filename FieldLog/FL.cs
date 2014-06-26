@@ -3087,7 +3087,12 @@ namespace Unclassified.FieldLog
 			if (prefix == null) throw new ArgumentNullException("prefix");
 
 #if ASPNET
-			LogWebStart(Assembly.GetCallingAssembly());
+			// Only call this from ASP.NET applications, so that the FieldLog DLL can be shared with
+			// non-ASP.NET applications
+			if (HttpRuntime.AppDomainAppId != null)
+			{
+				LogWebStart(Assembly.GetCallingAssembly());
+			}
 #endif
 
 			lock (customLogPathLock)
@@ -3115,7 +3120,12 @@ namespace Unclassified.FieldLog
 			if (path == null) throw new ArgumentNullException("path");
 
 #if ASPNET
-			LogWebStart(Assembly.GetCallingAssembly());
+			// Only call this from ASP.NET applications, so that the FieldLog DLL can be shared with
+			// non-ASP.NET applications
+			if (HttpRuntime.AppDomainAppId != null)
+			{
+				LogWebStart(Assembly.GetCallingAssembly());
+			}
 #endif
 
 			lock (customLogPathLock)
@@ -3141,7 +3151,12 @@ namespace Unclassified.FieldLog
 		public static void AcceptLogFileBasePath()
 		{
 #if ASPNET
-			LogWebStart(Assembly.GetCallingAssembly());
+			// Only call this from ASP.NET applications, so that the FieldLog DLL can be shared with
+			// non-ASP.NET applications
+			if (HttpRuntime.AppDomainAppId != null)
+			{
+				LogWebStart(Assembly.GetCallingAssembly());
+			}
 #endif
 
 			lock (customLogPathLock)

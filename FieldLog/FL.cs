@@ -251,7 +251,7 @@ namespace Unclassified.FieldLog
 		/// Lock object for setting a custom log path.
 		/// </summary>
 		private static readonly object customLogPathLock = new object();
-		
+
 		/// <summary>
 		/// Maximum size of any single log file. Only set when the send thread is stopped.
 		/// </summary>
@@ -790,7 +790,7 @@ namespace Unclassified.FieldLog
 				null,
 				AppErrorTerminateTimeout * 1000,
 				Timeout.Infinite);
-			
+
 			string msg;
 			if (allowContinue)
 			{
@@ -822,7 +822,7 @@ namespace Unclassified.FieldLog
 			{
 				Thread.Sleep(50);
 			}
-			
+
 			if (LogFileBasePath != null)
 			{
 				msg += string.Format(AppErrorDialogLogPath, logFileBasePath + "*.fl");
@@ -3045,7 +3045,7 @@ namespace Unclassified.FieldLog
 					// This can be a valid path, or null if we know that no log files can be
 					// written. Don't try to write anywhere and don't discard any buffers until
 					// the log file path has been set by the application.
-					
+
 					int itemCount = 0;
 					foreach (List<FieldLogItem> buffer in buffersToSend)
 					{
@@ -3297,7 +3297,7 @@ namespace Unclassified.FieldLog
 			{
 				return;
 			}
-			
+
 			if (logFileBasePath == null) return;   // Nowhere to write the log items, drop them
 			Dictionary<FieldLogFileWriter, bool> usedWriters = new Dictionary<FieldLogFileWriter, bool>();
 			// NOTE: HashSet<T> would be better here, but it's not supported in .NET 2.0, so we're
@@ -3585,7 +3585,7 @@ namespace Unclassified.FieldLog
 				return;   // No need to check again right now
 			}
 			priorityLastPurgeTimes[prio] = now;
-			
+
 			// Evaluate all existing files for this priority
 			string logDir = Path.GetDirectoryName(logFileBasePath);
 			string logFile = Path.GetFileName(logFileBasePath);
@@ -3596,7 +3596,7 @@ namespace Unclassified.FieldLog
 			{
 				currentFileName = fw.FileName;
 			}
-			
+
 			foreach (string fileName in Directory.GetFiles(logDir, logFile + "-" + (int) prio + "-*.fl"))
 			{
 				FileInfo fi = new FileInfo(fileName);

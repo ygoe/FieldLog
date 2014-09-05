@@ -16,7 +16,6 @@ using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Principal;
@@ -160,7 +159,7 @@ namespace Unclassified.FieldLog
 		/// Windows Home Server is installed.
 		/// </summary>
 		private const ushort VER_SUITE_WH_SERVER = 0x8000;
-		
+
 		private const ushort VER_NT_WORKSTATION = 1;
 
 		/// <summary>
@@ -201,14 +200,18 @@ namespace Unclassified.FieldLog
 
 		[DllImport("kernel32.dll")]
 		private static extern bool GetVersionEx(ref OSVERSIONINFOEX osvi);
+
 		[DllImport("user32.dll")]
 		private static extern int GetSystemMetrics(int smIndex);
+
 		[DllImport("gdi32.dll")]
-		static extern int GetDeviceCaps(IntPtr hdc, int nIndex);
+		private static extern int GetDeviceCaps(IntPtr hdc, int nIndex);
+
 		[DllImport("user32.dll", SetLastError = true)]
-		static extern IntPtr GetDC(IntPtr hWnd);
+		private static extern IntPtr GetDC(IntPtr hWnd);
+
 		[DllImport("user32.dll")]
-		static extern bool ReleaseDC(IntPtr hWnd, IntPtr hDC);
+		private static extern bool ReleaseDC(IntPtr hWnd, IntPtr hDC);
 
 		#endregion Native interop
 
@@ -383,7 +386,7 @@ namespace Unclassified.FieldLog
 				else
 				{
 					// Windows 2000 or newer
-					
+
 					// Collect equivalent values from different possible sources
 					OSVERSIONINFOEX osvi = new OSVERSIONINFOEX();
 					osvi.dwOSVersionInfoSize = Marshal.SizeOf(typeof(OSVERSIONINFOEX));
@@ -1390,6 +1393,58 @@ namespace Unclassified.FieldLog
 		}
 
 		#endregion Helper methods
+
+		#region OS version helper properties
+
+		/// <summary>
+		/// Gets a value indicating whether the OS version is Windows XP/Server 2003 or newer.
+		/// </summary>
+		public static bool IsWindowsXPOrNewer
+		{
+			get
+			{
+				return OSInfo.Type == OSType.Client && OSInfo.Version >= OSVersion.WindowsXP ||
+					(OSInfo.Type == OSType.Server || OSInfo.Type == OSType.ServerCore) && OSInfo.Version >= OSVersion.WindowsServer2003;
+			}
+		}
+
+		/// <summary>
+		/// Gets a value indicating whether the OS version is Windows Vista/Server 2008 or newer.
+		/// </summary>
+		public static bool IsWindowsVistaOrNewer
+		{
+			get
+			{
+				return OSInfo.Type == OSType.Client && OSInfo.Version >= OSVersion.WindowsVista ||
+					(OSInfo.Type == OSType.Server || OSInfo.Type == OSType.ServerCore) && OSInfo.Version >= OSVersion.WindowsServer2008;
+			}
+		}
+
+		/// <summary>
+		/// Gets a value indicating whether the OS version is Windows 7/Server 2008 R2 or newer.
+		/// </summary>
+		public static bool IsWindows7OrNewer
+		{
+			get
+			{
+				return OSInfo.Type == OSType.Client && OSInfo.Version >= OSVersion.Windows7 ||
+					(OSInfo.Type == OSType.Server || OSInfo.Type == OSType.ServerCore) && OSInfo.Version >= OSVersion.WindowsServer2008R2;
+			}
+		}
+
+		/// <summary>
+		/// Gets a value indicating whether the OS version is Windows 8/Server 2012 or newer.
+		/// </summary>
+		public static bool IsWindows8OrNewer
+		{
+			get
+			{
+				return OSInfo.Type == OSType.Client && OSInfo.Version >= OSVersion.Windows8 ||
+					(OSInfo.Type == OSType.Server || OSInfo.Type == OSType.ServerCore) && OSInfo.Version >= OSVersion.WindowsServer2012;
+			}
+		}
+
+		#endregion OS version helper properties
 	}
 
 	#endregion OSInfo class

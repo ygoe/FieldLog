@@ -28,11 +28,13 @@ namespace Unclassified.FieldLog
 		private static extern int DeviceIoControl(IntPtr hDevice, int dwIoControlCode,
 			ref short lpInBuffer, int nInBufferSize, IntPtr lpOutBuffer, int nOutBufferSize,
 			ref int lpBytesReturned, IntPtr lpOverlapped);
+
 		private const int FSCTL_SET_COMPRESSION = 0x9C040;
 
 		[DllImport("kernel32.dll")]
 		private static extern uint GetCompressedFileSizeW(
 			[MarshalAs(UnmanagedType.LPWStr)] string lpFileName, out uint lpFileSizeHigh);
+
 		private static bool supportsGetCompressedFileSize = true;
 
 		#endregion Native interop
@@ -253,7 +255,7 @@ namespace Unclassified.FieldLog
 				if (BitConverter.IsLittleEndian)
 					Array.Reverse(lengthBytes);
 				lengthBytes[0] = (byte) (lengthBytes[0] & 0x0F | ((byte) FieldLogItemType.StringData << 4));
-				
+
 				fileStream.Write(lengthBytes, 0, lengthBytes.Length);
 				fileStream.Write(bytes, 0, bytes.Length);
 

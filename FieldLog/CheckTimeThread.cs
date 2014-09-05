@@ -88,7 +88,7 @@ namespace Unclassified.FieldLog
 					FL.TraceData("System time offset", offset.TotalMilliseconds);
 					prevLoggedOffset = offset.TotalMilliseconds;
 				}
-				
+
 				// Check for local time zone changes
 				if (DateTime.UtcNow.Ticks >= nextOffsetCheck)
 				{

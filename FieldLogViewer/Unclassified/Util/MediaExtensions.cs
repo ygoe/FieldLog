@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Windows;
 using System.Windows.Media;
 
 namespace Unclassified.Util
@@ -49,5 +51,36 @@ namespace Unclassified.Util
 		}
 
 		#endregion Colour maths
+
+		#region Fonts
+
+		/// <summary>
+		/// Returns the first of the specified font families that is installed on the system.
+		/// </summary>
+		/// <param name="familyNames">The font family names to test.</param>
+		/// <returns>The first available font family or a default font family.</returns>
+		public static FontFamily FindAvailableFontFamily(params string[] familyNames)
+		{
+			foreach (string familyName in familyNames)
+			{
+				FontFamily ff = Fonts.SystemFontFamilies.FirstOrDefault(f => f.Source == familyName);
+				if (ff != null)
+				{
+					return ff;
+				}
+			}
+			return SystemFonts.MessageFontFamily;
+		}
+
+		/// <summary>
+		/// Finds the best available monospace font family installed on the system.
+		/// </summary>
+		/// <returns></returns>
+		public static FontFamily FindMonospaceFontFamily()
+		{
+			return FindAvailableFontFamily("Consolas", "Andale Mono", "Lucida Console", "Courier New");
+		}
+
+		#endregion Fonts
 	}
 }

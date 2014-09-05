@@ -183,7 +183,7 @@ namespace Unclassified.FieldLog
 				// Remove any files that were added from the FileSystemWatcher event before we
 				// started scanning for files. Those files will now be found again anyway.
 				readers[prio] = null;
-				
+
 				string logDir = Path.GetDirectoryName(basePath);
 				string logFile = Path.GetFileName(basePath);
 				List<string> fileNames = new List<string>(Directory.GetFiles(logDir, logFile + "-" + (int) prio + "-*.fl"));
@@ -215,7 +215,7 @@ namespace Unclassified.FieldLog
 				FL.Checkpoint("This file is already current or queued");
 				return;
 			}
-			
+
 			var reader = new FieldLogFileReader(fileName, true);
 			ManualResetEvent h;
 			if (!prioReadSignals.TryGetValue(prio, out h))

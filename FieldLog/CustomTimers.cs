@@ -69,7 +69,7 @@ namespace Unclassified.FieldLog
 			{
 				return;
 			}
-			
+
 			long ticks, ticksPc, ticksTt, localCounter;
 
 			lock (syncLock)
@@ -110,7 +110,7 @@ namespace Unclassified.FieldLog
 				prevTicks = ticks;
 				prevCounter = localCounter;
 			}
-				
+
 			// Total time
 			// (Add 5 ticks for simple microseconds rounding)
 			long roundTicks = ticks + 5;

@@ -867,7 +867,7 @@ namespace Unclassified.FieldLog
 			item.Type = (FieldLogScopeType) reader.ReadByte();
 			item.Level = reader.ReadInt32();
 			item.Name = reader.ReadString();
-			
+
 			if (item.Type == FieldLogScopeType.ThreadStart)
 			{
 				byte flags = reader.ReadByte();

@@ -340,7 +340,7 @@ namespace Unclassified.FieldLog
 			{
 				MethodName += FormatGenericTypeList(method.GetGenericArguments());
 			}
-			
+
 			StringBuilder sigSb = new StringBuilder();
 			ParameterInfo[] parameters = method.GetParameters();
 			for (int i = 0; i < parameters.Length; i++)

@@ -46,7 +46,7 @@ namespace Unclassified.FieldLog
 			this.reader = reader;
 			this.firstReader = reader;
 		}
-		
+
 		/// <summary>
 		/// Gets the log item at the current position of the enumerator.
 		/// </summary>
@@ -111,7 +111,7 @@ namespace Unclassified.FieldLog
 					// not be monitored anymore.
 					item = null;
 				}
-				
+
 				if (item == null && reader.IsClosing)
 				{
 					// Close event must have been set

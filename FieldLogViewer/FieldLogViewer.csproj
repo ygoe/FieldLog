@@ -133,59 +133,60 @@
     <Compile Include="Unclassified\UI\Wpf32Window.cs" />
     <Compile Include="Unclassified\UI\TextBoxExtensions.cs" />
     <Compile Include="Unclassified\UI\WindowExtensions.cs" />
-    <Compile Include="ViewModel\DetailsMessageViewModel.cs" />
-    <Compile Include="ViewModel\FieldLogTextItemViewModel.cs" />
-    <Compile Include="ViewModel\FieldLogItemViewModel.cs" />
-    <Compile Include="ViewModel\FieldLogDataItemViewModel.cs" />
-    <Compile Include="ViewModel\FieldLogScopeItemViewModel.cs" />
-    <Compile Include="ViewModel\FieldLogExceptionItemViewModel.cs" />
-    <Compile Include="ViewModel\DebugMessageViewModel.cs" />
-    <Compile Include="ViewModel\FieldLogExceptionViewModel.cs" />
-    <Compile Include="ViewModel\FieldLogStackFrameViewModel.cs" />
-    <Compile Include="ViewModel\FilterConditionGroupViewModel.cs" />
-    <Compile Include="ViewModel\FilterConditionViewModel.cs" />
-    <Compile Include="ViewModel\FilterViewModel.cs" />
-    <Compile Include="ViewModel\FieldLogEnvironmentViewModel.cs" />
-    <Compile Include="ViewModel\FieldLogWebRequestDataViewModel.cs" />
-    <Compile Include="ViewModel\LogItemViewModelBase.cs" />
-    <Compile Include="ViewModel\MainViewModel.cs" />
-    <Compile Include="ViewModel\SettingsViewModel.cs" />
-    <Compile Include="ViewModel\ViewModelBase.cs" />
-    <Compile Include="View\DetailsMessageView.xaml.cs">
+    <Compile Include="Unclassified\Util\ThreadSafeRandom.cs" />
+    <Compile Include="ViewModels\DetailsMessageViewModel.cs" />
+    <Compile Include="ViewModels\FieldLogTextItemViewModel.cs" />
+    <Compile Include="ViewModels\FieldLogItemViewModel.cs" />
+    <Compile Include="ViewModels\FieldLogDataItemViewModel.cs" />
+    <Compile Include="ViewModels\FieldLogScopeItemViewModel.cs" />
+    <Compile Include="ViewModels\FieldLogExceptionItemViewModel.cs" />
+    <Compile Include="ViewModels\DebugMessageViewModel.cs" />
+    <Compile Include="ViewModels\FieldLogExceptionViewModel.cs" />
+    <Compile Include="ViewModels\FieldLogStackFrameViewModel.cs" />
+    <Compile Include="ViewModels\FilterConditionGroupViewModel.cs" />
+    <Compile Include="ViewModels\FilterConditionViewModel.cs" />
+    <Compile Include="ViewModels\FilterViewModel.cs" />
+    <Compile Include="ViewModels\FieldLogEnvironmentViewModel.cs" />
+    <Compile Include="ViewModels\FieldLogWebRequestDataViewModel.cs" />
+    <Compile Include="ViewModels\LogItemViewModelBase.cs" />
+    <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="ViewModels\SettingsViewModel.cs" />
+    <Compile Include="ViewModels\ViewModelBase.cs" />
+    <Compile Include="Views\DetailsMessageView.xaml.cs">
       <DependentUpon>DetailsMessageView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\FieldLogExceptionItemView.xaml.cs">
+    <Compile Include="Views\FieldLogExceptionItemView.xaml.cs">
       <DependentUpon>FieldLogExceptionItemView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\FieldLogScopeItemView.xaml.cs">
+    <Compile Include="Views\FieldLogScopeItemView.xaml.cs">
       <DependentUpon>FieldLogScopeItemView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\FieldLogDataItemView.xaml.cs">
+    <Compile Include="Views\FieldLogDataItemView.xaml.cs">
       <DependentUpon>FieldLogDataItemView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\FieldLogExceptionView.xaml.cs">
+    <Compile Include="Views\FieldLogExceptionView.xaml.cs">
       <DependentUpon>FieldLogExceptionView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\DebugMessageItemView.xaml.cs">
+    <Compile Include="Views\DebugMessageItemView.xaml.cs">
       <DependentUpon>DebugMessageItemView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\FieldLogEnvironmentView.xaml.cs">
+    <Compile Include="Views\FieldLogEnvironmentView.xaml.cs">
       <DependentUpon>FieldLogEnvironmentView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\FieldLogWebRequestDataView.xaml.cs">
+    <Compile Include="Views\FieldLogWebRequestDataView.xaml.cs">
       <DependentUpon>FieldLogWebRequestDataView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\MainWindow.xaml.cs">
+    <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="View\FieldLogTextItemView.xaml.cs">
+    <Compile Include="Views\FieldLogTextItemView.xaml.cs">
       <DependentUpon>FieldLogTextItemView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\SettingsWindow.xaml.cs">
+    <Compile Include="Views\SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="Resources\Other.xaml">
@@ -196,47 +197,47 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="View\DetailsMessageView.xaml">
+    <Page Include="Views\DetailsMessageView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="View\FieldLogExceptionItemView.xaml">
+    <Page Include="Views\FieldLogExceptionItemView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="View\FieldLogScopeItemView.xaml">
+    <Page Include="Views\FieldLogScopeItemView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="View\FieldLogDataItemView.xaml">
+    <Page Include="Views\FieldLogDataItemView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="View\FieldLogExceptionView.xaml">
+    <Page Include="Views\FieldLogExceptionView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="View\DebugMessageItemView.xaml">
+    <Page Include="Views\DebugMessageItemView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="View\FieldLogEnvironmentView.xaml">
+    <Page Include="Views\FieldLogEnvironmentView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="View\FieldLogWebRequestDataView.xaml">
+    <Page Include="Views\FieldLogWebRequestDataView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="View\MainWindow.xaml">
+    <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="View\FieldLogTextItemView.xaml">
+    <Page Include="Views\FieldLogTextItemView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="View\SettingsWindow.xaml">
+    <Page Include="Views\SettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

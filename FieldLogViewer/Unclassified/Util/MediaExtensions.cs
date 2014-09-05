@@ -6,13 +6,11 @@ using System.Windows.Media;
 namespace Unclassified.Util
 {
 	/// <summary>
-	/// Provides extension methods for media elements like Color, Brush etc.
+	/// Provides extension methods for media elements like Color, Brush, Fonts etc.
 	/// </summary>
 	public static class MediaExtensions
 	{
-		#region Colour maths
-
-		// TODO: Compare with ColorMath class
+		#region Colour blending
 
 		/// <summary>
 		/// Blends two colours.
@@ -50,7 +48,52 @@ namespace Unclassified.Util
 			return new SolidColorBrush(Color.Add(Color.Multiply(b1.Color, ratio), Color.Multiply(c2, 1 - ratio)));
 		}
 
-		#endregion Colour maths
+		#endregion Colour blending
+
+		#region Colour to grey conversion
+
+		/// <summary>
+		/// Converts a colour to its grey representation.
+		/// </summary>
+		/// <param name="color">The colour to convert.</param>
+		/// <returns>The grey colour value.</returns>
+		public static Color ToGray(this Color color)
+		{
+			byte grey = (byte) (color.R * 0.3 + color.G * 0.59 + color.B * 0.11);
+			return Color.FromArgb(color.A, grey, grey, grey);
+		}
+
+		/// <summary>
+		/// Converts a brush to its grey representation.
+		/// </summary>
+		/// <param name="brush">The brush to convert.</param>
+		/// <returns>A brush with the grey colour.</returns>
+		public static SolidColorBrush ToGray(this SolidColorBrush brush)
+		{
+			return new SolidColorBrush(brush.Color.ToGray());
+		}
+
+		/// <summary>
+		/// Returns a value indicating whether the colour is dark or light.
+		/// </summary>
+		/// <param name="color">The colour to analyse.</param>
+		/// <returns>true if the colour is dark; false otherwise.</returns>
+		public static bool IsDark(this Color color)
+		{
+			return color.ToGray().R < 0x90;
+		}
+
+		/// <summary>
+		/// Returns a value indicating whether the brush colour is dark or light.
+		/// </summary>
+		/// <param name="brush">The brush to analyse.</param>
+		/// <returns>true if the brush colour is dark; false otherwise.</returns>
+		public static bool IsDark(this SolidColorBrush brush)
+		{
+			return brush.Color.ToGray().R < 0x90;
+		}
+
+		#endregion Colour to grey conversion
 
 		#region Fonts
 

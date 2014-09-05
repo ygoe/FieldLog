@@ -1,0 +1,51 @@
+﻿<UserControl
+	x:Class="Unclassified.FieldLogViewer.Views.DebugMessageItemView"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:my="clr-namespace:Unclassified.FieldLogViewer"
+	xmlns:u="clr-namespace:Unclassified.UI"
+	xmlns:v="clr-namespace:Unclassified.FieldLogViewer.Views"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	mc:Ignorable="d"
+	d:DesignHeight="190" d:DesignWidth="572"
+	Focusable="False">
+	<UserControl.Resources>
+	</UserControl.Resources>
+
+	<Grid Background="{Binding DetailBackground}">
+		<ScrollViewer VerticalScrollBarVisibility="Auto">
+			<Grid Margin="10" VerticalAlignment="Top">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+				</Grid.RowDefinitions>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="100"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+
+				<TextBlock Grid.Row="0" Grid.Column="0" Text="Time:"/>
+				<TextBox Grid.Row="0" Grid.Column="1" Margin="0,0,0,0" Text="{Binding DisplayTime, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,0,0" Text="Process:"/>
+				<TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,0" Text="{Binding ProcessId, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock Grid.Row="2" Grid.Column="0" Margin="0,8,0,0" Text="Text:"/>
+				<TextBox Grid.Row="2" Grid.Column="1" Margin="0,8,0,0" Text="{Binding Message, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+
+				<TextBlock
+					Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+					Margin="0,16,0,0" HorizontalAlignment="Left"
+					Visibility="{Binding OpenLogFileButtonVisibility}">
+					<Image Source="/Images/folder_open.png" Width="16" Height="16" Margin="0,0,0,-2"/>
+					<Hyperlink Command="{Binding OpenLogFileCommand}">
+						<Run Text="Open log files from this path"/>
+					</Hyperlink>
+				</TextBlock>
+			</Grid>
+		</ScrollViewer>
+	</Grid>
+</UserControl>

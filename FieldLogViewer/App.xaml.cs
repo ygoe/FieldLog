@@ -3,8 +3,8 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using Unclassified.FieldLog;
-using Unclassified.FieldLogViewer.View;
-using Unclassified.FieldLogViewer.ViewModel;
+using Unclassified.FieldLogViewer.Views;
+using Unclassified.FieldLogViewer.ViewModels;
 using Unclassified.Util;
 
 namespace Unclassified.FieldLogViewer

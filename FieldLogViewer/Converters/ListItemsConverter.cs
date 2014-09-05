@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Linq;
 using System.Windows.Data;
-using Unclassified.FieldLogViewer.ViewModel;
+using Unclassified.FieldLogViewer.ViewModels;
 
 namespace Unclassified.FieldLogViewer.Converters
 {

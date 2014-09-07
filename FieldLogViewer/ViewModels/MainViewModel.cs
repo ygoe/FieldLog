@@ -69,7 +69,6 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			Instance = this;
 			dispatcher = Dispatcher.CurrentDispatcher;
 
-			InitializeCommands();
 			UpdateWindowTitle();
 
 			// Setup toolbar and settings events
@@ -218,7 +217,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		public DelegateCommand QuickFilterWebSessionCommand { get; private set; }
 		public DelegateCommand QuickFilterWebUserCommand { get; private set; }
 
-		private void InitializeCommands()
+		protected override void InitializeCommands()
 		{
 			LoadLogCommand = new DelegateCommand(OnLoadLog, CanLoadLog);
 			StopLiveCommand = new DelegateCommand(OnStopLive, CanStopLive);

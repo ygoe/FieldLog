@@ -17,8 +17,6 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			this.UtcOffset = (int) DateTimeOffset.Now.Offset.TotalMinutes;
 			this.ProcessId = pid;
 			this.Message = (text ?? "").TrimEnd();
-
-			InitializeCommands();
 		}
 
 		#endregion Constructor
@@ -101,7 +99,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public DelegateCommand OpenLogFileCommand { get; private set; }
 
-		private void InitializeCommands()
+		protected override void InitializeCommands()
 		{
 			OpenLogFileCommand = new DelegateCommand(OnOpenLogFile, CanOpenLogFile);
 		}

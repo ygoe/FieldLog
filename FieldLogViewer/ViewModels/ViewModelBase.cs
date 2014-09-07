@@ -13,6 +13,18 @@ namespace Unclassified.FieldLogViewer.ViewModels
 	/// </summary>
 	internal abstract class ViewModelBase : INotifyPropertyChanged
 	{
+		#region Constructor
+
+		/// <summary>
+		/// Initializes a new instance of the ViewModelBase class.
+		/// </summary>
+		public ViewModelBase()
+		{
+			InitializeCommands();
+		}
+
+		#endregion Constructor
+
 		#region Common view properties
 
 		private string displayName;
@@ -23,12 +35,12 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		/// </summary>
 		public virtual string DisplayName
 		{
-			get { return this.displayName; }
+			get { return displayName; }
 			set
 			{
-				if (value != this.displayName)
+				if (value != displayName)
 				{
-					this.displayName = value;
+					displayName = value;
 					OnDisplayNameChanged();
 					OnPropertyChanged("DisplayName");
 				}
@@ -52,6 +64,17 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		}
 
 		#endregion Common view properties
+
+		#region Commands support
+
+		/// <summary>
+		/// Initializes the commands in the ViewModel class.
+		/// </summary>
+		protected virtual void InitializeCommands()
+		{
+		}
+
+		#endregion Commands support
 
 		#region Property update helpers
 
@@ -127,6 +150,20 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
+		protected string SanitizeDate(string str)
+		{
+			if (string.IsNullOrWhiteSpace(str)) return null;
+			try
+			{
+				DateTime d = Convert.ToDateTime(str);
+				return d.ToShortDateString();
+			}
+			catch
+			{
+				return str.Trim();
+			}
+		}
+
 		#endregion Data input cleanup
 
 		#region Data validation
@@ -154,7 +191,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 				// Don't do anything if not on the UI thread. The dispatcher event will never be
 				// fired there and probably there's nobody interested in changed properties
 				// anyway on that thread.
-				if (Dispatcher.CurrentDispatcher == Application.Current.MainWindow.Dispatcher)
+				if (Dispatcher.CurrentDispatcher == Application.Current.Dispatcher)
 				{
 					validationPending = true;
 					Dispatcher.CurrentDispatcher.BeginInvoke((Action) delegate
@@ -292,7 +329,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 #endif
 
-			var handler = this.PropertyChanged;
+			var handler = PropertyChanged;
 			if (handler != null)
 			{
 				handler(this, new PropertyChangedEventArgs(propertyName));
@@ -300,7 +337,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		}
 
 		/// <summary>
-		/// Raises this object's PropertyChanged event for each property.
+		/// Raises this object's PropertyChanged event for multiple properties.
 		/// </summary>
 		/// <param name="propertyNames">The properties that have a new value.</param>
 		protected void OnPropertyChanged(params string[] propertyNames)

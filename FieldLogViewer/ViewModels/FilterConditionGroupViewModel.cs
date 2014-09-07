@@ -28,8 +28,6 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 			Conditions = new ObservableCollection<FilterConditionViewModel>();
 
-			InitializeCommands();
-
 			isEnabled = true;
 		}
 
@@ -92,7 +90,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		public DelegateCommand CreateConditionCommand { get; private set; }
 		public DelegateCommand ReorderCommand { get; private set; }
 
-		private void InitializeCommands()
+		protected override void InitializeCommands()
 		{
 			CreateConditionCommand = new DelegateCommand(OnCreateCondition);
 			ReorderCommand = new DelegateCommand(OnReorder);

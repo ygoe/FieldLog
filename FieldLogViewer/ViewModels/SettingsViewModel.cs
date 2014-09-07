@@ -14,8 +14,6 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public SettingsViewModel()
 		{
-			InitializeCommands();
-
 			this.BindProperty(vm => vm.SelectedFilter, MainViewModel.Instance, vm => vm.SelectedFilter);
 		}
 
@@ -27,7 +25,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		public DelegateCommand DuplicateFilterCommand { get; private set; }
 		public DelegateCommand DeleteFilterCommand { get; private set; }
 
-		private void InitializeCommands()
+		protected override void InitializeCommands()
 		{
 			CreateFilterCommand = new DelegateCommand(OnCreateFilter);
 			DuplicateFilterCommand = new DelegateCommand(OnDuplicateFilter, CanDuplicateFilter);

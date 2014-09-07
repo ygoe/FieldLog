@@ -24,8 +24,6 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		{
 			this.parentConditionGroup = parentConditionGroup;
 
-			InitializeCommands();
-
 			comparison = FilterComparison.Contains;
 			value = "";
 			isEnabled = true;
@@ -37,7 +35,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public DelegateCommand DeleteCommand { get; private set; }
 
-		private void InitializeCommands()
+		protected override void InitializeCommands()
 		{
 			DeleteCommand = new DelegateCommand(OnDelete);
 		}

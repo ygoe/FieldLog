@@ -22,8 +22,6 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		public FilterViewModel()
 		{
 			ConditionGroups = new ObservableCollection<FilterConditionGroupViewModel>();
-
-			InitializeCommands();
 		}
 
 		public FilterViewModel(bool acceptAll)
@@ -75,7 +73,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		public DelegateCommand CreateConditionGroupCommand { get; private set; }
 		public DelegateCommand ReorderCommand { get; private set; }
 
-		private void InitializeCommands()
+		protected override void InitializeCommands()
 		{
 			CreateConditionGroupCommand = new DelegateCommand(OnCreateConditionGroup);
 			ReorderCommand = new DelegateCommand(OnReorder);

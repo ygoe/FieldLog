@@ -22,7 +22,7 @@ AppPublisher=Yves Goergen
 AppPublisherURL=http://dev.unclassified.de/source/fieldlog
 AppName=FieldLog
 AppVersion={#ShortRevId}
-AppMutex=Global\Unclassified.FieldLogViewer
+AppMutex=Global\Unclassified.FieldLogViewer,Unclassified.FieldLogViewer
 AppId={{52CCCE83-0A6F-447D-AAE0-506431641858}
 MinVersion=0,5.01sp3
 

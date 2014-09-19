@@ -68,9 +68,9 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		#region Data properties
 
-		public AppSettings AppSettings
+		public IAppSettings Settings
 		{
-			get { return AppSettings.Instance; }
+			get { return App.Settings; }
 		}
 
 		#region General tab

@@ -822,7 +822,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		private bool CompareTime(DateTime time, int utcOffset)
 		{
-			switch (AppSettings.Instance.ItemTimeMode)
+			switch (App.Settings.ItemTimeMode)
 			{
 				case ItemTimeType.Local:
 					time = time.ToLocalTime();

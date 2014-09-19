@@ -27,6 +27,8 @@ namespace Unclassified.FieldLogViewer
 			// Keep the setup away
 			GlobalMutex.Create("Unclassified.FieldLogViewer");
 
+			InitializeSettings();
+
 			// Make sure the settings are properly saved in the end
 			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 
@@ -54,13 +56,10 @@ namespace Unclassified.FieldLogViewer
 		{
 			base.OnStartup(e);
 
-			// Initialise the settings system
-			AppSettings.InitializeInstance();
-
 			// Remember the version of the application.
 			// If we need to react on settings changes from previous application versions, here is
 			// the place to check the version currently in the settings, before it's overwritten.
-			AppSettings.Instance.LastAppVersion = FL.AppVersion;
+			App.Settings.LastAppVersion = FL.AppVersion;
 
 			// Make some more worker threads for the ThreadPool. We need around 10 threads for
 			// reading a set of log files, and since some of them may be waiting for a long time,
@@ -119,6 +118,38 @@ namespace Unclassified.FieldLogViewer
 
 		#endregion Startup
 
+		#region Settings
+
+		/// <summary>
+		/// Provides properties to access the application settings.
+		/// </summary>
+		public static IAppSettings Settings { get; private set; }
+
+		private static void InitializeSettings()
+		{
+			Settings = SettingsAdapterFactory.New<IAppSettings>(
+				new FileSettingsStore(
+					SettingsHelper.GetAppDataPath(@"Unclassified\FieldLog", "FieldLogViewer.conf")));
+
+			// The settings ShowThreadIdColumn and ShowWebRequestIdColumn are mutually exclusive
+			Settings.OnPropertyChanged(
+				s => s.ShowThreadIdColumn,
+				() =>
+				{
+					if (Settings.ShowThreadIdColumn) Settings.ShowWebRequestIdColumn = false;
+				},
+				true);
+			Settings.OnPropertyChanged(
+				s => s.ShowWebRequestIdColumn,
+				() =>
+				{
+					if (Settings.ShowWebRequestIdColumn) Settings.ShowThreadIdColumn = false;
+				},
+				true);
+		}
+
+		#endregion Settings
+
 		#region Event handlers
 
 		/// <summary>
@@ -128,9 +159,12 @@ namespace Unclassified.FieldLogViewer
 		/// The processing time in this event is limited. All handlers of this event together must
 		/// not take more than ca. 3 seconds. The processing will then be terminated.
 		/// </remarks>
-		private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
+		private static void CurrentDomain_ProcessExit(object sender, EventArgs args)
 		{
-			AppSettings.CloseInstance();
+			if (Settings != null)
+			{
+				Settings.SettingsStore.Dispose();
+			}
 		}
 
 		#endregion Event handlers

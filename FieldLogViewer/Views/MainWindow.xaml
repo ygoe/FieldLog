@@ -13,7 +13,7 @@
 	Title="{Binding DisplayName}"
 	Height="201" Width="756"
 	Icon="/Images/FieldLog.ico"
-	LocationChanged="Window_LocationChanged" SizeChanged="Window_SizeChanged"
+	SizeChanged="Window_SizeChanged"
 	Activated="Window_Activated" Deactivated="Window_Deactivated"
 	Loaded="Window_Loaded" Closed="Window_Closed" Closing="Window_Closing"
 	PreviewKeyDown="Window_PreviewKeyDown"
@@ -120,32 +120,32 @@
 				<Separator Grid.Column="9" Style="{StaticResource ToolBarSeparator}"/>
 				<ToggleButton
 					Grid.Column="10"
-					IsChecked="{Binding AppSettings.ShowRelativeTime}" ToolTip="Show relative time" ToolTipService.ShowOnDisabled="True"
+					IsChecked="{Binding Settings.ShowRelativeTime}" ToolTip="Show relative time" ToolTipService.ShowOnDisabled="True"
 					Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" Focusable="False">
 					<ui:MenuIconImage Source="/Images/timer.png"/>
 				</ToggleButton>
 				<Separator Grid.Column="11" Style="{StaticResource ToolBarSeparator}"/>
 				<ToggleButton
 					Grid.Column="12"
-					IsChecked="{Binding AppSettings.IsLiveScrollingEnabled}" ToolTip="Live scroll" ToolTipService.ShowOnDisabled="True"
+					IsChecked="{Binding Settings.IsLiveScrollingEnabled}" ToolTip="Live scroll" ToolTipService.ShowOnDisabled="True"
 					Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" Focusable="False">
 					<ui:MenuIconImage Source="/Images/goto_bottom.png"/>
 				</ToggleButton>
 				<ToggleButton
 					Grid.Column="13"
-					IsChecked="{Binding AppSettings.IsSoundEnabled}" ToolTip="Play sound on new item" ToolTipService.ShowOnDisabled="True"
+					IsChecked="{Binding Settings.IsSoundEnabled}" ToolTip="Play sound on new item" ToolTipService.ShowOnDisabled="True"
 					Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" Focusable="False">
 					<ui:MenuIconImage Source="/Images/sound.png"/>
 				</ToggleButton>
 				<ToggleButton
 					Grid.Column="14"
-					IsChecked="{Binding AppSettings.IsFlashingEnabled}" ToolTip="Flash window on new item" ToolTipService.ShowOnDisabled="True"
+					IsChecked="{Binding Settings.IsFlashingEnabled}" ToolTip="Flash window on new item" ToolTipService.ShowOnDisabled="True"
 					Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" Focusable="False">
 					<ui:MenuIconImage Source="/Images/flash.png"/>
 				</ToggleButton>
 				<ToggleButton
 					Grid.Column="15"
-					IsChecked="{Binding AppSettings.IsWindowOnTop}" ToolTip="Keep window on top" ToolTipService.ShowOnDisabled="True"
+					IsChecked="{Binding Settings.IsWindowOnTop}" ToolTip="Keep window on top" ToolTipService.ShowOnDisabled="True"
 					Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" Focusable="False">
 					<ui:MenuIconImage Source="/Images/pin.png"/>
 				</ToggleButton>
@@ -311,7 +311,7 @@
 									<Image Grid.Column="1" Source="{Binding PrioImageSource}" Width="14" Height="14"/>
 									<TextBlock
 										Grid.Column="2" Margin="6,0,0,0"
-										Visibility="{Binding DataContext.AppSettings.ShowRelativeTime, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}">
+										Visibility="{Binding DataContext.Settings.ShowRelativeTime, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}">
 										<TextBlock.Text>
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}">
 												<Binding Path="Time" Mode="OneWay"/>
@@ -324,7 +324,7 @@
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}">
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
-												<Binding Path="DataContext.AppSettings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="DataContext.Settings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
 												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
@@ -334,7 +334,7 @@
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}" ConverterParameter="ms">
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
-												<Binding Path="DataContext.AppSettings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="DataContext.Settings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
 												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
@@ -344,7 +344,7 @@
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}" ConverterParameter="us">
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
-												<Binding Path="DataContext.AppSettings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="DataContext.Settings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
 												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
@@ -353,7 +353,7 @@
 										Grid.Column="6" Width="13"
 										Margin="6,-1,0,-1" Padding="0,1"
 										Text="{Binding ThreadId}" TextTrimming="CharacterEllipsis" TextAlignment="Right"
-										Visibility="{Binding DataContext.AppSettings.ShowThreadIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
+										Visibility="{Binding DataContext.Settings.ShowThreadIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
 										<TextBlock.Background>
 											<MultiBinding Converter="{StaticResource SameThreadBrushConverter}">
 												<Binding Path="ThreadId" Mode="OneWay"/>
@@ -367,7 +367,7 @@
 										Grid.Column="7" Width="26"
 										Margin="6,-1,0,-1" Padding="0,1"
 										Text="{Binding WebRequestIdString}" TextTrimming="CharacterEllipsis" TextAlignment="Right"
-										Visibility="{Binding DataContext.AppSettings.ShowWebRequestIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
+										Visibility="{Binding DataContext.Settings.ShowWebRequestIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
 										<TextBlock.Background>
 											<MultiBinding Converter="{StaticResource SameWebRequestBrushConverter}">
 												<Binding Path="WebRequestId" Mode="OneWay"/>
@@ -382,7 +382,7 @@
 											<TextBlock.Margin>
 												<MultiBinding Converter="{StaticResource IndentLevelToWidthConverter}">
 													<Binding Path="IndentLevel" Mode="OneWay"/>
-													<Binding Path="DataContext.AppSettings.IndentSize" ElementName="_this" Mode="OneWay"/>
+													<Binding Path="DataContext.Settings.IndentSize" ElementName="_this" Mode="OneWay"/>
 												</MultiBinding>
 											</TextBlock.Margin>
 										</TextBlock>
@@ -411,7 +411,7 @@
 									<Image Grid.Column="1" Source="{Binding PrioImageSource}" Width="14" Height="14"/>
 									<TextBlock
 										Grid.Column="2" Margin="6,0,0,0"
-										Visibility="{Binding DataContext.AppSettings.ShowRelativeTime, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}">
+										Visibility="{Binding DataContext.Settings.ShowRelativeTime, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}">
 										<TextBlock.Text>
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}">
 												<Binding Path="Time" Mode="OneWay"/>
@@ -424,7 +424,7 @@
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}">
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
-												<Binding Path="DataContext.AppSettings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="DataContext.Settings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
 												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
@@ -434,7 +434,7 @@
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}" ConverterParameter="ms">
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
-												<Binding Path="DataContext.AppSettings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="DataContext.Settings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
 												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
@@ -444,7 +444,7 @@
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}" ConverterParameter="us">
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
-												<Binding Path="DataContext.AppSettings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="DataContext.Settings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
 												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
@@ -453,7 +453,7 @@
 										Grid.Column="6" Width="13"
 										Margin="6,-1,0,-1" Padding="0,1"
 										Text="{Binding ThreadId}" TextTrimming="CharacterEllipsis" TextAlignment="Right"
-										Visibility="{Binding DataContext.AppSettings.ShowThreadIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
+										Visibility="{Binding DataContext.Settings.ShowThreadIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
 										<TextBlock.Background>
 											<MultiBinding Converter="{StaticResource SameThreadBrushConverter}">
 												<Binding Path="ThreadId" Mode="OneWay"/>
@@ -467,7 +467,7 @@
 										Grid.Column="7" Width="26"
 										Margin="6,-1,0,-1" Padding="0,1"
 										Text="{Binding WebRequestIdString}" TextTrimming="CharacterEllipsis" TextAlignment="Right"
-										Visibility="{Binding DataContext.AppSettings.ShowWebRequestIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
+										Visibility="{Binding DataContext.Settings.ShowWebRequestIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
 										<TextBlock.Background>
 											<MultiBinding Converter="{StaticResource SameWebRequestBrushConverter}">
 												<Binding Path="WebRequestId" Mode="OneWay"/>
@@ -482,7 +482,7 @@
 											<TextBlock.Margin>
 												<MultiBinding Converter="{StaticResource IndentLevelToWidthConverter}">
 													<Binding Path="IndentLevel" Mode="OneWay"/>
-													<Binding Path="DataContext.AppSettings.IndentSize" ElementName="_this" Mode="OneWay"/>
+													<Binding Path="DataContext.Settings.IndentSize" ElementName="_this" Mode="OneWay"/>
 												</MultiBinding>
 											</TextBlock.Margin>
 										</TextBlock>
@@ -511,7 +511,7 @@
 									<Image Grid.Column="1" Source="{Binding PrioImageSource}" Width="14" Height="14"/>
 									<TextBlock
 										Grid.Column="2" Margin="6,0,0,0"
-										Visibility="{Binding DataContext.AppSettings.ShowRelativeTime, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}">
+										Visibility="{Binding DataContext.Settings.ShowRelativeTime, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}">
 										<TextBlock.Text>
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}">
 												<Binding Path="Time" Mode="OneWay"/>
@@ -524,7 +524,7 @@
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}">
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
-												<Binding Path="DataContext.AppSettings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="DataContext.Settings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
 												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
@@ -534,7 +534,7 @@
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}" ConverterParameter="ms">
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
-												<Binding Path="DataContext.AppSettings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="DataContext.Settings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
 												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
@@ -544,7 +544,7 @@
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}" ConverterParameter="us">
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
-												<Binding Path="DataContext.AppSettings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="DataContext.Settings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
 												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
@@ -553,7 +553,7 @@
 										Grid.Column="6" Width="13"
 										Margin="6,-1,0,-1" Padding="0,1"
 										Text="{Binding ThreadId}" TextTrimming="CharacterEllipsis" TextAlignment="Right"
-										Visibility="{Binding DataContext.AppSettings.ShowThreadIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
+										Visibility="{Binding DataContext.Settings.ShowThreadIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
 										<TextBlock.Background>
 											<MultiBinding Converter="{StaticResource SameThreadBrushConverter}">
 												<Binding Path="ThreadId" Mode="OneWay"/>
@@ -567,7 +567,7 @@
 										Grid.Column="7" Width="26"
 										Margin="6,-1,0,-1" Padding="0,1"
 										Text="{Binding WebRequestIdString}" TextTrimming="CharacterEllipsis" TextAlignment="Right"
-										Visibility="{Binding DataContext.AppSettings.ShowWebRequestIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
+										Visibility="{Binding DataContext.Settings.ShowWebRequestIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
 										<TextBlock.Background>
 											<MultiBinding Converter="{StaticResource SameWebRequestBrushConverter}">
 												<Binding Path="WebRequestId" Mode="OneWay"/>
@@ -582,7 +582,7 @@
 											<TextBlock.Margin>
 												<MultiBinding Converter="{StaticResource IndentLevelToWidthConverter}">
 													<Binding Path="IndentLevel" Mode="OneWay"/>
-													<Binding Path="DataContext.AppSettings.IndentSize" ElementName="_this" Mode="OneWay"/>
+													<Binding Path="DataContext.Settings.IndentSize" ElementName="_this" Mode="OneWay"/>
 												</MultiBinding>
 											</TextBlock.Margin>
 										</TextBlock>
@@ -611,7 +611,7 @@
 									<Image Grid.Column="1" Source="{Binding PrioImageSource}" Width="14" Height="14"/>
 									<TextBlock
 										Grid.Column="2" Margin="6,0,0,0"
-										Visibility="{Binding DataContext.AppSettings.ShowRelativeTime, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}">
+										Visibility="{Binding DataContext.Settings.ShowRelativeTime, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}">
 										<TextBlock.Text>
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}">
 												<Binding Path="Time" Mode="OneWay"/>
@@ -624,7 +624,7 @@
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}">
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
-												<Binding Path="DataContext.AppSettings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="DataContext.Settings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
 												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
@@ -634,7 +634,7 @@
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}" ConverterParameter="ms">
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
-												<Binding Path="DataContext.AppSettings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="DataContext.Settings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
 												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
@@ -644,7 +644,7 @@
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}" ConverterParameter="us">
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
-												<Binding Path="DataContext.AppSettings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="DataContext.Settings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
 												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
@@ -653,7 +653,7 @@
 										Grid.Column="6" Width="13"
 										Margin="6,-1,0,-1" Padding="0,1"
 										Text="{Binding ThreadId}" TextTrimming="CharacterEllipsis" TextAlignment="Right"
-										Visibility="{Binding DataContext.AppSettings.ShowThreadIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
+										Visibility="{Binding DataContext.Settings.ShowThreadIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
 										<TextBlock.Background>
 											<MultiBinding Converter="{StaticResource SameThreadBrushConverter}">
 												<Binding Path="ThreadId" Mode="OneWay"/>
@@ -667,7 +667,7 @@
 										Grid.Column="7" Width="26"
 										Margin="6,-1,0,-1" Padding="0,1"
 										Text="{Binding WebRequestIdString}" TextTrimming="CharacterEllipsis" TextAlignment="Right"
-										Visibility="{Binding DataContext.AppSettings.ShowWebRequestIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
+										Visibility="{Binding DataContext.Settings.ShowWebRequestIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
 										<TextBlock.Background>
 											<MultiBinding Converter="{StaticResource SameWebRequestBrushConverter}">
 												<Binding Path="WebRequestId" Mode="OneWay"/>
@@ -682,7 +682,7 @@
 											<TextBlock.Margin>
 												<MultiBinding Converter="{StaticResource IndentLevelToWidthConverter}">
 													<Binding Path="IndentLevel" Mode="OneWay"/>
-													<Binding Path="DataContext.AppSettings.IndentSize" ElementName="_this" Mode="OneWay"/>
+													<Binding Path="DataContext.Settings.IndentSize" ElementName="_this" Mode="OneWay"/>
 												</MultiBinding>
 											</TextBlock.Margin>
 										</TextBlock>
@@ -711,7 +711,7 @@
 									<Image Grid.Column="1" Source="{Binding PrioImageSource}" Width="14" Height="14"/>
 									<TextBlock
 										Grid.Column="2" Margin="6,0,0,0"
-										Visibility="{Binding DataContext.AppSettings.ShowRelativeTime, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}">
+										Visibility="{Binding DataContext.Settings.ShowRelativeTime, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}">
 										<TextBlock.Text>
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}">
 												<Binding Path="Time" Mode="OneWay"/>
@@ -724,7 +724,7 @@
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}">
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
-												<Binding Path="DataContext.AppSettings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="DataContext.Settings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
 												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
@@ -734,7 +734,7 @@
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}" ConverterParameter="ms">
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
-												<Binding Path="DataContext.AppSettings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="DataContext.Settings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
 												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
@@ -744,7 +744,7 @@
 											<MultiBinding Converter="{StaticResource RelativeTimeConverter}" ConverterParameter="us">
 												<Binding Path="Time" Mode="OneWay"/>
 												<Binding Path="SelectedItem.Time" ElementName="LogItemsList" Mode="OneWay"/>
-												<Binding Path="DataContext.AppSettings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
+												<Binding Path="DataContext.Settings.ShowRelativeTime" ElementName="_this" Mode="OneWay"/>
 												<Binding Path="UtcOffset" Mode="OneWay"/>
 											</MultiBinding>
 										</TextBlock.Text>
@@ -752,19 +752,19 @@
 									<TextBlock
 										Grid.Column="6" Width="13"
 										Margin="6,-1,0,-1" Padding="0,1"
-										Visibility="{Binding DataContext.AppSettings.ShowThreadIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
+										Visibility="{Binding DataContext.Settings.ShowThreadIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
 									</TextBlock>
 									<TextBlock
 										Grid.Column="7" Width="26"
 										Margin="6,-1,0,-1" Padding="0,1"
-										Visibility="{Binding DataContext.AppSettings.ShowWebRequestIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
+										Visibility="{Binding DataContext.Settings.ShowWebRequestIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
 									</TextBlock>
 									<Grid Grid.Column="8" Margin="8,0,0,0">
 										<TextBlock Text="{Binding SimpleMessage}">
 											<TextBlock.Margin>
 												<MultiBinding Converter="{StaticResource IndentLevelToWidthConverter}">
 													<Binding Path="IndentLevel" Mode="OneWay"/>
-													<Binding Path="DataContext.AppSettings.IndentSize" ElementName="_this" Mode="OneWay"/>
+													<Binding Path="DataContext.Settings.IndentSize" ElementName="_this" Mode="OneWay"/>
 												</MultiBinding>
 											</TextBlock.Margin>
 										</TextBlock>

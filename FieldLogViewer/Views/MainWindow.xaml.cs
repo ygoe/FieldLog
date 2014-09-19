@@ -58,20 +58,17 @@ namespace Unclassified.FieldLogViewer.Views
 
 			InitializeComponent();
 
-			WindowStartupLocation = WindowStartupLocation.Manual;
-			Left = AppSettings.Instance.Window.MainLeft;
-			Top = AppSettings.Instance.Window.MainTop;
-			Width = AppSettings.Instance.Window.MainWidth;
-			Height = AppSettings.Instance.Window.MainHeight;
-			WindowState = AppSettings.Instance.Window.MainIsMaximized ? WindowState.Maximized : WindowState.Normal;
+			Width = 1000;
+			Height = 500;
+			SettingsHelper.BindWindowState(this, App.Settings.MainWindow);
 
 			newItemMediaPlayer.Open(new Uri(@"Sounds\ting.mp3", UriKind.Relative));
 
 			logItemsScrollPixelDc = DelayedCall.Create(() => { logItemsHostPanel.ScrollToPixel = true; }, 600);
 			updateScrollmapDc = DelayedCall.Create(UpdateScrollmap, 100);
 
-			AppSettings.Instance.OnPropertyChanged(s => s.ShowWarningsErrorsInScrollBar, () => InvalidateScrollmap(false));
-			AppSettings.Instance.OnPropertyChanged(s => s.ShowSelectionInScrollBar, () => InvalidateScrollmap(false));
+			App.Settings.OnPropertyChanged(s => s.ShowWarningsErrorsInScrollBar, () => InvalidateScrollmap(false));
+			App.Settings.OnPropertyChanged(s => s.ShowSelectionInScrollBar, () => InvalidateScrollmap(false));
 		}
 
 		#endregion Constructors
@@ -80,7 +77,7 @@ namespace Unclassified.FieldLogViewer.Views
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
-			if (AppSettings.Instance.Window.ToolBarInWindowFrame &&
+			if (App.Settings.ToolBarInWindowFrame &&
 				WindowManager.ExtendFrameIntoClientArea(this, 0, (int) ToolBar.ActualHeight, 0, 0))
 			{
 				Background = Brushes.Transparent;
@@ -104,22 +101,8 @@ namespace Unclassified.FieldLogViewer.Views
 			}
 		}
 
-		private void Window_LocationChanged(object sender, EventArgs e)
-		{
-			if (AppSettings.Instance != null)
-			{
-				AppSettings.Instance.Window.MainLeft = (int) RestoreBounds.Left;
-				AppSettings.Instance.Window.MainTop = (int) RestoreBounds.Top;
-				AppSettings.Instance.Window.MainWidth = (int) RestoreBounds.Width;
-				AppSettings.Instance.Window.MainHeight = (int) RestoreBounds.Height;
-				AppSettings.Instance.Window.MainIsMaximized = WindowState == WindowState.Maximized;
-			}
-		}
-
 		private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
-			Window_LocationChanged(this, EventArgs.Empty);
-
 			if (ActualHeight > 0)
 			{
 				double ratio = ActualWidth / ActualHeight;
@@ -216,7 +199,7 @@ namespace Unclassified.FieldLogViewer.Views
 				CheckScrollToEnd();
 
 				// Flash window on new item, if window is inactive and not yet flashing
-				if (AppSettings.Instance.IsFlashingEnabled)
+				if (App.Settings.IsFlashingEnabled)
 				{
 					if (!this.IsActive)
 					{
@@ -233,7 +216,7 @@ namespace Unclassified.FieldLogViewer.Views
 				}
 
 				// Play sound on new item, with rate limiting
-				if (AppSettings.Instance.IsSoundEnabled)
+				if (App.Settings.IsSoundEnabled)
 				{
 					if (now > prevItemTime.AddSeconds(1))
 					{
@@ -251,7 +234,7 @@ namespace Unclassified.FieldLogViewer.Views
 			if (logItemsScroll != null)
 			{
 				// Only scroll to the end if we're already near it and if the option is enabled
-				if (logItemsScrolledNearEnd && AppSettings.Instance.IsLiveScrollingEnabled)
+				if (logItemsScrolledNearEnd && App.Settings.IsLiveScrollingEnabled)
 				{
 					if (logItemsSmoothScrollActive)
 					{
@@ -373,8 +356,8 @@ namespace Unclassified.FieldLogViewer.Views
 			}
 			if (logItemsScroll == null) return;
 
-			bool showWarningsErrors = AppSettings.Instance.ShowWarningsErrorsInScrollBar;
-			bool showSelection = AppSettings.Instance.ShowSelectionInScrollBar;
+			bool showWarningsErrors = App.Settings.ShowWarningsErrorsInScrollBar;
+			bool showSelection = App.Settings.ShowSelectionInScrollBar;
 
 			if (!showWarningsErrors && !showSelection) return;   // Nothing to do
 

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using Unclassified.UI;
+using Unclassified.Util;
 
 namespace Unclassified.FieldLogViewer.Views
 {
@@ -14,11 +15,9 @@ namespace Unclassified.FieldLogViewer.Views
 		{
 			InitializeComponent();
 
-			WindowStartupLocation = WindowStartupLocation.Manual;
-			Left = AppSettings.Instance.Window.SettingsLeft;
-			Top = AppSettings.Instance.Window.SettingsTop;
-			Width = AppSettings.Instance.Window.SettingsWidth;
-			Height = AppSettings.Instance.Window.SettingsHeight;
+			Width = 500;
+			Height = 300;
+			SettingsHelper.BindWindowState(this, App.Settings.SettingsWindow);
 		}
 
 		#endregion Constructors
@@ -31,22 +30,6 @@ namespace Unclassified.FieldLogViewer.Views
 
 			this.HideIcon();
 			this.HideMinimizeAndMaximizeBoxes();
-		}
-
-		private void Window_LocationChanged(object sender, EventArgs e)
-		{
-			if (AppSettings.Instance != null)
-			{
-				AppSettings.Instance.Window.SettingsLeft = (int) RestoreBounds.Left;
-				AppSettings.Instance.Window.SettingsTop = (int) RestoreBounds.Top;
-				AppSettings.Instance.Window.SettingsWidth = (int) RestoreBounds.Width;
-				AppSettings.Instance.Window.SettingsHeight = (int) RestoreBounds.Height;
-			}
-		}
-
-		private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
-		{
-			Window_LocationChanged(this, EventArgs.Empty);
 		}
 
 		#endregion Window event handlers

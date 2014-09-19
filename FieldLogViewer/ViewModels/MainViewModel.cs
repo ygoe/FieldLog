@@ -72,23 +72,23 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			UpdateWindowTitle();
 
 			// Setup toolbar and settings events
-			this.BindProperty(vm => vm.IsLocalDebugMonitorActive, AppSettings, s => s.IsLocalDebugMonitorActive);
-			this.BindProperty(vm => vm.IsGlobalDebugMonitorActive, AppSettings, s => s.IsGlobalDebugMonitorActive);
-			AppSettings.OnPropertyChanged(
+			this.BindProperty(vm => vm.IsLocalDebugMonitorActive, App.Settings, s => s.IsLocalDebugMonitorActive);
+			this.BindProperty(vm => vm.IsGlobalDebugMonitorActive, App.Settings, s => s.IsGlobalDebugMonitorActive);
+			App.Settings.OnPropertyChanged(
 				s => s.IsLiveScrollingEnabled,
 				v => { if (v) ViewCommandManager.Invoke("ScrollToEnd"); });
-			AppSettings.OnPropertyChanged(
+			App.Settings.OnPropertyChanged(
 				s => s.IsWindowOnTop,
 				v => MainWindow.Instance.Topmost = v,
 				true);
-			AppSettings.OnPropertyChanged(
+			App.Settings.OnPropertyChanged(
 				s => s.IndentSize,
 				() =>
 				{
 					DecreaseIndentSizeCommand.RaiseCanExecuteChanged();
 					IncreaseIndentSizeCommand.RaiseCanExecuteChanged();
 				});
-			AppSettings.OnPropertyChanged(
+			App.Settings.OnPropertyChanged(
 				s => s.ItemTimeMode,
 				() => RefreshLogItemsFilterView());
 
@@ -107,7 +107,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			};
 
 			// Load filters
-			foreach (string s in AppSettings.Filters)
+			foreach (string s in App.Settings.Filters)
 			{
 				FilterViewModel f = new FilterViewModel();
 				try
@@ -133,7 +133,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 
 			// Restore filter selection
-			FilterViewModel selectedFilterVM = Filters.FirstOrDefault(f => f.DisplayName == AppSettings.SelectedFilter);
+			FilterViewModel selectedFilterVM = Filters.FirstOrDefault(f => f.DisplayName == App.Settings.SelectedFilter);
 			if (selectedFilterVM != null)
 			{
 				SelectedFilter = selectedFilterVM;
@@ -350,29 +350,29 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		private bool CanDecreaseIndentSize()
 		{
-			return AppSettings.IndentSize > 4;
+			return App.Settings.IndentSize > 4;
 		}
 
 		private void OnDecreaseIndentSize()
 		{
-			AppSettings.IndentSize -= 4;
-			if (AppSettings.IndentSize < 4)
+			App.Settings.IndentSize -= 4;
+			if (App.Settings.IndentSize < 4)
 			{
-				AppSettings.IndentSize = 4;
+				App.Settings.IndentSize = 4;
 			}
 		}
 
 		private bool CanIncreaseIndentSize()
 		{
-			return AppSettings.IndentSize < 32;
+			return App.Settings.IndentSize < 32;
 		}
 
 		private void OnIncreaseIndentSize()
 		{
-			AppSettings.IndentSize += 4;
-			if (AppSettings.IndentSize > 32)
+			App.Settings.IndentSize += 4;
+			if (App.Settings.IndentSize > 32)
 			{
-				AppSettings.IndentSize = 32;
+				App.Settings.IndentSize = 32;
 			}
 		}
 
@@ -759,7 +759,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 				if (!cg.IsExclude)
 				{
 					DateTime itemTime = new DateTime(SelectedItems[0].Time.Ticks / 10 * 10);   // Round down to the next microsecond
-					switch (AppSettings.ItemTimeMode)
+					switch (App.Settings.ItemTimeMode)
 					{
 						case ItemTimeType.Local:
 							itemTime = itemTime.ToLocalTime();
@@ -803,7 +803,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 				if (!cg.IsExclude)
 				{
 					DateTime itemTime = new DateTime((SelectedItems[0].Time.Ticks + 9) / 10 * 10);   // Round up to the next microsecond
-					switch (AppSettings.ItemTimeMode)
+					switch (App.Settings.ItemTimeMode)
 					{
 						case ItemTimeType.Local:
 							itemTime = itemTime.ToLocalTime();
@@ -1017,9 +1017,9 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		#region Data properties
 
-		public AppSettings AppSettings
+		public IAppSettings Settings
 		{
-			get { return AppSettings.Instance; }
+			get { return App.Settings; }
 		}
 
 		#region Toolbar and settings
@@ -1193,11 +1193,11 @@ namespace Unclassified.FieldLogViewer.ViewModels
 					ViewCommandManager.Invoke("RestoreScrolling");
 					if (selectedFilter != null)
 					{
-						AppSettings.SelectedFilter = selectedFilter.DisplayName;
+						App.Settings.SelectedFilter = selectedFilter.DisplayName;
 					}
 					else
 					{
-						AppSettings.SelectedFilter = "";
+						App.Settings.SelectedFilter = "";
 					}
 				}
 			}
@@ -1573,7 +1573,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			{
 				RefreshLogItemsFilterView();
 			}
-			AppSettings.Filters = Filters
+			App.Settings.Filters = Filters
 				.Where(f => !f.AcceptAll)
 				.Select(f => f.SaveToString())
 				.Where(s => !string.IsNullOrEmpty(s))

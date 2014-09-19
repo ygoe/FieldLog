@@ -102,7 +102,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="AppSettings.cs" />
+    <Compile Include="IAppSettings.cs" />
     <Compile Include="Converters\IndentLevelToWidthConverter.cs" />
     <Compile Include="Converters\SameWebRequestBrushConverter.cs" />
     <Compile Include="Converters\ListItemsConverter.cs" />
@@ -112,13 +112,15 @@
     <Compile Include="Unclassified\UI\MenuIconExtension.cs" />
     <Compile Include="Unclassified\UI\MenuIconImage.cs" />
     <Compile Include="Unclassified\UI\WindowManager.cs" />
+    <Compile Include="Unclassified\Util\FileSettingsStore.cs" />
     <Compile Include="Unclassified\Util\GlobalMutex.cs" />
     <Compile Include="Unclassified\Util\DebugMonitor.cs" />
     <Compile Include="Unclassified\Util\DelayedCall.cs" />
     <Compile Include="Unclassified\Util\ListExtensions.cs" />
     <Compile Include="Unclassified\Util\MediaExtensions.cs" />
     <Compile Include="Unclassified\Util\PropertyExtensions.cs" />
-    <Compile Include="Unclassified\Util\Settings.cs" />
+    <Compile Include="Unclassified\Util\SettingsAdapterFactory.cs" />
+    <Compile Include="Unclassified\Util\SettingsHelper.cs" />
     <Compile Include="Unclassified\Util\StringExtensions.cs" />
     <Compile Include="Unclassified\Util\TaskHelper.cs" />
     <Compile Include="Unclassified\UI\AnimationHelper.cs" />

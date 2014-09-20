@@ -2860,6 +2860,27 @@ namespace Unclassified.FieldLog
 
 		#endregion ASP.NET log methods
 
+		#region Debugging helpers
+
+		/// <summary>
+		/// Breaks the debugged process if the stack trace is currently at least the thecified
+		/// number of frames long. This method can be used to halt for debugging before Visual
+		/// Studio can't display the complete stack trace anymore, or a StackOverflowException is
+		/// thrown by the runtime (which prevents any further analysis of the stack). Does nothing
+		/// if no debugger is attached.
+		/// </summary>
+		/// <param name="minLength">The minimum length of the stack trace to break for.</param>
+		public static void BreakIfStackTraceLength(int minLength)
+		{
+			if (Debugger.IsAttached &&
+				new StackTrace(1).FrameCount >= minLength)
+			{
+				Debugger.Break();
+			}
+		}
+
+		#endregion Debugging helpers
+
 		#region Item buffer methods
 
 		/// <summary>

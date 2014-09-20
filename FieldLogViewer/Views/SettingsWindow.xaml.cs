@@ -17,7 +17,7 @@ namespace Unclassified.FieldLogViewer.Views
 
 			Width = 500;
 			Height = 300;
-			SettingsHelper.BindWindowState(this, App.Settings.SettingsWindow);
+			SettingsHelper.BindWindowState(this, App.Settings.SettingsWindowState);
 		}
 
 		#endregion Constructors

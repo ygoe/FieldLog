@@ -60,7 +60,7 @@ namespace Unclassified.FieldLogViewer.Views
 
 			Width = 1000;
 			Height = 500;
-			SettingsHelper.BindWindowState(this, App.Settings.MainWindow);
+			SettingsHelper.BindWindowState(this, App.Settings.MainWindowState);
 
 			newItemMediaPlayer.Open(new Uri(@"Sounds\ting.mp3", UriKind.Relative));
 

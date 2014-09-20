@@ -9,17 +9,17 @@ namespace Unclassified.FieldLogViewer
 		/// <summary>
 		/// Provides settings for the main window state.
 		/// </summary>
-		IWindowStateSettings MainWindow { get; }
+		IWindowStateSettings MainWindowState { get; }
 
 		/// <summary>
 		/// Provides settings for the settings window state.
 		/// </summary>
-		IWindowStateSettings SettingsWindow { get; }
+		IWindowStateSettings SettingsWindowState { get; }
 
 		/// <summary>
-		/// Gets or sets the version of the application.
+		/// Gets or sets the last started version of the application.
 		/// </summary>
-		string LastAppVersion { get; set; }
+		string LastStartedAppVersion { get; set; }
 
 		/// <summary>
 		/// Gets or sets a value indicating whether the local DebugOutputString monitor is active.

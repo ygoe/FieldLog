@@ -56,11 +56,6 @@ namespace Unclassified.FieldLogViewer
 		{
 			base.OnStartup(e);
 
-			// Remember the version of the application.
-			// If we need to react on settings changes from previous application versions, here is
-			// the place to check the version currently in the settings, before it's overwritten.
-			App.Settings.LastAppVersion = FL.AppVersion;
-
 			// Make some more worker threads for the ThreadPool. We need around 10 threads for
 			// reading a set of log files, and since some of them may be waiting for a long time,
 			// blocking other files from reading, this is sometimes a bottleneck. Depending on what
@@ -146,6 +141,28 @@ namespace Unclassified.FieldLogViewer
 					if (Settings.ShowWebRequestIdColumn) Settings.ShowThreadIdColumn = false;
 				},
 				true);
+
+			// Update settings format from old version
+			if (string.IsNullOrEmpty(App.Settings.LastStartedAppVersion))
+			{
+				Settings.SettingsStore.Rename("LastAppVersion", "LastStartedAppVersion");
+				Settings.SettingsStore.Rename("Window.MainLeft", "MainWindowState.Left");
+				Settings.SettingsStore.Rename("Window.MainTop", "MainWindowState.Top");
+				Settings.SettingsStore.Rename("Window.MainWidth", "MainWindowState.Width");
+				Settings.SettingsStore.Rename("Window.MainHeight", "MainWindowState.Height");
+				Settings.SettingsStore.Rename("Window.MainIsMaximized", "MainWindowState.IsMaximized");
+				Settings.SettingsStore.Rename("Window.ToolBarInWindowFrame", "ToolBarInWindowFrame");
+				Settings.SettingsStore.Rename("Window.SettingsLeft", "SettingsWindowState.Left");
+				Settings.SettingsStore.Rename("Window.SettingsTop", "SettingsWindowState.Top");
+				Settings.SettingsStore.Rename("Window.SettingsWidth", "SettingsWindowState.Width");
+				Settings.SettingsStore.Rename("Window.SettingsHeight", "SettingsWindowState.Height");
+			}
+
+			// Remember the version of the application.
+			// If we need to react on settings changes from previous application versions, here is
+			// the place to check the version currently in the settings, before it's overwritten.
+			App.Settings.LastStartedAppVersion = FL.AppVersion;
+
 		}
 
 		#endregion Settings

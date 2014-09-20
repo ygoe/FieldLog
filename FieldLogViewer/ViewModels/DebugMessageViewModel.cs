@@ -11,12 +11,13 @@ namespace Unclassified.FieldLogViewer.ViewModels
 	{
 		#region Constructor
 
-		public DebugMessageViewModel(int pid, string text)
+		public DebugMessageViewModel(int pid, string text, bool isGlobal)
 		{
 			this.Time = FL.UtcNow;
 			this.UtcOffset = (int) DateTimeOffset.Now.Offset.TotalMinutes;
 			this.ProcessId = pid;
 			this.Message = (text ?? "").TrimEnd();
+			this.IsGlobal = isGlobal;
 		}
 
 		#endregion Constructor
@@ -25,8 +26,23 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public int ProcessId { get; private set; }
 		public string Message { get; private set; }
-		public string TypeImageSource { get { return "/Images/Windows_14.png"; } }
+		public bool IsGlobal { get; private set; }
+		public string TypeImageSource
+		{
+			get
+			{
+				return IsGlobal ? "/Images/Windows_System_14.png" : "/Images/Windows_User_14.png";
+			}
+		}
 		public string PrioImageSource { get { return "/Images/Transparent_14.png"; } }
+
+		public string SourceString
+		{
+			get
+			{
+				return IsGlobal ? "Global" : "Local";
+			}
+		}
 
 		public string SimpleMessage
 		{

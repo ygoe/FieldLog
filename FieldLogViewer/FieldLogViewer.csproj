@@ -337,6 +337,11 @@
     <Resource Include="Images\ScopeItem_WebRequestStart_14.png" />
     <Resource Include="Images\ghost.png" />
     <Resource Include="Images\pdb-file.png" />
+    <Resource Include="Images\Windows.png" />
+    <Resource Include="Images\Windows_User.png" />
+    <Resource Include="Images\Windows_System.png" />
+    <Resource Include="Images\Windows_System_14.png" />
+    <Resource Include="Images\Windows_User_14.png" />
     <Content Include="Sounds\high.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

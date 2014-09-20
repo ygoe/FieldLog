@@ -109,13 +109,14 @@
 					Grid.Column="7"
 					IsChecked="{Binding IsLocalDebugMonitorActive}" ToolTip="Local debug monitor" ToolTipService.ShowOnDisabled="True"
 					Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" Focusable="False">
-					<ui:MenuIconImage Source="/Images/event.png"/>
+					<ui:MenuIconImage Source="/Images/Windows_User.png"/>
 				</ToggleButton>
 				<ToggleButton
 					Grid.Column="8"
 					IsChecked="{Binding IsGlobalDebugMonitorActive}" ToolTip="Global debug monitor" ToolTipService.ShowOnDisabled="True"
+					IsEnabled="{Binding IsGlobalDebugMonitorAvailable}"
 					Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" Focusable="False">
-					<ui:MenuIconImage Source="/Images/event.png"/>
+					<ui:MenuIconImage Source="/Images/Windows_System.png"/>
 				</ToggleButton>
 				<Separator Grid.Column="9" Style="{StaticResource ToolBarSeparator}"/>
 				<ToggleButton

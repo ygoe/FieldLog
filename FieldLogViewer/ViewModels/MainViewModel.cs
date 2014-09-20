@@ -58,6 +58,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		/// accessed with the Interlocked class.
 		/// </summary>
 		private int queuedNewItemsCount;
+		/// <summary>
+		/// Set if the UI thread requests the read thread to stop sending new items to the UI thread
+		/// separately and use a local list instead.
+		/// </summary>
 		private AutoResetEvent returnToLocalLogItemsList = new AutoResetEvent(false);
 
 		#endregion Private data
@@ -153,24 +157,15 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			filteredLogItems.Filter += filteredLogItems_Filter;
 
 			// Setup debug message monitor events
-			// TODO: Separate the messages by local and global source
 			localDebugMonitor.MessageReceived += (pid, text) =>
 			{
-				var itemVM = new DebugMessageViewModel(pid, text);
-
-				Interlocked.Increment(ref queuedNewItemsCount);
-				dispatcher.BeginInvoke(
-					new Action<LogItemViewModelBase>(this.InsertNewLogItem),
-					itemVM);
+				var itemVM = new DebugMessageViewModel(pid, text, false);
+				InsertLogItemThread(itemVM);
 			};
 			globalDebugMonitor.MessageReceived += (pid, text) =>
 			{
-				var itemVM = new DebugMessageViewModel(pid, text);
-
-				Interlocked.Increment(ref queuedNewItemsCount);
-				dispatcher.BeginInvoke(
-					new Action<LogItemViewModelBase>(this.InsertNewLogItem),
-					itemVM);
+				var itemVM = new DebugMessageViewModel(pid, text, true);
+				InsertLogItemThread(itemVM);
 			};
 		}
 
@@ -1046,7 +1041,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			get { return globalDebugMonitor.IsActive; }
 			set
 			{
-				if (value)
+				if (value && OSInfo.IsCurrentUserLocalAdministrator())
 				{
 					globalDebugMonitor.TryStart();
 				}
@@ -1055,6 +1050,14 @@ namespace Unclassified.FieldLogViewer.ViewModels
 					globalDebugMonitor.Stop();
 				}
 				OnPropertyChanged("IsGlobalDebugMonitorActive");
+			}
+		}
+
+		public bool IsGlobalDebugMonitorAvailable
+		{
+			get
+			{
+				return OSInfo.IsCurrentUserLocalAdministrator();
 			}
 		}
 
@@ -1782,77 +1785,90 @@ namespace Unclassified.FieldLogViewer.ViewModels
 					seenScopeItemVMs.Add((FieldLogScopeItemViewModel) itemVM);
 				}
 
-				bool upgradedLock = false;
-				localLogItemsLock.EnterUpgradeableReadLock();
-				try
+				InsertLogItemThread(itemVM);
+			}
+		}
+
+		/// <summary>
+		/// Inserts a new log item to either the localLogItems list or the UI list, which ever is
+		/// currently used.
+		/// </summary>
+		/// <param name="itemVM">The item to insert.</param>
+		private void InsertLogItemThread(LogItemViewModelBase itemVM)
+		{
+			bool upgradedLock = false;
+			localLogItemsLock.EnterUpgradeableReadLock();
+			try
+			{
+				if (localLogItems == null)
 				{
-					if (localLogItems == null)
+					// Not using local items list. Check if we should do so.
+					if (returnToLocalLogItemsList.WaitOne(0))
 					{
-						if (returnToLocalLogItemsList.WaitOne(0))
+						FL.Trace("ReadTask: returnToLocalLogItemsList was set", "Waiting for the UI queue to clear before taking the list back.");
+
+						// Wait for all queued items to be processed by the UI thread so that
+						// the list is complete and no item is lost
+						while (queuedNewItemsCount > 0)
 						{
-							FL.Trace("ReadTask: returnToLocalLogItemsList was set", "Waiting for the UI queue to clear before taking the list back.");
-
-							// Wait for all queued items to be processed by the UI thread so that
-							// the list is complete and no item is lost
-							while (queuedNewItemsCount > 0)
-							{
-								Thread.Sleep(10);
-							}
-							// Ensure the items list is current when the queued counter is seen zero
-							Thread.MemoryBarrier();
-
-							localLogItemsLock.EnterWriteLock();
-							upgradedLock = true;
-
-							// Setup everything as if we were still reading an initial set of log
-							// files and the the read Task thread use its local buffer again.
-							using (FL.Scope("Copying logItems to localLogItems"))
-							{
-								localLogItems = new List<LogItemViewModelBase>(logItems);
-							}
-							FL.Trace("ReadTask: took back the list");
-						}
-					}
-
-					if (localLogItems != null)
-					{
-						if (!upgradedLock)
-						{
-							localLogItemsLock.EnterWriteLock();
-							upgradedLock = true;
-						}
-
-						localLogItems.InsertSorted(itemVM, new Comparison<LogItemViewModelBase>((a, b) => a.CompareTo(b)));
-
-						if ((localLogItems.Count % 5000) == 0)
-						{
-							int count = localLogItems.Count;
-							FL.TraceData("localLogItems.Count", count);
-							dispatcher.BeginInvoke(new Action(() => LoadedItemsCount = count));
-						}
-					}
-					else
-					{
-						// Don't push a new item to the UI thread if there are currently more than
-						// 20 items waiting to be processed.
-						while (queuedNewItemsCount >= 20)
-						{
-							FL.Trace("Already too many items queued, waiting...");
 							Thread.Sleep(10);
 						}
+						// Ensure the items list is current when the queued counter is seen zero
+						Thread.MemoryBarrier();
 
-						Interlocked.Increment(ref queuedNewItemsCount);
-						dispatcher.BeginInvoke(
-							new Action<LogItemViewModelBase>(this.InsertNewLogItem),
-							itemVM);
+						localLogItemsLock.EnterWriteLock();
+						upgradedLock = true;
+
+						// Setup everything as if we were still reading an initial set of log
+						// files and the the read Task thread use its local buffer again.
+						using (FL.Scope("Copying logItems to localLogItems"))
+						{
+							localLogItems = new List<LogItemViewModelBase>(logItems);
+						}
+						FL.Trace("ReadTask: took back the list");
 					}
 				}
-				finally
+
+				if (localLogItems != null)
 				{
-					if (upgradedLock)
-						localLogItemsLock.ExitWriteLock();
-					localLogItemsLock.ExitUpgradeableReadLock();
+					// Using a local items list to store new log items
+					if (!upgradedLock)
+					{
+						localLogItemsLock.EnterWriteLock();
+						upgradedLock = true;
+					}
+
+					localLogItems.InsertSorted(itemVM, new Comparison<LogItemViewModelBase>((a, b) => a.CompareTo(b)));
+
+					if ((localLogItems.Count % 5000) == 0)
+					{
+						int count = localLogItems.Count;
+						FL.TraceData("localLogItems.Count", count);
+						dispatcher.BeginInvoke(new Action(() => LoadedItemsCount = count));
+					}
 				}
+				else
+				{
+					// Send each item to the UI thread for insertion.
+					// Don't push a new item to the UI thread if there are currently more than
+					// 20 items waiting to be processed.
+					while (queuedNewItemsCount >= 20)
+					{
+						FL.Trace("Already too many items queued, waiting...");
+						Thread.Sleep(10);
+					}
+
+					Interlocked.Increment(ref queuedNewItemsCount);
+					dispatcher.BeginInvoke(
+						new Action<LogItemViewModelBase>(this.InsertNewLogItem),
+						itemVM);
+				}
+			}
+			finally
+			{
+				if (upgradedLock)
+					localLogItemsLock.ExitWriteLock();
+				localLogItemsLock.ExitUpgradeableReadLock();
 			}
 		}
 

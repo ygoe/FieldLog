@@ -34,7 +34,7 @@ namespace Unclassified.FieldLogViewer.Views
 
 		#region Private data
 
-		private bool logItemsSmoothScrollActive;
+		private bool logItemsSmoothScrollActive = true;
 		private ScrollViewer logItemsScroll;
 		private ScrollViewerOffsetMediator logItemsScrollMediator;
 		private bool logItemsScrolledNearEnd = true;
@@ -169,7 +169,8 @@ namespace Unclassified.FieldLogViewer.Views
 								c.CollectionChanged += LogItems_CollectionChanged;
 								InvalidateScrollmap();
 							}
-						});
+						},
+						true);
 				}
 			}
 		}

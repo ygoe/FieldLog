@@ -15,6 +15,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 using System.Threading;
 
@@ -23,6 +24,7 @@ namespace Unclassified.FieldLog
 	/// <summary>
 	/// Contains information about the current system and process environment for log items.
 	/// </summary>
+	[TypeConverter(typeof(ExpandableObjectConverter))]
 	public class FieldLogEventEnvironment
 	{
 		#region Static members
@@ -53,6 +55,7 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Gets the approximate data size of this data structure. Used for buffer size estimation.
 		/// </summary>
+		[Browsable(false)]
 		public int Size { get; protected set; }
 
 		/// <summary>

@@ -80,6 +80,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppErrorDialog.cs" />
     <Compile Include="CheckTimeThread.cs" />
     <Compile Include="CustomTimers.cs" />
     <Compile Include="Enums.cs" />

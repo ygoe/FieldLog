@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
@@ -25,9 +26,11 @@ namespace Unclassified.FieldLog
 	/// <summary>
 	/// Wraps an Exception instance for use in FieldLog logging.
 	/// </summary>
+	[TypeConverter(typeof(ExpandableObjectConverter))]
 	public class FieldLogException
 	{
 		/// <summary>Gets the approximated data size of this log item. Used for buffer size estimation.</summary>
+		[Browsable(false)]
 		public int Size { get; protected set; }
 
 		/// <summary>Gets the exception type name.</summary>
@@ -291,9 +294,11 @@ namespace Unclassified.FieldLog
 	/// <summary>
 	/// Wraps a StackFrame instance for the FieldLogException class.
 	/// </summary>
+	[TypeConverter(typeof(ExpandableObjectConverter))]
 	public class FieldLogStackFrame
 	{
 		/// <summary>Gets the approximated data size of this log item. Used for buffer size estimation.</summary>
+		[Browsable(false)]
 		public int Size { get; protected set; }
 
 		/// <summary>Gets the module name.</summary>

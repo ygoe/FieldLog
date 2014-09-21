@@ -15,6 +15,7 @@
 using System;
 using System.Collections;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
@@ -33,6 +34,7 @@ namespace Unclassified.FieldLog
 	public abstract class FieldLogItem
 	{
 		/// <summary>Gets the approximated data size of this log item. Used for buffer size estimation.</summary>
+		[Browsable(false)]
 		public int Size { get; protected set; }
 
 		/// <summary>Gets the log item counter. Used for correct ordering of log items with the exact same time value. May wrap around.</summary>
@@ -51,10 +53,12 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Gets the name of the file from which this log item was read, if any.
 		/// </summary>
+		[Browsable(false)]
 		public string LogItemSourceFileName { get; private set; }
 		/// <summary>
 		/// Gets the file format version from which the item was read.
 		/// </summary>
+		[Browsable(false)]
 		public int FileFormatVersion { get; private set; }
 
 		/// <summary>

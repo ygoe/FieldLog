@@ -119,7 +119,7 @@ namespace Unclassified.FieldLog
 		/// user does not respond within this time, a warning is logged and the application is
 		/// terminated.
 		/// </summary>
-		private const int AppErrorTerminateTimeout = 180;
+		internal const int AppErrorTerminateTimeout = 180;
 
 		/// <summary>
 		/// Defines the log configuration file name extension.
@@ -445,24 +445,19 @@ namespace Unclassified.FieldLog
 
 			// Application error dialog localisation, default to English
 			AppErrorDialogTitle = "Application error";
-			AppErrorDialogContinuableGui = "An error occured and the application may not continue to work properly. " +
-				"Click “OK” to continue, or “Cancel” to quit the application. " +
-				"If you choose to continue, additional errors or failures may occur.";
-			AppErrorDialogContinuableConsole = "An error occured and the application may not continue to work properly. " +
+			AppErrorDialogContinuable = "An error occured and the application may not continue to work properly. " +
 				"If you choose to continue, additional errors or failures may occur.";
 			AppErrorDialogTerminating = "An error occured and the application cannot continue.";
 			AppErrorDialogContext = "Context:";
-			AppErrorDialogNote = "If the problem persists, please contact the application developer.";
 			AppErrorDialogLogPath = "The log file containing detailed error information is saved to {0}.";
 			AppErrorDialogNoLog = "The log file path is unknown. See http://u10d.de/flpath for the default log paths.";
 			AppErrorDialogConsoleAction = "Press the Enter key to continue, or Escape to quit the application.";
 			AppErrorDialogTimerNote = "The application will be terminated after {0} seconds without user response.";
-
-			//AppErrorDialogContinuable = "Es ist ein Fehler aufgetreten, die Anwendung kann möglicherweise nicht korrekt fortgesetzt werden. " +
-			//    "Drücken Sie auf „OK“, um das Programm fortzusetzen, oder „Abbrechen“, um das Programm zu beenden. " +
-			//    "Falls Sie die Ausführung fortsetzen, können weitere Fehler oder Störungen auftreten.";
-			//AppErrorDialogTerminating = "Es ist ein Fehler aufgetreten, die Anwendung kann nicht fortgesetzt werden.";
-			//AppErrorDialogNote = "Falls das Problem weiterhin bestehen sollte, wenden Sie sich bitte an den Programmentwickler.";
+			AppErrorDialogDetails = "What happened?";
+			AppErrorDialogSendLogs = "Send logs";
+			AppErrorDialogNext = "Next";
+			AppErrorDialogTerminate = "Terminate";
+			AppErrorDialogContinue = "Continue anyway";
 
 			// Use default implementation to show an application error dialog
 			ShowAppErrorDialog = DefaultShowAppErrorDialog;
@@ -654,16 +649,12 @@ namespace Unclassified.FieldLog
 
 		/// <summary>Gets or sets the application error user dialog title.</summary>
 		public static string AppErrorDialogTitle { get; set; }
-		/// <summary>Gets or sets the application error user dialog intro for GUI applications if the application can be continued.</summary>
-		public static string AppErrorDialogContinuableGui { get; set; }
-		/// <summary>Gets or sets the application error user dialog intro for console applications if the application can be continued.</summary>
-		public static string AppErrorDialogContinuableConsole { get; set; }
+		/// <summary>Gets or sets the application error user dialog intro if the application can be continued.</summary>
+		public static string AppErrorDialogContinuable { get; set; }
 		/// <summary>Gets or sets the application error user dialog intro if the application will be terminated.</summary>
 		public static string AppErrorDialogTerminating { get; set; }
 		/// <summary>Gets or sets the application error user dialog context caption, including a colon at the end.</summary>
 		public static string AppErrorDialogContext { get; set; }
-		/// <summary>Gets or sets the application error user dialog note at the end of the message.</summary>
-		public static string AppErrorDialogNote { get; set; }
 		/// <summary>Gets or sets the application error user dialog text describing the log path.</summary>
 		public static string AppErrorDialogLogPath { get; set; }
 		/// <summary>Gets or sets the application error user dialog text if no log is written to disk.</summary>
@@ -672,6 +663,16 @@ namespace Unclassified.FieldLog
 		public static string AppErrorDialogConsoleAction { get; set; }
 		/// <summary>Gets or sets the application error user dialog text informing about the safety timer.</summary>
 		public static string AppErrorDialogTimerNote { get; set; }
+		/// <summary>Gets or sets the application error user dialog label for error details.</summary>
+		public static string AppErrorDialogDetails { get; set; }
+		/// <summary>Gets or sets the application error user dialog label for sending logs.</summary>
+		public static string AppErrorDialogSendLogs { get; set; }
+		/// <summary>Gets or sets the application error user dialog label for the next error.</summary>
+		public static string AppErrorDialogNext { get; set; }
+		/// <summary>Gets or sets the application error user dialog label to terminate.</summary>
+		public static string AppErrorDialogTerminate { get; set; }
+		/// <summary>Gets or sets the application error user dialog label to continue.</summary>
+		public static string AppErrorDialogContinue { get; set; }
 
 		#endregion Static properties
 
@@ -788,33 +789,16 @@ namespace Unclassified.FieldLog
 					Environment.Exit(1);
 				},
 				null,
-				AppErrorTerminateTimeout * 1000,
+				(AppErrorTerminateTimeout + 2) * 1000,
 				Timeout.Infinite);
 
-			string msg;
-			if (allowContinue)
-			{
-				if (IsInteractiveConsoleApp)
-				{
-					msg = AppErrorDialogContinuableConsole;
-				}
-				else
-				{
-					msg = AppErrorDialogContinuableGui;
-				}
-			}
-			else
-			{
-				msg = AppErrorDialogTerminating;
-			}
-			msg += "\n\n";
-
-			msg += ExceptionUserMessageRecursive(exItem.Exception);
+			// Prepare messages to display
+			string errorMsg;
+			errorMsg = ExceptionUserMessageRecursive(exItem.Exception).TrimEnd();
 			if (!string.IsNullOrEmpty(exItem.Context))
 			{
-				msg += AppErrorDialogContext + " " + exItem.Context + "\n";
+				errorMsg += Environment.NewLine + AppErrorDialogContext + " " + exItem.Context;
 			}
-			msg += "\n";
 
 			// Wait max. 1 second for the log file path to be set
 			int pathRetry = 20;
@@ -823,35 +807,33 @@ namespace Unclassified.FieldLog
 				Thread.Sleep(50);
 			}
 
-			if (LogFileBasePath != null)
-			{
-				msg += string.Format(AppErrorDialogLogPath, logFileBasePath + "*.fl");
-			}
-			else
-			{
-				msg += AppErrorDialogNoLog;
-			}
-			msg += "\n\n";
-
-			msg += AppErrorDialogNote;
-
-			// TODO: Offer starting external log submit tool
-
 			if (IsInteractiveConsoleApp)
 			{
-				ConsoleColor foreColor = Console.ForegroundColor;
-				ConsoleColor backColor = Console.BackgroundColor;
+				// TODO: Offer starting external log submit tool
+
+				ConsoleColor oldForeColor = Console.ForegroundColor;
+				ConsoleColor oldBackColor = Console.BackgroundColor;
 
 				Console.BackgroundColor = ConsoleColor.Black;
 				Console.ForegroundColor = ConsoleColor.Red;
-				string appName = AppName;
-				if (!string.IsNullOrEmpty(appName))
-				{
-					Console.Error.Write(appName);
-					Console.Error.Write(" - ");
-				}
 				Console.Error.WriteLine(AppErrorDialogTitle);
-				Console.Error.WriteLine(msg);
+				if (allowContinue)
+				{
+					Console.Error.WriteLine(AppErrorDialogContinuable);
+				}
+				else
+				{
+					Console.Error.WriteLine(AppErrorDialogTerminating);
+				}
+				Console.Error.WriteLine();
+				if (LogFileBasePath != null)
+				{
+					Console.Error.WriteLine(string.Format(AppErrorDialogLogPath, LogFileBasePath + "*.fl"));
+				}
+				else
+				{
+					Console.Error.WriteLine(AppErrorDialogNoLog);
+				}
 
 				if (allowContinue)
 				{
@@ -860,8 +842,8 @@ namespace Unclassified.FieldLog
 					Console.Error.Write(string.Format(AppErrorDialogTimerNote, AppErrorTerminateTimeout));
 				}
 
-				Console.ForegroundColor = foreColor;
-				Console.BackgroundColor = backColor;
+				Console.ForegroundColor = oldForeColor;
+				Console.BackgroundColor = oldBackColor;
 
 				if (allowContinue)
 				{
@@ -890,43 +872,19 @@ namespace Unclassified.FieldLog
 					Environment.Exit(1);
 				}
 			}
-			else if (allowContinue)
-			{
-				string title = AppErrorDialogTitle;
-				string appName = AppName;
-				if (!string.IsNullOrEmpty(appName))
-				{
-					title = appName + " – " + title;
-				}
-
-				msg += "\n\n" + string.Format(AppErrorDialogTimerNote, AppErrorTerminateTimeout);
-
-				if (System.Windows.Forms.MessageBox.Show(
-					msg,
-					title,
-					System.Windows.Forms.MessageBoxButtons.OKCancel,
-					System.Windows.Forms.MessageBoxIcon.Error) == System.Windows.Forms.DialogResult.OK)
-				{
-					// Cancel the timer so that the process will not be terminated
-					timer.Change(Timeout.Infinite, Timeout.Infinite);
-					timer.Dispose();
-				}
-				else
-				{
-					Shutdown();
-					Environment.Exit(1);
-				}
-			}
 			else
 			{
-				System.Windows.Forms.MessageBox.Show(
-					msg,
-					AppErrorDialogTitle,
-					System.Windows.Forms.MessageBoxButtons.OK,
-					System.Windows.Forms.MessageBoxIcon.Error);
-				// Prevent Windows' application error dialog to appear and exit the process now
-				Shutdown();
-				Environment.Exit(1);
+				AppErrorDialog.ShowError(allowContinue, errorMsg, exItem);
+
+				// We're still alive!
+				// Cancel the timer so that the process will not be terminated.
+				// (Each concurrently displayed error starts its own timer and only the first one
+				// keeps running because it waits for the error dialog to close. All other errors
+				// return immediately because the error is just added to the opened dialog.
+				// Console applications don't have that dialog, every error blocks the causing
+				// thread there.)
+				timer.Change(Timeout.Infinite, Timeout.Infinite);
+				timer.Dispose();
 			}
 		}
 

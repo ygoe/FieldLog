@@ -229,6 +229,15 @@ namespace Unclassified.FieldLog
 		}
 
 		/// <summary>
+		/// Returns the exception message.
+		/// </summary>
+		/// <returns></returns>
+		public override string ToString()
+		{
+			return Message;
+		}
+
+		/// <summary>
 		/// Writes the exception fields to the log file writer.
 		/// </summary>
 		/// <param name="writer">The log file writer to write to.</param>
@@ -368,6 +377,15 @@ namespace Unclassified.FieldLog
 				(MethodSignature != null ? MethodSignature.Length * 2 : 0) +
 				(FileName != null ? FileName.Length * 2 : 0) +
 				4 + 4;
+		}
+
+		/// <summary>
+		/// Returns the type and method name.
+		/// </summary>
+		/// <returns></returns>
+		public override string ToString()
+		{
+			return TypeName + "." + MethodName;
 		}
 
 		private string FormatTypeName(Type t)

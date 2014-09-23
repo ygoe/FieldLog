@@ -27,6 +27,15 @@ namespace Unclassified.FieldLog
 
 		#endregion Delegates and types
 
+		#region Static constructor
+
+		static AppErrorDialog()
+		{
+			CanShowDetails = true;
+		}
+
+		#endregion Static constructor
+
 		#region Private static fields
 
 		private static object syncLock = new object();
@@ -35,6 +44,17 @@ namespace Unclassified.FieldLog
 		private static Thread uiThread;
 
 		#endregion Private static fields
+
+		#region Public static properties
+
+		/// <summary>
+		/// Gets or sets a value indicating whether the exception details object can be shown to the
+		/// user. This should be set to false for obfuscated applications because there will be no
+		/// or no readable data to display. (Default: true)
+		/// </summary>
+		public static bool CanShowDetails { get; set; }
+
+		#endregion Public static properties
 
 		#region Static methods
 
@@ -221,6 +241,7 @@ namespace Unclassified.FieldLog
 			detailsLabel.Padding = new Padding();
 			detailsLabel.TabIndex = 11;
 			detailsLabel.Text = FL.AppErrorDialogDetails;
+			detailsLabel.Visible = CanShowDetails;
 			tablePanel.Controls.Add(detailsLabel);
 			tablePanel.SetRow(detailsLabel, 3);
 			tablePanel.SetColumn(detailsLabel, 0);

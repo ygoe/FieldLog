@@ -66,23 +66,42 @@ namespace Unclassified.FieldLog
 		{
 			lock (syncLock)
 			{
-				if (currentInstance == null)
+				try
 				{
-					currentInstance = new AppErrorDialog();
-					currentInstance.SetCanContinue(canContinue);
-					currentInstance.errorLabel.Text = errorMsg;
-					currentInstance.grid.SelectedObject = ex;
+					if (currentInstance == null)
+					{
+						currentInstance = new AppErrorDialog();
+						currentInstance.SetCanContinue(canContinue);
+						currentInstance.errorLabel.Text = errorMsg;
+						currentInstance.grid.SelectedObject = ex;
 
-					// Source: http://stackoverflow.com/a/3992635/143684
-					uiThread = new Thread(UiThreadStart);
-					uiThread.SetApartmentState(ApartmentState.STA);
-					uiThread.Start();
+						// Source: http://stackoverflow.com/a/3992635/143684
+						uiThread = new Thread(UiThreadStart);
+						uiThread.SetApartmentState(ApartmentState.STA);
+						uiThread.Start();
+					}
+					else
+					{
+						// Add next error to existing dialog
+						currentInstance.Invoke(new AddErrorDelegate(currentInstance.AddError), canContinue, errorMsg, ex);
+					}
 				}
-				else
+				catch (Exception ex2)
 				{
-					// Add next error to existing dialog
-					currentInstance.Invoke(new AddErrorDelegate(currentInstance.AddError), canContinue, errorMsg, ex);
+					FL.Critical(ex2, "FieldLog.Showing AppErrorDialog", false);
+					FL.Flush();
+					MessageBox.Show(
+						"Error showing the application error dialog. Details should be logged.",
+						"Error",
+						MessageBoxButtons.OK,
+						MessageBoxIcon.Error);
 				}
+			}
+
+			// Make sure we won't continue in this thread if it's not possible
+			while (!canContinue)
+			{
+				Thread.Sleep(1000000);
 			}
 
 			// Slow down or halt the application as long as there are many pending errors.
@@ -138,7 +157,7 @@ namespace Unclassified.FieldLog
 		{
 			if (!appErrorInitialized)
 			{
-				Application.SetCompatibleTextRenderingDefault(false);
+				Application.EnableVisualStyles();
 				appErrorInitialized = true;
 			}
 
@@ -186,6 +205,7 @@ namespace Unclassified.FieldLog
 			introLabel.MaximumSize = new Size(this.ClientSize.Width, 0);
 			introLabel.Padding = new Padding(6, 4, 7, 6);
 			introLabel.Margin = new Padding();
+			introLabel.UseCompatibleTextRendering = false;
 			introLabel.UseMnemonic = false;
 			tablePanel.Controls.Add(introLabel);
 			tablePanel.SetRow(introLabel, 0);
@@ -205,6 +225,7 @@ namespace Unclassified.FieldLog
 			errorLabel.MaximumSize = new Size(this.ClientSize.Width - 20, 0);
 			errorLabel.Padding = new Padding();
 			errorLabel.Margin = new Padding();
+			errorLabel.UseCompatibleTextRendering = false;
 			errorLabel.UseMnemonic = false;
 			errorPanel.Controls.Add(errorLabel);
 
@@ -230,6 +251,7 @@ namespace Unclassified.FieldLog
 				logLabel.Text = FL.AppErrorDialogNoLog;
 				logLabel.LinkArea = new LinkArea(0, 0);
 			}
+			logLabel.UseCompatibleTextRendering = false;
 			logLabel.UseMnemonic = false;
 			tablePanel.Controls.Add(logLabel);
 			tablePanel.SetRow(logLabel, 2);
@@ -241,6 +263,7 @@ namespace Unclassified.FieldLog
 			detailsLabel.Padding = new Padding();
 			detailsLabel.TabIndex = 11;
 			detailsLabel.Text = FL.AppErrorDialogDetails;
+			detailsLabel.UseCompatibleTextRendering = false;
 			detailsLabel.Visible = CanShowDetails;
 			tablePanel.Controls.Add(detailsLabel);
 			tablePanel.SetRow(detailsLabel, 3);
@@ -254,6 +277,7 @@ namespace Unclassified.FieldLog
 			grid.ToolbarVisible = false;
 			grid.HelpVisible = false;
 			grid.PropertySort = PropertySort.Alphabetical;
+			grid.UseCompatibleTextRendering = false;
 			grid.Visible = false;
 			tablePanel.Controls.Add(grid);
 			tablePanel.SetRow(grid, 4);
@@ -320,6 +344,7 @@ namespace Unclassified.FieldLog
 			sendCheckBox.Margin = new Padding();
 			sendCheckBox.Padding = new Padding();
 			sendCheckBox.Text = FL.AppErrorDialogSendLogs;
+			sendCheckBox.UseCompatibleTextRendering = false;
 			buttonsPanel.Controls.Add(sendCheckBox);
 			buttonsPanel.SetRow(sendCheckBox, 0);
 			buttonsPanel.SetColumn(sendCheckBox, 0);
@@ -331,6 +356,7 @@ namespace Unclassified.FieldLog
 			nextButton.Margin = new Padding(6, 0, 0, 0);
 			nextButton.Padding = new Padding(2, 1, 2, 1);
 			nextButton.Text = FL.AppErrorDialogNext;
+			nextButton.UseCompatibleTextRendering = false;
 			nextButton.UseVisualStyleBackColor = true;
 			nextButton.Visible = false;
 			nextButton.Click += (s, e) =>
@@ -348,6 +374,7 @@ namespace Unclassified.FieldLog
 			terminateButton.Margin = new Padding(6, 0, 0, 0);
 			terminateButton.Padding = new Padding(2, 1, 2, 1);
 			terminateButton.Text = FL.AppErrorDialogTerminate + " (" + FL.AppErrorTerminateTimeout + ")";
+			terminateButton.UseCompatibleTextRendering = false;
 			terminateButton.UseVisualStyleBackColor = true;
 			terminateButton.Click += (s, e) =>
 			{
@@ -361,7 +388,7 @@ namespace Unclassified.FieldLog
 
 			DateTime shutdownTime = DateTime.UtcNow.AddSeconds(FL.AppErrorTerminateTimeout);
 			System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
-			timer.Interval = 1000;
+			timer.Interval = 500;
 			timer.Tick += (s, e) =>
 			{
 				int secondsToShutdown = (int) Math.Round((shutdownTime - DateTime.UtcNow).TotalSeconds);
@@ -369,7 +396,6 @@ namespace Unclassified.FieldLog
 					secondsToShutdown = 0;
 				terminateButton.Text = FL.AppErrorDialogTerminate + " (" + secondsToShutdown + ")";
 			};
-			timer.Start();
 
 			continueButton = new Button();
 			continueButton.AutoSize = true;
@@ -378,6 +404,7 @@ namespace Unclassified.FieldLog
 			continueButton.Margin = new Padding(6, 0, 0, 0);
 			continueButton.Padding = new Padding(2, 1, 2, 1);
 			continueButton.Text = FL.AppErrorDialogContinue;
+			continueButton.UseCompatibleTextRendering = false;
 			continueButton.UseVisualStyleBackColor = true;
 			continueButton.Click += (s, e) =>
 			{
@@ -386,6 +413,12 @@ namespace Unclassified.FieldLog
 			buttonsPanel.Controls.Add(continueButton);
 			buttonsPanel.SetRow(continueButton, 0);
 			buttonsPanel.SetColumn(continueButton, 3);
+
+			Load += (s, e) =>
+			{
+				// Start timer in the window's thread, not in the main UI thread (which may be blocked)
+				timer.Start();
+			};
 		}
 
 		#endregion Constructor (Form initialisation)
@@ -407,17 +440,30 @@ namespace Unclassified.FieldLog
 
 		private void AddError(bool canContinue, string errorMsg, object ex)
 		{
-			if (!canContinue)
+			try
 			{
-				SetCanContinue(false);
-			}
+				if (!canContinue)
+				{
+					SetCanContinue(false);
+				}
 
-			ErrorInfo ei = new ErrorInfo();
-			ei.ErrorMessage = errorMsg;
-			ei.DetailsObject = ex;
-			nextErrors.Enqueue(ei);
-			nextButton.Text = FL.AppErrorDialogNext + " (" + nextErrors.Count + ")";
-			nextButton.Visible = true;
+				ErrorInfo ei = new ErrorInfo();
+				ei.ErrorMessage = errorMsg;
+				ei.DetailsObject = ex;
+				nextErrors.Enqueue(ei);
+				nextButton.Text = FL.AppErrorDialogNext + " (" + nextErrors.Count + ")";
+				nextButton.Visible = true;
+			}
+			catch (Exception ex2)
+			{
+				FL.Critical(ex2, "FieldLog.Showing AppErrorDialog", false);
+				FL.Flush();
+				MessageBox.Show(
+					"Error updating the application error dialog. Details should be logged.",
+					"Error",
+					MessageBoxButtons.OK,
+					MessageBoxIcon.Error);
+			}
 		}
 
 		private int GetNextErrorsCount()

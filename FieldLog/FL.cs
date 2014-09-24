@@ -789,7 +789,7 @@ namespace Unclassified.FieldLog
 					Environment.Exit(1);
 				},
 				null,
-				(AppErrorTerminateTimeout + 2) * 1000,
+				(AppErrorTerminateTimeout + 1) * 1000,
 				Timeout.Infinite);
 
 			// Prepare messages to display

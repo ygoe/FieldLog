@@ -28,6 +28,8 @@ namespace PdbConvert
 		{
 			xmlWriter.WriteStartDocument();
 			xmlWriter.WriteStartElement("symbols");
+			xmlWriter.WriteAttributeString("program", "PdbConvert");
+			xmlWriter.WriteAttributeString("version", "1");
 
 			AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomain_ReflectionOnlyAssemblyResolve;
 

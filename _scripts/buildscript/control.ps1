@@ -36,7 +36,7 @@ if (IsSelected("build-debug"))
 if ((IsSelected("build-release")) -or (IsSelected("commit")))
 {
 	Build-Solution "FieldLog.sln" "Release" "Any CPU" 8
-	Exec-Console "PdbConvert\bin\Release\PdbConvert.exe" "$sourcePath\FieldLogViewer\bin\Release\* /srcbase $sourcePath /optimize /gz /outfile $sourcePath\.local\FieldLog-$revId.pdb.xml.gz" 1
+	Exec-Console "PdbConvert\bin\Release\PdbConvert.exe" "$sourcePath\FieldLogViewer\bin\Release\* /srcbase $sourcePath /optimize /outfile $sourcePath\.local\FieldLog-$revId.pdbx" 1
 
 	if (IsSelected("sign-lib"))
 	{
@@ -75,7 +75,7 @@ if (IsSelected("install"))
 if (IsSelected("commit"))
 {
 	Delete-File "Setup\bin\FieldLogSetup-$revId.exe" 0
-	Delete-File ".local\FieldLog-$revId.pdb.xml.gz" 0
+	Delete-File ".local\FieldLog-$revId.pdbx" 0
 	Git-Commit 1
 }
 

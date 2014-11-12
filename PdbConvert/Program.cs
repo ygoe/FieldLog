@@ -20,10 +20,10 @@ namespace PdbConvert
 
 			CommandLineHelper cmdLine = new CommandLineHelper();
 			var debugOption = cmdLine.RegisterOption("debug").Alias("d");
-			var gzOption = cmdLine.RegisterOption("gz");
 			var helpOption = cmdLine.RegisterOption("help").Alias("h", "?");
+			var noGzOption = cmdLine.RegisterOption("nogz");
 			var noNamesOption = cmdLine.RegisterOption("nonames");
-			var optimizeOption = cmdLine.RegisterOption("optimize");
+			var optimizeOption = cmdLine.RegisterOption("optimize").Alias("opt");
 			var outFileOption = cmdLine.RegisterOption("outfile", 1).Alias("o");
 			var srcBaseOption = cmdLine.RegisterOption("srcbase", 1);
 
@@ -146,9 +146,9 @@ namespace PdbConvert
 
 			string xmlFileName =
 				outFileOption.Value ??
-				Path.ChangeExtension(assemblyFileNames.OrderBy(a => Path.GetExtension(a).Equals(".dll", StringComparison.OrdinalIgnoreCase)).First(), ".pdb") +
-					".xml" +
-					(gzOption.IsSet ? ".gz" : "");
+				Path.ChangeExtension(
+					assemblyFileNames.OrderBy(a => Path.GetExtension(a).Equals(".dll", StringComparison.OrdinalIgnoreCase)).First(),
+					(noGzOption.IsSet ? ".pdb.xml" : ".pdbx"));
 
 			if (debugOption.IsSet)
 			{
@@ -158,7 +158,7 @@ namespace PdbConvert
 
 			try
 			{
-				if (gzOption.IsSet)
+				if (!noGzOption.IsSet)
 				{
 					using (FileStream fileStream = new FileStream(xmlFileName, FileMode.Create))
 					using (GZipStream gzStream = new GZipStream(fileStream, CompressionMode.Compress))
@@ -191,22 +191,22 @@ namespace PdbConvert
 		{
 			ConsoleHelper.WriteLine("PdbConvert", ConsoleColor.White);
 			ConsoleHelper.WriteWrapped(
-@"Converts .pdb debug symbols to a portable XML file.
+@"Converts .pdb debug symbols to a portable compressed XML file.
 Part of FieldLog, © Yves Goergen, GNU GPL v3
 Website: http://dev.unclassified.de/source/fieldlog
 
 Usage: PdbConvert [options] inputfile ...
 
-The input files must be either .exe or .dll assembly files. Only assemblies with an existing .pdb file are processed. Wildcards (? and *) are allowed for files within a directory. All files’ symbols are written to one XML file. Options and input files can be mixed.
+The input files must be either .exe or .dll assembly files. Only assemblies with an existing .pdb file are processed. Wildcards (? and *) are allowed for files within a directory. All files’ symbols are written to one output file. Options and input files can be mixed.
 
 Options:
-  /gz                Compresses the output file with gzip. (Default file extension: .xml.gz)
-  /nonames           Does not include method names in the XML file.
-  /optimize          Removes unnecessary elements (methods without source code, unreferenced source files) from the XML file.
-  /o[utfile] <path>  Specifies the path of the generated XML file. If unset, the file name is derived from the input files, preferring .exe files.
-  /srcbase <path>    Sets the source base path that is stripped from the beginning of the source file names. Set this to the project directory.
   /d[ebug]           Shows debug information.
-  /help, /h, /?      Shows this help information.", true);
+  /help, /h, /?      Shows this help information.
+  /nogz              Writes uncompressed XML output file.
+  /nonames           Does not include method names in the XML file.
+  /opt[imize]        Removes unnecessary elements (methods without source code, unreferenced source files) from the XML file.
+  /o[utfile] <path>  Specifies the path of the generated XML file. If unset, the file name is derived from the input files, preferring .exe files.
+  /srcbase <path>    Sets the source base path that is stripped from the beginning of the source file names. Set this to the project directory.", true);
 		}
 	}
 }

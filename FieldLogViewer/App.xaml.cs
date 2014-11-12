@@ -72,6 +72,8 @@ namespace Unclassified.FieldLogViewer
 			var viewModel = new MainViewModel();
 			view.DataContext = viewModel;
 
+			//viewModel.AddObfuscationMap(@"D:\tmp\Map.xml");
+
 			if (e.Args.Length > 0)
 			{
 				bool singleFile = false;

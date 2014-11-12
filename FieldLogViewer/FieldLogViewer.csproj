@@ -108,7 +108,10 @@
     <Compile Include="Converters\ListItemsConverter.cs" />
     <Compile Include="Converters\RelativeTimeConverter.cs" />
     <Compile Include="Converters\SameThreadBrushConverter.cs" />
-    <Compile Include="SourceResolver.cs" />
+    <Compile Include="SourceInfo\Deobfuscator.cs" />
+    <Compile Include="SourceInfo\DotfuscatorDeobfuscator.cs" />
+    <Compile Include="SourceInfo\SeeUnsharpDeobfuscator.cs" />
+    <Compile Include="SourceInfo\SourceResolver.cs" />
     <Compile Include="Unclassified\UI\MenuIconExtension.cs" />
     <Compile Include="Unclassified\UI\MenuIconImage.cs" />
     <Compile Include="Unclassified\UI\WindowManager.cs" />

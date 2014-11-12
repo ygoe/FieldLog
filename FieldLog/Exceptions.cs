@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -350,13 +351,19 @@ namespace Unclassified.FieldLog
 				TypeName = FormatTypeName(method.DeclaringType);
 			}
 			MethodName = method.Name;
-			if (method.IsGenericMethod)
-			{
-				MethodName += FormatGenericTypeList(method.GetGenericArguments());
-			}
 
+			MethodInfo methodInfo = method as MethodInfo;
 			StringBuilder sigSb = new StringBuilder();
+			if (methodInfo != null)
+			{
+				sigSb.Append(FormatTypeName(methodInfo.ReturnType));
+			}
+			else
+			{
+				sigSb.Append("void");   // Dummy return value for constructors
+			}
 			ParameterInfo[] parameters = method.GetParameters();
+			sigSb.Append("(");
 			for (int i = 0; i < parameters.Length; i++)
 			{
 				if (i > 0)
@@ -365,6 +372,7 @@ namespace Unclassified.FieldLog
 				}
 				sigSb.Append(FormatTypeName(parameters[i].ParameterType));
 			}
+			sigSb.Append(")");
 			MethodSignature = sigSb.ToString();
 
 			FileName = stackFrame.GetFileName();
@@ -390,6 +398,21 @@ namespace Unclassified.FieldLog
 
 		private string FormatTypeName(Type t)
 		{
+			if (t.IsArray)
+			{
+				return FormatTypeName(t.GetElementType()) + "[]";
+			}
+			if (t.IsPointer)
+			{
+				return FormatTypeName(t.GetElementType()) + "*";
+			}
+			if (t.IsByRef)
+			{
+				return FormatTypeName(t.GetElementType()) + "&";
+			}
+
+			if (t == typeof(void)) return "void";
+
 			if (t == typeof(bool)) return "bool";
 			if (t == typeof(byte)) return "byte";
 			if (t == typeof(sbyte)) return "sbyte";
@@ -430,11 +453,33 @@ namespace Unclassified.FieldLog
 				}
 				if (t.IsNested)
 				{
-					sb.Append(t.DeclaringType.Name);
-					sb.Append("+");
+					// Collect all nesting parents starting from the inner-most type and add them in
+					// reverse order (outer to inner) to the full type name
+					Stack<string> nestedNames = new Stack<string>();
+					Type parentType = t;
+					do
+					{
+						nestedNames.Push(parentType.DeclaringType.Name);
+						parentType = parentType.DeclaringType;
+					}
+					while (parentType.IsNested);
+					while (nestedNames.Count > 0)
+					{
+						sb.Append(nestedNames.Pop());
+						sb.Append("/");
+					}
 				}
+				sb.Append(t.Name);
 			}
-			sb.Append(t.Name);
+			else
+			{
+				// Specify generic parameters by index, not by name
+				if (t.DeclaringMethod != null)
+					sb.Append("!!");
+				else
+					sb.Append("!");
+				sb.Append(t.GenericParameterPosition);
+			}
 			if (t.IsGenericType)
 			{
 				sb.Append(FormatGenericTypeList(t.GetGenericArguments()));

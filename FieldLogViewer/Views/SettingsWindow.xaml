@@ -24,6 +24,7 @@
 						<RowDefinition Height="Auto"/>
 						<RowDefinition Height="Auto"/>
 						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
 					</Grid.RowDefinitions>
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="Auto"/>
@@ -55,6 +56,11 @@
 						Grid.Row="3" Grid.ColumnSpan="2" Margin="0,6,0,0"
 						Content="Show main window tool bar in the window frame (applied after restart)"
 						IsChecked="{Binding Settings.ToolBarInWindowFrame}"/>
+
+					<CheckBox
+						Grid.Row="4" Grid.ColumnSpan="2" Margin="0,6,0,0"
+						Content="Show metadata in stack frames"
+						IsChecked="{Binding Settings.ShowStackFrameMetadata}"/>
 				</Grid>
 			</TabItem>
 

@@ -13,6 +13,7 @@ using System.Windows.Threading;
 using Microsoft.Win32;
 using TaskDialogInterop;
 using Unclassified.FieldLog;
+using Unclassified.FieldLogViewer.SourceInfo;
 using Unclassified.FieldLogViewer.Views;
 using Unclassified.UI;
 using Unclassified.Util;
@@ -40,6 +41,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		private Task readerTask;
 		private FilterConditionViewModel adhocFilterCondition;
 		private SourceResolver sourceResolver = new SourceResolver();
+		private Deobfuscator deobfuscator = new Deobfuscator();
 		private SettingsWindow openSettingsWindow;
 		private DebugMonitor localDebugMonitor = new DebugMonitor(false);
 		private DebugMonitor globalDebugMonitor = new DebugMonitor(true);
@@ -95,6 +97,9 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			App.Settings.OnPropertyChanged(
 				s => s.ItemTimeMode,
 				() => RefreshLogItemsFilterView());
+			App.Settings.OnPropertyChanged(
+				s => s.ShowStackFrameMetadata,
+				() => SelectedItems.ForEach(i => i.Refresh()));
 
 			// Setup filter events
 			Filters = new ObservableCollection<FilterViewModel>();
@@ -177,11 +182,11 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public SourceResolver SourceResolver { get { return sourceResolver; } }
 
+		public Deobfuscator Deobfuscator { get { return deobfuscator; } }
+
 		#endregion Public properties
 
-		#region Commands
-
-		#region Definition and initialisation
+		#region Command definition
 
 		// Toolbar commands
 		public DelegateCommand LoadLogCommand { get; private set; }
@@ -225,8 +230,6 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			ClearSearchTextCommand = new DelegateCommand(OnClearSearchText);
 			SettingsCommand = new DelegateCommand(OnSettings);
 
-			LoadObfuscationMapCommand.IsEnabled = false;   // Not implemented yet
-
 			QuickFilterSessionCommand = new DelegateCommand(OnQuickFilterSession, CanQuickFilterSession);
 			QuickFilterThreadCommand = new DelegateCommand(OnQuickFilterThread, CanQuickFilterThread);
 			QuickFilterTypeCommand = new DelegateCommand(OnQuickFilterType, CanQuickFilterType);
@@ -264,9 +267,9 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			QuickFilterWebRequestCommand.RaiseCanExecuteChanged();
 		}
 
-		#endregion Definition and initialisation
+		#endregion Command definition
 
-		#region Toolbar
+		#region Toolbar command handlers
 
 		private bool CanLoadLog()
 		{
@@ -322,7 +325,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		private void OnLoadSymbols()
 		{
 			OpenFileDialog dlg = new OpenFileDialog();
-			dlg.Filter = "Symbol files|*.xml;*.xml.gz|All files|*.*";
+			dlg.Filter = "Symbol files|*.pdbx;*.pdb.xml;*.pdb.xml.gz|All files|*.*";
 			dlg.InitialDirectory = Path.GetDirectoryName(loadedBasePath);
 			dlg.Multiselect = true;
 			dlg.Title = "Select the symbol file(s) to load";
@@ -330,7 +333,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			{
 				foreach (string fileName in dlg.FileNames)
 				{
-					sourceResolver.AddFile(fileName);
+					AddSymbols(fileName);
 				}
 
 				logItems.ForEach(i => i.Refresh());
@@ -338,9 +341,33 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
+		public void AddSymbols(string fileName)
+		{
+			sourceResolver.AddFile(fileName);
+		}
+
 		private void OnLoadObfuscationMap()
 		{
-			// When implementing this, remove static disabling of the LoadObfuscationMapCommand above
+			OpenFileDialog dlg = new OpenFileDialog();
+			dlg.Filter = "Obfuscation map files|*.xml;*.xml.gz|All files|*.*";
+			dlg.InitialDirectory = Path.GetDirectoryName(loadedBasePath);
+			dlg.Multiselect = true;
+			dlg.Title = "Select the obfuscation map file(s) to load";
+			if (dlg.ShowDialog() == true)
+			{
+				foreach (string fileName in dlg.FileNames)
+				{
+					AddObfuscationMap(fileName);
+				}
+
+				logItems.ForEach(i => i.Refresh());
+				RefreshLogItemsFilterView();
+			}
+		}
+
+		public void AddObfuscationMap(string fileName)
+		{
+			deobfuscator.AddFile(fileName);
 		}
 
 		private bool CanDecreaseIndentSize()
@@ -434,9 +461,9 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
-		#endregion Toolbar
+		#endregion Toolbar command handlers
 
-		#region Log items list context menu
+		#region Log items list context menu command handlers
 
 		private FilterViewModel GetQuickFilter(out bool isNew, bool leaveEmpty = false)
 		{
@@ -1006,9 +1033,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			MultiValueQuickFilter(SelectedItemsWebUserIds, "Web user ", "Web users ", FilterColumn.WebRequestAppUserId, true);
 		}
 
-		#endregion Log items list context menu
-
-		#endregion Commands
+		#endregion Log items list context menu command handlers
 
 		#region Data properties
 

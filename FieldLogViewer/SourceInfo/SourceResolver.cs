@@ -5,7 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Xml;
 
-namespace Unclassified.FieldLogViewer
+namespace Unclassified.FieldLogViewer.SourceInfo
 {
 	/// <summary>
 	/// Resolves source code locations from module, token and IL offset with a converted XML file.

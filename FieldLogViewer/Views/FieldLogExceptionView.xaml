@@ -42,7 +42,7 @@
 				ItemsSource="{Binding StackFrameVMs}">
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<Grid>
+						<Grid Margin="0,0,0,3">
 							<Grid.RowDefinitions>
 								<RowDefinition Height="Auto"/>
 								<RowDefinition Height="Auto"/>
@@ -54,7 +54,7 @@
 							</Grid.ColumnDefinitions>
 
 							<TextBlock
-								Grid.Row="0" Grid.Column="0" Text="•"/>
+								Grid.Row="0" Grid.Column="0" Margin="2,0,0,0" Text="•" Foreground="{Binding ListBulletBrush}"/>
 							<TextBox
 								Grid.Row="0" Grid.Column="1"
 								Text="{Binding FullMethodName, Mode=OneWay}"
@@ -69,7 +69,7 @@
 								Grid.Row="2" Grid.Column="1"
 								Text="{Binding FullMeta, Mode=OneWay}"
 								Style="{StaticResource ReadOnlyTextBoxStyle}"
-								Foreground="Gray"
+								Foreground="DarkSeaGreen"
 								Visibility="{Binding MetaVisibility}"/>
 						</Grid>
 					</DataTemplate>

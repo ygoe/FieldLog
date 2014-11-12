@@ -108,6 +108,11 @@ namespace Unclassified.FieldLogViewer
 		/// Gets or sets a value indicating whether the toolbar is in the window frame.
 		/// </summary>
 		bool ToolBarInWindowFrame { get; set; }
+
+		/// <summary>
+		/// Gets or sets a value indicating whether the metadata of a stack frame is displayed.
+		/// </summary>
+		bool ShowStackFrameMetadata { get; set; }
 	}
 
 	public enum ItemTimeType

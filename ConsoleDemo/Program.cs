@@ -9,6 +9,24 @@ using Unclassified.FieldLog;
 
 namespace ConsoleDemo
 {
+	class NestHost
+	{
+		public class Nest1
+		{
+			public class Nest2
+			{
+			}
+		}
+	}
+
+	class GenericClass<T>
+	{
+		public static void Method<U>(T obj, U obj2)
+		{
+			FL.LogStackTrace();
+		}
+	}
+	
 	class Program
 	{
 		static void Main(string[] args)
@@ -20,10 +38,26 @@ namespace ConsoleDemo
 
 			//LoadTest();
 			//ConstantFlow();
-			NormalActivity();
+			//NormalActivity();
 			//BatchActivity();
 			//TestTimerPrecision();
 			//TestOutputDebugString();
+
+			//NestTest(null);
+			//GenericTest<string>("");
+			GenericClass<int>.Method<string>(0, "");
+		}
+
+		static int NestTest(ConsoleDemo.NestHost.Nest1.Nest2 obj)
+		{
+			FL.LogStackTrace();
+			return 0;
+		}
+
+		static int GenericTest<T>(T value)
+		{
+			FL.LogStackTrace();
+			return 0;
 		}
 
 		static void LoadTest()

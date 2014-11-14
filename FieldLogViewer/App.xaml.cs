@@ -3,53 +3,14 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using Unclassified.FieldLog;
-using Unclassified.FieldLogViewer.Views;
 using Unclassified.FieldLogViewer.ViewModels;
+using Unclassified.FieldLogViewer.Views;
 using Unclassified.Util;
 
 namespace Unclassified.FieldLogViewer
 {
 	public partial class App : Application
 	{
-		#region Application entry point
-
-		/// <summary>
-		/// Application entry point.
-		/// </summary>
-		[STAThread]
-		public static void Main()
-		{
-			// Set up FieldLog
-			FL.AcceptLogFileBasePath();
-			FL.RegisterPresentationTracing();
-			TaskHelper.UnhandledTaskException = ex => FL.Critical(ex, "TaskHelper.UnhandledTaskException", true);
-
-			// Keep the setup away
-			GlobalMutex.Create("Unclassified.FieldLogViewer");
-
-			InitializeSettings();
-
-			// Make sure the settings are properly saved in the end
-			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
-
-			App app = new App();
-			app.InitializeComponent();
-			app.Run();
-		}
-
-		#endregion Application entry point
-
-		#region Constructors
-
-		/// <summary>
-		/// Initialises a new instance of the App class.
-		/// </summary>
-		public App()
-		{
-		}
-
-		#endregion Constructors
-
 		#region Startup
 
 		protected override void OnStartup(StartupEventArgs e)
@@ -122,8 +83,13 @@ namespace Unclassified.FieldLogViewer
 		/// </summary>
 		public static IAppSettings Settings { get; private set; }
 
-		private static void InitializeSettings()
+		/// <summary>
+		/// Initialises the application settings.
+		/// </summary>
+		public static void InitializeSettings()
 		{
+			if (Settings != null) return;   // Already done
+
 			Settings = SettingsAdapterFactory.New<IAppSettings>(
 				new FileSettingsStore(
 					SettingsHelper.GetAppDataPath(@"Unclassified\FieldLog", "FieldLogViewer.conf")));
@@ -145,7 +111,7 @@ namespace Unclassified.FieldLogViewer
 				true);
 
 			// Update settings format from old version
-			if (string.IsNullOrEmpty(App.Settings.LastStartedAppVersion))
+			if (string.IsNullOrEmpty(Settings.LastStartedAppVersion))
 			{
 				Settings.SettingsStore.Rename("LastAppVersion", "LastStartedAppVersion");
 				Settings.SettingsStore.Rename("Window.MainLeft", "MainWindowState.Left");
@@ -163,29 +129,9 @@ namespace Unclassified.FieldLogViewer
 			// Remember the version of the application.
 			// If we need to react on settings changes from previous application versions, here is
 			// the place to check the version currently in the settings, before it's overwritten.
-			App.Settings.LastStartedAppVersion = FL.AppVersion;
-
+			Settings.LastStartedAppVersion = FL.AppVersion;
 		}
 
 		#endregion Settings
-
-		#region Event handlers
-
-		/// <summary>
-		/// Called when the current process exits.
-		/// </summary>
-		/// <remarks>
-		/// The processing time in this event is limited. All handlers of this event together must
-		/// not take more than ca. 3 seconds. The processing will then be terminated.
-		/// </remarks>
-		private static void CurrentDomain_ProcessExit(object sender, EventArgs args)
-		{
-			if (Settings != null)
-			{
-				Settings.SettingsStore.Dispose();
-			}
-		}
-
-		#endregion Event handlers
 	}
 }

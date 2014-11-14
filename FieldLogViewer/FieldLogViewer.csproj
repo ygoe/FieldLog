@@ -77,6 +77,9 @@
   <PropertyGroup>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Unclassified.FieldLogViewer.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -98,10 +101,11 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="App.xaml">
+    <Compile Include="Program.cs" />
+    <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
+    </ApplicationDefinition>
     <Compile Include="IAppSettings.cs" />
     <Compile Include="Converters\IndentLevelToWidthConverter.cs" />
     <Compile Include="Converters\SameWebRequestBrushConverter.cs" />

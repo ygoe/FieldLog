@@ -1,0 +1,28 @@
+# FieldLog configuration file
+#
+# This file controls how the application installed in this directory writes log files.
+#
+# You can edit this file with a plain text editor like Windows Notepad. Please avoid rich text
+# editors like Microsoft Word or WordPad though.
+#
+# Each line contains a setting and its value, separated by "=". Empty lines and unknown settings
+# are ignored. Contents are case-insensitive. The path setting defines a path and log file prefix
+# of where to write the log to. There will be multiple files created with the same file name
+# prefix. The max...size settings are defined in bytes, with valid suffixes k, M and G. The
+# keep... settings define log keep times for each priority, with valid suffixes s (seconds), m
+# (minutes), h (hours) and d (days). Changes to this file are applied automatically at runtime
+# with a few seconds delay.
+#
+# See http://dev.unclassified.de/source/fieldlog/devguide#config for more information.
+
+#path=C:\path\to\prefix
+maxfilesize=150k
+maxtotalsize=200M
+keeptrace=24h
+keepcheckpoint=24h
+keepinfo=30d
+keepnotice=30d
+keepwarning=90d
+keeperror=90d
+keepcritical=90d
+checktimethreshold=100

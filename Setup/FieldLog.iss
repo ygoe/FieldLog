@@ -113,6 +113,8 @@ Source: "..\FieldLogViewer\bin\Release\TaskDialog.dll"; DestDir: "{app}"; Flags:
 Source: "..\FieldLog\bin\ReleaseNET40\Unclassified.FieldLog.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\FieldLog\FileFormat.html"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\FieldLogViewer\bin\Release\Sounds\*.mp3"; DestDir: "{app}\Sounds"; Flags: ignoreversion
+; Sample configuration
+Source: "example-config.txt"; DestDir: "{app}"; DestName: "FieldLogViewer.exe.flconfig"; Flags: ignoreversion; Permissions: users-modify
 
 ; PdbConvert tool
 Source: "..\PdbConvert\bin\Release\PdbConvert.exe"; DestDir: "{app}"; Flags: ignoreversion

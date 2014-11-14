@@ -13,7 +13,7 @@
 	<UserControl.Resources>
 	</UserControl.Resources>
 
-	<Grid Background="{Binding DetailBackground}">
+	<Grid Background="{Binding DetailBackground, Mode=OneTime}">
 		<ScrollViewer VerticalScrollBarVisibility="Auto">
 			<Grid Margin="10" VerticalAlignment="Top">
 				<Grid.RowDefinitions>
@@ -29,23 +29,23 @@
 				</Grid.ColumnDefinitions>
 
 				<TextBlock Grid.Row="0" Grid.Column="0" Text="Time:"/>
-				<TextBox Grid.Row="0" Grid.Column="1" Margin="0,0,0,0" Text="{Binding DisplayTime, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+				<TextBox Grid.Row="0" Grid.Column="1" Margin="0,0,0,0" Text="{Binding DisplayTime}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
 				<TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,0,0" Text="Process:"/>
-				<TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,0" Text="{Binding ProcessId, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+				<TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,0" Text="{Binding ProcessId, Mode=OneTime}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
 				<TextBlock Grid.Row="2" Grid.Column="0" Margin="0,0,0,0" Text="Source:"/>
-				<TextBox Grid.Row="2" Grid.Column="1" Margin="0,0,0,0" Text="{Binding SourceString, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+				<TextBox Grid.Row="2" Grid.Column="1" Margin="0,0,0,0" Text="{Binding SourceString, Mode=OneTime}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
 				<TextBlock Grid.Row="3" Grid.Column="0" Margin="0,8,0,0" Text="Text:"/>
-				<TextBox Grid.Row="3" Grid.Column="1" Margin="0,8,0,0" Text="{Binding Message, Mode=OneWay}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+				<TextBox Grid.Row="3" Grid.Column="1" Margin="0,8,0,0" Text="{Binding Message, Mode=OneTime}" Style="{StaticResource ReadOnlyTextBoxStyle}"/>
 
 				<TextBlock
 					Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"
 					Margin="0,16,0,0" HorizontalAlignment="Left"
 					Visibility="{Binding OpenLogFileButtonVisibility}">
 					<Image Source="/Images/folder_open.png" Width="16" Height="16" Margin="0,0,0,-2"/>
-					<Hyperlink Command="{Binding OpenLogFileCommand}">
+					<Hyperlink Command="{Binding OpenLogFileCommand, Mode=OneTime}">
 						<Run Text="Open log files from this path"/>
 					</Hyperlink>
 				</TextBlock>

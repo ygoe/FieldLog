@@ -10,8 +10,6 @@
 	mc:Ignorable="d"
 	d:DesignHeight="190" d:DesignWidth="572"
 	Focusable="False">
-	<UserControl.Resources>
-	</UserControl.Resources>
 
 	<Grid Background="{Binding DetailBackground, Mode=OneTime}">
 		<ScrollViewer VerticalScrollBarVisibility="Auto">

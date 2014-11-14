@@ -26,8 +26,6 @@
 		<c:SameThreadBrushConverter x:Key="SameThreadBrushConverter"/>
 		<c:SameWebRequestBrushConverter x:Key="SameWebRequestBrushConverter"/>
 	</Window.Resources>
-	<Window.InputBindings>
-	</Window.InputBindings>
 
 	<Grid>
 		<Grid.RowDefinitions>

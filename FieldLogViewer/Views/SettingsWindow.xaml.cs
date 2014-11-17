@@ -15,24 +15,15 @@ namespace Unclassified.FieldLogViewer.Views
 		{
 			InitializeComponent();
 
+			this.HideIcon();
+			this.HideMinimizeAndMaximizeBoxes();
+
 			Width = 500;
 			Height = 300;
 			SettingsHelper.BindWindowState(this, App.Settings.SettingsWindowState);
 		}
 
 		#endregion Constructors
-
-		#region Window event handlers
-
-		protected override void OnSourceInitialized(EventArgs e)
-		{
-			base.OnSourceInitialized(e);
-
-			this.HideIcon();
-			this.HideMinimizeAndMaximizeBoxes();
-		}
-
-		#endregion Window event handlers
 
 		private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{

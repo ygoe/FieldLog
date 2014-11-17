@@ -12,24 +12,24 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public DetailsMessageViewModel(string title, string message, string iconName)
 		{
-			this.Title = title;
-			this.Message = message;
-			this.IconName = iconName;
+			Title = title;
+			Message = message;
+			IconName = iconName;
 		}
 
 		public DetailsMessageViewModel(string title, string message)
 		{
-			this.Title = title;
-			this.Message = message;
+			Title = title;
+			Message = message;
 		}
 
 		public DetailsMessageViewModel(string title)
 		{
-			this.Title = title;
+			Title = title;
 		}
 
-		public Visibility ArrowLeftIconVisibility { get { return this.IconName == "ArrowLeft" ? Visibility.Visible : Visibility.Collapsed; } }
-		public Visibility ArrowUpIconVisibility { get { return this.IconName == "ArrowUp" ? Visibility.Visible : Visibility.Collapsed; } }
-		public Visibility FlashIconVisibility { get { return this.IconName == "Flash" ? Visibility.Visible : Visibility.Collapsed; } }
+		public Visibility ArrowLeftIconVisibility { get { return IconName == "ArrowLeft" ? Visibility.Visible : Visibility.Collapsed; } }
+		public Visibility ArrowUpIconVisibility { get { return IconName == "ArrowUp" ? Visibility.Visible : Visibility.Collapsed; } }
+		public Visibility FlashIconVisibility { get { return IconName == "Flash" ? Visibility.Visible : Visibility.Collapsed; } }
 	}
 }

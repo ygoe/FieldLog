@@ -74,91 +74,91 @@
 				<Button
 					Grid.Column="0"
 					Command="{Binding LoadLogCommand}" ToolTip="Load log" ToolTipService.ShowOnDisabled="True"
-					Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Focusable="False">
+					Style="{StaticResource ToolButtonStyle}" Focusable="False">
 					<ui:MenuIconImage Source="/Images/folder_open.png"/>
 				</Button>
 				<Button
 					Grid.Column="1"
 					Command="{Binding StopLiveCommand}" ToolTip="Stop live" ToolTipService.ShowOnDisabled="True"
-					Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Focusable="False">
+					Style="{StaticResource ToolButtonStyle}" Focusable="False">
 					<ui:MenuIconImage Source="/Images/stop.png"/>
 				</Button>
 				<Button
 					Grid.Column="2"
 					Command="{Binding ClearCommand}" ToolTip="Clear window content" ToolTipService.ShowOnDisabled="True"
-					Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Focusable="False">
+					Style="{StaticResource ToolButtonStyle}" Focusable="False">
 					<ui:MenuIconImage Source="/Images/clearwindowcontent.png"/>
 				</Button>
 				<Separator Grid.Column="3" Style="{StaticResource ToolBarSeparator}"/>
 				<Button
 					Grid.Column="4"
 					Command="{Binding LoadSymbolsCommand}" ToolTip="Load source code symbols file" ToolTipService.ShowOnDisabled="True"
-					Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Focusable="False">
+					Style="{StaticResource ToolButtonStyle}" Focusable="False">
 					<ui:MenuIconImage Source="/Images/pdb-file.png"/>
 				</Button>
 				<Button
 					Grid.Column="5"
 					Command="{Binding LoadObfuscationMapCommand}" ToolTip="Load obfuscation map" ToolTipService.ShowOnDisabled="True"
-					Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Focusable="False">
+					Style="{StaticResource ToolButtonStyle}" Focusable="False">
 					<ui:MenuIconImage Source="/Images/ghost.png"/>
 				</Button>
 				<Separator Grid.Column="6" Style="{StaticResource ToolBarSeparator}"/>
 				<ToggleButton
 					Grid.Column="7"
 					IsChecked="{Binding IsLocalDebugMonitorActive}" ToolTip="Local debug monitor" ToolTipService.ShowOnDisabled="True"
-					Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" Focusable="False">
+					Style="{StaticResource ToolToggleButtonStyle}" Focusable="False">
 					<ui:MenuIconImage Source="/Images/Windows_User.png"/>
 				</ToggleButton>
 				<ToggleButton
 					Grid.Column="8"
 					IsChecked="{Binding IsGlobalDebugMonitorActive}" ToolTip="Global debug monitor" ToolTipService.ShowOnDisabled="True"
 					IsEnabled="{Binding IsGlobalDebugMonitorAvailable}"
-					Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" Focusable="False">
+					Style="{StaticResource ToolToggleButtonStyle}" Focusable="False">
 					<ui:MenuIconImage Source="/Images/Windows_System.png"/>
 				</ToggleButton>
 				<Separator Grid.Column="9" Style="{StaticResource ToolBarSeparator}"/>
 				<ToggleButton
 					Grid.Column="10"
 					IsChecked="{Binding Settings.ShowRelativeTime}" ToolTip="Show relative time" ToolTipService.ShowOnDisabled="True"
-					Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" Focusable="False">
+					Style="{StaticResource ToolToggleButtonStyle}" Focusable="False">
 					<ui:MenuIconImage Source="/Images/timer.png"/>
 				</ToggleButton>
 				<Separator Grid.Column="11" Style="{StaticResource ToolBarSeparator}"/>
 				<ToggleButton
 					Grid.Column="12"
 					IsChecked="{Binding Settings.IsLiveScrollingEnabled}" ToolTip="Live scroll" ToolTipService.ShowOnDisabled="True"
-					Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" Focusable="False">
+					Style="{StaticResource ToolToggleButtonStyle}" Focusable="False">
 					<ui:MenuIconImage Source="/Images/goto_bottom.png"/>
 				</ToggleButton>
 				<ToggleButton
 					Grid.Column="13"
 					IsChecked="{Binding Settings.IsSoundEnabled}" ToolTip="Play sound on new item" ToolTipService.ShowOnDisabled="True"
-					Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" Focusable="False">
+					Style="{StaticResource ToolToggleButtonStyle}" Focusable="False">
 					<ui:MenuIconImage Source="/Images/sound.png"/>
 				</ToggleButton>
 				<ToggleButton
 					Grid.Column="14"
 					IsChecked="{Binding Settings.IsFlashingEnabled}" ToolTip="Flash window on new item" ToolTipService.ShowOnDisabled="True"
-					Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" Focusable="False">
+					Style="{StaticResource ToolToggleButtonStyle}" Focusable="False">
 					<ui:MenuIconImage Source="/Images/flash.png"/>
 				</ToggleButton>
 				<ToggleButton
 					Grid.Column="15"
 					IsChecked="{Binding Settings.IsWindowOnTop}" ToolTip="Keep window on top" ToolTipService.ShowOnDisabled="True"
-					Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" Focusable="False">
+					Style="{StaticResource ToolToggleButtonStyle}" Focusable="False">
 					<ui:MenuIconImage Source="/Images/pin.png"/>
 				</ToggleButton>
 				<Separator Grid.Column="16" Style="{StaticResource ToolBarSeparator}"/>
 				<Button
 					Grid.Column="17"
 					Command="{Binding DecreaseIndentSizeCommand}" ToolTip="Decrease indent size" ToolTipService.ShowOnDisabled="True"
-					Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Focusable="False">
+					Style="{StaticResource ToolButtonStyle}" Focusable="False">
 					<ui:MenuIconImage Source="/Images/indent_minus.png"/>
 				</Button>
 				<Button
 					Grid.Column="18"
 					Command="{Binding IncreaseIndentSizeCommand}" ToolTip="Increase indent size" ToolTipService.ShowOnDisabled="True"
-					Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Focusable="False">
+					Style="{StaticResource ToolButtonStyle}" Focusable="False">
 					<ui:MenuIconImage Source="/Images/indent_plus.png"/>
 				</Button>
 				<Separator Grid.Column="19" Style="{StaticResource ToolBarSeparator}"/>
@@ -176,7 +176,7 @@
 				<Button
 					Grid.Column="22"
 					Command="{Binding DeleteFilterCommand}" ToolTip="Delete selected filter" ToolTipService.ShowOnDisabled="True"
-					Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Focusable="False">
+					Style="{StaticResource ToolButtonStyle}" Focusable="False">
 					<ui:MenuIconImage Source="/Images/filter_delete.png"/>
 				</Button>
 				<TextBox
@@ -186,11 +186,11 @@
 					ToolTipService.ShowOnDisabled="True"
 					Text="{Binding AdhocSearchText}"
 					ui:TextBoxExtensions.UpdateDelay="500"
-					Style="{StaticResource {x:Static ToolBar.TextBoxStyleKey}}"/>
+					Style="{StaticResource ToolTextBoxStyle}"/>
 				<Button
 					Grid.Column="24"
 					Command="{Binding ClearSearchTextCommand}" Content="Õ" FontFamily="Wingdings" ToolTip="Clear search text" ToolTipService.ShowOnDisabled="True"
-					Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Focusable="False"/>
+					Style="{StaticResource ToolButtonStyle}" Focusable="False"/>
 				<TextBlock
 					Grid.Column="25"
 					Margin="4,0,0,0" VerticalAlignment="Center" TextAlignment="Right" MinWidth="45">
@@ -208,7 +208,7 @@
 				<Button
 					Grid.Column="29"
 					Command="{Binding SettingsCommand}" ToolTip="Settings" ToolTipService.ShowOnDisabled="True"
-					Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Focusable="False">
+					Style="{StaticResource ToolButtonStyle}" Focusable="False">
 					<ui:MenuIconImage Source="/Images/gear.png"/>
 				</Button>
 			</Grid>
@@ -243,7 +243,7 @@
 				<ListBox.ItemContainerStyle>
 					<Style TargetType="ListBoxItem">
 						<Setter Property="IsSelected" Value="{Binding IsSelected, Mode=OneWayToSource}"/>
-						<!-- OneWayToSource fixes issues with vistualisation, but off-screen items won't be notified
+						<!-- OneWayToSource fixes issues with virtualisation, but off-screen items won't be notified
 						about deselection until they become visible again. -->
 						<Setter Property="Template">
 							<Setter.Value>

@@ -28,6 +28,15 @@ namespace Unclassified.FieldLogViewer
 			ThreadPool.GetMinThreads(out workerThreads, out ioThreads);
 			ThreadPool.SetMinThreads(20, ioThreads);
 
+			// Fix WPF's dumb Aero2 theme if we're on Windows 8 or newer
+			if (OSInfo.IsWindows8OrNewer)
+			{
+				Resources.MergedDictionaries.Add(new ResourceDictionary
+				{
+					Source = new Uri("/Resources/RealWindows8.xaml", UriKind.RelativeOrAbsolute)
+				});
+			}
+
 			// Create main window and view model
 			var view = new MainWindow();
 			var viewModel = new MainViewModel();
@@ -111,6 +120,7 @@ namespace Unclassified.FieldLogViewer
 				true);
 
 			// Update settings format from old version
+			FL.TraceData("LastStartedAppVersion", Settings.LastStartedAppVersion);
 			if (string.IsNullOrEmpty(Settings.LastStartedAppVersion))
 			{
 				Settings.SettingsStore.Rename("LastAppVersion", "LastStartedAppVersion");

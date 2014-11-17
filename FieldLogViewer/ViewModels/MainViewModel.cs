@@ -99,7 +99,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 				() => RefreshLogItemsFilterView());
 			App.Settings.OnPropertyChanged(
 				s => s.ShowStackFrameMetadata,
-				() => SelectedItems.ForEach(i => i.Refresh()));
+				() => { if (SelectedItems != null) SelectedItems.ForEach(i => i.Refresh()); });
 
 			// Setup filter events
 			Filters = new ObservableCollection<FilterViewModel>();

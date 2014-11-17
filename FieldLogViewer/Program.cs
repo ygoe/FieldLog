@@ -7,8 +7,6 @@ namespace Unclassified.FieldLogViewer
 {
 	internal class Program
 	{
-		#region Application entry point
-
 		/// <summary>
 		/// Application entry point.
 		/// </summary>
@@ -40,10 +38,6 @@ namespace Unclassified.FieldLogViewer
 			app.Run();
 		}
 
-		#endregion Application entry point
-
-		#region Event handlers
-
 		/// <summary>
 		/// Called when the current process exits.
 		/// </summary>
@@ -58,7 +52,5 @@ namespace Unclassified.FieldLogViewer
 				App.Settings.SettingsStore.Dispose();
 			}
 		}
-
-		#endregion Event handlers
 	}
 }

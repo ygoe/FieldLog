@@ -420,8 +420,8 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			if (value == null)
 				throw new ArgumentNullException("value");
 
+			Value = value;   // must be set first to prevent NullReferenceException caused in the following line
 			DisplayName = displayName;
-			Value = value;
 		}
 
 		/// <summary>

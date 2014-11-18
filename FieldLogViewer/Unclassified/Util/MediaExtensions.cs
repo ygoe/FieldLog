@@ -17,7 +17,7 @@ namespace Unclassified.Util
 		/// </summary>
 		/// <param name="c1">The first colour.</param>
 		/// <param name="c2">The second colour.</param>
-		/// <param name="ratio">The ratio between both colours, from 0 for the first to 1 for the second colour.</param>
+		/// <param name="ratio">The ratio between both colours, from 0 (second colour) to 1 (first colour).</param>
 		/// <returns>The blended colour value.</returns>
 		public static Color BlendWith(this Color c1, Color c2, float ratio = 0.5f)
 		{
@@ -29,7 +29,7 @@ namespace Unclassified.Util
 		/// </summary>
 		/// <param name="b1">The first brush.</param>
 		/// <param name="b2">The second brush.</param>
-		/// <param name="ratio">The ratio between both brush colours, from 0 for the first to 1 for the second brush.</param>
+		/// <param name="ratio">The ratio between both brush colours, from 0 (second brush) to 1 (first brush).</param>
 		/// <returns>A brush with the blended colour.</returns>
 		public static SolidColorBrush BlendWith(this SolidColorBrush b1, SolidColorBrush b2, float ratio = 0.5f)
 		{
@@ -41,11 +41,33 @@ namespace Unclassified.Util
 		/// </summary>
 		/// <param name="b1">The first brush.</param>
 		/// <param name="c2">The second colour.</param>
-		/// <param name="ratio">The ratio between both colours, from 0 for the first to 1 for the second colour.</param>
+		/// <param name="ratio">The ratio between both colours, from 0 (second colour) to 1 (first brush).</param>
 		/// <returns>A brush with the blended colour.</returns>
 		public static SolidColorBrush BlendWith(this SolidColorBrush b1, Color c2, float ratio = 0.5f)
 		{
 			return new SolidColorBrush(Color.Add(Color.Multiply(b1.Color, ratio), Color.Multiply(c2, 1 - ratio)));
+		}
+
+		/// <summary>
+		/// Makes a colour (more) transparent.
+		/// </summary>
+		/// <param name="color">The colour to make transparent.</param>
+		/// <param name="opacity">The opacity factor, from 0 (transparent) to 1 (no change).</param>
+		/// <returns></returns>
+		public static Color MakeTransparent(this Color color, float opacity = 0.5f)
+		{
+			return Color.FromArgb((byte) (color.A * opacity), color.R, color.G, color.B);
+		}
+
+		/// <summary>
+		/// Makes a brush colour (more) transparent.
+		/// </summary>
+		/// <param name="brush">The brush to make transparent.</param>
+		/// <param name="opacity">The opacity factor, from 0 (transparent) to 1 (no change).</param>
+		/// <returns></returns>
+		public static SolidColorBrush MakeTransparent(this SolidColorBrush brush, float opacity = 0.5f)
+		{
+			return new SolidColorBrush(Color.FromArgb((byte) (brush.Color.A * opacity), brush.Color.R, brush.Color.G, brush.Color.B));
 		}
 
 		#endregion Colour blending

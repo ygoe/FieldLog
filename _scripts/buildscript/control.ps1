@@ -36,6 +36,7 @@ if (IsSelected("build-debug"))
 if ((IsSelected("build-release")) -or (IsSelected("commit")))
 {
 	Build-Solution "FieldLog.sln" "Release" "Any CPU" 8
+	EnsureDirExists ".local"
 	Exec-Console "PdbConvert\bin\Release\PdbConvert.exe" "$sourcePath\FieldLogViewer\bin\Release\* /srcbase $sourcePath /optimize /outfile $sourcePath\.local\FieldLog-$revId.pdbx" 1
 
 	if (IsSelected("sign-lib"))

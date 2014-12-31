@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Media;
 using Unclassified.FieldLog;
 using Unclassified.Util;
 
@@ -15,6 +16,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			if (this.Exception.StackFrames != null)
 			{
 				this.StackFrameVMs = this.Exception.StackFrames.Select(sf => new FieldLogStackFrameViewModel(sf)).ToList();
+				UpdateStackFrames();
 			}
 			if (this.Exception.InnerExceptions != null)
 			{
@@ -50,7 +52,27 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		public void Refresh()
 		{
 			if (StackFrameVMs != null) StackFrameVMs.ForEach(vm => vm.Refresh());
+			UpdateStackFrames();
 			if (InnerExceptionVMs != null) InnerExceptionVMs.ForEach(vm => vm.Refresh());
+		}
+
+		private void UpdateStackFrames()
+		{
+			if (StackFrameVMs == null) return;
+
+			bool haveSource = StackFrameVMs.Any(s => !string.IsNullOrEmpty(s.FullSource));
+
+			foreach (var stackFrameVM in StackFrameVMs)
+			{
+				if (!haveSource || !string.IsNullOrEmpty(stackFrameVM.FullSource))
+				{
+					stackFrameVM.MethodBrush = Brushes.Black;
+				}
+				else
+				{
+					stackFrameVM.MethodBrush = Brushes.Gray;
+				}
+			}
 		}
 	}
 }

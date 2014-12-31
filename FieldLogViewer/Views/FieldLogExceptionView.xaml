@@ -56,18 +56,19 @@
 							<TextBox
 								Grid.Row="0" Grid.Column="1"
 								Text="{Binding FullMethodName, Mode=OneWay}"
-								Style="{StaticResource ReadOnlyTextBoxStyle}"/>
+								Style="{StaticResource ReadOnlyTextBoxStyle}"
+								Foreground="{Binding MethodBrush}"/>
 							<TextBox
 								Grid.Row="1" Grid.Column="1"
 								Text="{Binding FullSource, Mode=OneWay}"
 								Style="{StaticResource ReadOnlyTextBoxStyle}"
-								Foreground="Gray"
+								Foreground="#6cb266"
 								Visibility="{Binding SourceVisibility}"/>
 							<TextBox
 								Grid.Row="2" Grid.Column="1"
 								Text="{Binding FullMeta, Mode=OneWay}"
 								Style="{StaticResource ReadOnlyTextBoxStyle}"
-								Foreground="DarkSeaGreen"
+								Foreground="#87a1d7"
 								Visibility="{Binding MetaVisibility}"/>
 						</Grid>
 					</DataTemplate>

@@ -40,7 +40,7 @@ namespace Unclassified.FieldLogViewer.Views
 		private bool logItemsScrolledNearEnd = true;
 		private double prevRatio = 10;
 		private DateTime prevItemTime;
-		private MediaPlayer newItemMediaPlayer = new MediaPlayer();
+		private MediaPlayer newItemMediaPlayer;
 		private SmoothVirtualizingPanel logItemsHostPanel;
 		private DelayedCall logItemsScrollPixelDc;
 		private bool isFlashing;
@@ -61,8 +61,6 @@ namespace Unclassified.FieldLogViewer.Views
 			Width = 1000;
 			Height = 500;
 			SettingsHelper.BindWindowState(this, App.Settings.MainWindowState);
-
-			newItemMediaPlayer.Open(new Uri(@"Sounds\ting.mp3", UriKind.Relative));
 
 			logItemsScrollPixelDc = DelayedCall.Create(() => { logItemsHostPanel.ScrollToPixel = true; }, 600);
 			updateScrollmapDc = DelayedCall.Create(UpdateScrollmap, 100);
@@ -221,6 +219,11 @@ namespace Unclassified.FieldLogViewer.Views
 				{
 					if (now > prevItemTime.AddSeconds(1))
 					{
+						if (newItemMediaPlayer == null)
+						{
+							newItemMediaPlayer = new MediaPlayer();
+							newItemMediaPlayer.Open(new Uri(@"Sounds\ting.mp3", UriKind.Relative));
+						}
 						newItemMediaPlayer.Position = TimeSpan.Zero;
 						newItemMediaPlayer.Play();
 					}

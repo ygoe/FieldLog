@@ -57,6 +57,11 @@ namespace Unclassified.FieldLogViewer
 						fileName = null;
 					}
 				}
+				else if (fileName == "/w")
+				{
+					fileName = null;
+					MainViewModel.Instance.AutoLoadLog = true;
+				}
 
 				if (!string.IsNullOrWhiteSpace(fileName))
 				{

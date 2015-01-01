@@ -27,6 +27,10 @@
 				FontSize="26" FontWeight="Light" TextOptions.TextFormattingMode="Ideal"/>
 			<TextBlock Text="{Binding Message}" Opacity="0.75" Margin="0,16,0,0"
 				TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center"/>
+			<CheckBox Content="Open log from next announcement" Margin="0,8,0,0"
+				HorizontalAlignment="Center"
+				IsChecked="{Binding AutoLoad}"
+				Visibility="{Binding AutoLoadCheckBoxVisibility}"/>
 		</StackPanel>
 
 		<Path Name="ArrowLeftIcon" Visibility="{Binding ArrowLeftIconVisibility}"

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 using Unclassified.FieldLog;
@@ -18,6 +20,23 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			this.ProcessId = pid;
 			this.Message = (text ?? "").TrimEnd();
 			this.IsGlobal = isGlobal;
+
+			if (MainViewModel.Instance.AutoLoadLog && GetLogFileBasePath() != null)
+			{
+				// Open log file automatically.
+				// The log directory has already been created while directory probing, and the log
+				// files don't need to exist yet on loading. So no additional waiting is required
+				// here.
+				Application.Current.Dispatcher.BeginInvoke(
+					new Action(() =>
+						{
+							if (OpenLogFileCommand.TryExecute())
+							{
+								// Only do that once
+								MainViewModel.Instance.AutoLoadLog = false;
+							}
+						}));
+			}
 		}
 
 		#endregion Constructor

@@ -21,7 +21,10 @@ namespace Unclassified.FieldLogViewer.Converters
 				return new DetailsMessageViewModel(
 					"Nothing available",
 					"Currently no log items are available. Either load a log file, wait for new log items to be written or adjust your filter to see existing log items."
-					/*, "ArrowUp"*/);
+					/*, "ArrowUp"*/)
+					{
+						ShowAutoLoadCheckBox = MainViewModel.Instance != null && MainViewModel.Instance.LoadedBasePath == null
+					};
 			}
 
 			if (selectedItems.Count == 0)

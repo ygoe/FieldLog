@@ -38,14 +38,14 @@ namespace ConsoleDemo
 
 			//LoadTest();
 			//ConstantFlow();
-			//NormalActivity();
+			NormalActivity();
 			//BatchActivity();
 			//TestTimerPrecision();
 			//TestOutputDebugString();
 
 			//NestTest(null);
 			//GenericTest<string>("");
-			GenericClass<int>.Method<string>(0, "");
+			//GenericClass<int>.Method<string>(0, "");
 		}
 
 		static int NestTest(ConsoleDemo.NestHost.Nest1.Nest2 obj)

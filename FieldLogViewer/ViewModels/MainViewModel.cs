@@ -45,6 +45,8 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		private SettingsWindow openSettingsWindow;
 		private DebugMonitor localDebugMonitor = new DebugMonitor(false);
 		private DebugMonitor globalDebugMonitor = new DebugMonitor(true);
+		private bool autoLoadLog;
+		private bool tempActivatedLocalDebugMonitor;
 
 		/// <summary>
 		/// Buffer for all read items that are collected in the separate Task thread and then
@@ -183,6 +185,28 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		public SourceResolver SourceResolver { get { return sourceResolver; } }
 
 		public Deobfuscator Deobfuscator { get { return deobfuscator; } }
+
+		public bool AutoLoadLog
+		{
+			get { return autoLoadLog; }
+			set
+			{
+				if (value != autoLoadLog)
+				{
+					autoLoadLog = value;
+					if (autoLoadLog)
+					{
+						// Start local debug monitor temporarily (stop it again when done)
+						tempActivatedLocalDebugMonitor = !IsLocalDebugMonitorActive;
+						IsLocalDebugMonitorActive = true;
+					}
+					else
+					{
+						if (tempActivatedLocalDebugMonitor) IsLocalDebugMonitorActive = false;
+					}
+				}
+			}
+		}
 
 		#endregion Public properties
 
@@ -2460,6 +2484,9 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		internal void StopDebugMonitors()
 		{
+			// Stop wait mode so it can stop the debug monitor permanently again
+			AutoLoadLog = false;
+
 			localDebugMonitor.Stop();
 			globalDebugMonitor.Stop();
 		}

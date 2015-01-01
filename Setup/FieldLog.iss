@@ -99,10 +99,9 @@ de.DowngradeUninstall=Sie versuchen, eine ältere Version zu installieren, als be
 de.OpenSingleFileCommand=Einzelne Datei öffnen
 
 [Tasks]
-;Name: VSTool; Description: "{cm:Task_VSTool}"
-; TODO: Also enable UnregisterVSTool script call below
+Name: VSTool; Description: "{cm:Task_VSTool}"
 Name: DeleteConfig; Description: "{cm:Task_DeleteConfig}"; Flags: unchecked
-#define Task_DeleteConfig_Index 0
+#define Task_DeleteConfig_Index 1
 
 [Files]
 ; FieldLogViewer application files
@@ -346,12 +345,12 @@ begin
 	regKey := 'Software\Microsoft\VisualStudio\' + vsVersion + '\External Tools';
 
 	// Clean up existing entry before adding it
-	//UnregisterVSTool(vsVersion);
+	UnregisterVSTool(vsVersion);
 	
 	if RegQueryDWordValue(HKEY_CURRENT_USER, regKey, 'ToolNumKeys', ToolNumKeys) then
 	begin
 		// Visual Studio is installed
-		RegWriteStringValue(HKEY_CURRENT_USER, regKey, 'ToolArg' + IntToStr(ToolNumKeys), '-s "$(SolutionDir)"');
+		RegWriteStringValue(HKEY_CURRENT_USER, regKey, 'ToolArg' + IntToStr(ToolNumKeys), '/w');
 		RegWriteStringValue(HKEY_CURRENT_USER, regKey, 'ToolCmd' + IntToStr(ToolNumKeys), ExpandConstant('{app}') + '\FieldLogViewer.exe');
 		RegWriteStringValue(HKEY_CURRENT_USER, regKey, 'ToolDir' + IntToStr(ToolNumKeys), '');
 		RegWriteDWordValue(HKEY_CURRENT_USER, regKey, 'ToolOpt' + IntToStr(ToolNumKeys), 17);
@@ -375,9 +374,9 @@ procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
 	if CurUninstallStep = usPostUninstall then
 	begin
-		//UnregisterVSTool('10.0');
-		//UnregisterVSTool('11.0');
-		//UnregisterVSTool('12.0');
+		UnregisterVSTool('10.0');
+		UnregisterVSTool('11.0');
+		UnregisterVSTool('12.0');
 	end;
 end;
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using Unclassified.FieldLog;
+using Unclassified.UI;
 using Unclassified.Util;
 
 namespace Unclassified.FieldLogViewer.ViewModels

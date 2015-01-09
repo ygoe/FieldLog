@@ -1,18 +1,30 @@
-﻿using System;
+﻿//#define CSHARP5
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Windows;
 using System.Windows.Threading;
+using Unclassified.Util;
 
-namespace Unclassified.FieldLogViewer.ViewModels
+namespace Unclassified.UI
 {
 	/// <summary>
 	/// Provides common properties and methods supporting view model classes.
 	/// </summary>
 	internal abstract class ViewModelBase : INotifyPropertyChanged
 	{
+#if !CSHARP5
+		/// <summary>
+		/// Compatibility dummy attribute for C# before 5. This attribute does not backport the
+		/// functionality from later C# versions!
+		/// </summary>
+		[AttributeUsage(AttributeTargets.Parameter)]
+		public class CallerMemberNameAttribute : Attribute { }
+#endif
+
 		#region Constructor
 
 		/// <summary>
@@ -76,7 +88,82 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		#endregion Commands support
 
-		#region Property update helpers
+		#region Property access methods
+
+		private Dictionary<string, object> backingFields = new Dictionary<string, object>();
+
+		/// <summary>
+		/// Gets the current value of a property.
+		/// </summary>
+		/// <typeparam name="T">The property type.</typeparam>
+		/// <param name="propertyName">The property name.</param>
+		/// <returns>The current value.</returns>
+		protected T GetValue<T>(string propertyName)
+		{
+			if (propertyName == null) throw new ArgumentNullException("propertyName");
+
+			object value;
+			if (backingFields.TryGetValue(propertyName, out value))
+			{
+				return (T) value;
+			}
+			return default(T);
+		}
+
+		/// <summary>
+		/// Sets a new value for a property and notifies about the change.
+		/// </summary>
+		/// <typeparam name="T">The property type.</typeparam>
+		/// <param name="newValue">The new value for the property.</param>
+		/// <param name="propertyName">The property name.</param>
+		/// <returns>true if the value was changed, otherwise false.</returns>
+		protected bool SetValue<T>(T newValue, [CallerMemberName] string propertyName = null)
+		{
+			if (propertyName == null) throw new ArgumentNullException("propertyName");
+
+			if (EqualityComparer<T>.Default.Equals(newValue, GetValue<T>(propertyName)))
+				return false;
+
+			backingFields[propertyName] = newValue;
+			OnPropertyChanged(propertyName);
+			return true;
+		}
+
+		/// <summary>
+		/// Sets a new value for a property and notifies about the change.
+		/// </summary>
+		/// <typeparam name="T">The property type.</typeparam>
+		/// <param name="newValue">The new value for the property.</param>
+		/// <param name="propertyName">The property name.</param>
+		/// <param name="additionalPropertyNames">Names of additional properties that must be notified when the value has changed.</param>
+		/// <returns>true if the value was changed, otherwise false.</returns>
+		protected bool SetValue<T>(T newValue, [CallerMemberName] string propertyName = null, params string[] additionalPropertyNames)
+		{
+			if (SetValue(newValue, propertyName))
+			{
+				OnPropertyChanged(additionalPropertyNames);
+				return true;
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// Sets a new value for a property, but does not notify about the change.
+		/// </summary>
+		/// <typeparam name="T">The property type.</typeparam>
+		/// <param name="newValue">The new value for the property.</param>
+		/// <param name="propertyName">The property name.</param>
+		/// <returns>true if the value was changed, otherwise false.</returns>
+		protected bool SetValueSuppressNotify<T>(T newValue, [CallerMemberName] string propertyName = null)
+		{
+			if (propertyName == null) throw new ArgumentNullException("propertyName");
+
+			if (EqualityComparer<T>.Default.Equals(newValue, GetValue<T>(propertyName)))
+				return false;
+
+			backingFields[propertyName] = newValue;
+			return true;
+		}
 
 		/// <summary>
 		/// Checks whether the new property value has changed and updates the backing field.
@@ -86,6 +173,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		/// <param name="field">Backing field.</param>
 		/// <param name="propertyNames">Names of the properties to notify updated.</param>
 		/// <returns>true if the value has changed, false otherwise.</returns>
+		[Obsolete("Use the SetValue method instead.")]
 		protected bool CheckUpdate<T>(T value, ref T field, params string[] propertyNames)
 		{
 			if (!EqualityComparer<T>.Default.Equals(value, field))
@@ -97,7 +185,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			return false;
 		}
 
-		#endregion Property update helpers
+		#endregion Property access methods
 
 		#region Data input cleanup
 
@@ -317,10 +405,11 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		public event PropertyChangedEventHandler PropertyChanged;
 
 		/// <summary>
-		/// Raises this object's PropertyChanged event.
+		/// Raises this object's PropertyChanged event for one property and all its dependent
+		/// properties.
 		/// </summary>
-		/// <param name="propertyName">The property that has a new value.</param>
-		protected void OnPropertyChanged(string propertyName)
+		/// <param name="propertyName">The name of the property that has a new value.</param>
+		protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
 		{
 #if DEBUG
 			if (!TypeDescriptor.GetProperties(this).OfType<PropertyDescriptor>().Any(d => d.Name == propertyName))
@@ -328,35 +417,28 @@ namespace Unclassified.FieldLogViewer.ViewModels
 				throw new ArgumentException("Notifying a change of non-existing property " + this.GetType().Name + "." + propertyName);
 			}
 #endif
-
 			var handler = PropertyChanged;
 			if (handler != null)
 			{
 				handler(this, new PropertyChangedEventArgs(propertyName));
+				
+				foreach (var dependentPropertyName in DependentNotifications.GetValuesOrEmpty(propertyName))
+				{
+					OnPropertyChanged(dependentPropertyName);
+				}
 			}
 		}
 
 		/// <summary>
-		/// Raises this object's PropertyChanged event for multiple properties.
+		/// Raises this object's PropertyChanged event for multiple properties and all their
+		/// dependent properties.
 		/// </summary>
-		/// <param name="propertyNames">The properties that have a new value.</param>
+		/// <param name="propertyNames">The names of the properties that have a new value.</param>
 		protected void OnPropertyChanged(params string[] propertyNames)
 		{
-			// Only do all this work if somebody might listen to it
-			var handler = this.PropertyChanged;
-			if (handler != null)
+			foreach (string propertyName in propertyNames)
 			{
-				foreach (string propertyName in propertyNames)
-				{
-#if DEBUG
-					if (!TypeDescriptor.GetProperties(this).OfType<PropertyDescriptor>().Any(d => d.Name == propertyName))
-					{
-						throw new ArgumentException("Notifying a change of non-existing property " + this.GetType().Name + "." + propertyName);
-					}
-#endif
-
-					handler(this, new PropertyChangedEventArgs(propertyName));
-				}
+				OnPropertyChanged(propertyName);
 			}
 		}
 
@@ -385,6 +467,38 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		}
 
 		#endregion INotifyPropertyChanged Member
+
+		#region Dependent Notifications
+
+		private CollectionDictionary<string, string> dependentNotifications;
+
+		private CollectionDictionary<string, string> DependentNotifications
+		{
+			get
+			{
+				if (dependentNotifications == null)
+				{
+					dependentNotifications = new CollectionDictionary<string, string>();
+					foreach (var p in GetType().GetProperties())
+					{
+						foreach (NotifiesOnAttribute a in p.GetCustomAttributes(typeof(NotifiesOnAttribute), false))
+						{
+#if DEBUG
+							if (!TypeDescriptor.GetProperties(this).OfType<PropertyDescriptor>().Any(d => d.Name == a.Name))
+							{
+								throw new ArgumentException("Specified property " + this.GetType().Name + "." + p.Name +
+									" to notify on non-existing property " + a.Name);
+							}
+#endif
+							dependentNotifications.Add(a.Name, p.Name);
+						}
+					}
+				}
+				return dependentNotifications;
+			}
+		}
+
+		#endregion Dependent Notifications
 	}
 
 	#region Special view model classes
@@ -457,4 +571,40 @@ namespace Unclassified.FieldLogViewer.ViewModels
 	}
 
 	#endregion Special view model classes
+
+	#region Attributes
+
+	/// <summary>
+	/// Declares that a property that depends on another property should raise a notification when
+	/// the independent property is raising a notification.
+	/// </summary>
+	[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
+	public class NotifiesOnAttribute : Attribute
+	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="NotifiesOnAttribute"/> class.
+		/// </summary>
+		/// <param name="propertyName">The name of the independent property.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="propertyName"/> is null.</exception>
+		public NotifiesOnAttribute(string propertyName)
+		{
+			if (propertyName == null) throw new ArgumentNullException("propertyName");
+			Name = propertyName;
+		}
+
+		/// <summary>
+		/// Gets the name of the independent property.
+		/// </summary>
+		public string Name { get; private set; }
+
+		/// <summary>
+		/// A unique identifier for this attribute.
+		/// </summary>
+		public override object TypeId
+		{
+			get { return this; }
+		}
+	}
+
+	#endregion Attributes
 }

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using Unclassified.FieldLog;
+using Unclassified.UI;
 
 namespace Unclassified.FieldLogViewer.ViewModels
 {
@@ -66,7 +67,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		{
 			get
 			{
-				switch (this.Priority)
+				switch (Priority)
 				{
 					case FieldLogPriority.Trace: return "Trace";
 					case FieldLogPriority.Checkpoint: return "Checkpoint";
@@ -84,7 +85,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		{
 			get
 			{
-				switch (this.Priority)
+				switch (Priority)
 				{
 					case FieldLogPriority.Trace: return "/Images/Prio_Trace_14.png";
 					case FieldLogPriority.Checkpoint: return "/Images/Prio_Checkpoint_14.png";
@@ -116,11 +117,12 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
+		[NotifiesOn("IsSelected")]
 		public Brush Background
 		{
 			get
 			{
-				if (!this.isSelected)
+				if (!IsSelected)
 				{
 					return new SolidColorBrush(this.BackColor);
 				}
@@ -145,11 +147,12 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
+		[NotifiesOn("IsSelected")]
 		public Brush Foreground
 		{
 			get
 			{
-				if (!this.isSelected)
+				if (!IsSelected)
 				{
 					return Brushes.Black;
 				}
@@ -177,13 +180,12 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
-		private bool isSelected;
 		public bool IsSelected
 		{
-			get { return this.isSelected; }
+			get { return GetValue<bool>("IsSelected"); }
 			set
 			{
-				if (CheckUpdate(value, ref isSelected, "IsSelected", "Background", "Foreground"))
+				if (SetValue(value, "IsSelected"))
 				{
 					//System.Diagnostics.Debug.WriteLine("Item " + (isSelected ? "selected" : "deselected") + ": " + Time);
 				}

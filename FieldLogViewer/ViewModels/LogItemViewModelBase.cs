@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using Unclassified.UI;
 
 namespace Unclassified.FieldLogViewer.ViewModels
 {
@@ -9,18 +10,16 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		public int EventCounter { get; set; }
 		public DateTime Time { get; set; }
 
-		private int utcOffset;
 		public int UtcOffset
 		{
-			get { return utcOffset; }
-			set { CheckUpdate(value, ref utcOffset, "UtcOffset"); }
+			get { return GetValue<int>("UtcOffset"); }
+			set { SetValue(value, "UtcOffset"); }
 		}
 
-		private int indentLevel;
 		public int IndentLevel
 		{
-			get { return indentLevel; }
-			set { CheckUpdate(value, ref indentLevel, "IndentLevel"); }
+			get { return GetValue<int>("IndentLevel"); }
+			set { SetValue(value, "IndentLevel"); }
 		}
 
 		public string DisplayTime

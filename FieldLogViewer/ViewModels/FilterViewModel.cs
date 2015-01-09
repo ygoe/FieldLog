@@ -120,13 +120,12 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		#region Data properties
 
-		private ObservableCollection<FilterConditionGroupViewModel> conditionGroups;
 		public ObservableCollection<FilterConditionGroupViewModel> ConditionGroups
 		{
-			get { return conditionGroups; }
+			get { return GetValue<ObservableCollection<FilterConditionGroupViewModel>>("ConditionGroups"); }
 			private set
 			{
-				if (CheckUpdate(value, ref conditionGroups, "ConditionGroups"))
+				if (SetValue(value, "ConditionGroups"))
 				{
 					ConditionGroups.CollectionChanged += ConditionGroups_CollectionChanged;
 					UpdateFirstStatus();

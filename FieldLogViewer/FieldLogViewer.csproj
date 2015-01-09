@@ -119,6 +119,7 @@
     <Compile Include="Unclassified\UI\MenuIconExtension.cs" />
     <Compile Include="Unclassified\UI\MenuIconImage.cs" />
     <Compile Include="Unclassified\UI\WindowManager.cs" />
+    <Compile Include="Unclassified\Util\CollectionDictionary.cs" />
     <Compile Include="Unclassified\Util\FileSettingsStore.cs" />
     <Compile Include="Unclassified\Util\GlobalMutex.cs" />
     <Compile Include="Unclassified\Util\DebugMonitor.cs" />
@@ -160,7 +161,7 @@
     <Compile Include="ViewModels\LogItemViewModelBase.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
-    <Compile Include="ViewModels\ViewModelBase.cs" />
+    <Compile Include="Unclassified\UI\ViewModelBase.cs" />
     <Compile Include="Views\DetailsMessageView.xaml.cs">
       <DependentUpon>DetailsMessageView.xaml</DependentUpon>
     </Compile>

@@ -28,7 +28,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 			Conditions = new ObservableCollection<FilterConditionViewModel>();
 
-			isEnabled = true;
+			IsEnabled = true;
 		}
 
 		#endregion Constructor
@@ -116,13 +116,12 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		#region Data properties
 
-		private ObservableCollection<FilterConditionViewModel> conditions;
 		public ObservableCollection<FilterConditionViewModel> Conditions
 		{
-			get { return conditions; }
+			get { return GetValue<ObservableCollection<FilterConditionViewModel>>("Conditions"); }
 			private set
 			{
-				if (CheckUpdate(value, ref conditions, "Conditions"))
+				if (SetValue(value, "Conditions"))
 				{
 					Conditions.CollectionChanged += Conditions_CollectionChanged;
 					UpdateFirstStatus();
@@ -130,30 +129,30 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
-		private bool isFirst;
 		public bool IsFirst
 		{
-			get { return isFirst; }
-			set { CheckUpdate(value, ref isFirst, "IsFirst", "Margin"); }
+			get { return GetValue<bool>("IsFirst"); }
+			set { SetValue(value, "IsFirst"); }
 		}
 
+		[NotifiesOn("IsFirst")]
 		public Thickness Margin
 		{
 			get { return IsFirst ? new Thickness() : new Thickness(0, 4, 0, 0); }
 		}
 
+		[NotifiesOn("IsFirst")]
 		public Visibility OrLabelVisibility
 		{
 			get { return IsFirst ? Visibility.Hidden : Visibility.Visible; }
 		}
 
-		private bool isExclude;
 		public bool IsExclude
 		{
-			get { return isExclude; }
+			get { return GetValue<bool>("IsExclude"); }
 			set
 			{
-				if (CheckUpdate(value, ref isExclude, "IsExclude"))
+				if (SetValue(value, "IsExclude"))
 				{
 					OnFilterChanged(true);
 				}
@@ -169,31 +168,31 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
-		private bool isEnabled;
 		public bool IsEnabled
 		{
-			get { return isEnabled; }
+			get { return GetValue<bool>("IsEnabled"); }
 			set
 			{
-				if (CheckUpdate(value, ref isEnabled, "IsEnabled", "Opacity"))
+				if (SetValue(value, "IsEnabled"))
 				{
 					OnFilterChanged(true);
 				}
 			}
 		}
 
+		[NotifiesOn("IsEnabled")]
 		public double Opacity
 		{
 			get { return IsEnabled ? 1.0 : 0.4; }
 		}
 
-		private bool isInconsistent;
 		public bool IsInconsistent
 		{
-			get { return isInconsistent; }
-			set { CheckUpdate(value, ref isInconsistent, "IsInconsistent", "Background"); }
+			get { return GetValue<bool>("IsInconsistent"); }
+			set { SetValue(value, "IsInconsistent"); }
 		}
 
+		[NotifiesOn("IsInconsistent")]
 		public Brush Background
 		{
 			get { return new SolidColorBrush(IsInconsistent ? Color.FromArgb(32, 220, 20, 0) : Color.FromArgb(16, 0, 0, 0)); }

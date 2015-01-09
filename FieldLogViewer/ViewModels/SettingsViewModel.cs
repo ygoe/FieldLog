@@ -102,13 +102,12 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			get { return MainViewModel.Instance.SortedFilters; }
 		}
 
-		private FilterViewModel selectedFilter;
 		public FilterViewModel SelectedFilter
 		{
-			get { return selectedFilter; }
+			get { return GetValue<FilterViewModel>("SelectedFilter"); }
 			set
 			{
-				if (CheckUpdate(value, ref selectedFilter, "SelectedFilter"))
+				if (SetValue(value, "SelectedFilter"))
 				{
 					DuplicateFilterCommand.RaiseCanExecuteChanged();
 					DeleteFilterCommand.RaiseCanExecuteChanged();

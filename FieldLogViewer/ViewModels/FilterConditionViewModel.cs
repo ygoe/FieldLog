@@ -24,9 +24,9 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		{
 			this.parentConditionGroup = parentConditionGroup;
 
-			comparison = FilterComparison.Contains;
-			value = "";
-			isEnabled = true;
+			Comparison = FilterComparison.Contains;
+			Value = "";
+			IsEnabled = true;
 		}
 
 		#endregion Constructor
@@ -49,39 +49,34 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		#region Data properties
 
-		private bool isFirst;
 		public bool IsFirst
 		{
-			get { return isFirst; }
-			set { CheckUpdate(value, ref isFirst, "IsFirst", "Margin", "AndLabelVisibility"); }
+			get { return GetValue<bool>("IsFirst"); }
+			set { SetValue(value, "IsFirst"); }
 		}
 
+		[NotifiesOn("IsFirst")]
 		public Thickness Margin
 		{
 			get { return IsFirst ? new Thickness() : new Thickness(0, 4, 0, 0); }
 		}
 
+		[NotifiesOn("IsFirst")]
 		public Visibility AndLabelVisibility
 		{
 			get { return IsFirst ? Visibility.Hidden : Visibility.Visible; }
 		}
 
-		private FilterColumn column;
 		public FilterColumn Column
 		{
-			get { return column; }
+			get { return GetValue<FilterColumn>("Column"); }
 			set
 			{
-				if (CheckUpdate(value, ref column, "Column"))
+				if (SetValue(value, "Column"))
 				{
-					OnPropertyChanged(
-						"AvailableValues",
-						"Column",
-						"AvailableComparisons",
-						"ValueTextVisibility", "ValueListVisibility");
 					enableFilterChangedEvent = false;
 					// Set value to an acceptable default for enum columns
-					switch (column)
+					switch (Column)
 					{
 						case FilterColumn.Type:
 							Value = FilterItemType.Any.ToString();
@@ -113,37 +108,36 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
-		private FilterComparison comparison;
 		public FilterComparison Comparison
 		{
-			get { return comparison; }
+			get { return GetValue<FilterComparison>("Comparison"); }
 			set
 			{
-				if (CheckUpdate(value, ref comparison, "Comparison"))
+				if (SetValue(value, "Comparison"))
 				{
 					OnFilterChanged(true);
 				}
 			}
 		}
 
-		private string value;
 		public string Value
 		{
-			get { return value; }
+			get { return GetValue<string>("Value"); }
 			set
 			{
-				if (CheckUpdate(value, ref this.value, "Value"))
+				if (SetValue(value, "Value"))
 				{
 					OnFilterChanged(true);
 				}
 			}
 		}
 
+		[NotifiesOn("Column")]
 		public IEnumerable<EnumerationExtension.EnumerationMember> AvailableValues
 		{
 			get
 			{
-				switch (column)
+				switch (Column)
 				{
 					case FilterColumn.Type:
 						return new EnumerationExtension(typeof(FilterItemType), true).ProvideTypedValue();
@@ -161,11 +155,12 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
+		[NotifiesOn("Column")]
 		public IEnumerable<EnumerationExtension<FilterComparison>.EnumerationMember> AvailableComparisons
 		{
 			get
 			{
-				switch (column)
+				switch (Column)
 				{
 					case FilterColumn.AnyText:
 					case FilterColumn.SessionId:
@@ -234,6 +229,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
+		[NotifiesOn("Column")]
 		public Visibility ValueTextVisibility
 		{
 			get
@@ -289,6 +285,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
+		[NotifiesOn("Column")]
 		public Visibility ValueListVisibility
 		{
 			get
@@ -307,19 +304,19 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
-		private bool isEnabled;
 		public bool IsEnabled
 		{
-			get { return isEnabled; }
+			get { return GetValue<bool>("IsEnabled"); }
 			set
 			{
-				if (CheckUpdate(value, ref isEnabled, "IsEnabled", "Opacity"))
+				if (SetValue(value, "IsEnabled"))
 				{
 					OnFilterChanged(true);
 				}
 			}
 		}
 
+		[NotifiesOn("IsEnabled")]
 		public double Opacity
 		{
 			get { return IsEnabled ? 1.0 : 0.4; }

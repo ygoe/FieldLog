@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using Unclassified.FieldLog;
+using Unclassified.UI;
 
 namespace Unclassified.FieldLogViewer.ViewModels
 {

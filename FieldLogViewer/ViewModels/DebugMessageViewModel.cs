@@ -79,11 +79,12 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
+		[NotifiesOn("IsSelected")]
 		public Brush Background
 		{
 			get
 			{
-				if (!this.isSelected)
+				if (!IsSelected)
 				{
 					return new SolidColorBrush(this.BackColor);
 				}
@@ -98,11 +99,12 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
+		[NotifiesOn("IsSelected")]
 		public Brush Foreground
 		{
 			get
 			{
-				if (!this.isSelected)
+				if (!IsSelected)
 				{
 					return Brushes.Black;
 				}
@@ -113,11 +115,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
-		private bool isSelected;
 		public bool IsSelected
 		{
-			get { return this.isSelected; }
-			set { CheckUpdate(value, ref isSelected, "IsSelected", "Background", "Foreground"); }
+			get { return GetValue<bool>("IsSelected"); }
+			set { SetValue(value, "IsSelected"); }
 		}
 
 		public Visibility OpenLogFileButtonVisibility

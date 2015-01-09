@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Unclassified.FieldLog;
+using Unclassified.UI;
 
 namespace Unclassified.FieldLogViewer.ViewModels
 {

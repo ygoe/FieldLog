@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Media;
 using Unclassified.FieldLog;
+using Unclassified.UI;
 
 namespace Unclassified.FieldLogViewer.ViewModels
 {
@@ -26,11 +27,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		public string FullMeta { get; private set; }
 		public SolidColorBrush ListBulletBrush { get; private set; }
 
-		private SolidColorBrush methodBrush;
 		public SolidColorBrush MethodBrush
 		{
-			get { return methodBrush; }
-			set { CheckUpdate(value, ref methodBrush, "MethodBrush"); }
+			get { return GetValue<SolidColorBrush>("MethodBrush"); }
+			set { SetValue(value, "MethodBrush"); }
 		}
 
 		public Visibility MetaVisibility

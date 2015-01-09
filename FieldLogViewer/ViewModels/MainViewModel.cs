@@ -1124,34 +1124,34 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			get { return this.logItems; }
 		}
 
+		[NotifiesOn("IsLoadingFiles")]
+		[NotifiesOn("IsLoadingFilesAgain")]
 		public ICollectionView FilteredLogItemsView
 		{
 			get { return filteredLogItems.View; }
 		}
 
-		public List<LogItemViewModelBase> selectedItems;
 		public List<LogItemViewModelBase> SelectedItems
 		{
-			get { return selectedItems; }
+			get { return GetValue<List<LogItemViewModelBase>>("SelectedItems"); }
 			set
 			{
-				if (CheckUpdate(value, ref selectedItems, "SelectedItems", "QuickFilterThreadTitle", "QuickFilterTypeTitle", "QuickFilterMinPrioTitle"))
+				if (SetValue(value, "SelectedItems"))
 				{
 					InvalidateQuickFilterCommands();
 				}
 			}
 		}
 
-		private bool isLoadingFiles;
 		public bool IsLoadingFiles
 		{
-			get { return isLoadingFiles; }
+			get { return GetValue<bool>("IsLoadingFiles"); }
 			set
 			{
-				if (CheckUpdate(value, ref isLoadingFiles, "IsLoadingFiles"))
+				if (SetValueSuppressNotify(value, "IsLoadingFiles"))
 				{
 					FL.TraceData("IsLoadingFiles", IsLoadingFiles);
-					if (isLoadingFiles)
+					if (IsLoadingFiles)
 					{
 						filteredLogItems.Source = null;
 					}
@@ -1160,42 +1160,38 @@ namespace Unclassified.FieldLogViewer.ViewModels
 						filteredLogItems.Source = logItems;
 						RefreshLogItemsFilterView();
 					}
-					OnPropertyChanged("FilteredLogItemsView");
-					OnPropertyChanged("LogItemsVisibility");
-					OnPropertyChanged("ItemDetailsVisibility");
-					OnPropertyChanged("LoadingMsgVisibility");
+					OnPropertyChanged("IsLoadingFiles");
 					InvalidateToolbarCommandsLoading();
 				}
 			}
 		}
 
-		private bool isLoadingFilesAgain;
 		public bool IsLoadingFilesAgain
 		{
-			get { return isLoadingFilesAgain; }
+			get { return GetValue<bool>("IsLoadingFilesAgain"); }
 			set
 			{
-				if (CheckUpdate(value, ref isLoadingFilesAgain, "IsLoadingFilesAgain"))
+				if (SetValueSuppressNotify(value, "IsLoadingFilesAgain"))
 				{
 					FL.TraceData("IsLoadingFilesAgain", IsLoadingFilesAgain);
-					if (!isLoadingFilesAgain)
+					if (!IsLoadingFilesAgain)
 					{
 						filteredLogItems.Source = logItems;
 						RefreshLogItemsFilterView();
 					}
-					OnPropertyChanged("FilteredLogItemsView");
+					OnPropertyChanged("IsLoadingFilesAgain");
 					InvalidateToolbarCommandsLoading();
 				}
 			}
 		}
 
-		private int loadedItemsCount;
 		public int LoadedItemsCount
 		{
-			get { return loadedItemsCount; }
-			set { CheckUpdate(value, ref loadedItemsCount, "LoadedItemsCount"); }
+			get { return GetValue<int>("LoadedItemsCount"); }
+			set { SetValue(value, "LoadedItemsCount"); }
 		}
 
+		[NotifiesOn("IsLoadingFiles")]
 		public Visibility LogItemsVisibility
 		{
 			get
@@ -1204,6 +1200,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
+		[NotifiesOn("IsLoadingFiles")]
 		public Visibility ItemDetailsVisibility
 		{
 			get
@@ -1212,6 +1209,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
+		[NotifiesOn("IsLoadingFiles")]
 		public Visibility LoadingMsgVisibility
 		{
 			get
@@ -1231,21 +1229,20 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			get { return sortedFilters.View; }
 		}
 
-		private FilterViewModel selectedFilter;
 		public FilterViewModel SelectedFilter
 		{
-			get { return selectedFilter; }
+			get { return GetValue<FilterViewModel>("SelectedFilter"); }
 			set
 			{
-				if (CheckUpdate(value, ref selectedFilter, "SelectedFilter"))
+				if (SetValue(value, "SelectedFilter"))
 				{
 					DeleteFilterCommand.RaiseCanExecuteChanged();
 					ViewCommandManager.Invoke("SaveScrolling");
 					RefreshLogItemsFilterView();
 					ViewCommandManager.Invoke("RestoreScrolling");
-					if (selectedFilter != null)
+					if (SelectedFilter != null)
 					{
-						App.Settings.SelectedFilter = selectedFilter.DisplayName;
+						App.Settings.SelectedFilter = SelectedFilter.DisplayName;
 					}
 					else
 					{
@@ -1255,18 +1252,17 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
-		private string adhocSearchText;
 		public string AdhocSearchText
 		{
-			get { return adhocSearchText; }
+			get { return GetValue<string>("AdhocSearchText"); }
 			set
 			{
-				if (CheckUpdate(value, ref adhocSearchText, "AdhocSearchText"))
+				if (SetValue(value, "AdhocSearchText"))
 				{
-					if (!string.IsNullOrWhiteSpace(adhocSearchText))
+					if (!string.IsNullOrWhiteSpace(AdhocSearchText))
 					{
 						adhocFilterCondition = new FilterConditionViewModel(null);
-						adhocFilterCondition.Value = adhocSearchText;
+						adhocFilterCondition.Value = AdhocSearchText;
 					}
 					else
 					{
@@ -1316,6 +1312,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
+		[NotifiesOn("SelectedItems")]
 		public string QuickFilterThreadTitle
 		{
 			get
@@ -1353,6 +1350,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
+		[NotifiesOn("SelectedItems")]
 		public string QuickFilterTypeTitle
 		{
 			get
@@ -1365,6 +1363,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
+		[NotifiesOn("SelectedItems")]
 		public string QuickFilterMinPrioTitle
 		{
 			get

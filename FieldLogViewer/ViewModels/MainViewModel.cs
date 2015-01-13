@@ -1750,9 +1750,27 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 			loadedBasePath = basePath;
 			UpdateWindowTitle();
+			AddFileToHistory();
 
 			// Start the log file reading in a worker thread
 			TaskHelper.Start(c => ReadTask(basePath, singleFile), out readerTask);
+		}
+
+		private void AddFileToHistory()
+		{
+			var list = new List<string>();
+			// Add current path
+			list.Add(loadedBasePath);
+			// Add all previous items, remove current path if it exists
+			list.AddRange(App.Settings.RecentlyLoadedFiles
+				.Where(f => !f.Equals(loadedBasePath, StringComparison.OrdinalIgnoreCase)));
+			App.Settings.RecentlyLoadedFiles = list.ToArray();
+
+			//var jumpList = System.Windows.Shell.JumpList.GetJumpList(Application.Current);
+			//if (jumpList == null)
+			//    jumpList = new System.Windows.Shell.JumpList();
+			//jumpList.JumpItems.Add(new System.Windows.Shell.JumpPath() { Path = loadedBasePath, CustomCategory = "Recent logs" });
+			//System.Windows.Shell.JumpList.SetJumpList(Application.Current, jumpList);
 		}
 
 		/// <summary>

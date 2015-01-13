@@ -177,6 +177,24 @@ namespace Unclassified.FieldLogViewer.Views
 
 		#region Control event handlers
 
+		private void SplitButton_Click(object sender, RoutedEventArgs e)
+		{
+			// TODO: Drop-down menu background, padding, and drop shadow
+
+			var splitButton = e.Source as SplitButton;
+			var menuItem = e.OriginalSource as MenuItem;
+			if (menuItem != null)
+			{
+				splitButton.IsSubmenuOpen = false;
+				
+				MainViewModel vm = DataContext as MainViewModel;
+				if (vm != null)
+				{
+					vm.OpenFiles(menuItem.Header.ToString());
+				}
+			}
+		}
+
 		private void SmoothVirtualizingPanel_Loaded(object sender, RoutedEventArgs e)
 		{
 			logItemsHostPanel = sender as SmoothVirtualizingPanel;

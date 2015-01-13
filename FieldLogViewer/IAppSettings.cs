@@ -113,6 +113,12 @@ namespace Unclassified.FieldLogViewer
 		/// Gets or sets a value indicating whether the metadata of a stack frame is displayed.
 		/// </summary>
 		bool ShowStackFrameMetadata { get; set; }
+
+		/// <summary>
+		/// Gets or sets an array containing the recently loaded files with their path and base
+		/// name. The most recently loaded entry is first.
+		/// </summary>
+		string[] RecentlyLoadedFiles { get; set; }
 	}
 
 	public enum ItemTimeType

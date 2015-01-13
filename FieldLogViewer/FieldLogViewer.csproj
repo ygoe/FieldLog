@@ -116,8 +116,10 @@
     <Compile Include="SourceInfo\DotfuscatorDeobfuscator.cs" />
     <Compile Include="SourceInfo\SeeUnsharpDeobfuscator.cs" />
     <Compile Include="SourceInfo\SourceResolver.cs" />
+    <Compile Include="Unclassified\UI\BooleanBoxes.cs" />
     <Compile Include="Unclassified\UI\MenuIconExtension.cs" />
     <Compile Include="Unclassified\UI\MenuIconImage.cs" />
+    <Compile Include="Unclassified\UI\SplitButton.cs" />
     <Compile Include="Unclassified\UI\WindowManager.cs" />
     <Compile Include="Unclassified\Util\CollectionDictionary.cs" />
     <Compile Include="Unclassified\Util\FileSettingsStore.cs" />
@@ -214,6 +216,10 @@
     <Page Include="Resources\ToolBar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources\SplitButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\DetailsMessageView.xaml">
       <Generator>MSBuild:Compile</Generator>

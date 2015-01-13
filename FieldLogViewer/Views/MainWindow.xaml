@@ -71,12 +71,16 @@
 					<ColumnDefinition Width="Auto"/>
 				</Grid.ColumnDefinitions>
 
-				<Button
+				<ui:SplitButton
 					Grid.Column="0"
 					Command="{Binding LoadLogCommand}" ToolTip="Load log" ToolTipService.ShowOnDisabled="True"
-					Style="{StaticResource ToolButtonStyle}" Focusable="False">
-					<ui:MenuIconImage Source="/Images/folder_open.png"/>
-				</Button>
+					Focusable="False"
+					ItemsSource="{Binding Settings.RecentlyLoadedFiles}"
+					MenuItem.Click="SplitButton_Click">
+					<ui:SplitButton.Icon>
+						<ui:MenuIconImage Source="/Images/folder_open.png"/>
+					</ui:SplitButton.Icon>
+				</ui:SplitButton>
 				<Button
 					Grid.Column="1"
 					Command="{Binding StopLiveCommand}" ToolTip="Stop live" ToolTipService.ShowOnDisabled="True"

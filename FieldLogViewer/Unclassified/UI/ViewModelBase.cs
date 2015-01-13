@@ -1,4 +1,4 @@
-﻿//#define CSHARP5
+﻿//#define CSHARP50
 
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ namespace Unclassified.UI
 	/// </summary>
 	internal abstract class ViewModelBase : INotifyPropertyChanged
 	{
-#if !CSHARP5
+#if !CSHARP50
 		/// <summary>
 		/// Compatibility dummy attribute for C# before 5. This attribute does not backport the
 		/// functionality from later C# versions!
@@ -39,38 +39,34 @@ namespace Unclassified.UI
 
 		#region Common view properties
 
-		private string displayName;
-
 		/// <summary>
-		/// Gets or sets the user-friendly name of this object. Derived classes can set this
-		/// property to a new value, or override it to determine the value on-demand.
+		/// Gets or sets the display name of this object. Derived classes can set this property to a
+		/// new value, or override it to determine the value on-demand.
 		/// </summary>
 		public virtual string DisplayName
 		{
-			get { return displayName; }
-			set
-			{
-				if (value != displayName)
-				{
-					displayName = value;
-					OnDisplayNameChanged();
-					OnPropertyChanged("DisplayName");
-				}
-			}
+			get { return GetValue<string>("DisplayName"); }
+			set { SetValue(value, "DisplayName"); }
 		}
 
 		/// <summary>
-		/// Raised when the DisplayName property on this object has a new value.
+		/// Called when the <see cref="DisplayName"/> property on this object has a new value.
 		/// </summary>
+		[PropertyChangedHandler("DisplayName")]
 		protected virtual void OnDisplayNameChanged()
 		{
 		}
 
+		/// <summary>
+		/// Returns a string that represents the current object.
+		/// </summary>
+		/// <returns>A string that represents the current object.</returns>
 		public override string ToString()
 		{
-			if (DisplayName != null)
+			string displayName = DisplayName;
+			if (displayName != null)
 			{
-				return GetType().Name + ": " + DisplayName;
+				return GetType().Name + ": " + displayName;
 			}
 			return base.ToString();
 		}
@@ -90,6 +86,9 @@ namespace Unclassified.UI
 
 		#region Property access methods
 
+		/// <summary>
+		/// Stores the values for each property in the current object.
+		/// </summary>
 		private Dictionary<string, object> backingFields = new Dictionary<string, object>();
 
 		/// <summary>
@@ -117,6 +116,19 @@ namespace Unclassified.UI
 		/// <param name="newValue">The new value for the property.</param>
 		/// <param name="propertyName">The property name.</param>
 		/// <returns>true if the value was changed, otherwise false.</returns>
+		/// <remarks>
+		/// The order of actions is defined as the following:
+		/// <list type="number">
+		///   <item>Change property value, accessible through <see cref="GetValue"/></item>
+		///   <item>Call On...Changed method, if available</item>
+		///   <item>Raise <see cref="PropertyChanged"/> event for the property</item>
+		///   <item>Call On...Changed method and raise <see cref="PropertyChanged"/> event for
+		///     dependent properties in no particular order</item>
+		/// </list>
+		/// If code must be executed before the first event is raised, the On...Changed method is
+		/// the recommended place for that. This keeps the property setter clean and allows using
+		/// the default notification method.
+		/// </remarks>
 		protected bool SetValue<T>(T newValue, [CallerMemberName] string propertyName = null)
 		{
 			if (propertyName == null) throw new ArgumentNullException("propertyName");
@@ -137,6 +149,19 @@ namespace Unclassified.UI
 		/// <param name="propertyName">The property name.</param>
 		/// <param name="additionalPropertyNames">Names of additional properties that must be notified when the value has changed.</param>
 		/// <returns>true if the value was changed, otherwise false.</returns>
+		/// <remarks>
+		/// The order of actions is defined as the following:
+		/// <list type="number">
+		///   <item>Change property value, accessible through <see cref="GetValue"/></item>
+		///   <item>Call On...Changed method, if available</item>
+		///   <item>Raise <see cref="PropertyChanged"/> event for the property</item>
+		///   <item>Call On...Changed method and raise <see cref="PropertyChanged"/> event for
+		///     dependent properties in no particular order</item>
+		/// </list>
+		/// If code must be executed before the first event is raised, the On...Changed method is
+		/// the recommended place for that. This keeps the property setter clean and allows using
+		/// the default notification method.
+		/// </remarks>
 		protected bool SetValue<T>(T newValue, [CallerMemberName] string propertyName = null, params string[] additionalPropertyNames)
 		{
 			if (SetValue(newValue, propertyName))
@@ -154,6 +179,10 @@ namespace Unclassified.UI
 		/// <param name="newValue">The new value for the property.</param>
 		/// <param name="propertyName">The property name.</param>
 		/// <returns>true if the value was changed, otherwise false.</returns>
+		/// <remarks>
+		/// This method does not call On...Changed methods and does not raise the
+		/// <see cref="PropertyChanged"/> event for the indicated or any dependent properties.
+		/// </remarks>
 		protected bool SetValueSuppressNotify<T>(T newValue, [CallerMemberName] string propertyName = null)
 		{
 			if (propertyName == null) throw new ArgumentNullException("propertyName");
@@ -207,7 +236,9 @@ namespace Unclassified.UI
 		/// <returns>The sanitized string value.</returns>
 		protected string SanitizeInt(string str)
 		{
-			if (string.IsNullOrWhiteSpace(str)) return null;
+			if (str == null) return null;
+			str = str.Trim();
+			if (str.Length == 0) return "";
 			try
 			{
 				long l = Convert.ToInt64(str);
@@ -215,7 +246,7 @@ namespace Unclassified.UI
 			}
 			catch
 			{
-				return str.Trim();
+				return str;
 			}
 		}
 
@@ -226,7 +257,9 @@ namespace Unclassified.UI
 		/// <returns>The sanitized string value.</returns>
 		protected string SanitizeDouble(string str)
 		{
-			if (string.IsNullOrWhiteSpace(str)) return null;
+			if (str == null) return null;
+			str = str.Trim();
+			if (str.Length == 0) return "";
 			try
 			{
 				double d = Convert.ToDouble(str);
@@ -234,13 +267,20 @@ namespace Unclassified.UI
 			}
 			catch
 			{
-				return str.Trim();
+				return str;
 			}
 		}
 
+		/// <summary>
+		/// Sanitizes a user input string for a local date value.
+		/// </summary>
+		/// <param name="str">The text entered by the user.</param>
+		/// <returns>The sanitized string value.</returns>
 		protected string SanitizeDate(string str)
 		{
-			if (string.IsNullOrWhiteSpace(str)) return null;
+			if (str == null) return null;
+			str = str.Trim();
+			if (str.Length == 0) return "";
 			try
 			{
 				DateTime d = Convert.ToDateTime(str);
@@ -248,7 +288,28 @@ namespace Unclassified.UI
 			}
 			catch
 			{
-				return str.Trim();
+				return str;
+			}
+		}
+
+		/// <summary>
+		/// Sanitizes a user input string for an ISO date value.
+		/// </summary>
+		/// <param name="str">The text entered by the user.</param>
+		/// <returns>The sanitized string value.</returns>
+		protected string SanitizeIsoDate(string str)
+		{
+			if (str == null) return null;
+			str = str.Trim();
+			if (str.Length == 0) return "";
+			try
+			{
+				DateTime d = Convert.ToDateTime(str);
+				return d.ToString("yyyy-MM-dd");
+			}
+			catch
+			{
+				return str;
 			}
 		}
 
@@ -257,9 +318,14 @@ namespace Unclassified.UI
 		#region Data validation
 
 		/// <summary>
+		/// The message text that indicates how many more error messages were not returned.
+		/// </summary>
+		public static string MoreErrorsMessage = "({0} weitere Meldungen werden nicht angezeigt)";
+
+		/// <summary>
 		/// Gets a value indicating whether the view model instance has validation errors.
 		/// </summary>
-		public bool HasErrors { get { return GetErrors(true).Count > 0; } }
+		public bool HasErrors { get { return GetErrors(1).Count > 0; } }
 
 		/// <summary>
 		/// Gets the validation errors in this view model instance.
@@ -269,8 +335,9 @@ namespace Unclassified.UI
 		private bool validationPending;
 
 		/// <summary>
-		/// Raises PropertyChanged events for Errors and HasErrors with Loaded priority. Multiple
-		/// calls to this function before the asynchronous action has been started are ignored.
+		/// Raises PropertyChanged events for <see cref="Errors"/> and <see cref="HasErrors"/> with
+		/// Loaded dispatcher priority. Multiple calls to this function before the asynchronous
+		/// action has been started are ignored.
 		/// </summary>
 		protected virtual void RaiseValidationUpdated()
 		{
@@ -284,6 +351,7 @@ namespace Unclassified.UI
 					validationPending = true;
 					Dispatcher.CurrentDispatcher.BeginInvoke((Action) delegate
 					{
+						// Reset flag first (there's no locking)
 						validationPending = false;
 						OnPropertyChanged("Errors");
 						OnPropertyChanged("HasErrors");
@@ -293,12 +361,11 @@ namespace Unclassified.UI
 		}
 
 		/// <summary>
-		/// Determines all validation errors in this view model instance. Up to 5 error messages
-		/// are returned.
+		/// Determines all validation errors in this view model instance.
 		/// </summary>
-		/// <param name="onlyFirst">Only report the first determined error.</param>
+		/// <param name="maxCount">The maximum number of errors to return.</param>
 		/// <returns>A dictionary that holds the error message for each property name.</returns>
-		protected Dictionary<string, string> GetErrors(bool onlyFirst = false)
+		protected Dictionary<string, string> GetErrors(int maxCount = 5)
 		{
 			var dict = new Dictionary<string, string>();
 			int more = 0;
@@ -319,18 +386,26 @@ namespace Unclassified.UI
 						if (prop.Name == "HasErrors") continue;
 
 						string msg = dei[prop.Name];
+						if (msg == null)
+						{
+							// Also try locally stored error messages
+							msg = GetPropertyError(prop.Name);
+						}
 						if (msg != null)
 						{
-							if (dict.Count < 5)
+							if (dict.Count < maxCount)
 							{
 								dict[prop.Name] = msg;
-								if (onlyFirst && dict.Count > 0)
+								if (maxCount == 1)
 								{
 									return dict;
 								}
 							}
 							else
 							{
+								// Remember the last key and message in case it's the only one.
+								// (We don't need to waste space with a "more" note when we can show
+								// the actual single message instead.)
 								lastKey = prop.Name;
 								lastValue = msg;
 								more++;
@@ -341,12 +416,13 @@ namespace Unclassified.UI
 			}
 			if (more == 1)
 			{
+				// There's only one more message, so show it
 				dict[lastKey] = lastValue;
 			}
 			else if (more > 0)
 			{
-				// I18N - Not currently used
-				dict["zzz"] = "(" + more + " weitere Meldungen werden nicht angezeigt)";
+				// Add an item at the end, about how many more messages were not returned
+				dict["zzz"] = string.Format(MoreErrorsMessage, more);
 			}
 			return dict;
 		}
@@ -397,7 +473,7 @@ namespace Unclassified.UI
 
 		#endregion Data validation
 
-		#region INotifyPropertyChanged Member
+		#region INotifyPropertyChanged members
 
 		/// <summary>
 		/// Raised when a property on this object has a new value.
@@ -411,21 +487,37 @@ namespace Unclassified.UI
 		/// <param name="propertyName">The name of the property that has a new value.</param>
 		protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
 		{
+			// Verify that the notified property actually exists in the current object. This can
+			// reveal misspelled properties and missing notifications. It's only checked in Debug
+			// builds for performance and stability reasons.
 #if DEBUG
 			if (!TypeDescriptor.GetProperties(this).OfType<PropertyDescriptor>().Any(d => d.Name == propertyName))
 			{
 				throw new ArgumentException("Notifying a change of non-existing property " + this.GetType().Name + "." + propertyName);
 			}
 #endif
+
+			// Call On...Changed methods that are marked with the [PropertyChangedHandler]
+			// attribute
+			foreach (var changeHandler in PropertyChangedHandlers.GetValuesOrEmpty(propertyName))
+			{
+				changeHandler();
+			}
+
+			// Raise PropertyChanged event, if there is a handler listening to it
 			var handler = PropertyChanged;
 			if (handler != null)
 			{
 				handler(this, new PropertyChangedEventArgs(propertyName));
-				
-				foreach (var dependentPropertyName in DependentNotifications.GetValuesOrEmpty(propertyName))
-				{
-					OnPropertyChanged(dependentPropertyName);
-				}
+			}
+
+			// Also notify changes for dependent properties
+			// (This could be moved inside the (handler != null) check for improved performance, but
+			// then it could miss out On...Changed method calls for dependent properties, which
+			// might be a nice feature.)
+			foreach (var dependentPropertyName in DependentNotifications.GetValuesOrEmpty(propertyName))
+			{
+				OnPropertyChanged(dependentPropertyName);
 			}
 		}
 
@@ -466,12 +558,17 @@ namespace Unclassified.UI
 			}
 		}
 
-		#endregion INotifyPropertyChanged Member
+		#endregion INotifyPropertyChanged members
 
-		#region Dependent Notifications
+		#region Dependent notifications
 
+		// TODO: Use static cache for this type, with locking during reflection (not for field access)
+		
 		private CollectionDictionary<string, string> dependentNotifications;
 
+		/// <summary>
+		/// Determines and caches all dependent properties with reflection.
+		/// </summary>
 		private CollectionDictionary<string, string> DependentNotifications
 		{
 			get
@@ -483,6 +580,9 @@ namespace Unclassified.UI
 					{
 						foreach (NotifiesOnAttribute a in p.GetCustomAttributes(typeof(NotifiesOnAttribute), false))
 						{
+							// Verify that the notified property actually exists in the current object. This can
+							// reveal misspelled properties and missing notifications. It's only checked in Debug
+							// builds for performance and stability reasons.
 #if DEBUG
 							if (!TypeDescriptor.GetProperties(this).OfType<PropertyDescriptor>().Any(d => d.Name == a.Name))
 							{
@@ -498,7 +598,58 @@ namespace Unclassified.UI
 			}
 		}
 
-		#endregion Dependent Notifications
+		#endregion Dependent notifications
+
+		#region Property changed handler methods
+
+		// TODO: Use static cache for this type, with locking during reflection (not for field access)
+
+		private CollectionDictionary<string, Action> propertyChangedHandlers;
+
+		/// <summary>
+		/// Determines and caches all property changed handler methods with reflection.
+		/// </summary>
+		private CollectionDictionary<string, Action> PropertyChangedHandlers
+		{
+			get
+			{
+				if (propertyChangedHandlers == null)
+				{
+					propertyChangedHandlers = new CollectionDictionary<string, Action>();
+					foreach (var method in GetType().GetMethods(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance))
+					{
+						var m = method;
+						while (true)
+						{
+							foreach (PropertyChangedHandlerAttribute a in m.GetCustomAttributes(typeof(PropertyChangedHandlerAttribute), false))
+							{
+								// Verify that the notified property actually exists in the current object. This can
+								// reveal misspelled properties and missing notifications. It's only checked in Debug
+								// builds for performance and stability reasons.
+#if DEBUG
+								if (!TypeDescriptor.GetProperties(this).OfType<PropertyDescriptor>().Any(d => d.Name == a.Name))
+								{
+									throw new ArgumentException("Specified method " + this.GetType().Name + "." + m.Name +
+										" to handle changes of non-existing property " + a.Name);
+								}
+#endif
+								Action action = (Action) Delegate.CreateDelegate(typeof(Action), this, m);
+								propertyChangedHandlers.Add(a.Name, action);
+							}
+
+							// Check base methods for the attribute
+							if (!m.IsVirtual) break;
+							var baseMethod = m.GetBaseDefinition();
+							if (baseMethod == m) break;
+							m = baseMethod;
+						}
+					}
+				}
+				return propertyChangedHandlers;
+			}
+		}
+
+		#endregion Property changed handler methods
 	}
 
 	#region Special view model classes
@@ -604,6 +755,30 @@ namespace Unclassified.UI
 		{
 			get { return this; }
 		}
+	}
+
+	/// <summary>
+	/// Declares that a method is invoked when the specified property is changed, before the
+	/// notification event.
+	/// </summary>
+	[AttributeUsage(AttributeTargets.Method)]
+	public class PropertyChangedHandlerAttribute : Attribute
+	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="PropertyChangedHandlerAttribute"/> class.
+		/// </summary>
+		/// <param name="propertyName">The name of the property.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="propertyName"/> is null.</exception>
+		public PropertyChangedHandlerAttribute(string propertyName)
+		{
+			if (propertyName == null) throw new ArgumentNullException("propertyName");
+			Name = propertyName;
+		}
+
+		/// <summary>
+		/// Gets the name of the independent property.
+		/// </summary>
+		public string Name { get; private set; }
 	}
 
 	#endregion Attributes

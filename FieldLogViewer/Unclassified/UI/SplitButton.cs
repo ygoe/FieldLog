@@ -51,6 +51,7 @@ namespace Unclassified.UI
 				if (Mouse.Captured != splitButton)
 				{
 					Mouse.Capture(splitButton, CaptureMode.SubTree);
+					Mouse.AddLostMouseCaptureHandler(splitButton, OnLostMouseCapture);
 				}
 			}
 			else
@@ -65,6 +66,15 @@ namespace Unclassified.UI
 					splitButton.Focus();
 				}
 			}
+		}
+
+		private static void OnLostMouseCapture(object sender, MouseEventArgs e)
+		{
+			SplitButton splitButton = sender as SplitButton;
+			Mouse.RemoveLostMouseCaptureHandler(splitButton, OnLostMouseCapture);
+			splitButton.Dispatcher.BeginInvoke(
+				new Action(splitButton.CloseSubmenu),
+				System.Windows.Threading.DispatcherPriority.Input);
 		}
 
 		/// <summary>
@@ -107,11 +117,11 @@ namespace Unclassified.UI
 		private static void OnMouseButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			SplitButton splitButton = sender as SplitButton;
-			if (!splitButton.IsKeyboardFocusWithin)
-			{
-				splitButton.Focus();
-				return;
-			}
+			//if (!splitButton.IsKeyboardFocusWithin)
+			//{
+			//    splitButton.Focus();
+			//    return;
+			//}
 
 			if (Mouse.Captured == splitButton && e.OriginalSource == splitButton)
 			{
@@ -121,14 +131,11 @@ namespace Unclassified.UI
 
 			if (e.Source is MenuItem)
 			{
-				MenuItem menuItem = e.Source as MenuItem;
-				if (menuItem != null)
+				MenuItem menuItem = (MenuItem) e.Source;
+				if (!menuItem.HasItems)
 				{
-					if (!menuItem.HasItems)
-					{
-						splitButton.CloseSubmenu();
-						menuItem.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent, menuItem));
-					}
+					splitButton.CloseSubmenu();
+					menuItem.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent, menuItem));
 				}
 			}
 		}

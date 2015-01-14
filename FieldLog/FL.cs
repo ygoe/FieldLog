@@ -381,7 +381,7 @@ namespace Unclassified.FieldLog
 		/// The entry assembly's Location value. This is determined by other means for ASP.NET
 		/// applications.
 		/// </summary>
-		internal static string EntryAssemblyLocation;
+		public static string EntryAssemblyLocation { get; internal set; }
 
 		#endregion Internal static data
 

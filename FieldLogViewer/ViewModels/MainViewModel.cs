@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Shell;
 using System.Windows.Threading;
 using Microsoft.Win32;
 using TaskDialogInterop;
@@ -78,6 +79,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			dispatcher = Dispatcher.CurrentDispatcher;
 
 			UpdateWindowTitle();
+			SetJumpList();
 
 			// Setup toolbar and settings events
 			this.BindProperty(vm => vm.IsLocalDebugMonitorActive, App.Settings, s => s.IsLocalDebugMonitorActive);
@@ -721,7 +723,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		private bool CanQuickFilterType()
 		{
-			return SelectedItems.Count == 1;
+			return SelectedItems != null && SelectedItems.Count == 1;
 		}
 
 		private void OnQuickFilterType()
@@ -755,7 +757,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		private bool CanQuickFilterMinPrio()
 		{
-			return SelectedItems.Count == 1 && SelectedItems[0] is FieldLogItemViewModel;
+			return SelectedItems != null && SelectedItems.Count == 1 && SelectedItems[0] is FieldLogItemViewModel;
 		}
 
 		private void OnQuickFilterMinPrio()
@@ -790,7 +792,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		private bool CanQuickFilterNotBefore()
 		{
-			return SelectedItems.Count == 1;
+			return SelectedItems != null && SelectedItems.Count == 1;
 		}
 
 		private void OnQuickFilterNotBefore()
@@ -834,7 +836,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		private bool CanQuickFilterNotAfter()
 		{
-			return SelectedItems.Count == 1;
+			return SelectedItems != null && SelectedItems.Count == 1;
 		}
 
 		private void OnQuickFilterNotAfter()
@@ -878,7 +880,8 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		private bool CanQuickFilterExcludeText()
 		{
-			return SelectedItems.Count == 1 &&
+			return SelectedItems != null &&
+				SelectedItems.Count == 1 &&
 				(SelectedItems[0] is FieldLogTextItemViewModel || SelectedItems[0] is FieldLogExceptionItemViewModel);
 		}
 
@@ -1765,12 +1768,66 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			list.AddRange(App.Settings.RecentlyLoadedFiles
 				.Where(f => !f.Equals(loadedBasePath, StringComparison.OrdinalIgnoreCase)));
 			App.Settings.RecentlyLoadedFiles = list.ToArray();
+			SetJumpList();
+		}
 
-			//var jumpList = System.Windows.Shell.JumpList.GetJumpList(Application.Current);
-			//if (jumpList == null)
-			//    jumpList = new System.Windows.Shell.JumpList();
-			//jumpList.JumpItems.Add(new System.Windows.Shell.JumpPath() { Path = loadedBasePath, CustomCategory = "Recent logs" });
-			//System.Windows.Shell.JumpList.SetJumpList(Application.Current, jumpList);
+		/// <summary>
+		/// Sets the application's jump list with tasks and recently loaded logs.
+		/// </summary>
+		private void SetJumpList()
+		{
+			var jumpList = new JumpList();
+			// Add tasks first, they appear after recent logs (added below)
+			jumpList.JumpItems.Add(
+				new JumpTask
+				{
+					Title = "Wait for announcement",
+					ApplicationPath = FL.EntryAssemblyLocation,
+					Arguments = "/w",
+					IconResourcePath = FL.EntryAssemblyLocation,
+					IconResourceIndex = 0
+				});
+
+			Dictionary<string, int> prefixCount = new Dictionary<string, int>();
+			foreach (var path in App.Settings.RecentlyLoadedFiles)
+			{
+				string prefix = Path.GetFileName(path);
+				string dir = Path.GetDirectoryName(path);
+
+				if (prefixCount.ContainsKey(prefix))
+				{
+					prefixCount[prefix]++;
+				}
+				else
+				{
+					prefixCount[prefix] = 1;
+				}
+			}
+			foreach (var path in App.Settings.RecentlyLoadedFiles)
+			{
+				string prefix = Path.GetFileName(path);
+				string dir = Path.GetDirectoryName(path);
+
+				string title = prefix;
+				if (prefixCount[prefix] > 1)
+				{
+					// Make title unique by adding the directory
+					title += " in " + dir;
+				}
+
+				jumpList.JumpItems.Add(
+					new JumpTask
+					{
+						CustomCategory = "Recent logs",
+						Title = title,
+						ApplicationPath = FL.EntryAssemblyLocation,
+						Arguments = path,
+						IconResourcePath = FL.EntryAssemblyLocation,
+						IconResourceIndex = 1,
+						Description = path
+					});
+			}
+			JumpList.SetJumpList(Application.Current, jumpList);
 		}
 
 		/// <summary>

@@ -37,8 +37,10 @@
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type ToggleButton}">
-					<Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-						<Polygon x:Name="Polygon" Fill="Black" Points="0,0 6,0 3,4"/>
+					<Grid Background="{TemplateBinding Background}">
+						<Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+							<Polygon x:Name="Polygon" Fill="Black" Points="0,0 6,0 3,4"/>
+						</Grid>
 					</Grid>
 					<ControlTemplate.Triggers>
 						<Trigger Property="IsChecked" Value="true">
@@ -51,13 +53,13 @@
 	</Style>
 
 	<Style x:Key="HeaderButtonStyle" TargetType="{x:Type Button}">
-		<Setter Property="Background" Value="Transparent"/>
 		<Setter Property="OverridesDefaultStyle" Value="True"/>
 		<Setter Property="FocusVisualStyle" Value="{x:Null}"/>
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type Button}">
-					<Grid>
+					<Grid
+						Background="{TemplateBinding Background}">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition MinWidth="14" Width="Auto"/>
 							<ColumnDefinition/>
@@ -72,7 +74,7 @@
 							Grid.Column="0"/>
 						<Border Background="Transparent">
 							<ContentPresenter
-								Name="PART_ContentSite" 
+								Name="PART_ContentSite"
 								Margin="{TemplateBinding Control.Padding}"
 								HorizontalAlignment="{TemplateBinding Control.HorizontalContentAlignment}"
 								VerticalAlignment="{TemplateBinding Control.VerticalContentAlignment}"
@@ -125,18 +127,19 @@
 									<ColumnDefinition Width="*"/>
 									<ColumnDefinition Width="1"/>
 									<ColumnDefinition Width="12"/>
-									<!--ColumnDefinition 
+									<!--ColumnDefinition
 										MaxWidth="{DynamicResource {x:Static SystemParameters.HorizontalScrollBarButtonWidthKey}}"
 										MinWidth="{DynamicResource {x:Static SystemParameters.HorizontalScrollBarButtonWidthKey}}"/-->
 								</Grid.ColumnDefinitions>
 								<Button
-									Name="PART_Button" 
+									Name="PART_Button"
 									Focusable="False"
-									Style="{StaticResource HeaderButtonStyle}" 
+									Style="{StaticResource HeaderButtonStyle}"
+									Background="Transparent"
 									Padding="{TemplateBinding Control.Padding}"
 									SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
 									ContentTemplate="{TemplateBinding HeaderTemplate}"
-									ContentTemplateSelector="{TemplateBinding HeaderTemplateSelector}" 
+									ContentTemplateSelector="{TemplateBinding HeaderTemplateSelector}"
 									Content="{TemplateBinding Header}"
 									Grid.Column="0"/>
 								<Rectangle Fill="{TemplateBinding BorderBrush}" Grid.Column="1" Visibility="Hidden" Name="separator"/>
@@ -144,8 +147,10 @@
 									Grid.Column="2"
 									Focusable="False"
 									Name="PART_DropDownButton"
+									Background="Transparent"
 									Style="{StaticResource ExpanderStyle}"/>
-								<ToggleButton 
+								<ToggleButton
+									Name="DummyDropDownButton"
 									Style="{StaticResource DummyToggleButton}"
 									ClickMode="Press"
 									Grid.Column="2"
@@ -153,23 +158,34 @@
 									IsChecked="{Binding Path=IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"/>
 							</Grid>
 						</Border>
-						<Popup 
+						<Popup
 							Name="PART_Popup"
 							Placement="Bottom"
 							VerticalOffset="-1"
-							IsOpen="{Binding Path=IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" 
+							IsOpen="{Binding Path=IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
 							AllowsTransparency="True"
-							Focusable="False" 
+							Focusable="False"
 							PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}">
-							<Border 
+							<Border
+								Name="PopupBorder"
 								BorderThickness="1"
 								BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"
 								Background="{DynamicResource {x:Static SystemColors.MenuBrushKey}}"
+								Padding="2"
 								UseLayoutRounding="True">
-								<ItemsPresenter 
-									KeyboardNavigation.DirectionalNavigation="Cycle" 
-									KeyboardNavigation.TabNavigation="Cycle" 
-									SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+								<Grid>
+									<Border
+										HorizontalAlignment="Left" Width="29"
+										Background="#04000000"
+										BorderThickness="0,0,1,0" BorderBrush="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}"/>
+									<Border
+										HorizontalAlignment="Left" Margin="29,0,0,0"
+										BorderThickness="0,0,1,0" BorderBrush="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}"/>
+									<ItemsPresenter
+										KeyboardNavigation.DirectionalNavigation="Cycle"
+										KeyboardNavigation.TabNavigation="Cycle"
+										SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+								</Grid>
 							</Border>
 						</Popup>
 					</Grid>
@@ -181,7 +197,23 @@
 						</Trigger>
 						<Trigger Property="IsPressed" SourceName="PART_Button" Value="True">
 							<Setter Property="BorderBrush" Value="#62A2E4"/>
-							<Setter Property="Background" Value="#C9E0F7"/>
+							<Setter Property="Background" TargetName="PART_Button" Value="#C9E0F7"/>
+						</Trigger>
+						<Trigger Property="IsPressed" SourceName="DummyDropDownButton" Value="True">
+							<Setter Property="BorderBrush" Value="#62A2E4"/>
+							<Setter Property="Background" TargetName="PART_DropDownButton" Value="#C9E0F7"/>
+						</Trigger>
+						<Trigger Property="IsChecked" SourceName="DummyDropDownButton" Value="True">
+							<Setter Property="BorderBrush" Value="#62A2E4"/>
+							<Setter Property="Background" TargetName="PART_DropDownButton" Value="#C9E0F7"/>
+						</Trigger>
+						<Trigger Property="HasDropShadow" SourceName="PART_Popup" Value="True">
+							<Setter Property="Margin" TargetName="PopupBorder" Value="8"/>
+							<Setter Property="Effect" TargetName="PopupBorder">
+								<Setter.Value>
+									<DropShadowEffect BlurRadius="4" Color="Black" Direction="315" Opacity="0.6" ShadowDepth="2"/>
+								</Setter.Value>
+							</Setter>
 						</Trigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>

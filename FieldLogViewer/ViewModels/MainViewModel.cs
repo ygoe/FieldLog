@@ -129,11 +129,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 				}
 				catch (Exception ex)
 				{
-					MessageBox.Show(
-						"A filter could not be restored from the settings.\n" + ex.Message,
-						"Error",
-						MessageBoxButton.OK,
-						MessageBoxImage.Warning);
+					App.ErrorMessage("A filter could not be restored from the settings.", ex, "Loading filters");
 					continue;
 				}
 				Filters.Add(f);
@@ -437,11 +433,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			{
 				if (!SelectedFilter.IsQuickFilter)
 				{
-					if (MessageBox.Show(
-						"Would you like to delete the selected filter “" + SelectedFilter.DisplayName + "”?",
-						"FieldLogViewer",
-						MessageBoxButton.YesNo,
-						MessageBoxImage.Question) == MessageBoxResult.Yes)
+					if (App.YesNoQuestion("Would you like to delete the selected filter “" + SelectedFilter.DisplayName + "”?"))
 					{
 						FilterViewModel filter = SelectedFilter;
 						SelectedFilter = Filters[0];
@@ -1145,13 +1137,20 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			get { return localDebugMonitor.IsActive; }
 			set
 			{
-				if (value)
+				try
 				{
-					localDebugMonitor.TryStart();
+					if (value)
+					{
+						localDebugMonitor.TryStart();
+					}
+					else
+					{
+						localDebugMonitor.Stop();
+					}
 				}
-				else
+				catch (Exception ex)
 				{
-					localDebugMonitor.Stop();
+					App.WarningMessage("The local debug message monitor could not be started.", ex, "Starting local DebugMonitor");
 				}
 				OnPropertyChanged("IsLocalDebugMonitorActive");
 			}
@@ -1162,13 +1161,20 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			get { return globalDebugMonitor.IsActive; }
 			set
 			{
-				if (value && OSInfo.IsCurrentUserLocalAdministrator())
+				try
 				{
-					globalDebugMonitor.TryStart();
+					if (value && OSInfo.IsCurrentUserLocalAdministrator())
+					{
+						globalDebugMonitor.TryStart();
+					}
+					else
+					{
+						globalDebugMonitor.Stop();
+					}
 				}
-				else
+				catch (Exception ex)
 				{
-					globalDebugMonitor.Stop();
+					App.WarningMessage("The global debug message monitor could not be started.", ex, "Starting global DebugMonitor");
 				}
 				OnPropertyChanged("IsGlobalDebugMonitorActive");
 			}
@@ -1781,23 +1787,15 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			if (basePath == null) throw new ArgumentNullException("basePath");
 			if (basePath.Equals(FL.LogFileBasePath, StringComparison.InvariantCultureIgnoreCase))
 			{
-				MessageBox.Show(
-					"You cannot open the log file that this instance of FieldLogViewer is currently writing to.\n\n" +
-						"Trying to read the messages that may be generated while reading messages leads to a locking situation.",
-					"Error",
-					MessageBoxButton.OK,
-					MessageBoxImage.Warning);
+				App.WarningMessage("You cannot open the log file that this instance of FieldLogViewer is currently writing to.\n\n" +
+					"Trying to read the messages that may be generated while reading messages leads to a locking situation.");
 				return;
 			}
 			if (!Directory.Exists(Path.GetDirectoryName(basePath)))
 			{
-				MessageBox.Show(
-					"The directory of the log file path does not exist. If you expect log files to be created here, " +
-						"please create the directory now or retry loading when a file has been created.\n\n" +
-						"Selected base path: " + basePath,
-					"Error",
-					MessageBoxButton.OK,
-					MessageBoxImage.Warning);
+				App.WarningMessage("The directory of the log file path does not exist. If you expect log files to be created here, " +
+					"please create the directory now or retry loading when a file has been created.\n\n" +
+					"Selected base path: " + basePath);
 				return;
 			}
 

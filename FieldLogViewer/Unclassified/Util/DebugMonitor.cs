@@ -188,6 +188,11 @@ namespace Unclassified.Util
 				{
 					throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to create event 'DBWIN_BUFFER_READY'");
 				}
+				if (WaitForSingleObject(ackEvent, 0) == WAIT_OBJECT_0)
+				{
+					CloseHandle(ackEvent);
+					throw new InvalidOperationException("Another process is already listening for debug messages.");
+				}
 
 				readyEvent = CreateEvent(ref sa, false, false, prefix + "DBWIN_DATA_READY");
 				if (readyEvent == IntPtr.Zero)
@@ -222,10 +227,12 @@ namespace Unclassified.Util
 				if (monitorThread != null)
 				{
 					cancelRequested = true;
+					Thread.MemoryBarrier();   // Update cancelRequested in the monitor thread
 					PulseEvent(readyEvent);
 					monitorThread.Join();
 					monitorThread = null;
 				}
+				Dispose();
 			}
 		}
 
@@ -246,8 +253,18 @@ namespace Unclassified.Util
 				{
 					SetEvent(ackEvent);
 
-					int ret = WaitForSingleObject(readyEvent, INFINITE);
+					// We could wait for INFINITE instead but that may block the process wanting to
+					// stop a DebugMonitor if another process has also started a DebugMonitor. The
+					// readyEvent is then caught by the other process (that should ignore the false
+					// message) but this one won't unblock. That's why we have a maximum time until
+					// cancelRequested is checked in any case.
+					int ret = WaitForSingleObject(readyEvent, 1000);
+					// A more complete approach would be waiting for multiple objects and maintain a
+					// separate event (local to each process) in order to unblock and stop the
+					// monitor. The Stop method would then pulse the separate event instead of the
+					// shared readyEvent. This is left to do for the future...
 
+					Thread.MemoryBarrier();   // Update cancelRequested from the control/UI thread
 					if (cancelRequested)
 						break;
 
@@ -272,7 +289,11 @@ namespace Unclassified.Util
 		/// <param name="text">The message text.</param>
 		private void OnMessageReceived(int pid, string text)
 		{
-			if (MessageReceived != null)
+			// pid zero can sometimes be observed when starting DebugMonitor in multiple processes
+			// and then stopping one of them. The other process may catch the readyEvent that should
+			// unblock the stopping process and mistake it for a real message when there's no data
+			// in the memory. Ignore such false messages.
+			if (MessageReceived != null && pid != 0)
 			{
 				MessageReceived(pid, text);
 			}

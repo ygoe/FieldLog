@@ -158,5 +158,107 @@ namespace Unclassified.FieldLogViewer
 		}
 
 		#endregion Settings
+
+		#region Message dialog methods
+
+		private static string messageBoxTitle = "FieldLogViewer";
+		private static string unexpectedError = "An unexpected error occured.";
+		private static string detailsLogged = "Details are written to the error log file.";
+		//private static string unexpectedError = "Ein unerwarteter Fehler ist aufgetreten.";
+		//private static string detailsLogged = "Details wurden im Fehlerprotokoll aufgezeichnet.";
+
+		public static void InformationMessage(string message)
+		{
+			FL.Info(message);
+			MessageBox.Show(message, messageBoxTitle, MessageBoxButton.OK, MessageBoxImage.Information);
+		}
+
+		public static void WarningMessage(string message)
+		{
+			FL.Warning(message);
+			MessageBox.Show(message, messageBoxTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+		}
+
+		public static void WarningMessage(string message, Exception ex, string context)
+		{
+			FL.Warning(ex, context);
+			string exMsg = ex.Message;
+			var aex = ex as AggregateException;
+			if (aex != null && aex.InnerExceptions.Count == 1)
+			{
+				exMsg = aex.InnerExceptions[0].Message;
+			}
+			if (message == null)
+			{
+				message = unexpectedError;
+			}
+			MessageBox.Show(
+				message + " " + exMsg,
+				messageBoxTitle,
+				MessageBoxButton.OK,
+				MessageBoxImage.Warning);
+		}
+
+		public static void ErrorMessage(string message)
+		{
+			FL.Error(message);
+			MessageBox.Show(message, messageBoxTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+		}
+
+		public static void ErrorMessage(string message, Exception ex, string context)
+		{
+			FL.Error(ex, context);
+			string exMsg = ex.Message;
+			var aex = ex as AggregateException;
+			if (aex != null && aex.InnerExceptions.Count == 1)
+			{
+				exMsg = aex.InnerExceptions[0].Message;
+			}
+			if (message == null)
+			{
+				message = unexpectedError;
+			}
+			MessageBox.Show(
+				message + " " + exMsg + "\n\n" + detailsLogged,
+				messageBoxTitle,
+				MessageBoxButton.OK,
+				MessageBoxImage.Error);
+		}
+
+		public static bool YesNoQuestion(string message)
+		{
+			FL.Trace(message);
+			var result = MessageBox.Show(message, messageBoxTitle, MessageBoxButton.YesNo, MessageBoxImage.Question);
+			FL.Trace("Answer: " + result);
+			return result == MessageBoxResult.Yes;
+		}
+
+		public static bool YesNoInformation(string message)
+		{
+			FL.Info(message);
+			var result = MessageBox.Show(message, messageBoxTitle, MessageBoxButton.YesNo, MessageBoxImage.Information);
+			FL.Trace("Answer: " + result);
+			return result == MessageBoxResult.Yes;
+		}
+
+		public static bool YesNoWarning(string message)
+		{
+			FL.Warning(message);
+			var result = MessageBox.Show(message, messageBoxTitle, MessageBoxButton.YesNo, MessageBoxImage.Warning);
+			FL.Trace("Answer: " + result);
+			return result == MessageBoxResult.Yes;
+		}
+
+		public static bool? YesNoCancelQuestion(string message)
+		{
+			FL.Trace(message);
+			var result = MessageBox.Show(message, messageBoxTitle, MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+			FL.Trace("Answer: " + result);
+			if (result == MessageBoxResult.Yes) return true;
+			if (result == MessageBoxResult.No) return false;
+			return null;
+		}
+
+		#endregion Message dialog methods
 	}
 }

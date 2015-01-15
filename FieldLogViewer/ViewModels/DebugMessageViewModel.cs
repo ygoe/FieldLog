@@ -162,12 +162,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 				}
 				catch (Exception ex)
 				{
-					FL.Error(ex, "Loading log files from DebugOutputString notification");
-					MessageBox.Show(
-						"Error loading the specified log files. " + ex.Message + "\nSee the log file for details.",
-						"FieldLogViewer",
-						MessageBoxButton.OK,
-						MessageBoxImage.Error);
+					App.ErrorMessage("Error loading the specified log files.", ex, "Loading log files from DebugOutputString notification");
 				}
 			}
 		}

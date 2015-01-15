@@ -381,7 +381,12 @@ namespace Unclassified.FieldLogViewer.Views
 			bool showWarningsErrors = App.Settings.ShowWarningsErrorsInScrollBar;
 			bool showSelection = App.Settings.ShowSelectionInScrollBar;
 
-			if (!showWarningsErrors && !showSelection) return;   // Nothing to do
+			if (!showWarningsErrors && !showSelection)
+			{
+				// Nothing to display, but clear anything that may already be there
+				ClearScrollmap();
+				return;
+			}
 
 			double itemOffset = 0;
 			double itemHeight = logItemsHostPanel.ItemHeight;

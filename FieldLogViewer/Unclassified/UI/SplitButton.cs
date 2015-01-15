@@ -22,6 +22,11 @@ namespace Unclassified.UI
 
 		private static readonly RoutedEvent ButtonClickEvent;
 
+		/// <summary>
+		/// A reference to the single SplitButton that has an opened submenu.
+		/// </summary>
+		private static SplitButton openSplitButton;
+
 		static SplitButton()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(SplitButton), new FrameworkPropertyMetadata(typeof(SplitButton)));
@@ -48,6 +53,12 @@ namespace Unclassified.UI
 			SplitButton splitButton = sender as SplitButton;
 			if ((bool) e.NewValue)
 			{
+				openSplitButton = splitButton;
+
+				// Handle keyboard events as long as the popup is displayed
+				var window = Window.GetWindow(splitButton);
+				window.PreviewKeyDown += OnPreviewKeyDown;
+
 				if (Mouse.Captured != splitButton)
 				{
 					Mouse.Capture(splitButton, CaptureMode.SubTree);
@@ -56,6 +67,12 @@ namespace Unclassified.UI
 			}
 			else
 			{
+				// Remove popup keyboard handler
+				var window = Window.GetWindow(splitButton);
+				window.PreviewKeyDown -= OnPreviewKeyDown;
+
+				openSplitButton = null;
+
 				if (Mouse.Captured == splitButton)
 				{
 					Mouse.Capture(null);
@@ -75,6 +92,19 @@ namespace Unclassified.UI
 			splitButton.Dispatcher.BeginInvoke(
 				new Action(splitButton.CloseSubmenu),
 				System.Windows.Threading.DispatcherPriority.Input);
+		}
+
+		private static void OnPreviewKeyDown(object sender, KeyEventArgs e)
+		{
+			if (openSplitButton != null)
+			{
+				if (e.Key == Key.Escape ||
+					e.Key == Key.System)
+				{
+					openSplitButton.CloseSubmenu();
+					e.Handled = true;
+				}
+			}
 		}
 
 		/// <summary>

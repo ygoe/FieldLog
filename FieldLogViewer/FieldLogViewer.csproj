@@ -164,6 +164,9 @@
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="Unclassified\UI\ViewModelBase.cs" />
+    <Compile Include="Views\AboutWindow.xaml.cs">
+      <DependentUpon>AboutWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\DetailsMessageView.xaml.cs">
       <DependentUpon>DetailsMessageView.xaml</DependentUpon>
     </Compile>
@@ -220,6 +223,10 @@
     <Page Include="Resources\SplitButton.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\AboutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\DetailsMessageView.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -364,6 +371,9 @@
     <Resource Include="Images\Windows_System.png" />
     <Resource Include="Images\Windows_System_14.png" />
     <Resource Include="Images\Windows_User_14.png" />
+    <Resource Include="Images\FieldLog_256.png" />
+    <Resource Include="Images\about.png" />
+    <Resource Include="Images\settings.png" />
     <Content Include="Sounds\high.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

@@ -1,0 +1,51 @@
+﻿<Window
+	x:Class="Unclassified.FieldLogViewer.Views.AboutWindow"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	TextOptions.TextFormattingMode="Display"
+	UseLayoutRounding="True"
+	ShowInTaskbar="False"
+	Title="About FieldLogViewer"
+	Height="240" Width="370" ResizeMode="NoResize"
+	WindowStartupLocation="CenterOwner"
+	Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+
+	<Grid Margin="10">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto"/>
+			<ColumnDefinition Width="*"/>
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
+		
+		<Image
+			Grid.Row="0" Grid.Column="0" Grid.RowSpan="2"
+			VerticalAlignment="Top" Width="64" Height="64"
+			Source="/Images/FieldLog_256.png"/>
+		
+		<TextBlock
+			Grid.Row="0" Grid.Column="1" VerticalAlignment="Top" Margin="16,7,0,0"
+			FontSize="24" FontWeight="SemiBold"
+			Text="FieldLogViewer"/>
+
+		<TextBlock
+			Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" Margin="16,8,0,0"
+			TextWrapping="Wrap" FontStyle="Italic"
+			Text="Fast and comprehensive logging tool for .NET applications."/>
+
+		<TextBlock
+			Grid.Row="2" Grid.Column="1" VerticalAlignment="Top" Margin="16,8,0,24">
+			<Run>© by Yves Goergen</Run><LineBreak/>
+			<Hyperlink Click="Hyperlink_Click">unclassified.software/fieldlog</Hyperlink>
+		</TextBlock>
+
+		<Button
+			Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right"
+			MinWidth="75" IsDefault="True" IsCancel="True"
+			Content="OK"/>
+	</Grid>
+</Window>

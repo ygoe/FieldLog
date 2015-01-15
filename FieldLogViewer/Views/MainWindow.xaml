@@ -69,6 +69,7 @@
 					<ColumnDefinition Width="Auto"/>
 					<ColumnDefinition Width="Auto"/>
 					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
 				</Grid.ColumnDefinitions>
 
 				<ui:SplitButton
@@ -202,7 +203,7 @@
 				</TextBlock>
 				<TextBlock
 					Grid.Column="26"
-					Margin="0,0,0,0" VerticalAlignment="Center" Text="/"/>
+					Margin="2,0,2,0" VerticalAlignment="Center" Text="/"/>
 				<TextBlock
 					Grid.Column="27"
 					Margin="0,0,4,0" VerticalAlignment="Center" TextAlignment="Right" MinWidth="45">
@@ -213,7 +214,13 @@
 					Grid.Column="29"
 					Command="{Binding SettingsCommand}" ToolTip="Settings" ToolTipService.ShowOnDisabled="True"
 					Style="{StaticResource ToolButtonStyle}" Focusable="False">
-					<ui:MenuIconImage Source="/Images/gear.png"/>
+					<ui:MenuIconImage Source="/Images/settings.png"/>
+				</Button>
+				<Button
+					Grid.Column="30"
+					Command="{Binding AboutCommand}" ToolTip="About" ToolTipService.ShowOnDisabled="True"
+					Style="{StaticResource ToolButtonStyle}" Focusable="False">
+					<ui:MenuIconImage Source="/Images/about.png"/>
 				</Button>
 			</Grid>
 		</Border>

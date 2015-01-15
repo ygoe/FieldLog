@@ -225,6 +225,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		public DelegateCommand DeleteFilterCommand { get; private set; }
 		public DelegateCommand ClearSearchTextCommand { get; private set; }
 		public DelegateCommand SettingsCommand { get; private set; }
+		public DelegateCommand AboutCommand { get; private set; }
 
 		// Log items list context menu commands
 		public DelegateCommand QuickFilterSessionCommand { get; private set; }
@@ -255,6 +256,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			DeleteFilterCommand = new DelegateCommand(OnDeleteFilter, CanDeleteFilter);
 			ClearSearchTextCommand = new DelegateCommand(OnClearSearchText);
 			SettingsCommand = new DelegateCommand(OnSettings);
+			AboutCommand = new DelegateCommand(OnAbout);
 
 			QuickFilterSessionCommand = new DelegateCommand(OnQuickFilterSession, CanQuickFilterSession);
 			QuickFilterThreadCommand = new DelegateCommand(OnQuickFilterThread, CanQuickFilterThread);
@@ -485,6 +487,15 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			{
 				openSettingsWindow.Focus();
 			}
+		}
+
+		private void OnAbout()
+		{
+			new AboutWindow
+				{
+					Owner = MainWindow.Instance
+				}
+				.ShowDialog();
 		}
 
 		#endregion Toolbar command handlers

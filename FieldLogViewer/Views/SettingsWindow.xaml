@@ -207,6 +207,7 @@
 															<TextBox
 																Grid.Column="4" Margin="4,0,0,0"
 																Visibility="{Binding ValueTextVisibility}"
+																Background="{Binding ValueBackground}"
 																Text="{Binding Value}"
 																ui:TextBoxExtensions.UpdateDelay="500"
 																Opacity="{Binding Opacity}"/>

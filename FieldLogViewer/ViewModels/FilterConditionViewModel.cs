@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Media;
 using Unclassified.FieldLog;
 using Unclassified.UI;
 
@@ -115,6 +116,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			{
 				if (SetValue(value, "Comparison"))
 				{
+					ValidateValue();
 					OnFilterChanged(true);
 				}
 			}
@@ -127,6 +129,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			{
 				if (SetValue(value, "Value"))
 				{
+					ValidateValue();
 					OnFilterChanged(true);
 				}
 			}
@@ -320,6 +323,28 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		public double Opacity
 		{
 			get { return IsEnabled ? 1.0 : 0.4; }
+		}
+
+		public bool IsValid
+		{
+			get { return GetValue<bool>("IsValid"); }
+			set { SetValue(value, "IsValid"); }
+		}
+
+		[NotifiesOn("IsValid")]
+		public object ValueBackground
+		{
+			get
+			{
+				if (IsValid)
+				{
+					return SystemColors.WindowBrush;
+				}
+				else
+				{
+					return Brushes.MistyRose;
+				}
+			}
 		}
 
 		#endregion Data properties
@@ -1115,7 +1140,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 					return str != null && str.ToLower().EndsWith((Value ?? "").ToLower());
 				case FilterComparison.Regex:
 				case FilterComparison.NotRegex:
-					return Regex.IsMatch(str ?? "", Value ?? "", RegexOptions.IgnoreCase);
+					return IsValid && Regex.IsMatch(str ?? "", Value ?? "", RegexOptions.IgnoreCase);
 				case FilterComparison.InList:
 				case FilterComparison.NotInList:
 					return Value.Split(';').Any(s => s.Trim() == (str ?? "").Trim());
@@ -1259,6 +1284,31 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		}
 
 		#endregion Duplicate
+
+		#region Input validation
+
+		private void ValidateValue()
+		{
+			if (Comparison == FilterComparison.Regex ||
+				Comparison == FilterComparison.NotRegex)
+			{
+				try
+				{
+					new Regex(Value);
+					IsValid = true;
+				}
+				catch
+				{
+					IsValid = false;
+				}
+			}
+			else
+			{
+				IsValid = true;
+			}
+		}
+
+		#endregion Input validation
 	}
 
 	#region Filter definition enums

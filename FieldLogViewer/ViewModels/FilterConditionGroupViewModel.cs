@@ -33,6 +33,15 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		#endregion Constructor
 
+		#region Overridden methods
+
+		public override string ToString()
+		{
+			return GetType().Name + ": " + Conditions.Count + " conditions" + (IsExclude ? " (exclude)" : "");
+		}
+
+		#endregion Overridden methods
+
 		#region Event handlers
 
 		private bool isReordering;

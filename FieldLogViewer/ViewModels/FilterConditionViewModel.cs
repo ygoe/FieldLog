@@ -32,6 +32,15 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		#endregion Constructor
 
+		#region Overridden methods
+
+		public override string ToString()
+		{
+			return Column + " " + Comparison + " " + Value;
+		}
+
+		#endregion Overridden methods
+
 		#region Commands
 
 		public DelegateCommand DeleteCommand { get; private set; }

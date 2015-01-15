@@ -491,6 +491,8 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		#region Log items list context menu command handlers
 
+		private static string quickFilterSuffix = "*";
+
 		private FilterViewModel GetQuickFilter(out bool isNew, bool leaveEmpty = false)
 		{
 			isNew = false;
@@ -553,16 +555,23 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			switch (typeCount)
 			{
 				case 1:
-					filter.DisplayName = singlePrefix + values.First();
+					filter.DisplayName = singlePrefix + values.First() + quickFilterSuffix;
 					break;
 				default:
-					filter.DisplayName = multiPrefix + values.Aggregate(", ", " and ");
+					filter.DisplayName = multiPrefix + values.Aggregate(", ", " and ") + quickFilterSuffix;
 					break;
 			}
 			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
 			{
 				// Remove all existing conditions
 				cg.Conditions.Filter(c => c.Column != filterColumn);
+			}
+			if (filter.ConditionGroups.Count == 0)
+			{
+				filter.ConditionGroups.Add(new FilterConditionGroupViewModel(filter));
+			}
+			foreach (var cg in filter.ConditionGroups)
+			{
 				if (!cg.IsExclude)
 				{
 					if (typeCount == 1)
@@ -617,16 +626,23 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			switch (sessionCount)
 			{
 				case 1:
-					filter.DisplayName = "By session";
+					filter.DisplayName = "By session" + quickFilterSuffix;
 					break;
 				default:
-					filter.DisplayName = "By " + sessionCount + " sessions";
+					filter.DisplayName = "By " + sessionCount + " sessions" + quickFilterSuffix;
 					break;
 			}
 			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
 			{
 				// Remove all session and thread ID conditions
 				cg.Conditions.Filter(c => c.Column != FilterColumn.SessionId);
+			}
+			if (filter.ConditionGroups.Count == 0)
+			{
+				filter.ConditionGroups.Add(new FilterConditionGroupViewModel(filter));
+			}
+			foreach (var cg in filter.ConditionGroups)
+			{
 				if (!cg.IsExclude)
 				{
 					if (sessionCount == 1)
@@ -672,10 +688,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			switch (threadCount)
 			{
 				case 1:
-					filter.DisplayName = "Thread ID " + SelectedItemsThreadIds.First();
+					filter.DisplayName = "Thread ID " + SelectedItemsThreadIds.First() + quickFilterSuffix;
 					break;
 				default:
-					filter.DisplayName = "Thread IDs " + SelectedItemsThreadIds.Aggregate(", ", " and ");
+					filter.DisplayName = "Thread IDs " + SelectedItemsThreadIds.Aggregate(", ", " and ") + quickFilterSuffix;
 					break;
 			}
 			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
@@ -683,6 +699,13 @@ namespace Unclassified.FieldLogViewer.ViewModels
 				// Remove all session and thread ID conditions
 				cg.Conditions.Filter(c => c.Column != FilterColumn.SessionId);
 				cg.Conditions.Filter(c => c.Column != FilterColumn.ThreadId);
+			}
+			if (filter.ConditionGroups.Count == 0)
+			{
+				filter.ConditionGroups.Add(new FilterConditionGroupViewModel(filter));
+			}
+			foreach (var cg in filter.ConditionGroups)
+			{
 				if (!cg.IsExclude)
 				{
 					cg.Conditions.Add(new FilterConditionViewModel(cg)
@@ -730,11 +753,18 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		{
 			bool isNew;
 			var filter = GetQuickFilter(out isNew);
-			filter.DisplayName = "Type " + EnumerationExtension<FilterItemType>.GetDescription(SelectedItemFilterItemType);
+			filter.DisplayName = "Type " + EnumerationExtension<FilterItemType>.GetDescription(SelectedItemFilterItemType) + quickFilterSuffix;
 			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
 			{
 				// Remove all type conditions
 				cg.Conditions.Filter(c => c.Column != FilterColumn.Type);
+			}
+			if (filter.ConditionGroups.Count == 0)
+			{
+				filter.ConditionGroups.Add(new FilterConditionGroupViewModel(filter));
+			}
+			foreach (var cg in filter.ConditionGroups)
+			{
 				if (!cg.IsExclude)
 				{
 					cg.Conditions.Add(new FilterConditionViewModel(cg)
@@ -765,11 +795,18 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			FieldLogItemViewModel flItem = SelectedItems[0] as FieldLogItemViewModel;
 			bool isNew;
 			var filter = GetQuickFilter(out isNew);
-			filter.DisplayName = "Priority " + flItem.PrioTitle + " or higher";
+			filter.DisplayName = "Priority " + flItem.PrioTitle + " or higher" + quickFilterSuffix;
 			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
 			{
 				// Remove all priority conditions
 				cg.Conditions.Filter(c => c.Column != FilterColumn.Priority);
+			}
+			if (filter.ConditionGroups.Count == 0)
+			{
+				filter.ConditionGroups.Add(new FilterConditionGroupViewModel(filter));
+			}
+			foreach (var cg in filter.ConditionGroups)
+			{
 				if (!cg.IsExclude)
 				{
 					cg.Conditions.Add(new FilterConditionViewModel(cg)
@@ -799,11 +836,18 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		{
 			bool isNew;
 			var filter = GetQuickFilter(out isNew);
-			filter.DisplayName = "Not before...";
+			filter.DisplayName = "Not before..." + quickFilterSuffix;
 			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
 			{
 				// Remove all time conditions
 				cg.Conditions.Filter(c => c.Column != FilterColumn.Time);
+			}
+			if (filter.ConditionGroups.Count == 0)
+			{
+				filter.ConditionGroups.Add(new FilterConditionGroupViewModel(filter));
+			}
+			foreach (var cg in filter.ConditionGroups)
+			{
 				if (!cg.IsExclude)
 				{
 					DateTime itemTime = new DateTime(SelectedItems[0].Time.Ticks / 10 * 10);   // Round down to the next microsecond
@@ -843,11 +887,18 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		{
 			bool isNew;
 			var filter = GetQuickFilter(out isNew);
-			filter.DisplayName = "Not after...";
+			filter.DisplayName = "Not after..." + quickFilterSuffix;
 			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
 			{
 				// Remove all time conditions
 				cg.Conditions.Filter(c => c.Column != FilterColumn.Time);
+			}
+			if (filter.ConditionGroups.Count == 0)
+			{
+				filter.ConditionGroups.Add(new FilterConditionGroupViewModel(filter));
+			}
+			foreach (var cg in filter.ConditionGroups)
+			{
 				if (!cg.IsExclude)
 				{
 					DateTime itemTime = new DateTime((SelectedItems[0].Time.Ticks + 9) / 10 * 10);   // Round up to the next microsecond
@@ -889,7 +940,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		{
 			bool isNew;
 			var filter = GetQuickFilter(out isNew, true);
-			filter.DisplayName = "Exclude text";
+			filter.DisplayName = "Exclude text" + quickFilterSuffix;
 			var textItem = SelectedItems[0] as FieldLogTextItemViewModel;
 			var exItem = SelectedItems[0] as FieldLogExceptionItemViewModel;
 			string text = null;
@@ -961,10 +1012,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			switch (webRequestCount)
 			{
 				case 1:
-					filter.DisplayName = "Web request " + SelectedItemsWebRequestIds.First();
+					filter.DisplayName = "Web request " + SelectedItemsWebRequestIds.First() + quickFilterSuffix;
 					break;
 				default:
-					filter.DisplayName = "Web requests " + SelectedItemsWebRequestIds.Aggregate(", ", " and ");
+					filter.DisplayName = "Web requests " + SelectedItemsWebRequestIds.Aggregate(", ", " and ") + quickFilterSuffix;
 					break;
 			}
 			foreach (var cg in filter.ConditionGroups.ToList())   // Filtering conditions may remove the condition group, so enumerate a copy of the list
@@ -972,6 +1023,13 @@ namespace Unclassified.FieldLogViewer.ViewModels
 				// Remove all session and web request ID conditions
 				cg.Conditions.Filter(c => c.Column != FilterColumn.SessionId);
 				cg.Conditions.Filter(c => c.Column != FilterColumn.WebRequestId);
+			}
+			if (filter.ConditionGroups.Count == 0)
+			{
+				filter.ConditionGroups.Add(new FilterConditionGroupViewModel(filter));
+			}
+			foreach (var cg in filter.ConditionGroups)
+			{
 				if (!cg.IsExclude)
 				{
 					cg.Conditions.Add(new FilterConditionViewModel(cg)

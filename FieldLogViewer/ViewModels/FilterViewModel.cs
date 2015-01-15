@@ -38,6 +38,15 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		#endregion Constructors
 
+		#region Overridden methods
+
+		public override string ToString()
+		{
+			return GetType().Name + ": " + DisplayName + " (" + ConditionGroups.Count + " condition groups)";
+		}
+
+		#endregion Overridden methods
+
 		#region Event handlers
 
 		private bool isLoading;
@@ -52,7 +61,13 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 			else if (!isLoading && !isReordering)
 			{
-				Dispatcher.CurrentDispatcher.BeginInvoke((Action) OnCreateConditionGroup, DispatcherPriority.Normal);
+				// Later add an empty condition group, if none has been added until then
+				Dispatcher.CurrentDispatcher.BeginInvoke(
+					new Action(() =>
+						{
+							if (ConditionGroups.Count == 0) OnCreateConditionGroup();
+						}),
+					DispatcherPriority.Normal);
 			}
 		}
 

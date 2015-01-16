@@ -24,12 +24,14 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		public DelegateCommand CreateFilterCommand { get; private set; }
 		public DelegateCommand DuplicateFilterCommand { get; private set; }
 		public DelegateCommand DeleteFilterCommand { get; private set; }
+		public DelegateCommand ResetFiltersCommand { get; private set; }
 
 		protected override void InitializeCommands()
 		{
 			CreateFilterCommand = new DelegateCommand(OnCreateFilter);
 			DuplicateFilterCommand = new DelegateCommand(OnDuplicateFilter, CanDuplicateFilter);
 			DeleteFilterCommand = new DelegateCommand(OnDeleteFilter, CanDeleteFilter);
+			ResetFiltersCommand = new DelegateCommand(OnResetFilters);
 		}
 
 		private void OnCreateFilter()
@@ -61,6 +63,14 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			if (SelectedFilter != null)
 			{
 				MainViewModel.Instance.DeleteFilterCommand.Execute();
+			}
+		}
+
+		private void OnResetFilters()
+		{
+			if (App.YesNoQuestion("Do you want to delete all existing filters and recreate the default filters?"))
+			{
+				MainViewModel.Instance.ResetFilters();
 			}
 		}
 

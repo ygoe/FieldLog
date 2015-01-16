@@ -2577,7 +2577,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			Filters.Add(f);
 
 			f = new FilterViewModel();
-			f.DisplayName = "Relevant exceptions";
+			f.DisplayName = "Significant exceptions";
 			fcg = new FilterConditionGroupViewModel(f);
 			fc = new FilterConditionViewModel(fcg);
 			fc.Column = FilterColumn.Type;
@@ -2636,6 +2636,14 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			fcg.Conditions.Add(fc);
 			f.ConditionGroups.Add(fcg);
 			Filters.Add(f);
+		}
+
+		public void ResetFilters()
+		{
+			Filters.Clear();
+			Filters.Add(new FilterViewModel(true));
+			CreateBasicFilters();
+			SelectedFilter = Filters[0];
 		}
 
 		private void UpdateWindowTitle()

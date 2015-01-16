@@ -79,6 +79,7 @@
 						<ColumnDefinition Width="Auto"/>
 						<ColumnDefinition Width="Auto"/>
 						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
 					</Grid.ColumnDefinitions>
 
 					<TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Filter:"/>
@@ -106,8 +107,13 @@
 						Command="{Binding DeleteFilterCommand}"
 						Content="Delete"/>
 
+					<Button
+						Grid.Row="0" Grid.Column="5" Margin="6,0,0,0" Padding="6,1"
+						Command="{Binding ResetFiltersCommand}"
+						Content="Reset"/>
+
 					<ScrollViewer
-						Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5"
+						Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="6"
 						Margin="0,8,0,0" VerticalScrollBarVisibility="Auto" Focusable="False"
 						Visibility="{Binding SelectedFilter.AcceptAll, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}">
 						<ScrollViewer.Resources>

@@ -85,6 +85,11 @@ namespace Unclassified.UI
 		#endregion Commands support
 
 		#region Property access methods
+		
+		// Ideas based on concept of Steve Cadwallader:
+		// http://www.codecadwallader.com/2013/04/05/inotifypropertychanged-1-of-3-without-the-strings/
+		// http://www.codecadwallader.com/2013/04/06/inotifypropertychanged-2-of-3-without-the-backing-fields/
+		// http://www.codecadwallader.com/2013/04/08/inotifypropertychanged-3-of-3-without-the-reversed-notifications/
 
 		/// <summary>
 		/// Stores the values for each property in the current object.
@@ -562,8 +567,17 @@ namespace Unclassified.UI
 
 		#region Dependent notifications
 
-		// TODO: Use static cache for this type, with locking during reflection (not for field access)
-		
+		/// <summary>
+		/// Contains dependent property relationships for all types. This is used to share the
+		/// reflection knowledge of a certain type among all its instances. Access is locked through
+		/// the field itself.
+		/// </summary>
+		private static Dictionary<Type, CollectionDictionary<string, string>> allDependentNotifications = new Dictionary<Type, CollectionDictionary<string, string>>();
+
+		/// <summary>
+		/// Contains all dependent property relationships of the current type. This is used for
+		/// lookup to have a local, lock-free copy for performance reasons.
+		/// </summary>
 		private CollectionDictionary<string, string> dependentNotifications;
 
 		/// <summary>
@@ -575,22 +589,29 @@ namespace Unclassified.UI
 			{
 				if (dependentNotifications == null)
 				{
-					dependentNotifications = new CollectionDictionary<string, string>();
-					foreach (var p in GetType().GetProperties())
+					lock (allDependentNotifications)
 					{
-						foreach (NotifiesOnAttribute a in p.GetCustomAttributes(typeof(NotifiesOnAttribute), false))
+						if (!allDependentNotifications.TryGetValue(GetType(), out dependentNotifications))
 						{
-							// Verify that the notified property actually exists in the current object. This can
-							// reveal misspelled properties and missing notifications. It's only checked in Debug
-							// builds for performance and stability reasons.
-#if DEBUG
-							if (!TypeDescriptor.GetProperties(this).OfType<PropertyDescriptor>().Any(d => d.Name == a.Name))
+							dependentNotifications = new CollectionDictionary<string, string>();
+							foreach (var p in GetType().GetProperties())
 							{
-								throw new ArgumentException("Specified property " + this.GetType().Name + "." + p.Name +
-									" to notify on non-existing property " + a.Name);
-							}
+								foreach (NotifiesOnAttribute a in p.GetCustomAttributes(typeof(NotifiesOnAttribute), false))
+								{
+									// Verify that the notified property actually exists in the current object. This can
+									// reveal misspelled properties and missing notifications. It's only checked in Debug
+									// builds for performance and stability reasons.
+#if DEBUG
+									if (!TypeDescriptor.GetProperties(this).OfType<PropertyDescriptor>().Any(d => d.Name == a.Name))
+									{
+										throw new ArgumentException("Specified property " + this.GetType().Name + "." + p.Name +
+											" to notify on non-existing property " + a.Name);
+									}
 #endif
-							dependentNotifications.Add(a.Name, p.Name);
+									dependentNotifications.Add(a.Name, p.Name);
+								}
+							}
+							allDependentNotifications[GetType()] = dependentNotifications;
 						}
 					}
 				}
@@ -602,8 +623,17 @@ namespace Unclassified.UI
 
 		#region Property changed handler methods
 
-		// TODO: Use static cache for this type, with locking during reflection (not for field access)
+		/// <summary>
+		/// Contains property changed handlers for all types. This is used to share the reflection
+		/// knowledge of a certain type among all its instances. Access is locked through the field
+		/// itself.
+		/// </summary>
+		private static Dictionary<Type, CollectionDictionary<string, Action>> allPropertyChangedHandlers = new Dictionary<Type, CollectionDictionary<string, Action>>();
 
+		/// <summary>
+		/// Contains all property changed handlers of the current type. This is used for lookup to
+		/// have a local, lock-free copy for performance reasons.
+		/// </summary>
 		private CollectionDictionary<string, Action> propertyChangedHandlers;
 
 		/// <summary>
@@ -615,33 +645,40 @@ namespace Unclassified.UI
 			{
 				if (propertyChangedHandlers == null)
 				{
-					propertyChangedHandlers = new CollectionDictionary<string, Action>();
-					foreach (var method in GetType().GetMethods(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance))
+					lock (allPropertyChangedHandlers)
 					{
-						var m = method;
-						while (true)
+						if (!allPropertyChangedHandlers.TryGetValue(GetType(), out propertyChangedHandlers))
 						{
-							foreach (PropertyChangedHandlerAttribute a in m.GetCustomAttributes(typeof(PropertyChangedHandlerAttribute), false))
+							propertyChangedHandlers = new CollectionDictionary<string, Action>();
+							foreach (var method in GetType().GetMethods(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance))
 							{
-								// Verify that the notified property actually exists in the current object. This can
-								// reveal misspelled properties and missing notifications. It's only checked in Debug
-								// builds for performance and stability reasons.
-#if DEBUG
-								if (!TypeDescriptor.GetProperties(this).OfType<PropertyDescriptor>().Any(d => d.Name == a.Name))
+								var m = method;
+								while (true)
 								{
-									throw new ArgumentException("Specified method " + this.GetType().Name + "." + m.Name +
-										" to handle changes of non-existing property " + a.Name);
-								}
+									foreach (PropertyChangedHandlerAttribute a in m.GetCustomAttributes(typeof(PropertyChangedHandlerAttribute), false))
+									{
+										// Verify that the notified property actually exists in the current object. This can
+										// reveal misspelled properties and missing notifications. It's only checked in Debug
+										// builds for performance and stability reasons.
+#if DEBUG
+										if (!TypeDescriptor.GetProperties(this).OfType<PropertyDescriptor>().Any(d => d.Name == a.Name))
+										{
+											throw new ArgumentException("Specified method " + this.GetType().Name + "." + m.Name +
+												" to handle changes of non-existing property " + a.Name);
+										}
 #endif
-								Action action = (Action) Delegate.CreateDelegate(typeof(Action), this, m);
-								propertyChangedHandlers.Add(a.Name, action);
-							}
+										Action action = (Action) Delegate.CreateDelegate(typeof(Action), this, m);
+										propertyChangedHandlers.Add(a.Name, action);
+									}
 
-							// Check base methods for the attribute
-							if (!m.IsVirtual) break;
-							var baseMethod = m.GetBaseDefinition();
-							if (baseMethod == m) break;
-							m = baseMethod;
+									// Check base methods for the attribute
+									if (!m.IsVirtual) break;
+									var baseMethod = m.GetBaseDefinition();
+									if (baseMethod == m) break;
+									m = baseMethod;
+								}
+							}
+							allPropertyChangedHandlers[GetType()] = propertyChangedHandlers;
 						}
 					}
 				}

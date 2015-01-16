@@ -125,14 +125,14 @@ namespace Unclassified.UI
 		/// The order of actions is defined as the following:
 		/// <list type="number">
 		///   <item>Change property value, accessible through <see cref="GetValue"/></item>
-		///   <item>Call On...Changed method, if available</item>
+		///   <item>Call On…Changed method, if available</item>
 		///   <item>Raise <see cref="PropertyChanged"/> event for the property</item>
-		///   <item>Call On...Changed method and raise <see cref="PropertyChanged"/> event for
+		///   <item>Call On…Changed method and raise <see cref="PropertyChanged"/> event for
 		///     dependent properties in no particular order</item>
 		/// </list>
-		/// If code must be executed before the first event is raised, the On...Changed method is
-		/// the recommended place for that. This keeps the property setter clean and allows using
-		/// the default notification method.
+		/// If code must be executed before the first event is raised, the On…Changed method is the
+		/// recommended place for that. This keeps the property setter clean and allows using the
+		/// default notification method.
 		/// </remarks>
 		protected bool SetValue<T>(T newValue, [CallerMemberName] string propertyName = null)
 		{
@@ -158,14 +158,14 @@ namespace Unclassified.UI
 		/// The order of actions is defined as the following:
 		/// <list type="number">
 		///   <item>Change property value, accessible through <see cref="GetValue"/></item>
-		///   <item>Call On...Changed method, if available</item>
+		///   <item>Call On…Changed method, if available</item>
 		///   <item>Raise <see cref="PropertyChanged"/> event for the property</item>
-		///   <item>Call On...Changed method and raise <see cref="PropertyChanged"/> event for
+		///   <item>Call On…Changed method and raise <see cref="PropertyChanged"/> event for
 		///     dependent properties in no particular order</item>
 		/// </list>
-		/// If code must be executed before the first event is raised, the On...Changed method is
-		/// the recommended place for that. This keeps the property setter clean and allows using
-		/// the default notification method.
+		/// If code must be executed before the first event is raised, the On…Changed method is the
+		/// recommended place for that. This keeps the property setter clean and allows using the
+		/// default notification method.
 		/// </remarks>
 		protected bool SetValue<T>(T newValue, [CallerMemberName] string propertyName = null, params string[] additionalPropertyNames)
 		{
@@ -185,8 +185,18 @@ namespace Unclassified.UI
 		/// <param name="propertyName">The property name.</param>
 		/// <returns>true if the value was changed, otherwise false.</returns>
 		/// <remarks>
-		/// This method does not call On...Changed methods and does not raise the
+		/// <para>
+		/// This method does not call On…Changed methods and does not raise the
 		/// <see cref="PropertyChanged"/> event for the indicated or any dependent properties.
+		/// </para>
+		/// <para>
+		/// If you need to use this method to execute other code before the
+		/// <see cref="PropertyChanged"/> event may be raised for the property, and then call
+		/// <see cref="OnPropertyChanged"/> manually afterwards, you should consider moving this
+		/// pre-processing code out of the property setter into a separate On…Changed method
+		/// marked with the <see cref="PropertyChangedHandlerAttribute"/> and call the regular
+		/// <see cref="SetValue"/> method instead.
+		/// </para>
 		/// </remarks>
 		protected bool SetValueSuppressNotify<T>(T newValue, [CallerMemberName] string propertyName = null)
 		{
@@ -502,8 +512,7 @@ namespace Unclassified.UI
 			}
 #endif
 
-			// Call On...Changed methods that are marked with the [PropertyChangedHandler]
-			// attribute
+			// Call On…Changed methods that are marked with the [PropertyChangedHandler] attribute
 			foreach (var changeHandler in PropertyChangedHandlers.GetValuesOrEmpty(propertyName))
 			{
 				changeHandler();
@@ -518,8 +527,8 @@ namespace Unclassified.UI
 
 			// Also notify changes for dependent properties
 			// (This could be moved inside the (handler != null) check for improved performance, but
-			// then it could miss out On...Changed method calls for dependent properties, which
-			// might be a nice feature.)
+			// then it could miss out On…Changed method calls for dependent properties, which might
+			// be a nice feature.)
 			foreach (var dependentPropertyName in DependentNotifications.GetValuesOrEmpty(propertyName))
 			{
 				OnPropertyChanged(dependentPropertyName);

@@ -276,8 +276,6 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			LoadLogCommand.RaiseCanExecuteChanged();
 			StopLiveCommand.RaiseCanExecuteChanged();
 			ClearCommand.RaiseCanExecuteChanged();
-			LoadObfuscationMapCommand.RaiseCanExecuteChanged();
-			SettingsCommand.RaiseCanExecuteChanged();
 		}
 
 		private void InvalidateQuickFilterCommands()
@@ -1226,21 +1224,25 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			get { return GetValue<bool>("IsLoadingFiles"); }
 			set
 			{
-				if (SetValueSuppressNotify(value, "IsLoadingFiles"))
+				if (SetValue(value, "IsLoadingFiles"))
 				{
-					FL.TraceData("IsLoadingFiles", IsLoadingFiles);
-					if (IsLoadingFiles)
-					{
-						filteredLogItems.Source = null;
-					}
-					else
-					{
-						filteredLogItems.Source = logItems;
-						RefreshLogItemsFilterView();
-					}
-					OnPropertyChanged("IsLoadingFiles");
 					InvalidateToolbarCommandsLoading();
 				}
+			}
+		}
+
+		[PropertyChangedHandler("IsLoadingFiles")]
+		private void OnIsLoadingFilesChanged()
+		{
+			FL.TraceData("IsLoadingFiles", IsLoadingFiles);
+			if (IsLoadingFiles)
+			{
+				filteredLogItems.Source = null;
+			}
+			else
+			{
+				filteredLogItems.Source = logItems;
+				RefreshLogItemsFilterView();
 			}
 		}
 
@@ -1249,17 +1251,21 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			get { return GetValue<bool>("IsLoadingFilesAgain"); }
 			set
 			{
-				if (SetValueSuppressNotify(value, "IsLoadingFilesAgain"))
+				if (SetValue(value, "IsLoadingFilesAgain"))
 				{
-					FL.TraceData("IsLoadingFilesAgain", IsLoadingFilesAgain);
-					if (!IsLoadingFilesAgain)
-					{
-						filteredLogItems.Source = logItems;
-						RefreshLogItemsFilterView();
-					}
-					OnPropertyChanged("IsLoadingFilesAgain");
 					InvalidateToolbarCommandsLoading();
 				}
+			}
+		}
+
+		[PropertyChangedHandler("IsLoadingFilesAgain")]
+		private void OnIsLoadingFilesAgainChanged()
+		{
+			FL.TraceData("IsLoadingFilesAgain", IsLoadingFilesAgain);
+			if (!IsLoadingFilesAgain)
+			{
+				filteredLogItems.Source = logItems;
+				RefreshLogItemsFilterView();
 			}
 		}
 

@@ -43,8 +43,8 @@
 						</Grid>
 					</Grid>
 					<ControlTemplate.Triggers>
-						<Trigger Property="IsChecked" Value="true">
-							<Setter Property="Points" TargetName="Polygon" Value="0,6 8,6 4,0"/>
+						<Trigger Property="IsChecked" Value="True">
+							<Setter Property="Points" TargetName="Polygon" Value="0,4 6,4 3,0"/><!-- TODO: Unused? -->
 						</Trigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>
@@ -109,7 +109,8 @@
 		<Setter Property="Padding" Value="4"/>
 		<Setter Property="BorderThickness" Value="1"/>
 		<Setter Property="BorderBrush" Value="Transparent"/>
-		<Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+		<!--Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/-->
+		<Setter Property="Background" Value="Transparent"/>
 		<Setter Property="MinHeight" Value="{DynamicResource {x:Static SystemParameters.MenuButtonHeightKey}}"/>
 		<Setter Property="SnapsToDevicePixels" Value="True"/>
 		<Setter Property="Template">
@@ -166,27 +167,30 @@
 							AllowsTransparency="True"
 							Focusable="False"
 							PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}">
-							<Border
-								Name="PopupBorder"
-								BorderThickness="1"
-								BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"
-								Background="{DynamicResource {x:Static SystemColors.MenuBrushKey}}"
-								Padding="2"
-								UseLayoutRounding="True">
-								<Grid>
-									<Border
-										HorizontalAlignment="Left" Width="29"
-										Background="#04000000"
-										BorderThickness="0,0,1,0" BorderBrush="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}"/>
-									<Border
-										HorizontalAlignment="Left" Margin="29,0,0,0"
-										BorderThickness="0,0,1,0" BorderBrush="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}"/>
-									<ItemsPresenter
-										KeyboardNavigation.DirectionalNavigation="Cycle"
-										KeyboardNavigation.TabNavigation="Cycle"
-										SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
-								</Grid>
-							</Border>
+							<Grid Name="PopupGrid">
+								<!-- The shadow doesn't reach to the very top and left of the popup, so apply it on a slightly smaller Border -->
+								<Border Name="ShadowBorder" Margin="3,3,0,0" Background="Black"/>
+								<Border
+									BorderThickness="1"
+									BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"
+									Background="{DynamicResource {x:Static SystemColors.MenuBrushKey}}"
+									Padding="2"
+									UseLayoutRounding="True">
+									<Grid>
+										<Border
+											HorizontalAlignment="Left" Width="29"
+											Background="#04000000"
+											BorderThickness="0,0,1,0" BorderBrush="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}"/>
+										<Border
+											HorizontalAlignment="Left" Margin="29,0,0,0"
+											BorderThickness="0,0,1,0" BorderBrush="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}"/>
+										<ItemsPresenter
+											KeyboardNavigation.DirectionalNavigation="Cycle"
+											KeyboardNavigation.TabNavigation="Cycle"
+											SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+									</Grid>
+								</Border>
+							</Grid>
 						</Popup>
 					</Grid>
 					<ControlTemplate.Triggers>
@@ -208,8 +212,8 @@
 							<Setter Property="Background" TargetName="PART_DropDownButton" Value="#C9E0F7"/>
 						</Trigger>
 						<Trigger Property="HasDropShadow" SourceName="PART_Popup" Value="True">
-							<Setter Property="Margin" TargetName="PopupBorder" Value="8"/>
-							<Setter Property="Effect" TargetName="PopupBorder">
+							<Setter Property="Margin" TargetName="PopupGrid" Value="8"/>
+							<Setter Property="Effect" TargetName="ShadowBorder">
 								<Setter.Value>
 									<DropShadowEffect BlurRadius="4" Color="Black" Direction="315" Opacity="0.6" ShadowDepth="2"/>
 								</Setter.Value>

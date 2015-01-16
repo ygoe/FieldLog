@@ -40,7 +40,8 @@
 		<TextBlock
 			Grid.Row="2" Grid.Column="1" VerticalAlignment="Top" Margin="16,8,0,24">
 			<Run>© by Yves Goergen</Run><LineBreak/>
-			<Hyperlink Click="Hyperlink_Click">unclassified.software/fieldlog</Hyperlink>
+			<Run>Licence: GNU GPL v3</Run><LineBreak/>
+			<Run>Web:</Run> <Hyperlink Click="Hyperlink_Click">unclassified.software/fieldlog</Hyperlink>
 		</TextBlock>
 
 		<Button

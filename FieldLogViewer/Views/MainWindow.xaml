@@ -167,6 +167,7 @@
 					<ui:MenuIconImage Source="/Images/indent_plus.png"/>
 				</Button>
 				<Separator Grid.Column="19" Style="{StaticResource ToolBarSeparator}"/>
+				<!--Border Grid.Column="20" Grid.ColumnSpan="8" Margin="-2,-1" Background="#1800a000"/-->
 				<Image Grid.Column="20" Source="/Images/filter.png"/>
 				<ComboBox
 					Grid.Column="21"
@@ -177,7 +178,8 @@
 					ItemsSource="{Binding SortedFilters}"
 					SelectedItem="{Binding SelectedFilter}"
 					DisplayMemberPath="DisplayName"
-					Style="{StaticResource {x:Static ToolBar.ComboBoxStyleKey}}" Focusable="False"/>
+					Style="{StaticResource ToolComboBoxStyle}" Focusable="False"
+					ItemContainerStyle="{StaticResource ToolComboBoxItem}"/>
 				<Button
 					Grid.Column="22"
 					Command="{Binding DeleteFilterCommand}" ToolTip="Delete selected filter" ToolTipService.ShowOnDisabled="True"
@@ -186,19 +188,23 @@
 				</Button>
 				<TextBox
 					Grid.Column="23"
-					HorizontalAlignment="Stretch"
+					HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
 					ToolTip="Search text within filtered items"
 					ToolTipService.ShowOnDisabled="True"
 					Text="{Binding AdhocSearchText}"
 					ui:TextBoxExtensions.UpdateDelay="500"
 					Style="{StaticResource ToolTextBoxStyle}"/>
 				<Button
-					Grid.Column="24"
-					Command="{Binding ClearSearchTextCommand}" Content="Õ" FontFamily="Wingdings" ToolTip="Clear search text" ToolTipService.ShowOnDisabled="True"
-					Style="{StaticResource ToolButtonStyle}" Focusable="False"/>
+					Grid.Column="23"
+					Command="{Binding ClearSearchTextCommand}" ToolTip="Clear search text" ToolTipService.ShowOnDisabled="True"
+					Style="{StaticResource ToolButtonStyle}" Focusable="False"
+					HorizontalAlignment="Right" Margin="1,1,2,1">
+					<ui:MenuIconImage Source="/Images/clear_14.png" Width="14" Height="14"/>
+				</Button>
 				<TextBlock
 					Grid.Column="25"
-					Margin="4,0,0,0" VerticalAlignment="Center" TextAlignment="Right" MinWidth="45">
+					Margin="4,0,0,0" VerticalAlignment="Center" TextAlignment="Right" MinWidth="45"
+					ToolTip="Filtered items count">
 					<Run Text="{Binding FilteredLogItemsView.Count, Mode=OneWay}"/>
 				</TextBlock>
 				<TextBlock
@@ -206,7 +212,8 @@
 					Margin="2,0,2,0" VerticalAlignment="Center" Text="/"/>
 				<TextBlock
 					Grid.Column="27"
-					Margin="0,0,4,0" VerticalAlignment="Center" TextAlignment="Right" MinWidth="45">
+					Margin="0,0,4,0" VerticalAlignment="Center" TextAlignment="Right" MinWidth="45"
+					ToolTip="Total loaded items count">
 					<Run Text="{Binding LoadedItemsCount, Mode=OneWay}"/>
 				</TextBlock>
 				<Separator Grid.Column="28" Style="{StaticResource ToolBarSeparator}"/>

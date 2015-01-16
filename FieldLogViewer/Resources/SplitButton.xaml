@@ -162,7 +162,6 @@
 						<Popup
 							Name="PART_Popup"
 							Placement="Bottom"
-							VerticalOffset="-1"
 							IsOpen="{Binding Path=IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
 							AllowsTransparency="True"
 							Focusable="False"
@@ -212,7 +211,7 @@
 							<Setter Property="Background" TargetName="PART_DropDownButton" Value="#C9E0F7"/>
 						</Trigger>
 						<Trigger Property="HasDropShadow" SourceName="PART_Popup" Value="True">
-							<Setter Property="Margin" TargetName="PopupGrid" Value="8"/>
+							<Setter Property="Margin" TargetName="PopupGrid" Value="0,0,8,8"/>
 							<Setter Property="Effect" TargetName="ShadowBorder">
 								<Setter.Value>
 									<DropShadowEffect BlurRadius="4" Color="Black" Direction="315" Opacity="0.6" ShadowDepth="2"/>

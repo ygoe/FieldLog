@@ -276,8 +276,7 @@
 							IsOpen="{TemplateBinding IsDropDownOpen}"
 							AllowsTransparency="True"
 							Focusable="False"
-							PopupAnimation="None"
-							VerticalOffset="-1">
+							PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}">
 
 							<Grid
 								x:Name="DropDown"
@@ -335,7 +334,7 @@
 							<Setter Property="ScrollViewer.CanContentScroll" Value="False"/>
 						</Trigger>
 						<Trigger Property="HasDropShadow" SourceName="PART_Popup" Value="True">
-							<Setter Property="Margin" TargetName="DropDown" Value="8"/>
+							<Setter Property="Margin" TargetName="DropDown" Value="0,0,8,8"/>
 							<Setter Property="Effect" TargetName="ShadowBorder">
 								<Setter.Value>
 									<DropShadowEffect BlurRadius="4" Color="Black" Direction="315" Opacity="0.6" ShadowDepth="2"/>

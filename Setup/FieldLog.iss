@@ -19,7 +19,7 @@
 [Setup]
 AppCopyright=© Yves Goergen, GNU GPL v3
 AppPublisher=Yves Goergen
-AppPublisherURL=http://dev.unclassified.de/source/fieldlog
+AppPublisherURL=http://unclassified.software/source/fieldlog
 AppName=FieldLog
 AppVersion={#ShortRevId}
 AppMutex=Global\Unclassified.FieldLogViewer,Unclassified.FieldLogViewer
@@ -170,7 +170,7 @@ Root: HKCR; Subkey: "Applications\FieldLogViewer.exe\shell\open\command"; ValueT
 [Icons]
 Name: "{group}\FieldLogViewer"; Filename: "{app}\FieldLogViewer.exe"; IconFilename: "{app}\FieldLogViewer.exe"
 ;Name: "{group}\FieldLog Documentation"; Filename: "{app}\FieldLog Documentation.pdf"
-Name: "{group}\FieldLog website"; Filename: "http://dev.unclassified.de/source/fieldlog"
+Name: "{group}\FieldLog website"; Filename: "http://unclassified.software/source/fieldlog"
 Name: "{group}\FieldLog assembly (.NET 4.0)"; Filename: "{app}\FieldLog assembly (.NET 4.0)\"
 Name: "{group}\FieldLog assembly (.NET 2.0)"; Filename: "{app}\FieldLog assembly (.NET 2.0)\"
 Name: "{group}\FieldLog assembly (ASP.NET 4.0)"; Filename: "{app}\FieldLog assembly (ASP.NET 4.0)\"

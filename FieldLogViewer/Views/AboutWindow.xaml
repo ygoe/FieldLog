@@ -6,7 +6,7 @@
 	UseLayoutRounding="True"
 	ShowInTaskbar="False"
 	Title="About FieldLogViewer"
-	Height="240" Width="370" ResizeMode="NoResize"
+	Height="290" Width="370" ResizeMode="NoResize"
 	WindowStartupLocation="CenterOwner"
 	Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
 
@@ -20,32 +20,33 @@
 			<RowDefinition Height="*"/>
 			<RowDefinition Height="Auto"/>
 			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="Auto"/>
 		</Grid.RowDefinitions>
 		
 		<Image
 			Grid.Row="0" Grid.Column="0" Grid.RowSpan="2"
 			VerticalAlignment="Top" Width="64" Height="64"
 			Source="/Images/FieldLog_256.png"/>
-		
 		<TextBlock
 			Grid.Row="0" Grid.Column="1" VerticalAlignment="Top" Margin="16,7,0,0"
 			FontSize="24" FontWeight="SemiBold"
 			Text="FieldLogViewer"/>
-
 		<TextBlock
 			Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" Margin="16,8,0,0"
 			TextWrapping="Wrap" FontStyle="Italic"
 			Text="Fast and comprehensive logging tool for .NET applications."/>
-
 		<TextBlock
-			Grid.Row="2" Grid.Column="1" VerticalAlignment="Top" Margin="16,8,0,24">
+			Grid.Row="2" Grid.Column="1" Margin="16,8,0,0">
 			<Run>© by Yves Goergen</Run><LineBreak/>
 			<Run>Licence: GNU GPL v3</Run><LineBreak/>
 			<Run>Web:</Run> <Hyperlink Click="Hyperlink_Click">unclassified.software/fieldlog</Hyperlink>
 		</TextBlock>
-
+		<Image
+			Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="16,8,0,24"
+			HorizontalAlignment="Left" Width="130" Height="33"
+			Source="/Images/unclassified-software.png"/>
 		<Button
-			Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right"
+			Grid.Row="4" Grid.Column="1" HorizontalAlignment="Right"
 			MinWidth="75" IsDefault="True" IsCancel="True"
 			Content="OK"/>
 	</Grid>

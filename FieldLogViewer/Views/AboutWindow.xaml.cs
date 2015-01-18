@@ -16,7 +16,7 @@ namespace Unclassified.FieldLogViewer.Views
 
 		private void Hyperlink_Click(object sender, RoutedEventArgs e)
 		{
-			Process.Start("http://unclassified.software/fieldlog");
+			Process.Start("http://unclassified.software/fieldlog?ref=inapp-fieldlogviewer");
 		}
 	}
 }

@@ -375,6 +375,7 @@
     <Resource Include="Images\about.png" />
     <Resource Include="Images\settings.png" />
     <Resource Include="Images\clear_14.png" />
+    <Resource Include="Images\unclassified-software.png" />
     <Content Include="Sounds\high.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

@@ -18,7 +18,7 @@ namespace Unclassified.FieldLogViewer.Views
 			this.HideIcon();
 			this.HideMinimizeAndMaximizeBoxes();
 
-			Width = 500;
+			Width = 600;
 			Height = 300;
 			SettingsHelper.BindWindowState(this, App.Settings.SettingsWindowState);
 		}

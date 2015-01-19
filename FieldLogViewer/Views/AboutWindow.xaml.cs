@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
+using Unclassified.FieldLog;
 using Unclassified.UI;
 
 namespace Unclassified.FieldLogViewer.Views
@@ -12,6 +13,8 @@ namespace Unclassified.FieldLogViewer.Views
 		{
 			InitializeComponent();
 			this.HideIcon();
+
+			VersionText.Text = FL.AppVersion;
 		}
 
 		private void Hyperlink_Click(object sender, RoutedEventArgs e)

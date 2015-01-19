@@ -481,11 +481,9 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		private void OnAbout()
 		{
-			new AboutWindow
-				{
-					Owner = MainWindow.Instance
-				}
-				.ShowDialog();
+			var win = new AboutWindow();
+			win.Owner = MainWindow.Instance;
+			win.ShowDialog();
 		}
 
 		#endregion Toolbar command handlers

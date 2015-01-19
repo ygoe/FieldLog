@@ -227,7 +227,7 @@
 					Grid.Column="30"
 					Command="{Binding AboutCommand}" ToolTip="About" ToolTipService.ShowOnDisabled="True"
 					Style="{StaticResource ToolButtonStyle}" Focusable="False">
-					<ui:MenuIconImage Source="/Images/about.png"/>
+					<ui:MenuIconImage Source="/Images/info.png"/>
 				</Button>
 			</Grid>
 		</Border>

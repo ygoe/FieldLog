@@ -372,10 +372,10 @@
     <Resource Include="Images\Windows_System_14.png" />
     <Resource Include="Images\Windows_User_14.png" />
     <Resource Include="Images\FieldLog_256.png" />
-    <Resource Include="Images\about.png" />
     <Resource Include="Images\settings.png" />
     <Resource Include="Images\clear_14.png" />
     <Resource Include="Images\unclassified-software.png" />
+    <Resource Include="Images\info.png" />
     <Content Include="Sounds\high.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

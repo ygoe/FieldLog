@@ -445,9 +445,9 @@ namespace Unclassified.FieldLog
 
 			// Application error dialog localisation, default to English
 			AppErrorDialogTitle = "Application error";
-			AppErrorDialogContinuable = "An error occured and the application may not continue to work properly. " +
+			AppErrorDialogContinuable = "An error occurred and the application may not continue to work properly. " +
 				"If you choose to continue, additional errors or failures may occur.";
-			AppErrorDialogTerminating = "An error occured and the application cannot continue.";
+			AppErrorDialogTerminating = "An error occurred and the application cannot continue.";
 			AppErrorDialogContext = "Context:";
 			AppErrorDialogLogPath = "The log file containing detailed error information is saved to {0}.";
 			AppErrorDialogNoLog = "The log file path is unknown. See http://u10d.de/flpath for the default log paths.";
@@ -794,7 +794,7 @@ namespace Unclassified.FieldLog
 
 			// Prepare messages to display
 			string errorMsg;
-			errorMsg = ExceptionUserMessageRecursive(exItem.Exception).TrimEnd();
+			errorMsg = ExceptionUserMessageRecursive(exItem.Exception.Exception).TrimEnd();
 			if (!string.IsNullOrEmpty(exItem.Context))
 			{
 				errorMsg += Environment.NewLine + AppErrorDialogContext + " " + exItem.Context;
@@ -874,7 +874,7 @@ namespace Unclassified.FieldLog
 			}
 			else
 			{
-				AppErrorDialog.ShowError(allowContinue, errorMsg, exItem);
+				AppErrorDialog.ShowError(allowContinue, errorMsg, exItem, true);
 
 				// We're still alive!
 				// Cancel the timer so that the process will not be terminated.
@@ -889,43 +889,99 @@ namespace Unclassified.FieldLog
 		}
 
 		/// <summary>
+		/// Shows the default error dialog for an exception, initiated by user code.
+		/// </summary>
+		/// <param name="ex">The exception to display.</param>
+		/// <remarks>
+		/// A FieldLogItem should be logged before calling this method. This dialog is not modal so
+		/// the application continues to run. Additional errors are collected in the error dialog.
+		/// The dialog is top-most so it will overlay the application window.
+		/// </remarks>
+		public static void ShowErrorDialog(Exception ex)
+		{
+			// Prepare messages to display
+			string errorMsg;
+			errorMsg = ExceptionUserMessageRecursive(ex).TrimEnd();
+
+			ShowErrorDialog(errorMsg, ex);
+		}
+
+		/// <summary>
+		/// Shows the default error dialog, initiated by user code. An event should be logged before
+		/// calling this method.
+		/// </summary>
+		/// <param name="errorMsg">The error message to display.</param>
+		/// <param name="detailsObject">An object to display in the details grid view. Can be null.</param>
+		/// <remarks>
+		/// A FieldLogItem should be logged before calling this method. This dialog is not modal so
+		/// the application continues to run. Additional errors are collected in the error dialog.
+		/// The dialog is top-most so it will overlay the application window.
+		/// </remarks>
+		public static void ShowErrorDialog(string errorMsg, object detailsObject = null)
+		{
+			// Wait max. 1 second for the log file path to be set
+			int pathRetry = 20;
+			while (LogFileBasePath == null && logFileBasePathSet == false && pathRetry-- > 0)
+			{
+				Thread.Sleep(50);
+			}
+
+			AppErrorDialog.ShowError(true, errorMsg, detailsObject, false);
+		}
+
+		/// <summary>
 		/// Formats the message text of an exception and all inner exceptions for display in a user
 		/// dialog.
 		/// </summary>
 		/// <param name="ex">The exception to format.</param>
 		/// <returns>The formatted text for <paramref name="ex"/>.</returns>
-		public static string ExceptionUserMessageRecursive(FieldLogException ex)
+		public static string ExceptionUserMessageRecursive(Exception ex)
 		{
 			return ExceptionUserMessageRecursive(ex, 0);
 		}
 
-		private static string ExceptionUserMessageRecursive(FieldLogException ex, int level)
+		private static string ExceptionUserMessageRecursive(Exception ex, int level)
 		{
 			string msg;
-			if (level == 0)
+			bool isAggregate = false;
+			List<Exception> innerExceptions = null;
+
+#if !NET20
+			AggregateException aggEx = ex as AggregateException;
+			if (aggEx != null)
 			{
-#if !NET20
-				AggregateException aggEx = ex.Exception as AggregateException;
-				if (aggEx != null && aggEx.InnerExceptions.Count == 1)
-				{
-					// Simplify AggregateExceptions with a single InnerException
-					return ExceptionUserMessageRecursive(ex.InnerExceptions[0], 0);
-				}
-				else
-				{
-#endif
-					msg = ex.Message + " (" + ex.Type + ")\n";
-#if !NET20
-				}
-#endif
+				isAggregate = true;
+				innerExceptions = new List<Exception>(aggEx.InnerExceptions);
 			}
 			else
 			{
-				msg = new string(' ', (level - 1) * 4) + "> " + ex.Message + " (" + ex.Type + ")\n";
+#endif
+				if (ex.InnerException != null)
+				{
+					innerExceptions = new List<Exception> { ex.InnerException };
+				}
+#if !NET20
 			}
-			if (ex.InnerExceptions != null)
+#endif
+
+			// Simplify AggregateExceptions with a single InnerException
+			if (level == 0 && isAggregate && innerExceptions != null && innerExceptions.Count == 1)
 			{
-				foreach (FieldLogException inner in ex.InnerExceptions)
+				return ExceptionUserMessageRecursive(innerExceptions[0], 0);
+			}
+
+			if (level == 0)
+			{
+				msg = ex.Message + " (" + ex.GetType().FullName + ")\n";
+			}
+			else
+			{
+				msg = new string(' ', (level - 1) * 4) + "> " + ex.Message + " (" + ex.GetType().FullName + ")\n";
+			}
+
+			if (innerExceptions != null)
+			{
+				foreach (Exception inner in innerExceptions)
 				{
 					msg += ExceptionUserMessageRecursive(inner, level + 1);
 				}

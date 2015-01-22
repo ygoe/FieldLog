@@ -31,7 +31,8 @@ namespace Unclassified.FieldLog
 	{
 		#region Delegates and types
 
-		private delegate void AddErrorDelegate(bool canContinue, string errorMsg, object ex);
+		private delegate void AddErrorDelegate(bool canContinue, string errorMsg, object ex, bool terminateTimerEnabled);
+		private delegate void VoidMethod();   // = Action in .NET 4
 
 		private class ErrorInfo
 		{
@@ -76,7 +77,7 @@ namespace Unclassified.FieldLog
 		/// Shows the application error dialog. This is the only method that is called to show or
 		/// update an error dialog. If a dialog is already open, the error is added to it.
 		/// </summary>
-		public static void ShowError(bool canContinue, string errorMsg, object ex)
+		public static void ShowError(bool canContinue, string errorMsg, object ex, bool terminateTimerEnabled)
 		{
 			lock (syncLock)
 			{
@@ -88,6 +89,11 @@ namespace Unclassified.FieldLog
 						currentInstance.SetCanContinue(canContinue);
 						currentInstance.errorLabel.Text = errorMsg;
 						currentInstance.grid.SelectedObject = ex;
+						currentInstance.detailsLabel.Enabled = ex != null;
+						if (terminateTimerEnabled)
+						{
+							currentInstance.EnableTerminateTimer();
+						}
 
 						// Source: http://stackoverflow.com/a/3992635/143684
 						uiThread = new Thread(UiThreadStart);
@@ -97,7 +103,15 @@ namespace Unclassified.FieldLog
 					else
 					{
 						// Add next error to existing dialog
-						currentInstance.Invoke(new AddErrorDelegate(currentInstance.AddError), canContinue, errorMsg, ex);
+						// Wait until the window handle is created
+						int count = 0;
+						while (!currentInstance.IsHandleCreated)
+						{
+							if (count++ > 500)
+								throw new TimeoutException("Application error dialog was not created in reasonable time.");
+							Thread.Sleep(10);
+						}
+						currentInstance.Invoke(new AddErrorDelegate(currentInstance.AddError), canContinue, errorMsg, ex, terminateTimerEnabled);
 					}
 				}
 				catch (Exception ex2)
@@ -121,11 +135,11 @@ namespace Unclassified.FieldLog
 			// Slow down or halt the application as long as there are many pending errors.
 			// The error dialog runs in its own thread so it will still respond to user input. :-)
 			// (Unless, of course, should an error occur in the error dialog…)
-			if (currentInstance.GetNextErrorsCount() >= 20)
+			if (currentInstance != null && currentInstance.GetNextErrorsCount() >= 20)
 			{
 				Thread.Sleep(1000);
 			}
-			while (currentInstance.GetNextErrorsCount() >= 40)
+			while (currentInstance != null && currentInstance.GetNextErrorsCount() >= 40)
 			{
 				Thread.Sleep(1000);
 			}
@@ -159,6 +173,7 @@ namespace Unclassified.FieldLog
 		private Button nextButton;
 		private Button terminateButton;
 		private Button continueButton;
+		private System.Windows.Forms.Timer terminateTimer;
 
 		// Other fields
 		private Queue<ErrorInfo> nextErrors = new Queue<ErrorInfo>();
@@ -387,7 +402,7 @@ namespace Unclassified.FieldLog
 			terminateButton.FlatStyle = FlatStyle.System;
 			terminateButton.Margin = new Padding(6, 0, 0, 0);
 			terminateButton.Padding = new Padding(2, 1, 2, 1);
-			terminateButton.Text = FL.AppErrorDialogTerminate + " (" + FL.AppErrorTerminateTimeout + ")";
+			terminateButton.Text = FL.AppErrorDialogTerminate;
 			terminateButton.UseCompatibleTextRendering = false;
 			terminateButton.UseVisualStyleBackColor = true;
 			terminateButton.Click += (s, e) =>
@@ -399,17 +414,6 @@ namespace Unclassified.FieldLog
 			buttonsPanel.Controls.Add(terminateButton);
 			buttonsPanel.SetRow(terminateButton, 0);
 			buttonsPanel.SetColumn(terminateButton, 2);
-
-			DateTime shutdownTime = DateTime.UtcNow.AddSeconds(FL.AppErrorTerminateTimeout);
-			System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
-			timer.Interval = 500;
-			timer.Tick += (s, e) =>
-			{
-				int secondsToShutdown = (int) Math.Round((shutdownTime - DateTime.UtcNow).TotalSeconds);
-				if (secondsToShutdown < 0)
-					secondsToShutdown = 0;
-				terminateButton.Text = FL.AppErrorDialogTerminate + " (" + secondsToShutdown + ")";
-			};
 
 			continueButton = new Button();
 			continueButton.AutoSize = true;
@@ -427,17 +431,44 @@ namespace Unclassified.FieldLog
 			buttonsPanel.Controls.Add(continueButton);
 			buttonsPanel.SetRow(continueButton, 0);
 			buttonsPanel.SetColumn(continueButton, 3);
-
-			Load += (s, e) =>
-			{
-				// Start timer in the window's thread, not in the main UI thread (which may be blocked)
-				timer.Start();
-			};
 		}
 
 		#endregion Constructor (Form initialisation)
 
 		#region Private helper methods
+
+		private void EnableTerminateTimer()
+		{
+			if (terminateTimer == null)
+			{
+				terminateButton.Text = FL.AppErrorDialogTerminate + " (" + FL.AppErrorTerminateTimeout + ")";
+
+				DateTime shutdownTime = DateTime.UtcNow.AddSeconds(FL.AppErrorTerminateTimeout);
+				terminateTimer = new System.Windows.Forms.Timer();
+				terminateTimer.Interval = 500;
+				terminateTimer.Tick += (s, e) =>
+				{
+					int secondsToShutdown = (int) Math.Round((shutdownTime - DateTime.UtcNow).TotalSeconds);
+					if (secondsToShutdown < 0)
+						secondsToShutdown = 0;
+					terminateButton.Text = FL.AppErrorDialogTerminate + " (" + secondsToShutdown + ")";
+				};
+
+				if (!IsHandleCreated)
+				{
+					// Called directly after the constructor
+					Load += (s, e) =>
+					{
+						// Start timer in the window's thread, not in the main UI thread (which may be blocked)
+						terminateTimer.Start();
+					};
+				}
+				else
+				{
+					Invoke(new VoidMethod(terminateTimer.Start));
+				}
+			}
+		}
 
 		private void SetCanContinue(bool value)
 		{
@@ -452,13 +483,17 @@ namespace Unclassified.FieldLog
 			}
 		}
 
-		private void AddError(bool canContinue, string errorMsg, object ex)
+		private void AddError(bool canContinue, string errorMsg, object ex, bool terminateTimerEnabled)
 		{
 			try
 			{
 				if (!canContinue)
 				{
 					SetCanContinue(false);
+				}
+				if (terminateTimerEnabled)
+				{
+					EnableTerminateTimer();
 				}
 
 				ErrorInfo ei = new ErrorInfo();
@@ -497,6 +532,7 @@ namespace Unclassified.FieldLog
 			}
 			errorLabel.Text = ei.ErrorMessage;
 			grid.SelectedObject = ei.DetailsObject;
+			detailsLabel.Enabled = ei.DetailsObject != null;
 			if (nextErrors.Count > 0)
 			{
 				nextButton.Text = FL.AppErrorDialogNext + " (" + nextErrors.Count + ")";

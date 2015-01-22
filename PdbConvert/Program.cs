@@ -193,7 +193,7 @@ namespace PdbConvert
 			ConsoleHelper.WriteWrapped(
 @"Converts .pdb debug symbols to a portable compressed XML file.
 Part of FieldLog, © Yves Goergen, GNU GPL v3
-Website: http://dev.unclassified.de/source/fieldlog
+Website: http://unclassified.software/source/fieldlog
 
 Usage: PdbConvert [options] inputfile ...
 

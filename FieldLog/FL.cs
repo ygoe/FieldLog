@@ -1,6 +1,6 @@
 ﻿// FieldLog – .NET logging solution
 // © Yves Goergen, Made in Germany
-// Website: http://dev.unclassified.de/source/fieldlog
+// Website: http://unclassified.software/source/fieldlog
 //
 // This library is free software: you can redistribute it and/or modify it under the terms of
 // the GNU Lesser General Public License as published by the Free Software Foundation, version 3.
@@ -3436,7 +3436,7 @@ namespace Unclassified.FieldLog
 					sw.WriteLine("the same group. To view the contents of the log files, you need to install");
 					sw.WriteLine("the FieldLogViewer application available from:");
 					sw.WriteLine();
-					sw.WriteLine("http://dev.unclassified.de/source/fieldlog");
+					sw.WriteLine("http://unclassified.software/source/fieldlog");
 					sw.WriteLine();
 					sw.WriteLine("After installation, double-click on one file to open the entire group.");
 					sw.WriteLine();

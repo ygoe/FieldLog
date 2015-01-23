@@ -445,19 +445,25 @@ namespace Unclassified.FieldLog
 
 			// Application error dialog localisation, default to English
 			AppErrorDialogTitle = "Application error";
-			AppErrorDialogContinuable = "An error occurred and the application may not continue to work properly. " +
+			AppErrorDialogContinuable = "Sorry, an unexpected error occurred and the application may not continue to work properly. " +
 				"If you choose to continue, additional errors or failures may occur.";
-			AppErrorDialogTerminating = "An error occurred and the application cannot continue.";
+			AppErrorDialogTerminating = "Sorry, an unexpected error occurred and the application cannot continue.";
+			AppErrorDialogWeb = "Sorry, an unexpected error occurred processing your request.";
 			AppErrorDialogContext = "Context:";
 			AppErrorDialogLogPath = "The log file containing detailed error information is saved to {0}.";
 			AppErrorDialogNoLog = "The log file path is unknown. See http://u10d.de/flpath for the default log paths.";
 			AppErrorDialogConsoleAction = "Press the Enter key to continue, or Escape to quit the application.";
 			AppErrorDialogTimerNote = "The application will be terminated after {0} seconds without user response.";
 			AppErrorDialogDetails = "What happened?";
+			AppErrorDialogWebDescription = "Detailed error information is saved to the application error log file on the server. " +
+				"The current server time is {time} UTC. Please contact the webmaster or server administrator.\n" +
+				"You might want to chance it and retry loading the page. Be warned that additional errors or failures may occur.";
 			AppErrorDialogSendLogs = "Send logs";
 			AppErrorDialogNext = "Next";
 			AppErrorDialogTerminate = "Terminate";
 			AppErrorDialogContinue = "Continue anyway";
+			AppErrorDialogGoBack = "Go back";
+			AppErrorDialogRetry = "Retry";
 
 			// Use default implementation to show an application error dialog
 			ShowAppErrorDialog = DefaultShowAppErrorDialog;
@@ -647,12 +653,16 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		public static bool IsShutdown { get { return isShutdown; } }
 
+		// NOTE: When changing the below text properties, also update the SetAppErrorDialogTexts method!
+
 		/// <summary>Gets or sets the application error user dialog title.</summary>
 		public static string AppErrorDialogTitle { get; set; }
 		/// <summary>Gets or sets the application error user dialog intro if the application can be continued.</summary>
 		public static string AppErrorDialogContinuable { get; set; }
 		/// <summary>Gets or sets the application error user dialog intro if the application will be terminated.</summary>
 		public static string AppErrorDialogTerminating { get; set; }
+		/// <summary>Gets or sets the application error user dialog intro for web applications.</summary>
+		public static string AppErrorDialogWeb { get; set; }
 		/// <summary>Gets or sets the application error user dialog context caption, including a colon at the end.</summary>
 		public static string AppErrorDialogContext { get; set; }
 		/// <summary>Gets or sets the application error user dialog text describing the log path.</summary>
@@ -665,14 +675,20 @@ namespace Unclassified.FieldLog
 		public static string AppErrorDialogTimerNote { get; set; }
 		/// <summary>Gets or sets the application error user dialog label for error details.</summary>
 		public static string AppErrorDialogDetails { get; set; }
+		/// <summary>Gets or sets the application error user dialog description for web applications.</summary>
+		public static string AppErrorDialogWebDescription { get; set; }
 		/// <summary>Gets or sets the application error user dialog label for sending logs.</summary>
 		public static string AppErrorDialogSendLogs { get; set; }
-		/// <summary>Gets or sets the application error user dialog label for the next error.</summary>
+		/// <summary>Gets or sets the application error user dialog button label for the next error.</summary>
 		public static string AppErrorDialogNext { get; set; }
-		/// <summary>Gets or sets the application error user dialog label to terminate.</summary>
+		/// <summary>Gets or sets the application error user dialog button label to terminate.</summary>
 		public static string AppErrorDialogTerminate { get; set; }
-		/// <summary>Gets or sets the application error user dialog label to continue.</summary>
+		/// <summary>Gets or sets the application error user dialog button label to continue.</summary>
 		public static string AppErrorDialogContinue { get; set; }
+		/// <summary>Gets or sets the application error user dialog button label to go back.</summary>
+		public static string AppErrorDialogGoBack { get; set; }
+		/// <summary>Gets or sets the application error user dialog button label to retry.</summary>
+		public static string AppErrorDialogRetry { get; set; }
 
 		#endregion Static properties
 
@@ -934,13 +950,14 @@ namespace Unclassified.FieldLog
 		/// dialog.
 		/// </summary>
 		/// <param name="ex">The exception to format.</param>
+		/// <param name="htmlFormat">Specifies whether the output is formatted as HTML.</param>
 		/// <returns>The formatted text for <paramref name="ex"/>.</returns>
-		public static string ExceptionUserMessageRecursive(Exception ex)
+		public static string ExceptionUserMessageRecursive(Exception ex, bool htmlFormat = false)
 		{
-			return ExceptionUserMessageRecursive(ex, 0);
+			return ExceptionUserMessageRecursive(ex, 0, htmlFormat);
 		}
 
-		private static string ExceptionUserMessageRecursive(Exception ex, int level)
+		private static string ExceptionUserMessageRecursive(Exception ex, int level, bool htmlFormat)
 		{
 			string msg;
 			bool isAggregate = false;
@@ -967,27 +984,173 @@ namespace Unclassified.FieldLog
 			// Simplify AggregateExceptions with a single InnerException
 			if (level == 0 && isAggregate && innerExceptions != null && innerExceptions.Count == 1)
 			{
-				return ExceptionUserMessageRecursive(innerExceptions[0], 0);
+				return ExceptionUserMessageRecursive(innerExceptions[0], 0, htmlFormat);
 			}
 
-			if (level == 0)
+			if (htmlFormat)
 			{
-				msg = ex.Message + " (" + ex.GetType().FullName + ")\n";
+				msg = "<li>" + EncodeHtml(ex.Message) + " (" + EncodeHtml(ex.GetType().FullName) + ")";
 			}
 			else
 			{
-				msg = new string(' ', (level - 1) * 4) + "> " + ex.Message + " (" + ex.GetType().FullName + ")\n";
+				if (level == 0)
+				{
+					msg = ex.Message + " (" + ex.GetType().FullName + ")\n";
+				}
+				else
+				{
+					msg = new string(' ', (level - 1) * 4) + "> " + ex.Message + " (" + ex.GetType().FullName + ")\n";
+				}
 			}
 
-			if (innerExceptions != null)
+			if (innerExceptions != null && innerExceptions.Count > 0)
 			{
+				if (htmlFormat)
+				{
+					msg += "\n<ul>\n";
+				}
 				foreach (Exception inner in innerExceptions)
 				{
-					msg += ExceptionUserMessageRecursive(inner, level + 1);
+					msg += ExceptionUserMessageRecursive(inner, level + 1, htmlFormat);
+				}
+				if (htmlFormat)
+				{
+					msg += "</ul>\n";
+				}
+			}
+			if (htmlFormat)
+			{
+				msg += "</li>\n";
+				if (level == 0)
+				{
+					msg = "<ul>\n" + msg + "</ul>\n";
 				}
 			}
 			return msg;
 		}
+
+		private static string EncodeHtml(string plainText)
+		{
+			return plainText
+				.Replace("&", "&amp;")
+				.Replace("<", "&lt;")
+				.Replace(">", "&gt;")
+				.Replace("\"", "&quot;")
+				.Replace("'", "&#39;");
+		}
+
+#if !NET20
+		/// <summary>
+		/// Sets all application error dialog texts using a translator function.
+		/// </summary>
+		/// <param name="translator">A function that translates the property name to the localised text.</param>
+		/// <remarks>
+		/// This method is not available in the NET20 build. If the translator function returns
+		/// null, an empty string, or a string that contains the name of the requested property
+		/// (case-insensitive), that property is not changed. Default texts are in English.
+		/// </remarks>
+		/// <example>
+		/// The following example shows how to set texts from a TxTranslation dictionary, where all
+		/// texts are stored in the "fieldlog" key, under subkeys named like the property.
+		/// Properties for which no matching text key is defined will keep their default value.
+		/// <code lang="C#"><![CDATA[
+		/// FL.SetAppErrorDialogTexts(name => Tx.T("fieldlog." + name));
+		/// ]]></code>
+		/// </example>
+		public static void SetAppErrorDialogTexts(Func<string, string> translator)
+		{
+			Func<string, string> safeTranslator = name =>
+				{
+					string text = translator(name);
+					return
+						!string.IsNullOrEmpty(text) && text.IndexOf(name, StringComparison.OrdinalIgnoreCase) == -1 ?
+						text :
+						null;
+				};
+
+			AppErrorDialogConsoleAction = safeTranslator("AppErrorDialogConsoleAction") ?? AppErrorDialogConsoleAction;
+			AppErrorDialogContext = safeTranslator("AppErrorDialogContext") ?? AppErrorDialogContext;
+			AppErrorDialogContinuable = safeTranslator("AppErrorDialogContinuable") ?? AppErrorDialogContinuable;
+			AppErrorDialogContinue = safeTranslator("AppErrorDialogContinue") ?? AppErrorDialogContinue;
+			AppErrorDialogDetails = safeTranslator("AppErrorDialogDetails") ?? AppErrorDialogDetails;
+			AppErrorDialogGoBack = safeTranslator("AppErrorDialogGoBack") ?? AppErrorDialogGoBack;
+			AppErrorDialogLogPath = safeTranslator("AppErrorDialogLogPath") ?? AppErrorDialogLogPath;
+			AppErrorDialogNext = safeTranslator("AppErrorDialogNext") ?? AppErrorDialogNext;
+			AppErrorDialogNoLog = safeTranslator("AppErrorDialogNoLog") ?? AppErrorDialogNoLog;
+			AppErrorDialogRetry = safeTranslator("AppErrorDialogRetry") ?? AppErrorDialogRetry;
+			AppErrorDialogSendLogs = safeTranslator("AppErrorDialogSendLogs") ?? AppErrorDialogSendLogs;
+			AppErrorDialogTerminate = safeTranslator("AppErrorDialogTerminate") ?? AppErrorDialogTerminate;
+			AppErrorDialogTerminating = safeTranslator("AppErrorDialogTerminating") ?? AppErrorDialogTerminating;
+			AppErrorDialogTimerNote = safeTranslator("AppErrorDialogTimerNote") ?? AppErrorDialogTimerNote;
+			AppErrorDialogTitle = safeTranslator("AppErrorDialogTitle") ?? AppErrorDialogTitle;
+			AppErrorDialogTitle = safeTranslator("AppErrorDialogTitle") ?? AppErrorDialogTitle;
+			AppErrorDialogWeb = safeTranslator("AppErrorDialogWeb") ?? AppErrorDialogWeb;
+			AppErrorDialogWebDescription = safeTranslator("AppErrorDialogWebDescription") ?? AppErrorDialogWebDescription;
+		}
+#endif
+
+#if ASPNET
+		/// <summary>
+		/// Writes a complete application error web page to the response, replacing all previous
+		/// content, and sets the HTTP response code to 500.
+		/// </summary>
+		/// <param name="exception">The exception to display.</param>
+		/// <remarks>
+		/// This method is only available in the ASPNET build.
+		/// </remarks>
+		/// <example>
+		/// The following example shows the usage of the method:
+		/// <code lang="C#"><![CDATA[
+		/// protected void Application_Error()
+		/// {
+		///     Exception ex = Server.GetLastError();
+		///     FL.Critical(ex, "ASP.Application_Error");
+		///     FL.WriteErrorPage(ex);
+		///     Server.ClearError();
+		/// }
+		/// ]]></code>
+		/// </example>
+		public static void WriteErrorPage(Exception exception)
+		{
+			string html = @"<!doctype html>
+<html>
+<head>
+	<title>" + FL.AppErrorDialogTitle + @"</title>
+	<style type=""text/css"">
+	body { margin: 0; }
+	body, input { font-family: Segoe UI, Arial, sans-serif; font-size: 14px; }
+	div.head { padding: 10px; background: rgb(221, 74, 59); color: white; font-size: 1.3em; }
+	div.msg { padding: 20px 10px; }
+	div.actions { padding: 10px; background: rgb(240, 240, 240); }
+	ul { margin-left: 0; padding-left: 0; }
+	ul li { list-style-type: none; }
+	ul ul { margin-left: 0; padding-left: 20px; }
+	ul ul li { list-style-type: disc; list-style-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAALAgMAAADUwp+1AAAACVBMVEX///8AAAAAAAB+UaldAAAAAnRSTlMANSAgCRsAAAAmSURBVHheY4CBCRwMDClcDAySXA0MbKsWMDAAaQYuBgYGDgYYAABYsQOWQwhiTQAAAABJRU5ErkJggg==); }
+	input[type=""button""] { border: none; background: rgb(120, 120, 120); color: white; padding: 3px 10px 4px; }
+	input[type=""button""]:hover, input[type=""button""]:focus { border: none; background: rgb(100, 100, 100); }
+	input[type=""button""]:active { border: none; background: rgb(60, 60, 60); }
+	</style>
+</head>
+<body>
+<div class=""head"">
+" + FL.AppErrorDialogWeb + @"
+</div>
+<div class=""msg"">
+" + FL.ExceptionUserMessageRecursive(exception, true) + @"
+<p>" + FL.AppErrorDialogWebDescription.Replace("{time}", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")).Replace("\n", "</p>\n<p>") + @"</p>
+</div>
+<div class=""actions"">
+<input type=""button"" value=""" + FL.AppErrorDialogGoBack + @""" onclick=""history.back()"">
+<input type=""button"" value=""" + FL.AppErrorDialogRetry + @""" onclick=""location.reload()"">
+</div>
+</body>
+</html>";
+
+			HttpContext.Current.Response.Clear();
+			HttpContext.Current.Response.StatusCode = 500;
+			HttpContext.Current.Response.Write(html);
+		}
+#endif
 
 		#endregion Application error handling
 
@@ -2644,6 +2807,9 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Starts logging for ASP.NET applications.
 		/// </summary>
+		/// <remarks>
+		/// This method is only available in the ASPNET build.
+		/// </remarks>
 		private static void LogWebStart(Assembly callingAssembly)
 		{
 			if (EntryAssembly == null)
@@ -2699,6 +2865,9 @@ namespace Unclassified.FieldLog
 		/// <param name="useSession">true to access the Session, false to leave it alone. This is not available before the AcquireRequestState event.</param>
 		/// <param name="appUserId">The application-specific user ID, if available.</param>
 		/// <param name="appUserName">The application-specific user name, if available.</param>
+		/// <remarks>
+		/// This method is only available in the ASPNET build.
+		/// </remarks>
 		public static void LogWebRequestStart(bool dnsLookup = false, bool useSession = false, string appUserId = null, string appUserName = null)
 		{
 			FieldLogWebRequestData wrd = new FieldLogWebRequestData();
@@ -2752,6 +2921,9 @@ namespace Unclassified.FieldLog
 		/// <param name="useSession">true to access the Session, false to leave it alone.</param>
 		/// <param name="appUserId">The application-specific user ID, if available. null does not update an existing value.</param>
 		/// <param name="appUserName">The application-specific user name, if available. null does not update an existing value.</param>
+		/// <remarks>
+		/// This method is only available in the ASPNET build.
+		/// </remarks>
 		public static void UpdateWebRequestStart(bool dnsLookup = false, bool useSession = false, string appUserId = null, string appUserName = null)
 		{
 			var currentWebRequestStartItem = HttpContext.Current.Items[HttpContextKey_WebRequestStartItem] as FieldLogScopeItem;
@@ -2824,6 +2996,9 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Writes a web request end scope log item to the log file.
 		/// </summary>
+		/// <remarks>
+		/// This method is only available in the ASPNET build.
+		/// </remarks>
 		public static void LogWebRequestEnd()
 		{
 			string status = null;
@@ -2842,6 +3017,9 @@ namespace Unclassified.FieldLog
 		/// Writes the HTTP POST data sent from the client to the log file, if the request method is
 		/// "POST".
 		/// </summary>
+		/// <remarks>
+		/// This method is only available in the ASPNET build.
+		/// </remarks>
 		public static void LogWebPostData()
 		{
 			if (HttpContext.Current.Request.HttpMethod == "POST")

@@ -12,6 +12,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogBenchmark", "LogBenchmark\LogBenchmark.csproj", "{A58A3F11-E46D-4440-B1C5-217E2906A76B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FieldLog.NET40", "FieldLog\FieldLog.NET40.csproj", "{5024F0F3-092C-414A-94C6-36764C4D42EA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{42AA33E7-62BF-4EA8-BFA5-D712EA72709C} = {42AA33E7-62BF-4EA8-BFA5-D712EA72709C}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FieldLog.ASPNET40", "FieldLog\FieldLog.ASPNET40.csproj", "{96E92847-D5F7-4552-83C6-36FEDD5CA895}"
 EndProject

@@ -1,16 +1,11 @@
-param($config, $batchMode = "")
-$scriptDir = ($MyInvocation.MyCommand.Definition | Split-Path -parent)
-$sourcePath = $scriptDir | Split-Path -parent | Split-Path -parent
-. (Join-Path $scriptDir "psbuildlib.ps1")
+# PowerShell build framework
+# Project-specific control file
 
-Begin-BuildScript "FieldLog" "$config" ($batchMode -eq "batch")
+Begin-BuildScript "FieldLog"
+Set-GitVersion "{bmin:2014:4}.{commit:6}{!:+}"
 
-# Set the application version
-$gitRevisionFormat = "{bmin:2014:4}.{commit:6}{!:+}"
-$revId = Get-GitRevision
-
-# Disable parallel builds for overlapping projects in a solution
-$noParallelBuild = $true
+# FieldLog.*NET* projects are overlapping, don't build them in parallel
+Disable-ParallelBuild
 
 # Debug builds
 if (IsSelected("build-debug"))
@@ -36,6 +31,8 @@ if (IsSelected("build-debug"))
 if ((IsSelected("build-release")) -or (IsSelected("commit")))
 {
 	Build-Solution "FieldLog.sln" "Release" "Any CPU" 8
+	
+	# Archive debug symbols for later source lookup
 	EnsureDirExists ".local"
 	Exec-Console "PdbConvert\bin\Release\PdbConvert.exe" "$sourcePath\FieldLogViewer\bin\Release\* /srcbase $sourcePath /optimize /outfile $sourcePath\.local\FieldLog-$revId.pdbx" 1
 
@@ -75,8 +72,10 @@ if (IsSelected("install"))
 # Commit to repository
 if (IsSelected("commit"))
 {
+	# Clean up test build files
 	Delete-File "Setup\bin\FieldLogSetup-$revId.exe" 0
 	Delete-File ".local\FieldLog-$revId.pdbx" 0
+
 	Git-Commit 1
 }
 

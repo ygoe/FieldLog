@@ -60,7 +60,7 @@ function Do-Build-Solution($action)
 	if ($global:gitUsed)
 	{
 		$env:FASTBUILD = "1"
-		& (Join-Path $absToolsPath "GitRevisionTool") --multi-project --assembly-info (MakeRootedPath($solution))
+		& (Join-Path $absToolsPath "GitRevisionTool") --multi-project --assembly-info (MakeRootedPath $solution)
 		if (-not $?)
 		{
 			WaitError "GitRevisionTool multi-project patch failed"
@@ -70,7 +70,7 @@ function Do-Build-Solution($action)
 	if ($global:svnUsed)
 	{
 		$env:FASTBUILD = "1"
-		& (Join-Path $absToolsPath "SvnRevisionTool") --multi-project --assembly-info (MakeRootedPath($solution))
+		& (Join-Path $absToolsPath "SvnRevisionTool") --multi-project --assembly-info (MakeRootedPath $solution)
 		if (-not $?)
 		{
 			WaitError "SvnRevisionTool multi-project patch failed"
@@ -96,7 +96,7 @@ function Do-Build-Solution($action)
 	#   1591: Missing XML documentation for public type or member
 
 	$buildError = $false
-	& $msbuildBin /nologo (MakeRootedPath($solution)) /t:Rebuild /p:Configuration="$configuration" /p:Platform="$buildPlatform" /v:minimal /p:WarningLevel=1 $mParam
+	& $msbuildBin /nologo (MakeRootedPath $solution) /t:Rebuild /p:Configuration="$configuration" /p:Platform="$buildPlatform" /v:minimal /p:WarningLevel=1 $mParam
 	if (-not $?)
 	{
 		$buildError = $true
@@ -106,7 +106,7 @@ function Do-Build-Solution($action)
 	if ($global:gitUsed)
 	{
 		$env:FASTBUILD = ""
-		& (Join-Path $absToolsPath "GitRevisionTool") --multi-project --restore (MakeRootedPath($solution))
+		& (Join-Path $absToolsPath "GitRevisionTool") --multi-project --restore (MakeRootedPath $solution)
 		if (-not $?)
 		{
 			if ($buildError)
@@ -123,7 +123,7 @@ function Do-Build-Solution($action)
 	if ($global:svnUsed)
 	{
 		$env:FASTBUILD = ""
-		& (Join-Path $absToolsPath "SvnRevisionTool") --multi-project --restore (MakeRootedPath($solution))
+		& (Join-Path $absToolsPath "SvnRevisionTool") --multi-project --restore (MakeRootedPath $solution)
 		if (-not $?)
 		{
 			if ($buildError)

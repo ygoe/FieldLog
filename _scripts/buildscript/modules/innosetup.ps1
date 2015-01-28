@@ -46,7 +46,7 @@ function Do-Create-Setup($action)
 		exit 1
 	}
 
-	& $innosetupBin /q (MakeRootedPath($configFile)) /dBuildConfig=$configuration /dRevId=$revId
+	& $innosetupBin /q (MakeRootedPath $configFile) /dBuildConfig=$configuration /dRevId=$revId
 	if (-not $?)
 	{
 		WaitError "Creating setup failed"

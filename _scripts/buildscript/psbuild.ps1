@@ -101,7 +101,7 @@ function MakeRootedPath($path)
 #
 function EnsureDirExists($path)
 {
-	$path = MakeRootedPath($path)
+	$path = MakeRootedPath $path
 	if (!(Test-Path "$path"))
 	{
 		New-Item -ItemType Directory "$path" -ErrorAction Stop | Out-Null
@@ -205,7 +205,7 @@ function Wait-Key($msg = $true, $timeout = -1, $showDots = $false)
 		{
 			Clear-KeyBuffer
 			#[void][System.Console]::ReadKey($true)
-			while (!(IsInputKey($Host.UI.RawUI.ReadKey("IncludeKeyDown,NoEcho"))))
+			while (!(IsInputKey $Host.UI.RawUI.ReadKey("IncludeKeyDown,NoEcho")))
 			{
 			}
 		}
@@ -224,7 +224,7 @@ function Wait-Key($msg = $true, $timeout = -1, $showDots = $false)
 			$step = 100
 			$nextSecond = 1000
 			Clear-KeyBuffer
-			while (!($Host.UI.RawUI.KeyAvailable -and (IsInputKey($Host.UI.RawUI.ReadKey("IncludeKeyDown,NoEcho")))) -and ($counter -lt $timeout))
+			while (!($Host.UI.RawUI.KeyAvailable -and (IsInputKey $Host.UI.RawUI.ReadKey("IncludeKeyDown,NoEcho"))) -and ($counter -lt $timeout))
 			{
 				Start-Sleep -m $step
 				$counter += $step
@@ -314,7 +314,7 @@ function Get-SvnRevision()
 #
 function Get-AssemblyInfoVersion($sourceFile, $attributeName)
 {
-	$sourceFile = Check-FileName (MakeRootedPath($sourceFile))
+	$sourceFile = Check-FileName (MakeRootedPath $sourceFile)
 	if ($sourceFile -eq $null)
 	{
 		WaitError "AssemblyInfo source file not found"
@@ -383,7 +383,7 @@ function Set-SvnVersion($format)
 #
 function Set-AssemblyInfoVersion($sourceFile, $attributeName)
 {
-	$global:revId = Get-AssemblyInfoVersion($sourceFile, $attributeName)
+	$global:revId = Get-AssemblyInfoVersion $sourceFile $attributeName
 }
 
 # Disables using parallel builds with MSBuild.

@@ -72,7 +72,7 @@ function Do-Sign-File($action)
 	{
 		foreach ($timestampServer in $timestampServers)
 		{
-			$output = & $signtoolBin sign /f (MakeRootedPath($keyFile)) /p "$password" /t $timestampServer (MakeRootedPath($file)) 2>&1
+			$output = & $signtoolBin sign /f (MakeRootedPath $keyFile) /p "$password" /t $timestampServer (MakeRootedPath $file) 2>&1
 			if ($?)
 			{
 				# Sucessful, leave this function

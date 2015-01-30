@@ -4105,8 +4105,8 @@ namespace Unclassified.FieldLog
 
 		/// <summary>
 		/// Gets the version string of the current application from the
-		/// AssemblyInformationalVersionAttribute, AssemblyVersionAttribute or
-		/// AssemblyFileVersionAttribute value, or null if none is set.
+		/// AssemblyInformationalVersionAttribute, AssemblyFileVersionAttribute or
+		/// AssemblyVersionAttribute value, or null if the entry assembly is unknown.
 		/// </summary>
 		public static string AppVersion
 		{
@@ -4116,28 +4116,30 @@ namespace Unclassified.FieldLog
 				{
 					return null;
 				}
+				// Differences between version attributes: http://stackoverflow.com/a/65062/143684
+				// Descriptive version name, can be any string
 				object[] customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
 					return ((AssemblyInformationalVersionAttribute) customAttributes[0]).InformationalVersion;
 				}
-				customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyVersionAttribute), false);
-				if (customAttributes != null && customAttributes.Length > 0)
-				{
-					return ((AssemblyVersionAttribute) customAttributes[0]).Version;
-				}
+				// Win32 file resource version
 				customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
 					return ((AssemblyFileVersionAttribute) customAttributes[0]).Version;
 				}
-				return null;
+				// Assembly identity version, always present.
+				// The AssemblyVersionAttribute is accessed like this, the attribute itself is not
+				// present in the compiled assembly.
+				return EntryAssembly.GetName().Version.ToString();
 			}
 		}
 
 		/// <summary>
 		/// Gets the assembly configuration of the current application from the
-		/// AssemblyConfigurationAttribute value, or null if none is set.
+		/// AssemblyConfigurationAttribute value, or null if none is set or the entry assembly is
+		/// unknown.
 		/// </summary>
 		public static string AppAsmConfiguration
 		{
@@ -4158,7 +4160,7 @@ namespace Unclassified.FieldLog
 
 		/// <summary>
 		/// Gets the name of the current application from the AssemblyProductAttribute or
-		/// AssemblyTitleAttribute value, or null if none is set.
+		/// AssemblyTitleAttribute value, or null if none is set or the entry assembly is unknown.
 		/// </summary>
 		public static string AppName
 		{
@@ -4184,7 +4186,7 @@ namespace Unclassified.FieldLog
 
 		/// <summary>
 		/// Gets the description of the current application from the AssemblyDescriptionAttribute
-		/// value, or null if none is set.
+		/// value, or null if none is set or the entry assembly is unknown.
 		/// </summary>
 		public static string AppDescription
 		{
@@ -4205,7 +4207,7 @@ namespace Unclassified.FieldLog
 
 		/// <summary>
 		/// Gets the copyright note of the current application from the AssemblyCopyrightAttribute
-		/// value, or null if none is set.
+		/// value, or null if none is set or the entry assembly is unknown.
 		/// </summary>
 		public static string AppCopyright
 		{

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package>
+	<metadata>
+		<id>Unclassified.FieldLog</id>
+		<title>FieldLog</title>
+		<version>1.0.0</version>
+		<authors>Yves Goergen</authors>
+		<owners>Yves Goergen</owners>
+		<projectUrl>http://unclassified.software/source/fieldlog</projectUrl>
+		<iconUrl>http://unclassified.software/img/source/fieldlog/FieldLog_48.png</iconUrl>
+		<licenseUrl>https://github.com/dg9ngf/FieldLog/blob/master/LICENSE-LGPL</licenseUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<summary>Fast and comprehensive logging tool for .NET applications.</summary>
+		<description>Fast and comprehensive logging tool for .NET applications, designed for always-on logging. FieldLog allows applications to write events, data and errors (including structured exceptions with lots of details) to managed and efficient log files. The logging methods are optimised for high performance multi-threaded operation. A useful log viewer application is available from the project website.</description>
+		<releaseNotes>See changes at: https://github.com/dg9ngf/FieldLog/commits/master</releaseNotes>
+		<copyright>Yves Goergen</copyright>
+		<tags>fieldlog log logs logging logger logfiles tracing debug diagnostics unhandled exception exceptions error monitor logviewer</tags>
+	</metadata>
+	<files>
+		<file src="bin\ReleaseNET20\Unclassified.FieldLog.dll" target="lib\net20"/>
+		<file src="bin\ReleaseNET20\Unclassified.FieldLog.pdb" target="lib\net20"/>
+		<file src="bin\ReleaseNET20\Unclassified.FieldLog.xml" target="lib\net20"/>
+		<file src="bin\ReleaseNET40\Unclassified.FieldLog.dll" target="lib\net40-client"/>
+		<file src="bin\ReleaseNET40\Unclassified.FieldLog.pdb" target="lib\net40-client"/>
+		<file src="bin\ReleaseNET40\Unclassified.FieldLog.xml" target="lib\net40-client"/>
+		<file src="bin\ReleaseASPNET40\Unclassified.FieldLog.dll" target="lib\net40-full"/>
+		<file src="bin\ReleaseASPNET40\Unclassified.FieldLog.pdb" target="lib\net40-full"/>
+		<file src="bin\ReleaseASPNET40\Unclassified.FieldLog.xml" target="lib\net40-full"/>
+	</files>
+</package>

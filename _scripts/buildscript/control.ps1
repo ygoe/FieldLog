@@ -49,6 +49,10 @@ if ((IsSelected "build-release") -or (IsSelected "commit"))
 		Sign-File "FieldLogViewer\bin\Release\FieldLogViewer.exe" "$signKeyFile" "$signPassword" 1
 		Sign-File "PdbConvert\bin\Release\PdbConvert.exe" "$signKeyFile" "$signPassword" 1
 	}
+
+	# Use a different versioning scheme for NuGet as they require numbers only
+	$gitRevisionFormat = "1.{dmin:2015}"
+	Create-NuGet "FieldLog\Unclassified.FieldLog.nuspec" "FieldLog\bin" (Get-GitRevision) 2
 }
 
 # Release setups

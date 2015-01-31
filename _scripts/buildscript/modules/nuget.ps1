@@ -10,17 +10,27 @@
 #
 # $specFile = The file name of the .nuspec file.
 # $outDir = The output directory of the created package.
-# $version = The version of the package. If empty, $revId is used.
 #
 # Requires nuget.exe in the search path.
 #
-function Create-NuGet($specFile, $outDir, $version, $time)
+function Create-NuGet($specFile, $outDir, $time)
 {
-	$action = @{ action = "Do-Create-NuGet"; specFile = $specFile; outDir = $outDir; version = $version; time = $time }
+	$action = @{ action = "Do-Create-NuGet"; specFile = $specFile; outDir = $outDir; time = $time }
 	$global:actions += $action
 }
 
-# TODO: Create push method for publishing a package
+# Uploads a NuGet package.
+#
+# $packageFile = The file path and base name of the .nupkg file to upload to the NuGet gallery (excluding version and extension).
+# $apiKey = Your API key. If empty, the current user configuration is used.
+#
+# Requires nuget.exe in the search path.
+#
+function Push-NuGet($packageFile, $apiKey, $time)
+{
+	$action = @{ action = "Do-Push-NuGet"; packageFile = $packageFile; apiKey = $apiKey; time = $time }
+	$global:actions += $action
+}
 
 # ==============================  FUNCTION IMPLEMENTATIONS  ==============================
 
@@ -28,20 +38,39 @@ function Do-Create-NuGet($action)
 {
 	$specFile = $action.specFile
 	$outDir = $action.outDir
-	$version = $action.version
 
-	if (!$version)
-	{
-		$version = $revId
-	}
-	
 	Write-Host ""
 	Write-Host -ForegroundColor DarkCyan "Creating NuGet package $specFile..."
 
-	& nuget pack (MakeRootedPath $specFile) -OutputDirectory (MakeRootedPath $outDir) -Version $version -NonInteractive
+	& nuget pack (MakeRootedPath $specFile) -OutputDirectory (MakeRootedPath $outDir) -Version $revId -NonInteractive
 	if (-not $?)
 	{
 		WaitError "Creating NuGet package failed"
+		exit 1
+	}
+}
+
+function Do-Push-NuGet($action)
+{
+	$packageFile = $action.packageFile
+	$apiKey = $action.apiKey
+
+	$packageFile = $packageFile + "." + $revId + ".nupkg"
+	
+	Write-Host ""
+	Write-Host -ForegroundColor DarkCyan "Uploading NuGet package $packageFile..."
+
+	if ($apiKey)
+	{
+		& nuget push (MakeRootedPath $packageFile) -ApiKey $apiKey -NonInteractive
+	}
+	else
+	{
+		& nuget push (MakeRootedPath $packageFile) -NonInteractive
+	}
+	if (-not $?)
+	{
+		WaitError "Uploading NuGet package failed"
 		exit 1
 	}
 }

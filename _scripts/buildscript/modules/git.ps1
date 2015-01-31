@@ -73,7 +73,7 @@ function Do-Git-Export($action)
 	Write-Host ""
 	Write-Host -ForegroundColor DarkCyan "Git export to $archive..."
 
-	if ($revId.Contains("+"))
+	if (($revId.Contains("!")) -or ($revId.Contains("+")))
 	{
 		Write-Host -ForegroundColor Yellow "Warning: The local working copy is modified! Uncommitted changes are NOT exported."
 	}
@@ -152,7 +152,7 @@ function Do-Git-Log($action)
 	Write-Host ""
 	Write-Host -ForegroundColor DarkCyan "Git log dump..."
 	
-	if ($revId.Contains("+"))
+	if (($revId.Contains("!")) -or ($revId.Contains("+")))
 	{
 		Write-Host -ForegroundColor Yellow "Warning: The local working copy is modified!"
 	}

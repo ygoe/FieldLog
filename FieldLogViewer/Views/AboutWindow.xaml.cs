@@ -16,7 +16,7 @@ namespace Unclassified.FieldLogViewer.Views
 			InitializeComponent();
 			this.HideIcon();
 
-			VersionText.Text = FL.AppVersion;
+			VersionText.Text = FL.AppLongVersion;
 		}
 
 		public new void ShowDialog()

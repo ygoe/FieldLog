@@ -4282,11 +4282,131 @@ namespace Unclassified.FieldLog
 		}
 
 		/// <summary>
-		/// Gets the version string of the current application from the
+		/// Gets the version string of the current application from the AssemblyFileVersionAttribute
+		/// or AssemblyVersionAttribute value, or null if the entry assembly is unknown.
+		/// </summary>
+		/// <remarks>
+		/// This is a regular dotted-numeric version with no additional text. It can be compared
+		/// with the <see cref="AppVersionCompareTo"/> and <see cref="CompareVersions"/> methods.
+		/// </remarks>
+		public static string AppVersion
+		{
+			get
+			{
+				if (EntryAssembly == null)
+				{
+					return null;
+				}
+				// Differences between version attributes: http://stackoverflow.com/a/65062/143684
+				// Win32 file resource version
+				object[] customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false);
+				if (customAttributes != null && customAttributes.Length > 0)
+				{
+					return ((AssemblyFileVersionAttribute) customAttributes[0]).Version;
+				}
+				// Assembly identity version, always present.
+				// The AssemblyVersionAttribute is accessed like this, the attribute itself is not
+				// present in the compiled assembly.
+				return EntryAssembly.GetName().Version.ToString();
+			}
+		}
+
+		/// <summary>
+		/// Compares two dotted-numeric versions.
+		/// </summary>
+		/// <param name="a">The first version.</param>
+		/// <param name="b">The second version.</param>
+		/// <returns>
+		/// A signed number indicating the relative values of <paramref name="a"/> and <paramref name="b"/>.
+		/// <list type="table">
+		///   <listheader>
+		///     <term>Return value</term>
+		///     <description>Description</description>
+		///   </listheader>
+		///   <item>
+		///     <term>Less than zero</term>
+		///     <description><paramref name="a"/> is less than <paramref name="b"/>.</description>
+		///   </item>
+		///   <item>
+		///     <term>Zero</term>
+		///     <description><paramref name="a"/> is equal to <paramref name="b"/>.</description>
+		///   </item>
+		///   <item>
+		///     <term>Greater than zero</term>
+		///     <description><paramref name="a"/> is greater than <paramref name="b"/>.</description>
+		///   </item>
+		/// </list>
+		/// </returns>
+		/// <remarks>
+		/// In contrast to <see cref="System.Version.CompareTo(Version)"/>, this method interprets
+		/// missing segments as zero. So "1.0" and "1.0.0" are the same version. This is relevant
+		/// because the AssemblyVersion attribute always contains all four segments but this is not
+		/// how we want to display simpler versions to the user.
+		/// </remarks>
+		public static int CompareVersions(string a, string b)
+		{
+			string[] aStrings = a.Split('.');
+			string[] bStrings = b.Split('.');
+			int length = Math.Max(aStrings.Length, bStrings.Length);
+			for (int i = 0; i < length; i++)
+			{
+				string aStr = i < aStrings.Length ? aStrings[i] : "0";
+				string bStr = i < bStrings.Length ? bStrings[i] : "0";
+				int aNum = int.Parse(aStr, System.Globalization.CultureInfo.InvariantCulture);
+				int bNum = int.Parse(bStr, System.Globalization.CultureInfo.InvariantCulture);
+				if (aNum < bNum) return -1;
+				if (aNum > bNum) return 1;
+			}
+			return 0;
+		}
+
+		/// <summary>
+		/// Compares <see cref="AppVersion"/> to a specified version.
+		/// </summary>
+		/// <param name="otherVersion">The version to compare.</param>
+		/// <returns>
+		/// A signed number indicating the relative values of <see cref="AppVersion"/> and <paramref name="otherVersion"/>.
+		/// <list type="table">
+		///   <listheader>
+		///     <term>Return value</term>
+		///     <description>Description</description>
+		///   </listheader>
+		///   <item>
+		///     <term>Less than zero</term>
+		///     <description><see cref="AppVersion"/> is less than <paramref name="otherVersion"/>.</description>
+		///   </item>
+		///   <item>
+		///     <term>Zero</term>
+		///     <description><see cref="AppVersion"/> is equal to <paramref name="otherVersion"/>.</description>
+		///   </item>
+		///   <item>
+		///     <term>Greater than zero</term>
+		///     <description><see cref="AppVersion"/> is greater than <paramref name="otherVersion"/>.</description>
+		///   </item>
+		/// </list>
+		/// </returns>
+		/// <remarks>
+		/// In contrast to <see cref="System.Version.CompareTo(Version)"/>, this method interprets
+		/// missing segments as zero. So "1.0" and "1.0.0" are the same version. This is relevant
+		/// because the AssemblyVersion attribute always contains all four segments but this is not
+		/// how we want to display simpler versions to the user.
+		/// </remarks>
+		public static int AppVersionCompareTo(string otherVersion)
+		{
+			return CompareVersions(AppVersion, otherVersion);
+		}
+
+		/// <summary>
+		/// Gets the descriptive version string of the current application from the
 		/// AssemblyInformationalVersionAttribute, AssemblyFileVersionAttribute or
 		/// AssemblyVersionAttribute value, or null if the entry assembly is unknown.
 		/// </summary>
-		public static string AppVersion
+		/// <remarks>
+		/// This can contain text in an arbitrary format or include release names or commit hashes.
+		/// It may not be suitable for comparison but rather for displaying to the user or writing
+		/// to log files.
+		/// </remarks>
+		public static string AppLongVersion
 		{
 			get
 			{

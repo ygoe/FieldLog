@@ -464,6 +464,7 @@ namespace Unclassified.FieldLog
 			AppErrorDialogContinue = "Continue anyway";
 			AppErrorDialogGoBack = "Go back";
 			AppErrorDialogRetry = "Retry";
+			AppErrorDialogRetryWithoutPost = "Retry (without data)";
 
 			// Use default implementation to show an application error dialog
 			ShowAppErrorDialog = DefaultShowAppErrorDialog;
@@ -689,6 +690,8 @@ namespace Unclassified.FieldLog
 		public static string AppErrorDialogGoBack { get; set; }
 		/// <summary>Gets or sets the application error user dialog button label to retry.</summary>
 		public static string AppErrorDialogRetry { get; set; }
+		/// <summary>Gets or sets the application error user dialog button label to retry without POST data.</summary>
+		public static string AppErrorDialogRetryWithoutPost { get; set; }
 
 		#endregion Static properties
 
@@ -1078,6 +1081,7 @@ namespace Unclassified.FieldLog
 			AppErrorDialogNext = safeTranslator("AppErrorDialogNext") ?? AppErrorDialogNext;
 			AppErrorDialogNoLog = safeTranslator("AppErrorDialogNoLog") ?? AppErrorDialogNoLog;
 			AppErrorDialogRetry = safeTranslator("AppErrorDialogRetry") ?? AppErrorDialogRetry;
+			AppErrorDialogRetryWithoutPost = safeTranslator("AppErrorDialogRetryWithoutPost") ?? AppErrorDialogRetryWithoutPost;
 			AppErrorDialogSendLogs = safeTranslator("AppErrorDialogSendLogs") ?? AppErrorDialogSendLogs;
 			AppErrorDialogTerminate = safeTranslator("AppErrorDialogTerminate") ?? AppErrorDialogTerminate;
 			AppErrorDialogTerminating = safeTranslator("AppErrorDialogTerminating") ?? AppErrorDialogTerminating;
@@ -1097,21 +1101,35 @@ namespace Unclassified.FieldLog
 		/// <param name="exception">The exception to display.</param>
 		/// <remarks>
 		/// This method is only available in the ASPNET build.
+		/// This method should be called from the Application_Error method.
 		/// </remarks>
 		/// <example>
 		/// The following example shows the usage of the method:
 		/// <code lang="C#"><![CDATA[
 		/// protected void Application_Error()
 		/// {
-		///     Exception ex = Server.GetLastError();
-		///     FL.Critical(ex, "ASP.Application_Error");
-		///     FL.WriteErrorPage(ex);
-		///     Server.ClearError();
+		///     var error = FL.GetAllWebErrors();
+		///     if (error != null)
+		///     {
+		///         FL.Critical(error, "ASP.Application_Error");
+		///         FL.WriteErrorPage(error);
+		///         Server.ClearError();
+		///     }
+		///     else
+		///     {
+		///         FL.Error("Application_Error called with no error");
+		///     }
 		/// }
 		/// ]]></code>
 		/// </example>
 		public static void WriteErrorPage(Exception exception)
 		{
+			string retryWithoutPost = "";
+			if (HttpContext.Current.Request.HttpMethod == "POST")
+			{
+				retryWithoutPost = @"<input type=""button"" value=""" + FL.AppErrorDialogRetryWithoutPost + @""" onclick=""location.href=location.href"">";
+			}
+
 			string html = @"<!doctype html>
 <html>
 <head>
@@ -1142,13 +1160,46 @@ namespace Unclassified.FieldLog
 <div class=""actions"">
 <input type=""button"" value=""" + FL.AppErrorDialogGoBack + @""" onclick=""history.back()"">
 <input type=""button"" value=""" + FL.AppErrorDialogRetry + @""" onclick=""location.reload()"">
+" + retryWithoutPost + @"
 </div>
 </body>
 </html>";
 
+			// Replace possible content by this error page
 			HttpContext.Current.Response.Clear();
 			HttpContext.Current.Response.StatusCode = 500;
 			HttpContext.Current.Response.Write(html);
+			// Skip custom errors when hosted in IIS 7.0 and later, to make this error page visible at all
+			HttpContext.Current.Response.TrySkipIisCustomErrors = true;
+		}
+
+		/// <summary>
+		/// Returns all errors accumulated while processing an HTTP request. Multiple errors are
+		/// grouped in a single <see cref="AggregateException"/> instance.
+		/// </summary>
+		/// <returns>An <see cref="Exception"/> instance containing one or more errors, or null if no error occured.</returns>
+		/// <remarks>
+		/// This method is only available in the ASPNET build.
+		/// Call <see cref="HttpContext.ClearError"/> to clear all errors after handling them.
+		/// </remarks>
+		/// <example>
+		/// See the <see cref="WriteErrorPage"/> method for an example.
+		/// </example>
+		public static Exception GetAllWebErrors()
+		{
+			var errors = HttpContext.Current.AllErrors;
+			if (errors != null && errors.Length > 0)
+			{
+				if (errors.Length == 1)
+				{
+					return errors[0];
+				}
+				else
+				{
+					return new AggregateException(errors);
+				}
+			}
+			return null;
 		}
 #endif
 
@@ -2867,6 +2918,7 @@ namespace Unclassified.FieldLog
 		/// <param name="appUserName">The application-specific user name, if available.</param>
 		/// <remarks>
 		/// This method is only available in the ASPNET build.
+		/// This method should be called from the Application_BeginRequest method.
 		/// </remarks>
 		public static void LogWebRequestStart(bool dnsLookup = false, bool useSession = false, string appUserId = null, string appUserName = null)
 		{
@@ -2923,6 +2975,7 @@ namespace Unclassified.FieldLog
 		/// <param name="appUserName">The application-specific user name, if available. null does not update an existing value.</param>
 		/// <remarks>
 		/// This method is only available in the ASPNET build.
+		/// This method may be called from the Application_AcquireRequestState method.
 		/// </remarks>
 		public static void UpdateWebRequestStart(bool dnsLookup = false, bool useSession = false, string appUserId = null, string appUserName = null)
 		{
@@ -2998,6 +3051,7 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		/// <remarks>
 		/// This method is only available in the ASPNET build.
+		/// This method may be called from the Application_EndRequest method.
 		/// </remarks>
 		public static void LogWebRequestEnd()
 		{
@@ -3019,6 +3073,7 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		/// <remarks>
 		/// This method is only available in the ASPNET build.
+		/// This method may be called from the Application_AcquireRequestState method.
 		/// </remarks>
 		public static void LogWebPostData()
 		{
@@ -3026,6 +3081,46 @@ namespace Unclassified.FieldLog
 			{
 				TraceData("POST data", HttpContext.Current.Request.Form);
 			}
+		}
+
+		/// <summary>
+		/// Writes the ASP.NET application shutdown reason to the log file.
+		/// </summary>
+		/// <remarks>
+		/// This method is only available in the ASPNET build.
+		/// This method should be called from the Application_End method.
+		/// </remarks>
+		public static void LogWebShutdown()
+		{
+			string text = System.Web.Hosting.HostingEnvironment.ShutdownReason.ToString();
+			string details = null;
+
+			// The shutdown message is not publicly available, let's try to get it anyway
+			try
+			{
+				HttpRuntime runtime = (HttpRuntime) typeof(HttpRuntime).InvokeMember(
+					"_theRuntime",
+					BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.GetField,
+					null,
+					null,
+					null);
+				if (runtime != null)
+				{
+					details = (string) runtime.GetType().InvokeMember(
+						"_shutDownMessage",
+						BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField,
+						null,
+						runtime,
+						null);
+				}
+			}
+			catch
+			{
+				// The framework innards might have changed in an unpredictable way.
+				// Don't bother, at least we've tried.
+			}
+
+			Trace("ASP.NET shutdown reason: " + text, details);
 		}
 #endif
 

@@ -1177,7 +1177,7 @@ namespace Unclassified.FieldLog
 		/// Returns all errors accumulated while processing an HTTP request. Multiple errors are
 		/// grouped in a single <see cref="AggregateException"/> instance.
 		/// </summary>
-		/// <returns>An <see cref="Exception"/> instance containing one or more errors, or null if no error occured.</returns>
+		/// <returns>An <see cref="System.Exception"/> instance containing one or more errors, or null if no error occured.</returns>
 		/// <remarks>
 		/// This method is only available in the ASPNET build.
 		/// Call <see cref="HttpContext.ClearError"/> to clear all errors after handling them.
@@ -3300,7 +3300,7 @@ namespace Unclassified.FieldLog
 				}
 				if (localConfigChanged)
 				{
-					FL.Trace("FieldLog configuration file re-read", "File name: " + configFileName + "\nResult: " + readResult);
+					DumpConfiguration(readResult);
 				}
 			}
 			// Send remaining buffers
@@ -3784,6 +3784,14 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		private static void PurgeAllFiles()
 		{
+			if (configFileName == null)
+			{
+				// Configuration has not been read, so the custom keep times are not yet known.
+				// Don't purge anything now because it might delete files that should be kept for
+				// longer.
+				return;
+			}
+
 			// Purge each priority according to the configured minimum keep time
 			foreach (FieldLogPriority prio in priorityKeepTimes.Keys)
 			{
@@ -3884,6 +3892,7 @@ namespace Unclassified.FieldLog
 				currentFileName = fw.FileName;
 			}
 
+			int deletedCount = 0;
 			foreach (string fileName in Directory.GetFiles(logDir, logFile + "-" + (int) prio + "-*.fl"))
 			{
 				FileInfo fi = new FileInfo(fileName);
@@ -3894,13 +3903,16 @@ namespace Unclassified.FieldLog
 					try
 					{
 						File.Delete(fileName);
+						deletedCount++;
 					}
 					catch
 					{
-						// Retry next time
+						// Retry next time (might be locked by a log viewer reading the file)
 					}
 				}
 			}
+			// DEBUG:
+			//FL.Trace("FieldLog files purged for priority " + prio, "Keep time: " + keepTime + "\nDeleted files: " + deletedCount);
 		}
 
 		#endregion File writing
@@ -4063,6 +4075,36 @@ namespace Unclassified.FieldLog
 				ResetLogConfiguration();
 				return false;
 			}
+		}
+
+		private static void DumpConfiguration(bool readResult)
+		{
+			StringBuilder sb = new StringBuilder();
+			sb.Append("Configuration file name: ").AppendLine(configFileName);
+			if (readResult)
+			{
+				sb.AppendLine("No errors.");
+			}
+			else
+			{
+				sb.AppendLine("Errors while reading.");
+			}
+			sb.AppendLine("Configuration dump follows:");
+			sb.AppendLine();
+
+			sb.Append("path: ").AppendLine(customLogFileBasePath);
+			sb.Append("maxfilesize: ").Append(maxFileSize.ToString("N0", System.Globalization.CultureInfo.InvariantCulture).Replace(",", "\u202F")).AppendLine(" bytes");
+			sb.Append("maxtotalsize: ").Append(maxTotalSize.ToString("N0", System.Globalization.CultureInfo.InvariantCulture).Replace(",", "\u202F")).AppendLine(" bytes");
+			sb.Append("keeptrace: ").AppendLine(priorityKeepTimes[FieldLogPriority.Trace].ToString());
+			sb.Append("keepcheckpoint: ").AppendLine(priorityKeepTimes[FieldLogPriority.Checkpoint].ToString());
+			sb.Append("keepinfo: ").AppendLine(priorityKeepTimes[FieldLogPriority.Info].ToString());
+			sb.Append("keepnotice: ").AppendLine(priorityKeepTimes[FieldLogPriority.Notice].ToString());
+			sb.Append("keepwarning: ").AppendLine(priorityKeepTimes[FieldLogPriority.Warning].ToString());
+			sb.Append("keeperror: ").AppendLine(priorityKeepTimes[FieldLogPriority.Error].ToString());
+			sb.Append("keepcritical: ").AppendLine(priorityKeepTimes[FieldLogPriority.Critical].ToString());
+			sb.Append("checktimethreshold: ").Append(CheckTimeThreshold.ToString("N0", System.Globalization.CultureInfo.InvariantCulture).Replace(",", "\u202F")).AppendLine(" ms");
+
+			FL.Trace("FieldLog configuration file re-read", sb.ToString());
 		}
 
 		private static void configFileWatcher_Event(object sender, FileSystemEventArgs e)

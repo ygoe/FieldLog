@@ -756,7 +756,6 @@ namespace Unclassified.FieldLog
 									// Oops, try something else
 									// NOTE: Editions not supported in this branch.
 									// Registry value InstallationType is not yet supported in Server 2008 (not R2)
-									//if (!File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe")))
 									if (!File.Exists(Path.Combine(Environment.GetEnvironmentVariable("windir"), "explorer.exe")))
 									{
 										Type = OSType.ServerCore;
@@ -1173,7 +1172,7 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Determines whether the logged on Windows user is member of the specified Windows group.
 		/// </summary>
-		/// <param name="groupName">Group name (format: "Domain\Group")</param>
+		/// <param name="groupName">Group name in the format "Domain\Group".</param>
 		/// <returns>true, if the user is member of the group, false otherwise.</returns>
 		public static bool IsCurrentUserInWindowsGroup(string groupName)
 		{
@@ -1480,59 +1479,59 @@ namespace Unclassified.FieldLog
 		[Description("Not Windows")]
 		NonWindows = 1,
 
-		/// <summary>Windows 98</summary>
+		/// <summary>Windows 98.</summary>
 		[Description("Windows 98")]
 		Windows98 = 10,
-		/// <summary>Windows 98 SE</summary>
+		/// <summary>Windows 98 SE.</summary>
 		[Description("Windows 98 SE")]
 		Windows98SE,
-		/// <summary>Windows ME</summary>
+		/// <summary>Windows ME.</summary>
 		[Description("Windows ME")]
 		WindowsME,
-		/// <summary>Windows NT 4</summary>
+		/// <summary>Windows NT 4.</summary>
 		[Description("Windows NT 4")]
 		WindowsNT4,
-		/// <summary>Windows 2000</summary>
+		/// <summary>Windows 2000.</summary>
 		[Description("Windows 2000")]
 		Windows2000,
-		/// <summary>Windows XP</summary>
+		/// <summary>Windows XP.</summary>
 		[Description("Windows XP")]
 		WindowsXP,
-		/// <summary>Windows Vista</summary>
+		/// <summary>Windows Vista.</summary>
 		[Description("Windows Vista")]
 		WindowsVista,
-		/// <summary>Windows 7</summary>
+		/// <summary>Windows 7.</summary>
 		[Description("Windows 7")]
 		Windows7,
-		/// <summary>Windows 8</summary>
+		/// <summary>Windows 8.</summary>
 		[Description("Windows 8")]
 		Windows8,
-		/// <summary>Windows 8.1</summary>
+		/// <summary>Windows 8.1.</summary>
 		[Description("Windows 8.1")]
 		Windows81,
 
-		/// <summary>Windows 2000 Server</summary>
+		/// <summary>Windows 2000 Server.</summary>
 		[Description("Windows 2000 Server")]
 		Windows2000Server = 100,
-		/// <summary>Windows Home Server</summary>
+		/// <summary>Windows Home Server.</summary>
 		[Description("Windows Home Server")]
 		WindowsHomeServer,
-		/// <summary>Windows Server 2003</summary>
+		/// <summary>Windows Server 2003.</summary>
 		[Description("Windows Server 2003")]
 		WindowsServer2003,
-		/// <summary>Windows Server 2003 R2</summary>
+		/// <summary>Windows Server 2003 R2.</summary>
 		[Description("Windows Server 2003 R2")]
 		WindowsServer2003R2,
-		/// <summary>Windows Server 2008</summary>
+		/// <summary>Windows Server 2008.</summary>
 		[Description("Windows Server 2008")]
 		WindowsServer2008,
-		/// <summary>Windows Server 2008 R2</summary>
+		/// <summary>Windows Server 2008 R2.</summary>
 		[Description("Windows Server 2008 R2")]
 		WindowsServer2008R2,
-		/// <summary>Windows Server 2012</summary>
+		/// <summary>Windows Server 2012.</summary>
 		[Description("Windows Server 2012")]
 		WindowsServer2012,
-		/// <summary>Windows Server 2012 R2</summary>
+		/// <summary>Windows Server 2012 R2.</summary>
 		[Description("Windows Server 2012 R2")]
 		WindowsServer2012R2,
 

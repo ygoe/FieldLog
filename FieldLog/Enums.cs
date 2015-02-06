@@ -19,8 +19,8 @@ namespace Unclassified.FieldLog
 	/// </summary>
 	public enum FieldLogPriority
 	{
-		/// <summary>Detailed information for debugging purposes only. (Default if unset)</summary>
-		/// <example>User chose to load a file. / 5 files found to chose from. / (Most other data items.)</example>
+		/// <summary>Detailed information for debugging purposes only. This is the default priority if unspecified.</summary>
+		/// <example>User chose to load a file. / 5 files found to chose from. / Most other data items.</example>
 		Trace,
 		/// <summary>Information for debugging purposes only.</summary>
 		/// <example>Scanning optional directories completed. / First part of the file was processed.</example>
@@ -37,7 +37,7 @@ namespace Unclassified.FieldLog
 		/// <summary>Error condition that can normally be handled.</summary>
 		/// <example>File cannot be saved to disk, the user was informed and has alternative options.</example>
 		Error,
-		/// <summary>Critical error condition that prevents the application or an essential part of it from working (properly). (Exception default if unset)</summary>
+		/// <summary>Critical error condition that prevents the application or an essential part of it from working (properly). This is the default priority for exceptions if unspecified.</summary>
 		/// <example>Out of memory or missing assembly file, the algorithm cannot complete.</example>
 		Critical
 	}

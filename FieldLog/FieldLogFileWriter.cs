@@ -20,6 +20,9 @@ using System.Text;
 
 namespace Unclassified.FieldLog
 {
+	/// <summary>
+	/// Writes log items to a log file.
+	/// </summary>
 	internal class FieldLogFileWriter : IDisposable
 	{
 		#region Native interop
@@ -53,6 +56,11 @@ namespace Unclassified.FieldLog
 
 		#region Constructor
 
+		/// <summary>
+		/// Initialises a new instance of the <see cref="FieldLogFileWriter"/> class.
+		/// </summary>
+		/// <param name="fileName">The name of the log file to write to.</param>
+		/// <param name="prio">The priority of the items in the log file.</param>
 		public FieldLogFileWriter(string fileName, FieldLogPriority prio)
 		{
 			FileName = fileName;
@@ -239,6 +247,12 @@ namespace Unclassified.FieldLog
 			}
 		}
 
+		/// <summary>
+		/// Adds the text to the file's string table and returns the offset of the table entry.
+		/// If the text already exists, the existing offset is returned.
+		/// </summary>
+		/// <param name="text">The text to add.</param>
+		/// <returns>The text's offset.</returns>
 		public int GetText(string text)
 		{
 			if (text != null)
@@ -272,16 +286,28 @@ namespace Unclassified.FieldLog
 
 		#region Data buffer
 
+		/// <summary>
+		/// Sets the type of the item to write.
+		/// </summary>
+		/// <param name="itemType">Log item type.</param>
 		internal void SetItemType(FieldLogItemType itemType)
 		{
 			this.itemType = (byte) itemType;
 		}
 
+		/// <summary>
+		/// Adds a Byte value to the log item buffer.
+		/// </summary>
+		/// <param name="b">Value.</param>
 		internal void AddBuffer(byte b)
 		{
 			buffer.Add(b);
 		}
 
+		/// <summary>
+		/// Adds an Int16 value to the log item buffer.
+		/// </summary>
+		/// <param name="s">Value.</param>
 		internal void AddBuffer(short s)
 		{
 			byte[] bytes = BitConverter.GetBytes(s);
@@ -290,6 +316,10 @@ namespace Unclassified.FieldLog
 			buffer.AddRange(bytes);
 		}
 
+		/// <summary>
+		/// Adds an Int32 value to the log item buffer.
+		/// </summary>
+		/// <param name="i">Value.</param>
 		internal void AddBuffer(int i)
 		{
 			byte[] bytes = BitConverter.GetBytes(i);
@@ -298,6 +328,10 @@ namespace Unclassified.FieldLog
 			buffer.AddRange(bytes);
 		}
 
+		/// <summary>
+		/// Adds an Int64 value to the log item buffer.
+		/// </summary>
+		/// <param name="l">Value.</param>
 		internal void AddBuffer(long l)
 		{
 			byte[] bytes = BitConverter.GetBytes(l);
@@ -306,6 +340,10 @@ namespace Unclassified.FieldLog
 			buffer.AddRange(bytes);
 		}
 
+		/// <summary>
+		/// Adds a UInt16 value to the log item buffer.
+		/// </summary>
+		/// <param name="s">Value.</param>
 		internal void AddBuffer(ushort s)
 		{
 			byte[] bytes = BitConverter.GetBytes(s);
@@ -314,6 +352,10 @@ namespace Unclassified.FieldLog
 			buffer.AddRange(bytes);
 		}
 
+		/// <summary>
+		/// Adds a UInt32 value to the log item buffer.
+		/// </summary>
+		/// <param name="i">Value.</param>
 		internal void AddBuffer(uint i)
 		{
 			byte[] bytes = BitConverter.GetBytes(i);
@@ -322,6 +364,10 @@ namespace Unclassified.FieldLog
 			buffer.AddRange(bytes);
 		}
 
+		/// <summary>
+		/// Adds a UInt64 value to the log item buffer.
+		/// </summary>
+		/// <param name="l">Value.</param>
 		internal void AddBuffer(ulong l)
 		{
 			byte[] bytes = BitConverter.GetBytes(l);
@@ -330,11 +376,19 @@ namespace Unclassified.FieldLog
 			buffer.AddRange(bytes);
 		}
 
+		/// <summary>
+		/// Adds a Byte array to the log item buffer.
+		/// </summary>
+		/// <param name="bytes">Byte array.</param>
 		internal void AddBuffer(byte[] bytes)
 		{
 			buffer.AddRange(bytes);
 		}
 
+		/// <summary>
+		/// Adds a string value to the log item buffer.
+		/// </summary>
+		/// <param name="str">Value.</param>
 		internal void AddBuffer(string str)
 		{
 			int pos = GetText(str);
@@ -344,6 +398,9 @@ namespace Unclassified.FieldLog
 			buffer.AddRange(bytes);
 		}
 
+		/// <summary>
+		/// Writes the buffered data of a log item to the log file.
+		/// </summary>
 		internal void WriteBuffer()
 		{
 			int length = buffer.Count;
@@ -379,6 +436,8 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Gets the file size on disk. Considers NTFS compression if available and used.
 		/// </summary>
+		/// <param name="fileName">The file name.</param>
+		/// <returns>The file size on disk.</returns>
 		public static int GetCompressedFileSize(string fileName)
 		{
 			if (supportsGetCompressedFileSize)
@@ -401,6 +460,9 @@ namespace Unclassified.FieldLog
 
 		#region IDispose members
 
+		/// <summary>
+		/// Closes the log file.
+		/// </summary>
 		public void Dispose()
 		{
 			if (fileStream != null)

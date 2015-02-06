@@ -138,6 +138,12 @@ namespace Unclassified.FieldLog
 			writer.AddBuffer(WebRequestId);
 		}
 
+		/// <summary>
+		/// Reads a log item from the log file.
+		/// </summary>
+		/// <param name="reader">Log file reader.</param>
+		/// <param name="type">The type of log item to read.</param>
+		/// <returns>The read log item.</returns>
 		internal static FieldLogItem Read(FieldLogFileReader reader, FieldLogItemType type)
 		{
 			switch (type)
@@ -265,6 +271,7 @@ namespace Unclassified.FieldLog
 		/// Reads the log item fields from the specified log file reader.
 		/// </summary>
 		/// <param name="reader">The log file reader to read from.</param>
+		/// <returns>The read log item.</returns>
 		internal static FieldLogTextItem Read(FieldLogFileReader reader)
 		{
 			FieldLogTextItem item = new FieldLogTextItem();
@@ -346,6 +353,7 @@ namespace Unclassified.FieldLog
 		/// Reads the log item fields from the specified log file reader.
 		/// </summary>
 		/// <param name="reader">The log file reader to read from.</param>
+		/// <returns>The read log item.</returns>
 		internal static FieldLogDataItem Read(FieldLogFileReader reader)
 		{
 			FieldLogDataItem item = new FieldLogDataItem();
@@ -681,6 +689,7 @@ namespace Unclassified.FieldLog
 		/// Reads the log item fields from the specified log file reader.
 		/// </summary>
 		/// <param name="reader">The log file reader to read from.</param>
+		/// <returns>The read log item.</returns>
 		internal static FieldLogExceptionItem Read(FieldLogFileReader reader)
 		{
 			FieldLogExceptionItem item = new FieldLogExceptionItem();
@@ -863,6 +872,7 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		/// <param name="reader">The log file reader to read from.</param>
 		/// <param name="isRepeated">true if the log item is repeated from a previous file, false if it is written for the first time.</param>
+		/// <returns>The read log item.</returns>
 		internal static FieldLogScopeItem Read(FieldLogFileReader reader, bool isRepeated)
 		{
 			FieldLogScopeItem item = new FieldLogScopeItem();

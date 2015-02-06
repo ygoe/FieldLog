@@ -371,7 +371,7 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Writes the FieldLogEventEnvironment data to a log file writer.
 		/// </summary>
-		/// <param name="writer"></param>
+		/// <param name="writer">Log file writer.</param>
 		internal void Write(FieldLogFileWriter writer)
 		{
 			writer.AddBuffer((byte) OSType);
@@ -428,8 +428,8 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Reads the FieldLogEventEnvironment data from a log file reader.
 		/// </summary>
-		/// <param name="reader"></param>
-		/// <returns></returns>
+		/// <param name="reader">Log file reader.</param>
+		/// <returns>The environment data.</returns>
 		internal static FieldLogEventEnvironment Read(FieldLogFileReader reader)
 		{
 			FieldLogEventEnvironment env = new FieldLogEventEnvironment();

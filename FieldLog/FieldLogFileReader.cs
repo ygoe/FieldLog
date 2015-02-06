@@ -14,8 +14,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
+using System.Text;
 using System.Threading;
 #if !NET20
 using System.Threading.Tasks;
@@ -63,11 +63,6 @@ namespace Unclassified.FieldLog
 
 			// Validate existing file
 			byte[] fileHeaderBytes = Encoding.UTF8.GetBytes(fileHeader);
-			//byte[] bytes = new byte[fileHeaderBytes.Length];
-			//if (fileStream.Read(bytes, 0, fileHeaderBytes.Length) < fileHeaderBytes.Length)
-			//{
-			//    throw new FormatException("Invalid log file. Header too short.");
-			//}
 			byte[] bytes = ReadBytes(fileHeaderBytes.Length);
 			if (bytes == null)
 				throw new FormatException("Invalid log file. Header too short.");
@@ -75,7 +70,6 @@ namespace Unclassified.FieldLog
 				if (bytes[i] != fileHeaderBytes[i])
 					throw new FormatException("Invalid log file. Wrong header.");
 
-			//int formatVersion = fileStream.ReadByte();
 			bytes = ReadBytes(1);
 			if (bytes == null)
 				throw new FormatException("Invalid log file. Header too short.");

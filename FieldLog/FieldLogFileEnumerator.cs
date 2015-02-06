@@ -234,8 +234,10 @@ namespace Unclassified.FieldLog
 			{
 				currentLastReader.WaitMode = false;
 			}
-			FL.Trace("Appending next reader", "this=" + Path.GetFileName(currentLastReader.FileName) + "\nNext=" + Path.GetFileName(newReader.FileName) +
-				"\nItems read from this=" + currentLastReader.ItemCount);
+			FL.Trace(
+				"Appending next reader",
+				"this=" + Path.GetFileName(currentLastReader.FileName) + "\nNext=" + Path.GetFileName(newReader.FileName) +
+					"\nItems read from this=" + currentLastReader.ItemCount);
 		}
 
 		/// <summary>

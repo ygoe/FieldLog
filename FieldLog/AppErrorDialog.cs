@@ -65,7 +65,7 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Gets or sets a value indicating whether the exception details object can be shown to the
 		/// user. This should be set to false for obfuscated applications because there will be no
-		/// or no readable data to display. (Default: true)
+		/// or no readable data to display. The default value is true.
 		/// </summary>
 		public static bool CanShowDetails { get; set; }
 
@@ -77,6 +77,10 @@ namespace Unclassified.FieldLog
 		/// Shows the application error dialog. This is the only method that is called to show or
 		/// update an error dialog. If a dialog is already open, the error is added to it.
 		/// </summary>
+		/// <param name="canContinue">Indicates whether the application can continue.</param>
+		/// <param name="errorMsg">The error message to display.</param>
+		/// <param name="ex">The <see cref="Exception"/> instance to display as details object.</param>
+		/// <param name="terminateTimerEnabled">Indicates whether the termination safety timer has been started.</param>
 		public static void ShowError(bool canContinue, string errorMsg, object ex, bool terminateTimerEnabled)
 		{
 			lock (syncLock)
@@ -289,8 +293,6 @@ namespace Unclassified.FieldLog
 			if (FL.LogFileBasePath != null)
 			{
 				logLabel.Text = string.Format(FL.AppErrorDialogLogPath, FL.LogFileBasePath.Replace("\\", "\\\u200B") + "*.fl");
-				//logLabel.Text += " Open directory";
-				//logLabel.LinkArea = new LinkArea(logLabel.Text.Length - 14, 14);
 				string dir = Path.GetDirectoryName(FL.LogFileBasePath).Replace("\\", "\\\u200B");
 				logLabel.LinkArea = new LinkArea(FL.AppErrorDialogLogPath.IndexOf("{0}"), dir.Length);
 				logLabel.LinkClicked += (s, e) =>

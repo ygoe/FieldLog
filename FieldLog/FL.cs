@@ -322,7 +322,7 @@ namespace Unclassified.FieldLog
 		/// The last assigned web request ID, counted for each new request. Synchronised by
 		/// Interlocked access.
 		/// </summary>
-		private static int LastWebRequestId;
+		private static int lastWebRequestId;
 #endif
 
 		/// <summary>
@@ -366,9 +366,15 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		internal static readonly Dictionary<int, Stack<FieldLogScopeItem>> CurrentScopes = new Dictionary<int, Stack<FieldLogScopeItem>>();
 
+		/// <summary>
+		/// The current scope level in a thread.
+		/// </summary>
 		[ThreadStatic]
 		internal static short ScopeLevel;
 
+		/// <summary>
+		/// The thread ID of a thread.
+		/// </summary>
 		[ThreadStatic]
 		internal static int ThreadId;
 
@@ -496,16 +502,18 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Called when the current process exits.
 		/// </summary>
+		/// <param name="sender">Unused.</param>
+		/// <param name="args">Unused.</param>
 		/// <remarks>
 		/// <para>
-		/// The processing time in this event is limited. All handlers of this event together must
-		/// not take more than ca. 3 seconds. The processing will then be terminated.
+		///   The processing time in this event is limited. All handlers of this event together must
+		///   not take more than ca. 3 seconds. The processing will then be terminated.
 		/// </para>
 		/// <para>
-		/// This method is called on a pool thread.
+		///   This method is called on a pool thread.
 		/// </para>
 		/// </remarks>
-		private static void AppDomain_ProcessExit(object sender, EventArgs e)
+		private static void AppDomain_ProcessExit(object sender, EventArgs args)
 		{
 			// Flush log files, if not already done by the application
 			Shutdown();
@@ -514,12 +522,14 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Called when the current AppDomains is unloaded.
 		/// </summary>
+		/// <param name="sender">Unused.</param>
+		/// <param name="args">Unused.</param>
 		/// <remarks>
 		/// <para>
-		/// This event is never raised in the default application domain.
+		///   This event is never raised in the default application domain.
 		/// </para>
 		/// <para>
-		/// This method is called on a pool thread.
+		///   This method is called on a pool thread.
 		/// </para>
 		/// </remarks>
 		private static void AppDomain_DomainUnload(object sender, EventArgs args)
@@ -550,7 +560,9 @@ namespace Unclassified.FieldLog
 			// a fresh and most-accurate time.
 			stopwatch = new Stopwatch();
 			DateTime t0 = DateTime.UtcNow;
-			while ((startTime = DateTime.UtcNow) == t0) { }
+			while ((startTime = DateTime.UtcNow) == t0)
+			{
+			}
 			stopwatch.Start();
 		}
 
@@ -558,7 +570,9 @@ namespace Unclassified.FieldLog
 		{
 			DateTime t0 = DateTime.UtcNow;
 			DateTime freshTime;
-			while ((freshTime = DateTime.UtcNow) == t0) { }
+			while ((freshTime = DateTime.UtcNow) == t0)
+			{
+			}
 			startTime = freshTime - stopwatch.Elapsed;
 		}
 
@@ -592,14 +606,15 @@ namespace Unclassified.FieldLog
 
 		/// <summary>
 		/// Gets or sets the threshold value in milliseconds above which discontinuities of the
-		/// system time will be recalibrated. This event is logged at Notice priority. (Default: 100)
+		/// system time will be recalibrated. This event is logged at Notice priority. The default
+		/// value is 100.
 		/// </summary>
 		public static int CheckTimeThreshold { get; set; }
 
 		/// <summary>
 		/// Experimental. Gets or sets the value in milliseconds above which discontinuities of the
-		/// system time will be logged. No calibration takes place for this event.
-		/// (Default: -1, do not log)
+		/// system time will be logged. No calibration takes place for this event. The default value
+		/// is -1 (do not log).
 		/// </summary>
 		public static int LogTimeThreshold { get; set; }
 
@@ -652,7 +667,10 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Gets a value indicating whether the log queue has been shut down.
 		/// </summary>
-		public static bool IsShutdown { get { return isShutdown; } }
+		public static bool IsShutdown
+		{
+			get { return isShutdown; }
+		}
 
 		// NOTE: When changing the below text properties, also update the SetAppErrorDialogTexts method!
 
@@ -2062,7 +2080,7 @@ namespace Unclassified.FieldLog
 
 				// Interlocked.Increment is only available for Int32 but it handles the overflow, so
 				// we can safely cast it to UInt32 to use the other half of the value space.
-				uint newWebRequestId = unchecked((uint) Interlocked.Increment(ref LastWebRequestId));
+				uint newWebRequestId = unchecked((uint) Interlocked.Increment(ref lastWebRequestId));
 				HttpContext.Current.Items[HttpContextKey_WebRequestId] = newWebRequestId;
 				FieldLogScopeItem scopeItem = new FieldLogScopeItem(FieldLogPriority.Trace, type, name, webRequestData);
 				Log(scopeItem);
@@ -2211,6 +2229,7 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		/// <param name="item">The log item to write.</param>
 		/// <param name="milliseconds">The timeout in milliseconds.</param>
+		/// <returns>The <see cref="Timer"/> instance that logs the timeout if not cancelled in time.</returns>
 		/// <remarks>
 		/// To cancel the timeout logging, call the Dispose method of the returned Timer instance.
 		/// </remarks>
@@ -2309,6 +2328,7 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Wraps an Action delegate in a FieldLogScope to mark its entering and returning.
 		/// </summary>
+		/// <typeparam name="T">The type of the Action parameter.</typeparam>
 		/// <param name="action">The action to execute.</param>
 		/// <param name="arg1">The first argument passed to <paramref name="action"/>.</param>
 		/// <param name="name">The scope name. Defaults to the delegate's method name if not specified.</param>
@@ -2330,6 +2350,8 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Wraps an Action delegate in a FieldLogScope to mark its entering and returning.
 		/// </summary>
+		/// <typeparam name="T1">The type of the first Action parameter.</typeparam>
+		/// <typeparam name="T2">The type of the second Action parameter.</typeparam>
 		/// <param name="action">The action to execute.</param>
 		/// <param name="arg1">The first argument passed to <paramref name="action"/>.</param>
 		/// <param name="arg2">The second argument passed to <paramref name="action"/>.</param>
@@ -2352,6 +2374,7 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Wraps a Func delegate in a FieldLogScope to mark its entering and returning.
 		/// </summary>
+		/// <typeparam name="TResult">The type of the Func return value.</typeparam>
 		/// <param name="func">The function to execute.</param>
 		/// <param name="name">The scope name. Defaults to the delegate's method name if not specified.</param>
 		/// <returns>The return value of <paramref name="func"/>.</returns>
@@ -2373,6 +2396,8 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Wraps a Func delegate in a FieldLogScope to mark its entering and returning.
 		/// </summary>
+		/// <typeparam name="T">The type of the Func parameter.</typeparam>
+		/// <typeparam name="TResult">The type of the Func return value.</typeparam>
 		/// <param name="func">The function to execute.</param>
 		/// <param name="arg1">The first argument passed to <paramref name="func"/>.</param>
 		/// <param name="name">The scope name. Defaults to the delegate's method name if not specified.</param>
@@ -2395,6 +2420,9 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Wraps a Func delegate in a FieldLogScope to mark its entering and returning.
 		/// </summary>
+		/// <typeparam name="T1">The type of the first Func parameter.</typeparam>
+		/// <typeparam name="T2">The type of the second Func parameter.</typeparam>
+		/// <typeparam name="TResult">The type of the Func return value.</typeparam>
 		/// <param name="func">The function to execute.</param>
 		/// <param name="arg1">The first argument passed to <paramref name="func"/>.</param>
 		/// <param name="arg2">The second argument passed to <paramref name="func"/>.</param>
@@ -2588,6 +2616,7 @@ namespace Unclassified.FieldLog
 		/// Wraps an Action delegate in a CustomTimerScope to measure the time that the action
 		/// takes to execute.
 		/// </summary>
+		/// <typeparam name="T">The type of the Action parameter.</typeparam>
 		/// <param name="action">The action to execute.</param>
 		/// <param name="arg1">The first argument passed to <paramref name="action"/>.</param>
 		/// <param name="key">The custom timer key. Defaults to the delegate's method name if not specified.</param>
@@ -2612,6 +2641,8 @@ namespace Unclassified.FieldLog
 		/// Wraps an Action delegate in a CustomTimerScope to measure the time that the action
 		/// takes to execute.
 		/// </summary>
+		/// <typeparam name="T1">The type of the first Action parameter.</typeparam>
+		/// <typeparam name="T2">The type of the second Action parameter.</typeparam>
 		/// <param name="action">The action to execute.</param>
 		/// <param name="arg1">The first argument passed to <paramref name="action"/>.</param>
 		/// <param name="arg2">The second argument passed to <paramref name="action"/>.</param>
@@ -2637,6 +2668,7 @@ namespace Unclassified.FieldLog
 		/// Wraps a Func delegate in a CustomTimerScope to measure the time that the action takes
 		/// to execute.
 		/// </summary>
+		/// <typeparam name="TResult">The type of the Func return value.</typeparam>
 		/// <param name="func">The function to execute.</param>
 		/// <param name="key">The custom timer key. Defaults to the delegate's method name if not specified.</param>
 		/// <param name="incrementCounter">Increment the counter value.</param>
@@ -2661,6 +2693,8 @@ namespace Unclassified.FieldLog
 		/// Wraps a Func delegate in a CustomTimerScope to measure the time that the action takes
 		/// to execute.
 		/// </summary>
+		/// <typeparam name="T">The type of the Func parameter.</typeparam>
+		/// <typeparam name="TResult">The type of the Func return value.</typeparam>
 		/// <param name="func">The function to execute.</param>
 		/// <param name="arg1">The first argument passed to <paramref name="func"/>.</param>
 		/// <param name="key">The custom timer key. Defaults to the delegate's method name if not specified.</param>
@@ -2686,6 +2720,9 @@ namespace Unclassified.FieldLog
 		/// Wraps a Func delegate in a CustomTimerScope to measure the time that the action takes
 		/// to execute.
 		/// </summary>
+		/// <typeparam name="T1">The type of the first Func parameter.</typeparam>
+		/// <typeparam name="T2">The type of the second Func parameter.</typeparam>
+		/// <typeparam name="TResult">The type of the Func return value.</typeparam>
 		/// <param name="func">The function to execute.</param>
 		/// <param name="arg1">The first argument passed to <paramref name="func"/>.</param>
 		/// <param name="arg2">The second argument passed to <paramref name="func"/>.</param>
@@ -2858,6 +2895,7 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Starts logging for ASP.NET applications.
 		/// </summary>
+		/// <param name="callingAssembly">The web application assembly.</param>
 		/// <remarks>
 		/// This method is only available in the ASPNET build.
 		/// </remarks>
@@ -3863,7 +3901,7 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Purges log files of the specified priority if necessary.
 		/// </summary>
-		/// <param name="prio"></param>
+		/// <param name="prio">The priority to purge.</param>
 		private static void PurgePriority(FieldLogPriority prio)
 		{
 			// Collect relevant timing data
@@ -3924,6 +3962,7 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Reads the log configuration from the file next to the executable file.
 		/// </summary>
+		/// <returns>A value indicating whether the configuration was successfully read.</returns>
 		private static bool ReadLogConfiguration()
 		{
 			if (EntryAssemblyLocation == null && configFileNameOverride == null)

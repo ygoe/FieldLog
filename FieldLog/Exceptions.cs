@@ -273,6 +273,7 @@ namespace Unclassified.FieldLog
 		/// Reads the exception fields from the specified log file reader.
 		/// </summary>
 		/// <param name="reader">The log file reader to read from.</param>
+		/// <returns>The exception data.</returns>
 		internal static FieldLogException Read(FieldLogFileReader reader)
 		{
 			FieldLogException ex = new FieldLogException();
@@ -524,6 +525,7 @@ namespace Unclassified.FieldLog
 		/// Reads the stack frame fields from the specified log file reader.
 		/// </summary>
 		/// <param name="reader">The log file reader to read from.</param>
+		/// <returns>The stack frame data.</returns>
 		internal static FieldLogStackFrame Read(FieldLogFileReader reader)
 		{
 			FieldLogStackFrame frame = new FieldLogStackFrame();

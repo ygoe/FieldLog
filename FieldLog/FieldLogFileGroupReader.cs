@@ -150,22 +150,22 @@ namespace Unclassified.FieldLog
 		/// Called when the FileSystemWatcher found a newly created file of the currently used
 		/// log file set.
 		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void fsw_Created(object sender, FileSystemEventArgs e)
+		/// <param name="sender">Unused.</param>
+		/// <param name="args">Event arguments.</param>
+		private void fsw_Created(object sender, FileSystemEventArgs args)
 		{
 			if (closeEvent.WaitOne(0)) return;   // Already closing...
 
 			// Ensure it's a file, not a directory
-			if (File.Exists(e.FullPath))
+			if (File.Exists(args.FullPath))
 			{
 				lock (readerLock)
 				{
-					Match m = Regex.Match(e.FullPath, @"-([0-9])-[0-9]{18}\.fl");
+					Match m = Regex.Match(args.FullPath, @"-([0-9])-[0-9]{18}\.fl");
 					if (m.Success)
 					{
 						FieldLogPriority prio = (FieldLogPriority) int.Parse(m.Groups[1].Value);
-						AddNewReader(prio, e.FullPath, true);
+						AddNewReader(prio, args.FullPath, true);
 					}
 				}
 			}
@@ -174,8 +174,8 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Finds all currently existing log files and adds a new reader for each of them.
 		/// </summary>
-		/// <param name="basePath"></param>
-		/// <param name="prio"></param>
+		/// <param name="basePath">The directory and file base name.</param>
+		/// <param name="prio">The priority of files to find.</param>
 		private void FindLogFiles(string basePath, FieldLogPriority prio)
 		{
 			lock (readerLock)
@@ -198,8 +198,8 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Creates a new log file reader and adds it to the priority's log file enumerator.
 		/// </summary>
-		/// <param name="prio"></param>
-		/// <param name="fileName"></param>
+		/// <param name="prio">The priority of files to write.</param>
+		/// <param name="fileName">The name of the log file.</param>
 		/// <param name="fromFsw">Indicates whether the reader was created from a FileSystemWatcher event.</param>
 		private void AddNewReader(FieldLogPriority prio, string fileName, bool fromFsw)
 		{

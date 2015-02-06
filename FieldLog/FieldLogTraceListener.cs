@@ -143,38 +143,45 @@ namespace Unclassified.FieldLog
 		//    base.TraceData(eventCache, source, eventType, id, data);
 		//}
 
+		/// <inheritdoc/>
 		public override void TraceEvent(TraceEventCache eventCache, string source, TraceEventType eventType, int id)
 		{
 			TraceEvent(eventCache, source, eventType, id, "");
 		}
 
+		/// <inheritdoc/>
 		public override void TraceEvent(TraceEventCache eventCache, string source, TraceEventType eventType, int id, string format, params object[] args)
 		{
 			WriteToFieldLog(source, eventType, id, string.Format(CultureInfo.InvariantCulture, format, args));
 		}
 
+		/// <inheritdoc/>
 		public override void TraceEvent(TraceEventCache eventCache, string source, TraceEventType eventType, int id, string message)
 		{
 			WriteToFieldLog(source, eventType, id, message);
 		}
 
 		// Also support plain text messages. Collect all Write(), write item on WriteLine().
+		/// <inheritdoc/>
 		public override void Write(object o)
 		{
 			msgSb.Append(o);
 		}
 
+		/// <inheritdoc/>
 		public override void Write(string message)
 		{
 			msgSb.Append(message);
 		}
 
+		/// <inheritdoc/>
 		public override void WriteLine(object o)
 		{
 			msgSb.Append(o);
 			WriteLine("");
 		}
 
+		/// <inheritdoc/>
 		public override void WriteLine(string message)
 		{
 			msgSb.Append(message);

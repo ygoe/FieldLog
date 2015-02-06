@@ -176,7 +176,7 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Writes the FieldLogWebRequestData data to a log file writer.
 		/// </summary>
-		/// <param name="writer"></param>
+		/// <param name="writer">Log file writer.</param>
 		internal void Write(FieldLogFileWriter writer)
 		{
 			writer.AddBuffer(RequestUrl);
@@ -195,8 +195,8 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Reads the FieldLogWebRequestData data from a log file reader.
 		/// </summary>
-		/// <param name="reader"></param>
-		/// <returns></returns>
+		/// <param name="reader">Log file reader.</param>
+		/// <returns>The web request data.</returns>
 		internal static FieldLogWebRequestData Read(FieldLogFileReader reader)
 		{
 			FieldLogWebRequestData data = new FieldLogWebRequestData();

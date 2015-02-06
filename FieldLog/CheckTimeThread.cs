@@ -41,6 +41,7 @@ namespace Unclassified.FieldLog
 		public static void Start()
 		{
 			checkThread = new Thread(ThreadProc);
+			checkThread.Name = "FieldLog.CheckTimeThread";
 			checkThread.IsBackground = true;
 			checkThread.Start();
 		}
@@ -48,12 +49,14 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Stops the time checking thread.
 		/// </summary>
-		/// <param name="millisecondsTimeout">Timeout to wait for the thread to stop. Should be longer than <see cref="CheckInterval"/>.</param>
-		/// <returns>true if the thread has stopped; otherwise, false.</returns>
-		public static bool Stop(int millisecondsTimeout)
+		public static void Stop()
 		{
 			cancelPending = true;
-			return checkThread.Join(millisecondsTimeout);
+			checkThread.Interrupt();
+			if (!checkThread.Join(50))
+			{
+				checkThread.Abort();
+			}
 		}
 
 		private static void ThreadProc()
@@ -69,7 +72,14 @@ namespace Unclassified.FieldLog
 
 			do
 			{
-				Thread.Sleep(CheckInterval);
+				try
+				{
+					Thread.Sleep(CheckInterval);
+				}
+				catch (ThreadInterruptedException)
+				{
+					// That's fine.
+				}
 
 				// Check for UTC time changes
 				TimeSpan offset = DateTime.UtcNow - FL.UtcNow;

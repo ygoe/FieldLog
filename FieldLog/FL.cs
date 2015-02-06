@@ -3209,6 +3209,8 @@ namespace Unclassified.FieldLog
 				isShutdown = true;
 			}
 
+			CheckTimeThread.Stop();
+
 			// Prevent further log items to be added from now on
 			lock (currentBufferLock)
 			{

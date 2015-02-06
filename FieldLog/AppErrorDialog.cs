@@ -97,6 +97,7 @@ namespace Unclassified.FieldLog
 
 						// Source: http://stackoverflow.com/a/3992635/143684
 						uiThread = new Thread(UiThreadStart);
+						uiThread.Name = "FieldLog.AppErrorDialogUIThread";
 						uiThread.SetApartmentState(ApartmentState.STA);
 						uiThread.Start();
 					}
@@ -147,8 +148,30 @@ namespace Unclassified.FieldLog
 
 		private static void UiThreadStart()
 		{
+			// Keep the window in the foreground.
+			// Sometimes, when debugging in Visual Studio, the window sits in the background,
+			// unnoticed, and prevents the application to shut down because it's not a background
+			// thread. Setting TopMost again after a short while helps to bring it in the foreground
+			// again.
+			System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
+			timer.Tick += delegate(object sender, EventArgs args)
+				{
+					// Just to be sure, also set Visible, it doesn't hurt
+					currentInstance.Visible = true;
+					currentInstance.TopMost = true;
+					
+					// Come back, but not so soon
+					timer.Interval *= 2;
+				};
+			timer.Interval = 100;
+			timer.Start();
+
 			Application.Run(currentInstance);
 
+			// The window has been closed and the message loop was left. Should there still be a
+			// timer event scheduled, it won't be executed anymore. Now clean up everything.
+			timer.Stop();
+			timer.Dispose();
 			lock (syncLock)
 			{
 				currentInstance.Dispose();

@@ -41,7 +41,7 @@ $batchMode = ($batchMode -eq "batch")
 Clear-Host
 
 $scriptDir = ($MyInvocation.MyCommand.Definition | Split-Path -parent)
-$sourcePath = $scriptDir | Split-Path -parent | Split-Path -parent
+$rootDir = $scriptDir | Split-Path -parent | Split-Path -parent
 $startTime = Get-Date
 
 # Configuration defaults
@@ -66,7 +66,7 @@ $absToolsPath = Join-Path $scriptDir $toolsPath
 function Check-FileName($fn)
 {
 	$fn = [System.Environment]::ExpandEnvironmentVariables($fn)
-	if (test-path $fn)
+	if (Test-Path $fn)
 	{
 		return $fn
 	}
@@ -83,13 +83,13 @@ function Check-RegFilename($key, $value)
 	}
 }
 
-# Returns a rooted path. Non-rooted paths are interpreted relative to $sourcePath.
+# Returns a rooted path. Non-rooted paths are interpreted relative to $rootDir.
 #
 function MakeRootedPath($path)
 {
 	if (![System.IO.Path]::IsPathRooted($path))
 	{
-		return "$sourcePath\$path"
+		return "$rootDir\$path"
 	}
 	return $path
 }
@@ -279,12 +279,17 @@ function Get-VcsRevision($haveFormat)
 		# Scan the solution for a format defined in a project
 		$args += " /multi"
 	}
-	$revId = Invoke-Expression ((Join-Path $absToolsPath "NetRevisionTool") + " " + $args + " `"$sourcePath`"")
+	
+	$consoleEncoding = [System.Console]::OutputEncoding
+	[System.Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+	$revId = Invoke-Expression ((Join-Path $absToolsPath "NetRevisionTool") + " " + $args + " `"$rootDir`"")
 	if ($LASTEXITCODE -ne 0)
 	{
+		[System.Console]::OutputEncoding = $consoleEncoding
 		WaitError "Repository revision could not be determined"
 		exit 1
 	}
+	[System.Console]::OutputEncoding = $consoleEncoding
 	$global:revisionToolUsed = $true
 	return $revId
 }
@@ -390,6 +395,11 @@ function End-BuildScript()
 		$totalTime += $action.time
 	}
 	Write-Host "Total scheduled time: $totalTime s"
+	if (!$totalTime)
+	{
+		# Prevent divide by zero
+		$totalTime = 1
+	}
 
 	$timeSum = 0
 	foreach ($action in $actions)
@@ -398,9 +408,8 @@ function End-BuildScript()
 		& $functionName $action
 		
 		$timeSum += $action.time
-		$progressAfter = [int] ($timeSum / $totalTime * 100)
+		$progressAfter = [int] (100 * $timeSum / $totalTime)
 		& (Join-Path $absToolsPath "FlashConsoleWindow") -progress $progressAfter
-		$timeSum += $action.time
 	}
 	
 	$endTime = Get-Date
@@ -433,6 +442,13 @@ Get-ChildItem (Join-Path $scriptDir $modulesPath) `
 	| ForEach { . $_.FullName }
 
 # ==============================  CONTROL FILE  ==============================
+
+# Include the private config file if it exists
+$privateConfigFile = (Join-Path $scriptDir "private.ps1")
+if (Test-Path $privateConfigFile)
+{
+	. $privateConfigFile
+}
 
 # Include the control file that specifies what to do
 . (Join-Path $scriptDir "control.ps1")

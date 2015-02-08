@@ -100,6 +100,7 @@ _NCrunch_*
 Dotfuscated/
 
 # PowerShell build framework tools
+_scripts/buildscript/private.ps1
 !_scripts/bin/
 
 # Windows/other detritus

@@ -14,38 +14,34 @@ if (IsSelected "build-debug")
 
 	if (IsSelected "sign-lib")
 	{
-		. "$sourcePath\.local\sign_config.ps1"
 		Sign-File "FieldLog\bin\DebugNET40\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword" 1
 		Sign-File "FieldLog\bin\DebugNET20\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword" 1
 		Sign-File "FieldLog\bin\DebugASPNET40\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword" 1
 	}
 	if (IsSelected "sign-app")
 	{
-		. "$sourcePath\.local\sign_config.ps1"
 		Sign-File "FieldLogViewer\bin\Debug\FieldLogViewer.exe" "$signKeyFile" "$signPassword" 1
 		Sign-File "PdbConvert\bin\Debug\PdbConvert.exe" "$signKeyFile" "$signPassword" 1
 	}
 }
 
 # Release builds
-if ((IsSelected "build-release") -or (IsSelected "commit") -or (IsSelected "publish-nuget"))
+if ((IsSelected "build-release") -or (IsSelected "commit") -or (IsSelected "publish"))
 {
 	Build-Solution "FieldLog.sln" "Release" "Any CPU" 8
 	
 	# Archive debug symbols for later source lookup
 	EnsureDirExists ".local"
-	Exec-Console "PdbConvert\bin\Release\PdbConvert.exe" "$sourcePath\FieldLogViewer\bin\Release\* /srcbase $sourcePath /optimize /outfile $sourcePath\.local\FieldLog-$revId.pdbx" 1
+	Exec-Console "PdbConvert\bin\Release\PdbConvert.exe" "$rootDir\FieldLogViewer\bin\Release\* /srcbase $rootDir /optimize /outfile $rootDir\.local\FieldLog-$revId.pdbx" 1
 
-	if (IsSelected "sign-lib")
+	if ((IsSelected "sign-lib") -or (IsSelected "publish"))
 	{
-		. "$sourcePath\.local\sign_config.ps1"
 		Sign-File "FieldLog\bin\ReleaseNET40\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword" 1
 		Sign-File "FieldLog\bin\ReleaseNET20\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword" 1
 		Sign-File "FieldLog\bin\ReleaseASPNET40\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword" 1
 	}
-	if (IsSelected "sign-app")
+	if ((IsSelected "sign-app") -or (IsSelected "publish"))
 	{
-		. "$sourcePath\.local\sign_config.ps1"
 		Sign-File "FieldLogViewer\bin\Release\FieldLogViewer.exe" "$signKeyFile" "$signPassword" 1
 		Sign-File "PdbConvert\bin\Release\PdbConvert.exe" "$signKeyFile" "$signPassword" 1
 	}
@@ -54,13 +50,12 @@ if ((IsSelected "build-release") -or (IsSelected "commit") -or (IsSelected "publ
 }
 
 # Release setups
-if ((IsSelected "setup-release") -or (IsSelected "commit"))
+if ((IsSelected "setup-release") -or (IsSelected "commit") -or (IsSelected "publish"))
 {
 	Create-Setup "Setup\FieldLog.iss" Release 1
 
-	if (IsSelected "sign-setup")
+	if ((IsSelected "sign-setup") -or (IsSelected "publish"))
 	{
-		. "$sourcePath\.local\sign_config.ps1"
 		Sign-File "Setup\bin\FieldLogSetup-$revId.exe" "$signKeyFile" "$signPassword" 1
 	}
 }
@@ -78,13 +73,26 @@ if (IsSelected "commit")
 	Delete-File "Setup\bin\FieldLogSetup-$revId.exe" 0
 	Delete-File ".local\FieldLog-$revId.pdbx" 0
 
-	Git-Commit 1
+	Git-Commit 5
 }
 
-# Publish to NuGet
-if (IsSelected "publish-nuget")
+# Prepare publishing a release
+if (IsSelected "publish")
 {
-	Push-NuGet "FieldLog\bin\Unclassified.FieldLog" "" 20
+	Git-Log ".local\FieldLogChanges.txt" 1
+}
+
+# Copy to website (local)
+if (IsSelected "transfer-web")
+{
+	Copy-File "Setup\bin\FieldLogSetup-$revId.exe" "$webDir\files\source\fieldlog\" 0
+	Copy-File ".local\FieldLogChanges.txt" "$webDir\files\source\fieldlog\" 0
+}
+
+# Upload to NuGet
+if (IsSelected "transfer-nuget")
+{
+	Push-NuGet "FieldLog\bin\Unclassified.FieldLog" $nuGetApiKey 20
 }
 
 End-BuildScript

@@ -1,65 +1,80 @@
-#ifndef RevId
-	#define RevId "0.1"
-#endif
-#ifndef ShortRevId
-	#define ShortRevId Copy(RevId, 1, Pos(".", RevId) - 1)
-#endif
+; Determine product and file version from the application to be installed
+#define RevFileName '..\FieldLogViewer\bin\Release\FieldLogViewer.exe'
+#define RevId GetStringFileInfo(RevFileName, 'ProductVersion')
+#define TruncRevId GetFileVersion(RevFileName)
 
-#include "scripts\products.iss"
-#include "scripts\products\stringversion.iss"
-#include "scripts\products\winversion.iss"
-#include "scripts\products\fileversion.iss"
-#include "scripts\products\dotnetfxversion.iss"
+; Include 3rd-party software check and download support
+#include "include\products.iss"
+#include "include\products\stringversion.iss"
+#include "include\products\winversion.iss"
+#include "include\products\fileversion.iss"
+#include "include\products\dotnetfxversion.iss"
 
-#include "scripts\products\msi31.iss"
+; Include modules for required products
+#include "include\products\msi31.iss"
+#include "include\products\dotnetfx40client.iss"
+#include "include\products\dotnetfx40full.iss"
+#include "include\products\dotnetfx45.iss"
 
-#include "scripts\products\dotnetfx40client.iss"
-#include "scripts\products\dotnetfx40full.iss"
+; Include general helper functions
+#include "include\util-code.iss"
+
+; Include Visual Studio external tools management
+#include "include\visualstudio-tool.iss"
 
 [Setup]
+; Names and versions for the Windows programs listing
+AppName=FieldLog
+AppVersion={#RevId}
 AppCopyright=© Yves Goergen, GNU GPL v3
 AppPublisher=Yves Goergen
 AppPublisherURL=http://unclassified.software/source/fieldlog
-AppName=FieldLog
-AppVersion={#ShortRevId}
-AppMutex=Global\Unclassified.FieldLogViewer,Unclassified.FieldLogViewer
+
+; Setup file version
+VersionInfoDescription=FieldLog Setup
+VersionInfoVersion={#TruncRevId}
+VersionInfoCompany=Yves Goergen
+
+; General application information
 AppId={{52CCCE83-0A6F-447D-AAE0-506431641858}
+AppMutex=Global\Unclassified.FieldLogViewer,Unclassified.FieldLogViewer
 MinVersion=0,5.01sp3
+ArchitecturesInstallIn64BitMode=x64
 
-ShowLanguageDialog=no
-ChangesAssociations=yes
-
+; General setup information
 DefaultDirName={pf}\Unclassified\FieldLog
 AllowUNCPath=False
 DefaultGroupName=FieldLog
 DisableDirPage=auto
 DisableProgramGroupPage=auto
+ShowLanguageDialog=no
+ChangesAssociations=yes
 
+; Setup design
 ; Large image max. 164x314 pixels, small image max. 55x58 pixels
-WizardImageFile=FieldLog_144.bmp
 WizardImageBackColor=$ffffff
 WizardImageStretch=no
+WizardImageFile=FieldLog_144.bmp
 WizardSmallImageFile=FieldLog_48.bmp
 
+; Uninstaller configuration
 UninstallDisplayName=FieldLog
 UninstallDisplayIcon={app}\FieldLogViewer.exe
 
+; Setup package creation
 OutputDir=bin
 OutputBaseFilename=FieldLogSetup-{#RevId}
 SolidCompression=True
 InternalCompressLevel=max
-VersionInfoVersion=1.0
-VersionInfoCompany=Yves Goergen
-VersionInfoDescription=FieldLog Setup
-ArchitecturesInstallIn64BitMode=x64
+
+; This file must be included after other setup settings
+#include "include\previous-installation.iss"
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
-Name: "de"; MessagesFile: "compiler:Languages\German.isl"
 
 [LangOptions]
-;de.LanguageName=Deutsch
-;de.LanguageID=$0407
+; More setup design
 DialogFontName=Segoe UI
 DialogFontSize=9
 WelcomeFontName=Segoe UI
@@ -74,29 +89,16 @@ FinishedLabelNoIcons=
 FinishedLabel=The application may be launched by selecting the installed start menu icon.
 ClickFinish=Click Finish to exit the setup.
 
-de.WelcomeLabel1=%n%n%nWillkommen zum FieldLog-Setup-Assistenten
-de.WelcomeLabel2=FieldLog ist ein schnelles und umfassendes Logging-Werkzeug für .NET-Anwendungen. Es ist für hohe Performance, geringen Speicherplatzbedarf und ständig aktiviertes Logging konzipiert und bringt eine nützliche Log-Betrachter-Anwendung mit.%n%nVersion: {#RevId}
-de.ClickNext=Klicken Sie auf Weiter, um den FieldLogViewer, die Dokumentation und die FieldLog-Bibliothek mit Quelltext zu installieren, oder auf Abbrechen zum Beenden des Setups.
-de.FinishedHeadingLabel=%n%n%n%n%nFieldLog ist jetzt installiert.
-de.FinishedLabelNoIcons=
-de.FinishedLabel=Die Anwendung kann über die installierte Startmenü-Verknüpfung gestartet werden.
-de.ClickFinish=Klicken Sie auf Fertigstellen, um das Setup zu beenden.
-
 [CustomMessages]
 Upgrade=&Upgrade
 UpdatedHeadingLabel=%n%n%n%n%nFieldLog was upgraded.
-Task_VSTool=Register as External Tool in Visual Studio (2010/2012/2013)
+Task_VSTool=Register as External Tool in Visual Studio (2010–2015)
+Task_DeleteConfig=Delete existing configuration
 NgenMessage=Optimising application performance (this may take a moment)
-DowngradeUninstall=You are trying to install an older version than is currently installed on the system. The newer version must first be uninstalled. Would you like to do that now?%n%nPlease note than uninstallation also deletes the configuration file. If you want to keep it, you need to make a copy of it. It is located in the directory %AppData%\Unclassified\FieldLog.
 OpenSingleFileCommand=Open single file
 
-de.Upgrade=&Aktualisieren
-de.UpdatedHeadingLabel=%n%n%n%n%nFieldLog wurde aktualisiert.
-de.Task_VSTool=In Visual Studio (2010/2012/2013) als Externes Tool eintragen
-Task_DeleteConfig=Vorhandene Konfiguration löschen
-de.NgenMessage=Anwendungs-Performance optimieren (kann einen Moment dauern)
-de.DowngradeUninstall=Sie versuchen, eine ältere Version zu installieren, als bereits im System installiert ist. Die neuere Version muss zuerst deinstalliert werden. Möchten Sie das jetzt tun?%n%nBitte beachten Sie, dass bei der Deinstallation auch die Einstellungen gelöscht werden. Wenn Sie diese behalten möchten, müssen Sie sie sichern. Die Datei befindet sich im Verzeichnis %AppData%\Unclassified\FieldLog.
-de.OpenSingleFileCommand=Einzelne Datei öffnen
+; Add translations after messages have been defined
+#include "FieldLog.de.iss"
 
 [Tasks]
 Name: VSTool; Description: "{cm:Task_VSTool}"
@@ -110,46 +112,53 @@ Source: "..\FieldLogViewer\bin\Release\TaskDialog.dll"; DestDir: "{app}"; Flags:
 ;Source: "..\FieldLog Documentation.pdf"; DestDir: "{app}"; Flags: ignoreversion
 ; This is the signed version of the DLL:
 Source: "..\FieldLog\bin\ReleaseNET40\Unclassified.FieldLog.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\FieldLog\FileFormat.html"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\FieldLogViewer\bin\Release\Sounds\*.mp3"; DestDir: "{app}\Sounds"; Flags: ignoreversion
+Source: "..\FieldLog\FileFormat.html"; DestDir: "{app}"
+Source: "..\FieldLogViewer\bin\Release\Sounds\*.mp3"; DestDir: "{app}\Sounds"
 ; Sample configuration
-Source: "example-config.txt"; DestDir: "{app}"; DestName: "FieldLogViewer.exe.flconfig"; Flags: ignoreversion; Permissions: users-modify
+Source: "example-config.txt"; DestDir: "{app}"; DestName: "FieldLogViewer.exe.flconfig"; Permissions: users-modify
 
 ; PdbConvert tool
 Source: "..\PdbConvert\bin\Release\PdbConvert.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 ; FieldLog assembly
-Source: "..\FieldLog\bin\ReleaseNET40\Unclassified.FieldLog.dll"; DestDir: "{app}\FieldLog assembly (.NET 4.0)"; Flags: ignoreversion
-Source: "..\FieldLog\bin\ReleaseNET40\Unclassified.FieldLog.xml"; DestDir: "{app}\FieldLog assembly (.NET 4.0)"; Flags: ignoreversion
 Source: "..\FieldLog\bin\ReleaseNET20\Unclassified.FieldLog.dll"; DestDir: "{app}\FieldLog assembly (.NET 2.0)"; Flags: ignoreversion
-Source: "..\FieldLog\bin\ReleaseNET20\Unclassified.FieldLog.xml"; DestDir: "{app}\FieldLog assembly (.NET 2.0)"; Flags: ignoreversion
+Source: "..\FieldLog\bin\ReleaseNET20\Unclassified.FieldLog.xml"; DestDir: "{app}\FieldLog assembly (.NET 2.0)"
+Source: "..\FieldLog\bin\ReleaseNET40\Unclassified.FieldLog.dll"; DestDir: "{app}\FieldLog assembly (.NET 4.0)"; Flags: ignoreversion
+Source: "..\FieldLog\bin\ReleaseNET40\Unclassified.FieldLog.xml"; DestDir: "{app}\FieldLog assembly (.NET 4.0)"
 Source: "..\FieldLog\bin\ReleaseASPNET40\Unclassified.FieldLog.dll"; DestDir: "{app}\FieldLog assembly (ASP.NET 4.0)"; Flags: ignoreversion
-Source: "..\FieldLog\bin\ReleaseASPNET40\Unclassified.FieldLog.xml"; DestDir: "{app}\FieldLog assembly (ASP.NET 4.0)"; Flags: ignoreversion
+Source: "..\FieldLog\bin\ReleaseASPNET40\Unclassified.FieldLog.xml"; DestDir: "{app}\FieldLog assembly (ASP.NET 4.0)"
 
 ; FieldLog source code
-Source: "..\FieldLog\CheckTimeThread.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
-Source: "..\FieldLog\CustomTimers.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
-Source: "..\FieldLog\Enums.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
-Source: "..\FieldLog\Exceptions.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
-Source: "..\FieldLog\FieldLogEventEnvironment.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
-Source: "..\FieldLog\FieldLogFileEnumerator.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
-Source: "..\FieldLog\FieldLogFileGroupReader.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
-Source: "..\FieldLog\FieldLogFileReader.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
-Source: "..\FieldLog\FieldLogFileWriter.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
-Source: "..\FieldLog\FieldLogTraceListener.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
-Source: "..\FieldLog\FieldLogWebRequestData.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
-Source: "..\FieldLog\FL.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
-Source: "..\FieldLog\LogItems.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
-Source: "..\FieldLog\OSInfo.cs"; DestDir: "{app}\FieldLog source code"; Flags: ignoreversion
+Source: "..\FieldLog\AppErrorDialog.cs"; DestDir: "{app}\FieldLog source code"
+Source: "..\FieldLog\CheckTimeThread.cs"; DestDir: "{app}\FieldLog source code"
+Source: "..\FieldLog\CustomTimers.cs"; DestDir: "{app}\FieldLog source code"
+Source: "..\FieldLog\Enums.cs"; DestDir: "{app}\FieldLog source code"
+Source: "..\FieldLog\Exceptions.cs"; DestDir: "{app}\FieldLog source code"
+Source: "..\FieldLog\FieldLogEventEnvironment.cs"; DestDir: "{app}\FieldLog source code"
+Source: "..\FieldLog\FieldLogFileEnumerator.cs"; DestDir: "{app}\FieldLog source code"
+Source: "..\FieldLog\FieldLogFileGroupReader.cs"; DestDir: "{app}\FieldLog source code"
+Source: "..\FieldLog\FieldLogFileReader.cs"; DestDir: "{app}\FieldLog source code"
+Source: "..\FieldLog\FieldLogFileWriter.cs"; DestDir: "{app}\FieldLog source code"
+Source: "..\FieldLog\FieldLogTraceListener.cs"; DestDir: "{app}\FieldLog source code"
+Source: "..\FieldLog\FieldLogWebRequestData.cs"; DestDir: "{app}\FieldLog source code"
+Source: "..\FieldLog\FL.cs"; DestDir: "{app}\FieldLog source code"
+Source: "..\FieldLog\LogItems.cs"; DestDir: "{app}\FieldLog source code"
+Source: "..\FieldLog\OSInfo.cs"; DestDir: "{app}\FieldLog source code"
+
+; Tx dictionary with FieldLog messages
+Source: "..\FieldLog\FieldLog.txd"; DestDir: "{app}\FieldLog source code"
 
 ; License files
-Source: "..\LICENSE-GPL"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\LICENSE-LGPL"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\LICENSE-GPL"; DestDir: "{app}"
+Source: "..\LICENSE-LGPL"; DestDir: "{app}"
 
 [Dirs]
+; Create user-writable log directory in the installation directory.
+; FieldLog will first try to write log file there.
 Name: "{app}\log"; Permissions: users-modify
 
 [InstallDelete]
+; Delete user configuration files if the task is selected
 Type: files; Name: "{userappdata}\Unclassified\FieldLog\FieldLogViewer.conf"; Tasks: DeleteConfig
 
 [Registry]
@@ -168,6 +177,7 @@ Root: HKCR; Subkey: "Applications\FieldLogViewer.exe\shell\open"; ValueType: str
 Root: HKCR; Subkey: "Applications\FieldLogViewer.exe\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\FieldLogViewer.exe"" ""%1"""
 
 [Icons]
+; Start menu
 Name: "{group}\FieldLogViewer"; Filename: "{app}\FieldLogViewer.exe"; IconFilename: "{app}\FieldLogViewer.exe"
 ;Name: "{group}\FieldLog Documentation"; Filename: "{app}\FieldLog Documentation.pdf"
 Name: "{group}\FieldLog website"; Filename: "http://unclassified.software/source/fieldlog"
@@ -184,179 +194,70 @@ Filename: {app}\FieldLogViewer.exe; WorkingDir: {app}; Flags: nowait postinstall
 Filename: {win}\Microsoft.NET\Framework\v4.0.30319\ngen.exe; Parameters: uninstall {app}\FieldLogViewer.exe; Flags: runhidden
 
 [UninstallDelete]
-; Delete user configuration files
+; Delete user configuration files if not uninstalling for a downgrade
+Type: files; Name: "{userappdata}\Unclassified\FieldLog\FieldLogViewer.conf"; Check: not IsDowngradeUninstall
 Type: dirifempty; Name: "{userappdata}\Unclassified\FieldLog"
 Type: dirifempty; Name: "{userappdata}\Unclassified"
 
-; Delete log files
-Type: files; Name: "{app}\log\FieldLogViewer-*.fl"
-Type: files; Name: "{app}\log\!README.txt"
+; Delete log files if not uninstalling for a downgrade
+Type: files; Name: "{app}\log\FieldLogViewer-*.fl"; Check: not IsDowngradeUninstall
+Type: files; Name: "{app}\log\!README.txt"; Check: not IsDowngradeUninstall
+; TODO: Is the following required? http://stackoverflow.com/q/28383251/143684
+Type: dirifempty; Name: "{app}\log"
+Type: dirifempty; Name: "{app}"
 
 [Code]
+function InitializeSetup: boolean;
 var
-  IsDowngradeSetup: Boolean;
-
-function IsUpgrade: Boolean;
-var
-  Value: string;
-  UninstallKey: string;
+	cmp: Integer;
 begin
-  UninstallKey := 'Software\Microsoft\Windows\CurrentVersion\Uninstall\' +
-    ExpandConstant('{#SetupSetting("AppId")}') + '_is1';
-  Result := (RegQueryStringValue(HKLM, UninstallKey, 'UninstallString', Value) or
-    RegQueryStringValue(HKCU, UninstallKey, 'UninstallString', Value)) and (Value <> '');
-end;
+	Result := InitCheckDowngrade;
 
-function GetQuietUninstallString: String;
-var
-  Value: string;
-  UninstallKey: string;
-begin
-  UninstallKey := 'Software\Microsoft\Windows\CurrentVersion\Uninstall\' +
-    ExpandConstant('{#SetupSetting("AppId")}') + '_is1';
-  if not RegQueryStringValue(HKLM, UninstallKey, 'QuietUninstallString', Value) then
-    RegQueryStringValue(HKCU, UninstallKey, 'QuietUninstallString', Value);
-  Result := Value;
-end;
-
-function GetInstalledVersion: String;
-var
-  Value: string;
-  UninstallKey: string;
-begin
-  UninstallKey := 'Software\Microsoft\Windows\CurrentVersion\Uninstall\' +
-    ExpandConstant('{#SetupSetting("AppId")}') + '_is1';
-  if not RegQueryStringValue(HKLM, UninstallKey, 'DisplayVersion', Value) then
-    RegQueryStringValue(HKCU, UninstallKey, 'DisplayVersion', Value);
-  Result := Value;
-end;
-
-function InitializeSetup(): boolean;
-var
-  ResultCode: Integer;
-begin
-  Result := true;
-  
-  // Check for downgrade
-  if IsUpgrade then
-  begin
-    if '{#ShortRevId}' < GetInstalledVersion then
-    begin
-      if MsgBox(ExpandConstant('{cm:DowngradeUninstall}'), mbConfirmation, MB_YESNO) = IDYES then
-      begin
-        Exec('>', GetQuietUninstallString, '', SW_SHOW, ewWaitUntilTerminated, ResultCode);
-      end;
-
-      // Check again
-      if '{#ShortRevId}' < GetInstalledVersion then
-      begin
-        Result := false;
-      end;
-
-      IsDowngradeSetup := true;
-    end;
-  end;
-  
-  if Result then
-  begin
-    //init windows version
-    initwinversion();
-
-    msi31('3.1');
-
-    // if no .netfx 4.0 is found, install the client (smallest)
-    if (not netfxinstalled(NetFx40Client, '') and not netfxinstalled(NetFx40Full, '')) then
-      dotnetfx40client();
-  end;
-end;
-
-procedure RegRenameStringValue(const RootKey: Integer; const SubKeyName, ValueName, NewValueName: String);
-var
-	value: String;
-begin
-	if RegQueryStringValue(RootKey, SubKeyName, ValueName, value) then
+	if Result then
 	begin
-		RegWriteStringValue(RootKey, SubKeyName, NewValueName, value);
-		RegDeleteValue(RootKey, SubKeyName, ValueName);
+		// Initialise 3rd-party requirements management
+		initwinversion();
+
+		msi31('3.1');
+
+		// If no .NET 4.0 is found, install the client profile (smallest)
+		if (not netfxinstalled(NetFx40Client, '') and not netfxinstalled(NetFx40Full, '')) then
+			dotnetfx40client();
 	end;
 end;
 
-procedure RegRenameDWordValue(const RootKey: Integer; const SubKeyName, ValueName, NewValueName: String);
-var
-	value: Cardinal;
+function ShouldSkipPage(PageID: Integer): Boolean;
 begin
-	if RegQueryDWordValue(RootKey, SubKeyName, ValueName, value) then
-	begin
-		RegWriteDWordValue(RootKey, SubKeyName, NewValueName, value);
-		RegDeleteValue(RootKey, SubKeyName, ValueName);
-	end;
+	// Make upgrade install quicker
+	Result := ((PageID = wpSelectTasks) or (PageID = wpReady)) and PrevInstallExists;
 end;
 
-procedure UnregisterVSTool(vsVersion: String);
-var
-	regKey: String;
-	ToolNumKeys: Cardinal;
-	i, j: Cardinal;
-	num: Cardinal;
-	str: String;
+procedure CurPageChanged(CurPageID: Integer);
 begin
-	regKey := 'Software\Microsoft\VisualStudio\' + vsVersion + '\External Tools';
-
-	if RegQueryDWordValue(HKEY_CURRENT_USER, regKey, 'ToolNumKeys', ToolNumKeys) then
+	if CurPageID = wpWelcome then
 	begin
-		// Visual Studio is installed
-		for i := 0 to ToolNumKeys - 1 do
+		if PrevInstallExists then
 		begin
-			if RegQueryStringValue(HKEY_CURRENT_USER, regKey, 'ToolTitle' + IntToStr(i), str) then
-			begin
-				if str = 'FieldLogViewer' then
-				begin
-					// Found TxEditor at index i. Remove it and move all others one position up.
-					RegDeleteValue(HKEY_CURRENT_USER, regKey, 'ToolArg' + IntToStr(i));
-					RegDeleteValue(HKEY_CURRENT_USER, regKey, 'ToolCmd' + IntToStr(i));
-					RegDeleteValue(HKEY_CURRENT_USER, regKey, 'ToolDir' + IntToStr(i));
-					RegDeleteValue(HKEY_CURRENT_USER, regKey, 'ToolOpt' + IntToStr(i));
-					RegDeleteValue(HKEY_CURRENT_USER, regKey, 'ToolSourceKey' + IntToStr(i));
-					RegDeleteValue(HKEY_CURRENT_USER, regKey, 'ToolTitle' + IntToStr(i));
-					
-					for j := i + 1 to ToolNumKeys - 1 do
-					begin
-						RegRenameStringValue(HKEY_CURRENT_USER, regKey, 'ToolArg' + IntToStr(j), 'ToolArg' + IntToStr(j - 1));
-						RegRenameStringValue(HKEY_CURRENT_USER, regKey, 'ToolCmd' + IntToStr(j), 'ToolCmd' + IntToStr(j - 1));
-						RegRenameStringValue(HKEY_CURRENT_USER, regKey, 'ToolDir' + IntToStr(j), 'ToolDir' + IntToStr(j - 1));
-						RegRenameDWordValue(HKEY_CURRENT_USER, regKey, 'ToolOpt' + IntToStr(j), 'ToolOpt' + IntToStr(j - 1));
-						RegRenameStringValue(HKEY_CURRENT_USER, regKey, 'ToolSourceKey' + IntToStr(j), 'ToolSourceKey' + IntToStr(j - 1));
-						RegRenameStringValue(HKEY_CURRENT_USER, regKey, 'ToolTitle' + IntToStr(j), 'ToolTitle' + IntToStr(j - 1));
-						RegRenameStringValue(HKEY_CURRENT_USER, regKey, 'ToolTitlePkg' + IntToStr(j), 'ToolTitlePkg' + IntToStr(j - 1));
-						RegRenameDWordValue(HKEY_CURRENT_USER, regKey, 'ToolTitleResID' + IntToStr(j), 'ToolTitleResID' + IntToStr(j - 1));
-					end;
-					RegWriteDWordValue(HKEY_CURRENT_USER, regKey, 'ToolNumKeys', ToolNumKeys - 1);
-				end;
-			end;
+			// Change "Next" button to "Upgrade" on the first page, because it won't ask any more
+			WizardForm.NextButton.Caption := ExpandConstant('{cm:Upgrade}');
+			WizardForm.FinishedHeadingLabel.Caption := ExpandConstant('{cm:UpdatedHeadingLabel}');
 		end;
 	end;
-end;
 
-procedure RegisterVSTool(vsVersion: String);
-var
-	regKey: String;
-	ToolNumKeys: Cardinal;
-begin
-	regKey := 'Software\Microsoft\VisualStudio\' + vsVersion + '\External Tools';
-
-	// Clean up existing entry before adding it
-	UnregisterVSTool(vsVersion);
-	
-	if RegQueryDWordValue(HKEY_CURRENT_USER, regKey, 'ToolNumKeys', ToolNumKeys) then
+	if CurPageID = wpSelectTasks then
 	begin
-		// Visual Studio is installed
-		RegWriteStringValue(HKEY_CURRENT_USER, regKey, 'ToolArg' + IntToStr(ToolNumKeys), '/w');
-		RegWriteStringValue(HKEY_CURRENT_USER, regKey, 'ToolCmd' + IntToStr(ToolNumKeys), ExpandConstant('{app}') + '\FieldLogViewer.exe');
-		RegWriteStringValue(HKEY_CURRENT_USER, regKey, 'ToolDir' + IntToStr(ToolNumKeys), '');
-		RegWriteDWordValue(HKEY_CURRENT_USER, regKey, 'ToolOpt' + IntToStr(ToolNumKeys), 17);
-		RegWriteStringValue(HKEY_CURRENT_USER, regKey, 'ToolSourceKey' + IntToStr(ToolNumKeys), '');
-		RegWriteStringValue(HKEY_CURRENT_USER, regKey, 'ToolTitle' + IntToStr(ToolNumKeys), 'FieldLogViewer');
-		RegWriteDWordValue(HKEY_CURRENT_USER, regKey, 'ToolNumKeys', ToolNumKeys + 1);
+		if IsDowngradeSetup then
+		begin
+			// Pre-select task to delete existing configuration on downgrading (user can deselect it again)
+			// (Use the zero-based index of all rows in the tasks list GUI)
+			// Source: http://stackoverflow.com/a/10490352/143684
+			WizardForm.TasksList.Checked[{#Task_DeleteConfig_Index}] := true;
+		end
+		else
+		begin
+			// Clear possibly remembered value from previous downgrade install
+			WizardForm.TasksList.Checked[{#Task_DeleteConfig_Index}] := false;
+		end;
 	end;
 end;
 
@@ -364,9 +265,11 @@ procedure CurStepChanged(CurStep: TSetupStep);
 begin
 	if (CurStep = ssPostInstall) and IsTaskSelected('VSTool') then
 	begin
-		RegisterVSTool('10.0');
-		RegisterVSTool('11.0');
-		RegisterVSTool('12.0');
+		// Register FieldLogViewer as external tool in all Visual Studio versions after setup
+		RegisterVSTool('10.0', 'FieldLogViewer', ExpandConstant('{app}') + '\FieldLogViewer.exe', '/w');
+		RegisterVSTool('11.0', 'FieldLogViewer', ExpandConstant('{app}') + '\FieldLogViewer.exe', '/w');
+		RegisterVSTool('12.0', 'FieldLogViewer', ExpandConstant('{app}') + '\FieldLogViewer.exe', '/w');
+		RegisterVSTool('14.0', 'FieldLogViewer', ExpandConstant('{app}') + '\FieldLogViewer.exe', '/w');
 	end;
 end;
 
@@ -374,37 +277,10 @@ procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
 	if CurUninstallStep = usPostUninstall then
 	begin
-		UnregisterVSTool('10.0');
-		UnregisterVSTool('11.0');
-		UnregisterVSTool('12.0');
+		// Unregister FieldLogViewer as external tool in all Visual Studio versions after uninstall
+		UnregisterVSTool('10.0', 'FieldLogViewer');
+		UnregisterVSTool('11.0', 'FieldLogViewer');
+		UnregisterVSTool('12.0', 'FieldLogViewer');
+		UnregisterVSTool('14.0', 'FieldLogViewer');
 	end;
 end;
-
-function ShouldSkipPage(PageID: Integer): Boolean;
-begin
-  Result := ((PageID = wpSelectTasks) or (PageID = wpReady)) and IsUpgrade;
-end;
-
-procedure CurPageChanged(CurPageID: Integer);
-begin
-  if CurPageID = wpWelcome then
-  begin
-    if IsUpgrade then
-    begin
-      WizardForm.NextButton.Caption := ExpandConstant('{cm:Upgrade}');
-      WizardForm.FinishedHeadingLabel.Caption := ExpandConstant('{cm:UpdatedHeadingLabel}');
-    end;
-  end;
-
-  if CurPageID = wpSelectTasks then
-  begin
-    if IsDowngradeSetup then
-    begin
-      // Pre-select task to delete existing configuration
-      // (Use the zero-based index of all rows in the tasks list GUI)
-      // Source: http://stackoverflow.com/a/10490352/143684
-      WizardForm.TasksList.Checked[{#Task_DeleteConfig_Index}] := true;
-    end;
-  end;
-end;
-

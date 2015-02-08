@@ -73,6 +73,7 @@ function Do-Git-Export($action)
 	Write-Host ""
 	Write-Host -ForegroundColor DarkCyan "Git export to $archive..."
 
+	# TODO: Replace with something like GitRevisionTool --stop-if-modified
 	if (($revId.Contains("!")) -or ($revId.Contains("+")))
 	{
 		Write-Host -ForegroundColor Yellow "Warning: The local working copy is modified! Uncommitted changes are NOT exported."

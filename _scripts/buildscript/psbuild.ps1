@@ -31,7 +31,7 @@
 # system. The following programs are used by the core script:
 #
 # * $toolsPath\FlashConsoleWindow
-# * $toolsPath\GitRevisionTool or SvnRevisionTool (only if automatic Git/Subversion versioning is used)
+# * $toolsPath\NetRevisionTool (only if automatic VCS versioning is used)
 
 # Initialisation code
 param($configParts, $batchMode = "")
@@ -48,13 +48,10 @@ $startTime = Get-Date
 # (Paths relative to this script file)
 $toolsPath = "../bin"
 $modulesPath = "modules"
-$gitRevisionFormat = "{commit:8}{!:+}"
-$svnRevisionFormat = "{commit}{!:+}"
 $revId = "0"
+$shortRevId = "0"
 $noParallelBuild = $false
-
-# Disable FASTBUILD mode to always include a full version number in the assembly version info
-$env:FASTBUILD = ""
+$revisionToolOptions = ""
 
 # Contains the selected actions to be executed
 $actions = @()
@@ -272,37 +269,23 @@ function Get-Platform()
 	}
 }
 
-# Returns the Git revision of the working directory.
+# Returns the VCS revision ID of the working directory.
 #
-# The revision format is specified in $gitRevisionFormat.
-#
-function Get-GitRevision()
+function Get-VcsRevision($haveFormat)
 {
-	# Determine current repository revision
-	$revId = & (Join-Path $absToolsPath "GitRevisionTool") --format "$global:gitRevisionFormat" "$sourcePath"
-	if ($revId -eq $null)
+	$args = $global:revisionToolOptions
+	if (!$haveFormat)
+	{
+		# Scan the solution for a format defined in a project
+		$args += " /multi"
+	}
+	$revId = Invoke-Expression ((Join-Path $absToolsPath "NetRevisionTool") + " " + $args + " `"$sourcePath`"")
+	if ($LASTEXITCODE -ne 0)
 	{
 		WaitError "Repository revision could not be determined"
 		exit 1
 	}
-	$global:gitUsed = $true
-	return $revId
-}
-
-# Returns the Subversion revision of the working directory.
-#
-# The revision format is specified in $svnRevisionFormat.
-#
-function Get-SvnRevision()
-{
-	# Determine current repository revision
-	$revId = & (Join-Path $absToolsPath "SvnRevisionTool") --format "$global:svnRevisionFormat" "$sourcePath"
-	if ($revId -eq $null)
-	{
-		WaitError "Repository revision could not be determined"
-		exit 1
-	}
-	$global:svnUsed = $true
+	$global:revisionToolUsed = $true
 	return $revId
 }
 
@@ -355,24 +338,23 @@ function Begin-BuildScript($projectTitle)
 	Write-Host ""
 }
 
-# Sets the application version from the Git revision.
+# Sets the application version from the VCS revision.
 #
-# $format = The GitRevisionTool format string.
+# $format = The NetRevisionTool format string. If unset, the format is searched in a project.
+# $options = Additional options passed to NetRevisionTool.
 #
-function Set-GitVersion($format)
+function Set-VcsVersion($format, $options)
 {
-	$global:gitRevisionFormat = $format
-	$global:revId = Get-GitRevision
-}
-
-# Sets the application version from the Subversion revision.
-#
-# $format = The SvnRevisionTool format string.
-#
-function Set-SvnVersion($format)
-{
-	$global:svnRevisionFormat = $format
-	$global:revId = Get-SvnRevision
+	$haveFormat = $false
+	if ($format)
+	{
+		$options += " /format `"" + $format + "`""
+		$haveFormat = $true
+	}
+	$global:revisionToolOptions = $options
+	$global:revId = Get-VcsRevision $haveFormat
+	# Make a shorter version that only includes numbers and dots
+	$global:shortRevId = $global:revId -Replace "[^0-9.].*$",""
 }
 
 # Sets the application version from an assembly version attribute.
@@ -384,6 +366,8 @@ function Set-SvnVersion($format)
 function Set-AssemblyInfoVersion($sourceFile, $attributeName)
 {
 	$global:revId = Get-AssemblyInfoVersion $sourceFile $attributeName
+	# Make a shorter version that only includes numbers and dots
+	$global:shortRevId = $global:revId -Replace "[^0-9.].*$",""
 }
 
 # Disables using parallel builds with MSBuild.

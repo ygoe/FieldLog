@@ -2,8 +2,7 @@
 # Project-specific control file
 
 Begin-BuildScript "FieldLog"
-Set-GitVersion "{bmin:2014:4}.{commit:6}{!:+}"
-#Set-GitVersion "1.{dmin:2015}-{commit:6}{!:+}"   # TODO: Later change to this format, then re-enable Create-NuGet
+Set-VcsVersion "" "/require git"
 
 # FieldLog.*NET* projects are overlapping, don't build them in parallel
 Disable-ParallelBuild
@@ -29,7 +28,7 @@ if (IsSelected "build-debug")
 }
 
 # Release builds
-if ((IsSelected "build-release") -or (IsSelected "commit") -or (IsSelected "publish"))
+if ((IsSelected "build-release") -or (IsSelected "commit") -or (IsSelected "publish-nuget"))
 {
 	Build-Solution "FieldLog.sln" "Release" "Any CPU" 8
 	
@@ -51,7 +50,7 @@ if ((IsSelected "build-release") -or (IsSelected "commit") -or (IsSelected "publ
 		Sign-File "PdbConvert\bin\Release\PdbConvert.exe" "$signKeyFile" "$signPassword" 1
 	}
 
-	#Create-NuGet "FieldLog\Unclassified.FieldLog.nuspec" "FieldLog\bin" 2   # TODO: Re-enable with new version format
+	Create-NuGet "FieldLog\Unclassified.FieldLog.nuspec" "FieldLog\bin" 2
 }
 
 # Release setups
@@ -83,7 +82,7 @@ if (IsSelected "commit")
 }
 
 # Publish to NuGet
-if (IsSelected "publish")
+if (IsSelected "publish-nuget")
 {
 	Push-NuGet "FieldLog\bin\Unclassified.FieldLog" "" 20
 }

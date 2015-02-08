@@ -4312,7 +4312,7 @@ namespace Unclassified.FieldLog
 		}
 
 		/// <summary>
-		/// Compares two dotted-numeric versions.
+		/// Compares two dotted-numeric versions. Anything after numbers and dots is ignored.
 		/// </summary>
 		/// <param name="a">The first version.</param>
 		/// <param name="b">The second version.</param>
@@ -4345,6 +4345,10 @@ namespace Unclassified.FieldLog
 		/// </remarks>
 		public static int CompareVersions(string a, string b)
 		{
+			// Cut off anything that's not numbers and dots
+			a = Regex.Replace(a, @"[^0-9.].*$", "");
+			b = Regex.Replace(b, @"[^0-9.].*$", "");
+
 			string[] aStrings = a.Split('.');
 			string[] bStrings = b.Split('.');
 			int length = Math.Max(aStrings.Length, bStrings.Length);
@@ -4361,7 +4365,8 @@ namespace Unclassified.FieldLog
 		}
 
 		/// <summary>
-		/// Compares <see cref="AppVersion"/> to a specified version.
+		/// Compares <see cref="AppVersion"/> to a specified version. Anything after numbers and
+		/// dots is ignored.
 		/// </summary>
 		/// <param name="otherVersion">The version to compare.</param>
 		/// <returns>

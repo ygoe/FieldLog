@@ -42,7 +42,7 @@ function Do-Create-NuGet($action)
 	Write-Host ""
 	Write-Host -ForegroundColor DarkCyan "Creating NuGet package $specFile..."
 
-	& nuget pack (MakeRootedPath $specFile) -OutputDirectory (MakeRootedPath $outDir) -Version $revId -NonInteractive
+	& nuget pack (MakeRootedPath $specFile) -OutputDirectory (MakeRootedPath $outDir) -Version $shortRevId -NonInteractive
 	if (-not $?)
 	{
 		WaitError "Creating NuGet package failed"
@@ -55,7 +55,7 @@ function Do-Push-NuGet($action)
 	$packageFile = $action.packageFile
 	$apiKey = $action.apiKey
 
-	$packageFile = $packageFile + "." + $revId + ".nupkg"
+	$packageFile = $packageFile + "." + $shortRevId + ".nupkg"
 	
 	Write-Host ""
 	Write-Host -ForegroundColor DarkCyan "Uploading NuGet package $packageFile..."

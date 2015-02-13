@@ -24,12 +24,7 @@ namespace Unclassified.FieldLog
 		#region Static members
 
 		/// <summary>Contains the empty data object.</summary>
-		public static readonly FieldLogWebRequestData Empty;
-
-		static FieldLogWebRequestData()
-		{
-			Empty = new FieldLogWebRequestData();
-		}
+		public static readonly FieldLogWebRequestData Empty = new FieldLogWebRequestData();
 
 		/// <summary>
 		/// Indicates whether the specified data variable is null or the Empty object.

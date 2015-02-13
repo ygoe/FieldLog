@@ -57,6 +57,7 @@ namespace Unclassified.FieldLog
 		public void Dispose()
 		{
 			timer.Dispose();
+			GC.SuppressFinalize(this);
 		}
 
 		/// <summary>

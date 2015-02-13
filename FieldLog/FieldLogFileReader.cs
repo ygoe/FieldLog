@@ -387,7 +387,7 @@ namespace Unclassified.FieldLog
 						}
 						if (!localWaitMode)
 						{
-							throw new Exception("Unexpected end of file.");
+							throw new EndOfStreamException("Unexpected end of file.");
 						}
 					}
 					// Parse type and length data
@@ -449,7 +449,7 @@ namespace Unclassified.FieldLog
 			}
 			catch (Exception ex)
 			{
-				throw new Exception(
+				throw new IOException(
 					"Error seeking the log file \"" + FileName + "\" to position " + startPosition + ". " + ex.Message,
 					ex);
 			}
@@ -475,6 +475,12 @@ namespace Unclassified.FieldLog
 				fileStream.Close();
 				fileStream = null;
 			}
+			if (closeEvent != null)
+			{
+				closeEvent.Close();
+				closeEvent = null;
+			}
+			GC.SuppressFinalize(this);
 		}
 
 		#endregion IDispose members

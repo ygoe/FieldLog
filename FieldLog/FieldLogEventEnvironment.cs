@@ -30,13 +30,10 @@ namespace Unclassified.FieldLog
 		#region Static members
 
 		/// <summary>Contains the empty environment object.</summary>
-		public static readonly FieldLogEventEnvironment Empty;
-
-		static FieldLogEventEnvironment()
+		public static readonly FieldLogEventEnvironment Empty = new FieldLogEventEnvironment
 		{
-			Empty = new FieldLogEventEnvironment();
-			Empty.Size = 148 + 14 * IntPtr.Size;   // 148 bytes + 14 null strings
-		}
+			Size = 148 + 14 * IntPtr.Size   // 148 bytes + 14 null strings
+		};
 
 		/// <summary>
 		/// Indicates whether the specified environment variable is null or an Empty environment.
@@ -292,7 +289,7 @@ namespace Unclassified.FieldLog
 			{
 				envNames.Add(de.Key.ToString());
 			}
-			envNames.Sort(StringComparer.InvariantCultureIgnoreCase);
+			envNames.Sort(StringComparer.OrdinalIgnoreCase);
 			StringBuilder envSb = new StringBuilder();
 			foreach (string envName in envNames)
 			{

@@ -75,6 +75,7 @@ namespace Unclassified.FieldLog
 				r = r.NextReader;
 				r2.Dispose();
 			}
+			GC.SuppressFinalize(this);
 		}
 
 		/// <summary>

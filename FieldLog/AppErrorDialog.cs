@@ -294,7 +294,7 @@ namespace Unclassified.FieldLog
 			{
 				logLabel.Text = string.Format(FL.AppErrorDialogLogPath, FL.LogFileBasePath.Replace("\\", "\\\u200B") + "*.fl");
 				string dir = Path.GetDirectoryName(FL.LogFileBasePath).Replace("\\", "\\\u200B");
-				logLabel.LinkArea = new LinkArea(FL.AppErrorDialogLogPath.IndexOf("{0}"), dir.Length);
+				logLabel.LinkArea = new LinkArea(FL.AppErrorDialogLogPath.IndexOf("{0}", StringComparison.Ordinal), dir.Length);
 				logLabel.LinkClicked += (s, e) =>
 				{
 					Process.Start(Path.GetDirectoryName(FL.LogFileBasePath));

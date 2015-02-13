@@ -203,7 +203,7 @@ namespace Unclassified.FieldLog
 
 			if (source == PresentationTraceSources.DataBindingSource.Name)
 			{
-				int i = msg.IndexOf(" BindingExpression:");
+				int i = msg.IndexOf(" BindingExpression:", StringComparison.Ordinal);
 				if (i > 0)
 				{
 					msg = msg.Substring(0, i) + "\n\n" + msg.Substring(i + 1).Replace("; ", ";\n");

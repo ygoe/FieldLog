@@ -445,7 +445,7 @@ namespace Unclassified.FieldLog
 					}
 
 					// Detect common features
-					if (csdVersion != null && csdVersion.Length > 13 && csdVersion.StartsWith("Service Pack "))
+					if (csdVersion != null && csdVersion.Length > 13 && csdVersion.StartsWith("Service Pack ", StringComparison.Ordinal))
 					{
 						ServicePack = csdVersion.Substring(13);
 					}
@@ -510,7 +510,7 @@ namespace Unclassified.FieldLog
 					}
 
 					// Detect version and edition
-					if (version.StartsWith("5.0"))
+					if (version.StartsWith("5.0", StringComparison.Ordinal))
 					{
 						if (productType == VER_NT_WORKSTATION)
 						{
@@ -537,7 +537,7 @@ namespace Unclassified.FieldLog
 							}
 						}
 					}
-					else if (version.StartsWith("5.1"))
+					else if (version.StartsWith("5.1", StringComparison.Ordinal))
 					{
 						Version = OSVersion.WindowsXP;
 						Is64Bit = false;
@@ -564,7 +564,7 @@ namespace Unclassified.FieldLog
 							Edition = OSEdition.WindowsXPProfessional;
 						}
 					}
-					else if (version.StartsWith("5.2"))
+					else if (version.StartsWith("5.2", StringComparison.Ordinal))
 					{
 						if (productType == VER_NT_WORKSTATION)
 						{
@@ -619,7 +619,7 @@ namespace Unclassified.FieldLog
 							}
 						}
 					}
-					else if (version.StartsWith("6.0"))
+					else if (version.StartsWith("6.0", StringComparison.Ordinal))
 					{
 						if (productType == VER_NT_WORKSTATION)
 						{
@@ -781,7 +781,7 @@ namespace Unclassified.FieldLog
 							}
 						}
 					}
-					else if (version.StartsWith("6.1"))
+					else if (version.StartsWith("6.1", StringComparison.Ordinal))
 					{
 						if (productType == VER_NT_WORKSTATION)
 						{
@@ -944,7 +944,7 @@ namespace Unclassified.FieldLog
 							}
 						}
 					}
-					else if (version.StartsWith("6.2"))
+					else if (version.StartsWith("6.2", StringComparison.Ordinal))
 					{
 						if (productType == VER_NT_WORKSTATION)
 						{
@@ -1048,7 +1048,7 @@ namespace Unclassified.FieldLog
 							}
 						}
 					}
-					else if (version.StartsWith("6.3"))
+					else if (version.StartsWith("6.3", StringComparison.Ordinal))
 					{
 						if (productType == VER_NT_WORKSTATION)
 						{
@@ -1152,7 +1152,7 @@ namespace Unclassified.FieldLog
 							}
 						}
 					}
-					else if (string.Compare(version, "6.3") > 0)
+					else if (FL.CompareVersions(version, "6.3") > 0)
 					{
 						Version = OSVersion.WindowsFuture;
 					}
@@ -1320,7 +1320,7 @@ namespace Unclassified.FieldLog
 
 		private static string ParseSPNumber(string spString)
 		{
-			if (spString != null && spString.Length > 13 && spString.StartsWith("Service Pack "))
+			if (spString != null && spString.Length > 13 && spString.StartsWith("Service Pack ", StringComparison.Ordinal))
 			{
 				return spString.Substring(13);
 			}

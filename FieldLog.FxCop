@@ -1,0 +1,1063 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FxCopProject Version="10.0" Name="FieldLog FxCop Project">
+ <ProjectOptions>
+  <SharedProject>True</SharedProject>
+  <Stylesheet Apply="False">$(FxCopDir)\Xml\FxCopReport.xsl</Stylesheet>
+  <SaveMessages>
+   <Project Status="Active, Excluded" NewOnly="False" />
+   <Report Status="Active" NewOnly="False" />
+  </SaveMessages>
+  <ProjectFile Compress="True" DefaultTargetCheck="True" DefaultRuleCheck="True" SaveByRuleGroup="" Deterministic="True" />
+  <EnableMultithreadedLoad>True</EnableMultithreadedLoad>
+  <EnableMultithreadedAnalysis>True</EnableMultithreadedAnalysis>
+  <SourceLookup>True</SourceLookup>
+  <AnalysisExceptionsThreshold>10</AnalysisExceptionsThreshold>
+  <RuleExceptionsThreshold>1</RuleExceptionsThreshold>
+  <Spelling Locale="de-DE" />
+  <OverrideRuleVisibilities>False</OverrideRuleVisibilities>
+  <CustomDictionaries SearchFxCopDir="True" SearchUserProfile="True" SearchProjectDir="True" />
+  <SearchGlobalAssemblyCache>False</SearchGlobalAssemblyCache>
+  <DeadlockDetectionTimeout>120</DeadlockDetectionTimeout>
+  <IgnoreGeneratedCode>False</IgnoreGeneratedCode>
+ </ProjectOptions>
+ <Targets>
+  <Target Name="$(ProjectDir)/FieldLog/bin/ReleaseASPNET40/Unclassified.FieldLog.dll" Analyze="True" AnalyzeAllChildren="True" />
+ </Targets>
+ <Rules>
+  <RuleFiles>
+   <RuleFile Name="$(FxCopDir)\Rules\DesignRules.dll" Enabled="True" AllRulesEnabled="False">
+    <Rule Name="AbstractTypesShouldNotHaveConstructors" Enabled="True" />
+    <Rule Name="AssembliesShouldHaveValidStrongNames" Enabled="True" />
+    <Rule Name="AvoidEmptyInterfaces" Enabled="True" />
+    <Rule Name="AvoidExcessiveParametersOnGenericTypes" Enabled="True" />
+    <Rule Name="AvoidNamespacesWithFewTypes" Enabled="True" />
+    <Rule Name="AvoidOutParameters" Enabled="True" />
+    <Rule Name="CollectionsShouldImplementGenericInterface" Enabled="True" />
+    <Rule Name="ConsiderPassingBaseTypesAsParameters" Enabled="True" />
+    <Rule Name="DeclareEventHandlersCorrectly" Enabled="True" />
+    <Rule Name="DeclareTypesInNamespaces" Enabled="True" />
+    <Rule Name="DefineAccessorsForAttributeArguments" Enabled="True" />
+    <Rule Name="DoNotDeclareProtectedMembersInSealedTypes" Enabled="True" />
+    <Rule Name="DoNotDeclareStaticMembersOnGenericTypes" Enabled="True" />
+    <Rule Name="DoNotDeclareVirtualMembersInSealedTypes" Enabled="True" />
+    <Rule Name="DoNotDeclareVisibleInstanceFields" Enabled="True" />
+    <Rule Name="DoNotExposeGenericLists" Enabled="True" />
+    <Rule Name="DoNotHideBaseClassMethods" Enabled="True" />
+    <Rule Name="DoNotNestGenericTypesInMemberSignatures" Enabled="True" />
+    <Rule Name="DoNotOverloadOperatorEqualsOnReferenceTypes" Enabled="True" />
+    <Rule Name="DoNotPassTypesByReference" Enabled="True" />
+    <Rule Name="DoNotRaiseExceptionsInUnexpectedLocations" Enabled="True" />
+    <Rule Name="EnumeratorsShouldBeStronglyTyped" Enabled="True" />
+    <Rule Name="EnumsShouldHaveZeroValue" Enabled="True" />
+    <Rule Name="EnumStorageShouldBeInt32" Enabled="True" />
+    <Rule Name="ExceptionsShouldBePublic" Enabled="True" />
+    <Rule Name="GenericMethodsShouldProvideTypeParameter" Enabled="True" />
+    <Rule Name="ICollectionImplementationsHaveStronglyTypedMembers" Enabled="True" />
+    <Rule Name="ImplementStandardExceptionConstructors" Enabled="True" />
+    <Rule Name="IndexersShouldNotBeMultidimensional" Enabled="True" />
+    <Rule Name="InterfaceMethodsShouldBeCallableByChildTypes" Enabled="True" />
+    <Rule Name="ListsAreStronglyTyped" Enabled="True" />
+    <Rule Name="MarkAssembliesWithAssemblyVersion" Enabled="True" />
+    <Rule Name="MarkAssembliesWithClsCompliant" Enabled="True" />
+    <Rule Name="MarkAssembliesWithComVisible" Enabled="True" />
+    <Rule Name="MarkAttributesWithAttributeUsage" Enabled="True" />
+    <Rule Name="MarkEnumsWithFlags" Enabled="True" />
+    <Rule Name="MembersShouldNotExposeCertainConcreteTypes" Enabled="True" />
+    <Rule Name="NestedTypesShouldNotBeVisible" Enabled="True" />
+    <Rule Name="OverloadOperatorEqualsOnOverloadingAddAndSubtract" Enabled="True" />
+    <Rule Name="OverrideMethodsOnComparableTypes" Enabled="True" />
+    <Rule Name="PropertiesShouldNotBeWriteOnly" Enabled="True" />
+    <Rule Name="ProvideObsoleteAttributeMessage" Enabled="True" />
+    <Rule Name="ReplaceRepetitiveArgumentsWithParamsArray" Enabled="True" />
+    <Rule Name="StaticHolderTypesShouldBeSealed" Enabled="True" />
+    <Rule Name="StaticHolderTypesShouldNotHaveConstructors" Enabled="True" />
+    <Rule Name="StringUriOverloadsCallSystemUriOverloads" Enabled="True" />
+    <Rule Name="TypesShouldNotExtendCertainBaseTypes" Enabled="True" />
+    <Rule Name="TypesThatOwnDisposableFieldsShouldBeDisposable" Enabled="True" />
+    <Rule Name="TypesThatOwnNativeResourcesShouldBeDisposable" Enabled="True" />
+    <Rule Name="UriParametersShouldNotBeStrings" Enabled="True" />
+    <Rule Name="UriPropertiesShouldNotBeStrings" Enabled="True" />
+    <Rule Name="UriReturnValuesShouldNotBeStrings" Enabled="True" />
+    <Rule Name="UseEventsWhereAppropriate" Enabled="True" />
+    <Rule Name="UseGenericEventHandlerInstances" Enabled="True" />
+    <Rule Name="UseGenericsWhereAppropriate" Enabled="True" />
+    <Rule Name="UseIntegralOrStringArgumentForIndexers" Enabled="True" />
+    <Rule Name="UsePropertiesWhereAppropriate" Enabled="True" />
+   </RuleFile>
+   <RuleFile Name="$(FxCopDir)\Rules\GlobalizationRules.dll" Enabled="True" AllRulesEnabled="False">
+    <Rule Name="AvoidDuplicateAccelerators" Enabled="True" />
+    <Rule Name="DoNotHardcodeLocaleSpecificStrings" Enabled="True" />
+    <Rule Name="SetLocaleForDataTypes" Enabled="True" />
+    <Rule Name="SpecifyCultureInfo" Enabled="True" />
+    <Rule Name="SpecifyMarshalingForPInvokeStringArguments" Enabled="True" />
+    <Rule Name="SpecifyMessageBoxOptions" Enabled="True" />
+    <Rule Name="SpecifyStringComparison" Enabled="True" />
+    <Rule Name="UseOrdinalStringComparison" Enabled="True" />
+   </RuleFile>
+   <RuleFile Name="$(FxCopDir)\Rules\InteroperabilityRules.dll" Enabled="True" AllRulesEnabled="False">
+    <Rule Name="AutoLayoutTypesShouldNotBeComVisible" Enabled="True" />
+    <Rule Name="AvoidInt64ArgumentsForVB6Clients" Enabled="True" />
+    <Rule Name="AvoidNonpublicFieldsInComVisibleValueTypes" Enabled="True" />
+    <Rule Name="AvoidOverloadsInComVisibleInterfaces" Enabled="True" />
+    <Rule Name="AvoidStaticMembersInComVisibleTypes" Enabled="True" />
+    <Rule Name="CallGetLastErrorImmediatelyAfterPInvoke" Enabled="True" />
+    <Rule Name="ComRegistrationMethodsShouldBeMatched" Enabled="True" />
+    <Rule Name="ComRegistrationMethodsShouldNotBeVisible" Enabled="True" />
+    <Rule Name="ComVisibleTypeBaseTypesShouldBeComVisible" Enabled="True" />
+    <Rule Name="ComVisibleTypesShouldBeCreatable" Enabled="True" />
+    <Rule Name="DeclarePInvokesCorrectly" Enabled="True" />
+    <Rule Name="DoNotUseAutoDualClassInterfaceType" Enabled="True" />
+    <Rule Name="MarkComSourceInterfacesAsIDispatch" Enabled="True" />
+    <Rule Name="PInvokeEntryPointsShouldExist" Enabled="True" />
+    <Rule Name="PInvokesShouldNotBeVisible" Enabled="True" />
+   </RuleFile>
+   <RuleFile Name="$(FxCopDir)\Rules\MobilityRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\NamingRules.dll" Enabled="True" AllRulesEnabled="False">
+    <Rule Name="CompoundWordsShouldBeCasedCorrectly" Enabled="True" />
+    <Rule Name="DoNotNameEnumValuesReserved" Enabled="True" />
+    <Rule Name="DoNotPrefixEnumValuesWithTypeName" Enabled="True" />
+    <Rule Name="EventsShouldNotHaveBeforeOrAfterPrefix" Enabled="True" />
+    <Rule Name="FlagsEnumsShouldHavePluralNames" Enabled="True" />
+    <Rule Name="IdentifiersShouldBeCasedCorrectly" Enabled="True" />
+    <Rule Name="IdentifiersShouldBeSpelledCorrectly" Enabled="True" />
+    <Rule Name="IdentifiersShouldDifferByMoreThanCase" Enabled="True" />
+    <Rule Name="IdentifiersShouldHaveCorrectPrefix" Enabled="True" />
+    <Rule Name="IdentifiersShouldHaveCorrectSuffix" Enabled="True" />
+    <Rule Name="IdentifiersShouldNotContainTypeNames" Enabled="True" />
+    <Rule Name="IdentifiersShouldNotContainUnderscores" Enabled="True" />
+    <Rule Name="IdentifiersShouldNotHaveIncorrectPrefix" Enabled="True" />
+    <Rule Name="IdentifiersShouldNotHaveIncorrectSuffix" Enabled="True" />
+    <Rule Name="IdentifiersShouldNotMatchKeywords" Enabled="True" />
+    <Rule Name="OnlyFlagsEnumsShouldHavePluralNames" Enabled="True" />
+    <Rule Name="ParameterNamesShouldMatchBaseDeclaration" Enabled="True" />
+    <Rule Name="PropertyNamesShouldNotMatchGetMethods" Enabled="True" />
+    <Rule Name="ResourceStringCompoundWordsShouldBeCasedCorrectly" Enabled="True" />
+    <Rule Name="ResourceStringsShouldBeSpelledCorrectly" Enabled="True" />
+    <Rule Name="TypeNamesShouldNotMatchNamespaces" Enabled="True" />
+    <Rule Name="UsePreferredTerms" Enabled="True" />
+   </RuleFile>
+   <RuleFile Name="$(FxCopDir)\Rules\PerformanceRules.dll" Enabled="True" AllRulesEnabled="False">
+    <Rule Name="AvoidExcessiveLocals" Enabled="True" />
+    <Rule Name="AvoidUncalledPrivateCode" Enabled="True" />
+    <Rule Name="AvoidUninstantiatedInternalClasses" Enabled="True" />
+    <Rule Name="AvoidUnsealedAttributes" Enabled="True" />
+    <Rule Name="AvoidUnusedPrivateFields" Enabled="True" />
+    <Rule Name="DoNotCastUnnecessarily" Enabled="True" />
+    <Rule Name="InitializeReferenceTypeStaticFieldsInline" Enabled="True" />
+    <Rule Name="MarkAssembliesWithNeutralResourcesLanguage" Enabled="True" />
+    <Rule Name="MarkMembersAsStatic" Enabled="True" />
+    <Rule Name="OverrideEqualsAndOperatorEqualsOnValueTypes" Enabled="True" />
+    <Rule Name="PreferJaggedArraysOverMultidimensional" Enabled="True" />
+    <Rule Name="RemoveEmptyFinalizers" Enabled="True" />
+    <Rule Name="RemoveUnusedLocals" Enabled="True" />
+    <Rule Name="TestForEmptyStringsUsingStringLength" Enabled="True" />
+    <Rule Name="UseLiteralsWhereAppropriate" Enabled="True" />
+   </RuleFile>
+   <RuleFile Name="$(FxCopDir)\Rules\PortabilityRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\SecurityRules.dll" Enabled="True" AllRulesEnabled="False">
+    <Rule Name="AptcaMethodsShouldOnlyCallAptcaMethods" Enabled="True" />
+    <Rule Name="AptcaTypesShouldOnlyExtendAptcaBaseTypes" Enabled="True" />
+    <Rule Name="ArrayFieldsShouldNotBeReadOnly" Enabled="True" />
+    <Rule Name="CallGCKeepAliveWhenUsingNativeResources" Enabled="True" />
+    <Rule Name="CatchNonClsCompliantExceptionsInGeneralHandlers" Enabled="True" />
+    <Rule Name="DoNotIndirectlyExposeMethodsWithLinkDemands" Enabled="True" />
+    <Rule Name="MethodSecurityShouldBeASupersetOfType" Enabled="True" />
+    <Rule Name="PointersShouldNotBeVisible" Enabled="True" />
+    <Rule Name="ReviewDeclarativeSecurityOnValueTypes" Enabled="True" />
+    <Rule Name="ReviewDenyAndPermitOnlyUsage" Enabled="True" />
+    <Rule Name="ReviewImperativeSecurity" Enabled="True" />
+    <Rule Name="ReviewSuppressUnmanagedCodeSecurityUsage" Enabled="True" />
+    <Rule Name="ReviewVisibleEventHandlers" Enabled="True" />
+    <Rule Name="SealMethodsThatSatisfyPrivateInterfaces" Enabled="True" />
+    <Rule Name="SecureAsserts" Enabled="True" />
+    <Rule Name="SecuredTypesShouldNotExposeFields" Enabled="True" />
+    <Rule Name="SecureSerializationConstructors" Enabled="True" />
+    <Rule Name="StaticConstructorsShouldBePrivate" Enabled="True" />
+    <Rule Name="TypeLinkDemandsRequireInheritanceDemands" Enabled="True" />
+    <Rule Name="WrapVulnerableFinallyClausesInOuterTry" Enabled="True" />
+   </RuleFile>
+   <RuleFile Name="$(FxCopDir)\Rules\SecurityTransparencyRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\UsageRules.dll" Enabled="True" AllRulesEnabled="False">
+    <Rule Name="CallBaseClassMethodsOnISerializableTypes" Enabled="True" />
+    <Rule Name="CallGCSuppressFinalizeCorrectly" Enabled="True" />
+    <Rule Name="CollectionPropertiesShouldBeReadOnly" Enabled="True" />
+    <Rule Name="DisposableFieldsShouldBeDisposed" Enabled="True" />
+    <Rule Name="DisposableTypesShouldDeclareFinalizer" Enabled="True" />
+    <Rule Name="DoNotCallOverridableMethodsInConstructors" Enabled="True" />
+    <Rule Name="DoNotDecreaseInheritedMemberVisibility" Enabled="True" />
+    <Rule Name="DoNotIgnoreMethodResults" Enabled="True" />
+    <Rule Name="DoNotMarkEnumsWithFlags" Enabled="True" />
+    <Rule Name="DoNotMarkServicedComponentsWithWebMethod" Enabled="True" />
+    <Rule Name="DoNotRaiseExceptionsInExceptionClauses" Enabled="True" />
+    <Rule Name="DoNotRaiseReservedExceptionTypes" Enabled="True" />
+    <Rule Name="DoNotShipUnreleasedResourceFormats" Enabled="True" />
+    <Rule Name="FinalizersShouldBeProtected" Enabled="True" />
+    <Rule Name="FinalizersShouldCallBaseClassFinalizer" Enabled="True" />
+    <Rule Name="ImplementISerializableCorrectly" Enabled="True" />
+    <Rule Name="ImplementSerializationConstructors" Enabled="True" />
+    <Rule Name="ImplementSerializationMethodsCorrectly" Enabled="True" />
+    <Rule Name="InitializeValueTypeStaticFieldsInline" Enabled="True" />
+    <Rule Name="InstantiateArgumentExceptionsCorrectly" Enabled="True" />
+    <Rule Name="MarkAllNonSerializableFields" Enabled="True" />
+    <Rule Name="MarkISerializableTypesWithSerializable" Enabled="True" />
+    <Rule Name="MarkWindowsFormsEntryPointsWithStaThread" Enabled="True" />
+    <Rule Name="MembersShouldDifferByMoreThanReturnType" Enabled="True" />
+    <Rule Name="NonConstantFieldsShouldNotBeVisible" Enabled="True" />
+    <Rule Name="OperationsShouldNotOverflow" Enabled="True" />
+    <Rule Name="OperatorOverloadsHaveNamedAlternates" Enabled="True" />
+    <Rule Name="OperatorsShouldHaveSymmetricalOverloads" Enabled="True" />
+    <Rule Name="OverloadOperatorEqualsOnOverridingValueTypeEquals" Enabled="True" />
+    <Rule Name="OverrideEqualsOnOverloadingOperatorEquals" Enabled="True" />
+    <Rule Name="OverrideGetHashCodeOnOverridingEquals" Enabled="True" />
+    <Rule Name="PassSystemUriObjectsInsteadOfStrings" Enabled="True" />
+    <Rule Name="ProvideDeserializationMethodsForOptionalFields" Enabled="True" />
+    <Rule Name="RethrowToPreserveStackDetails" Enabled="True" />
+    <Rule Name="ReviewUnusedParameters" Enabled="True" />
+    <Rule Name="TestForNaNCorrectly" Enabled="True" />
+    <Rule Name="UseManagedEquivalentsOfWin32Api" Enabled="True" />
+    <Rule Name="UseParamsForVariableArguments" Enabled="True" />
+   </RuleFile>
+  </RuleFiles>
+  <Groups />
+  <Settings />
+ </Rules>
+ <FxCopReport Version="10.0">
+  <Targets>
+   <Target Name="$(ProjectDir)/FieldLog/bin/ReleaseASPNET40/Unclassified.FieldLog.dll">
+    <Modules>
+     <Module Name="unclassified.fieldlog.dll">
+      <Messages>
+       <Message TypeName="AssembliesShouldHaveValidStrongNames" Category="Microsoft.Design" CheckId="CA2210" Created="2015-02-13 09:17:31Z">
+        <Issue Name="NoStrongName">
+         <Item>'Unclassified.FieldLog.dll'</Item>
+        </Issue>
+       </Message>
+       <Message TypeName="MarkAssembliesWithClsCompliant" Category="Microsoft.Design" CheckId="CA1014" Created="2015-02-13 09:17:31Z">
+        <Issue>
+         <Item>'Unclassified.FieldLog.dll'</Item>
+        </Issue>
+       </Message>
+      </Messages>
+      <Namespaces>
+       <Namespace Name="Unclassified.FieldLog">
+        <Types>
+         <Type Name="AppErrorDialog">
+          <Members>
+           <Member Name="#.cctor()">
+            <Messages>
+             <Message TypeName="InitializeReferenceTypeStaticFieldsInline" Category="Microsoft.Performance" CheckId="CA1810" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue>
+               <Item>'AppErrorDialog'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="6" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#.ctor()">
+            <Messages>
+             <Message TypeName="DoNotIndirectlyExposeMethodsWithLinkDemands" Category="Microsoft.Security" CheckId="CA2122" Created="2015-02-13 09:17:31Z">
+              <Issue>
+               <Item>'AppErrorDialog.AppErrorDialog()'</Item>
+               <Item>'PropertyGrid.HelpVisible.set(bool)'</Item>
+               <Item>&#xD;&#xA;   -&gt;'AppErrorDialog.AppErrorDialog()'&#xD;&#xA;   -&gt;'AppErrorDialog.AppErrorDialog()'&#xD;&#xA;   -&gt;'AppErrorDialog.ShowError(bool, string, object, bool)'</Item>
+              </Issue>
+              <Issue>
+               <Item>'AppErrorDialog.AppErrorDialog()'</Item>
+               <Item>'PropertyGrid.PropertySort.set(PropertySort)'</Item>
+               <Item>&#xD;&#xA;   -&gt;'AppErrorDialog.AppErrorDialog()'&#xD;&#xA;   -&gt;'AppErrorDialog.AppErrorDialog()'&#xD;&#xA;   -&gt;'AppErrorDialog.ShowError(bool, string, object, bool)'</Item>
+              </Issue>
+              <Issue>
+               <Item>'AppErrorDialog.AppErrorDialog()'</Item>
+               <Item>'PropertyGrid.ToolbarVisible.set(bool)'</Item>
+               <Item>&#xD;&#xA;   -&gt;'AppErrorDialog.AppErrorDialog()'&#xD;&#xA;   -&gt;'AppErrorDialog.AppErrorDialog()'&#xD;&#xA;   -&gt;'AppErrorDialog.ShowError(bool, string, object, bool)'</Item>
+              </Issue>
+              <Issue>
+               <Item>'AppErrorDialog.AppErrorDialog()'</Item>
+               <Item>'PropertyGrid.UseCompatibleTextRendering.set(bool)'</Item>
+               <Item>&#xD;&#xA;   -&gt;'AppErrorDialog.AppErrorDialog()'&#xD;&#xA;   -&gt;'AppErrorDialog.AppErrorDialog()'&#xD;&#xA;   -&gt;'AppErrorDialog.ShowError(bool, string, object, bool)'</Item>
+              </Issue>
+              <Issue>
+               <Item>'AppErrorDialog.AppErrorDialog()'</Item>
+               <Item>'TypeDescriptor.AddAttributes(Type, params Attribute[])'</Item>
+               <Item>&#xD;&#xA;   -&gt;'AppErrorDialog.AppErrorDialog()'&#xD;&#xA;   -&gt;'AppErrorDialog.AppErrorDialog()'&#xD;&#xA;   -&gt;'AppErrorDialog.ShowError(bool, string, object, bool)'</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#AddError(System.Boolean,System.String,System.Object,System.Boolean)">
+            <Messages>
+             <Message TypeName="SpecifyMessageBoxOptions" Category="Microsoft.Globalization" CheckId="CA1300" Created="2015-02-13 09:17:31Z">
+              <Issue>
+               <Item>'AppErrorDialog.AddError(bool, string, object, bool)'</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#EnableTerminateTimer()">
+            <Messages>
+             <Message TypeName="DoNotUseTimersThatPreventPowerStateChanges" Category="Microsoft.Mobility" CheckId="CA1601" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue>
+               <Item>'Timer.Interval.set(int)'</Item>
+               <Item>'AppErrorDialog.EnableTerminateTimer()'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="1" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#ShowError(System.Boolean,System.String,System.Object,System.Boolean)">
+            <Messages>
+             <Message TypeName="DoNotIndirectlyExposeMethodsWithLinkDemands" Category="Microsoft.Security" CheckId="CA2122" Created="2015-02-13 09:17:31Z">
+              <Issue>
+               <Item>'AppErrorDialog.ShowError(bool, string, object, bool)'</Item>
+               <Item>'PropertyGrid.SelectedObject.set(object)'</Item>
+               <Item>&#xD;&#xA;   -&gt;'AppErrorDialog.ShowError(bool, string, object, bool)'&#xD;&#xA;   -&gt;'AppErrorDialog.ShowError(bool, string, object, bool)'</Item>
+              </Issue>
+             </Message>
+             <Message TypeName="SpecifyMessageBoxOptions" Category="Microsoft.Globalization" CheckId="CA1300" Created="2015-02-13 09:17:31Z">
+              <Issue>
+               <Item>'AppErrorDialog.ShowError(bool, string, object, bool)'</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#UiThreadStart()">
+            <Messages>
+             <Message TypeName="DoNotUseTimersThatPreventPowerStateChanges" Category="Microsoft.Mobility" CheckId="CA1601" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue>
+               <Item>'Timer.Interval.set(int)'</Item>
+               <Item>'AppErrorDialog.UiThreadStart()'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="1" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="FieldLogDataItem">
+          <Members>
+           <Member Name="#FormatValues(System.Object,System.Int32,System.Collections.Stack)">
+            <Messages>
+             <Message TypeName="DoNotCastUnnecessarily" Category="Microsoft.Performance" CheckId="CA1800" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue Name="Parameter">
+               <Item>'data'</Item>
+               <Item>'Enum'</Item>
+               <Item>'FieldLogDataItem.FormatValues(object, int, Stack)'</Item>
+               <Item>castclass</Item>
+              </Issue>
+              <Issue Name="Parameter">
+               <Item>'data'</Item>
+               <Item>'Enum'</Item>
+               <Item>'FieldLogDataItem.FormatValues(object, int, Stack)'</Item>
+               <Item>castclass</Item>
+              </Issue>
+              <Issue Name="Parameter">
+               <Item>'data'</Item>
+               <Item>'StringBuilder'</Item>
+               <Item>'FieldLogDataItem.FormatValues(object, int, Stack)'</Item>
+               <Item>castclass</Item>
+              </Issue>
+              <Issue Name="Parameter">
+               <Item>'data'</Item>
+               <Item>'string'</Item>
+               <Item>'FieldLogDataItem.FormatValues(object, int, Stack)'</Item>
+               <Item>castclass</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="4" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="FieldLogEventEnvironment">
+          <Members>
+           <Member Name="#Current()">
+            <Messages>
+             <Message TypeName="DoNotIndirectlyExposeMethodsWithLinkDemands" Category="Microsoft.Security" CheckId="CA2122" Created="2015-02-13 09:17:31Z">
+              <Issue>
+               <Item>'FieldLogEventEnvironment.Current()'</Item>
+               <Item>'Process.GetCurrentProcess()'</Item>
+               <Item>&#xD;&#xA;   -&gt;'FieldLogEventEnvironment.Current()'&#xD;&#xA;   -&gt;'FieldLogEventEnvironment.Current()'</Item>
+              </Issue>
+              <Issue>
+               <Item>'FieldLogEventEnvironment.Current()'</Item>
+               <Item>'Process.Id.get()'</Item>
+               <Item>&#xD;&#xA;   -&gt;'FieldLogEventEnvironment.Current()'&#xD;&#xA;   -&gt;'FieldLogEventEnvironment.Current()'</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#OSIs64Bit">
+            <Messages>
+             <Message Id="OSIs" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue Name="Member">
+               <Item>OSIs</Item>
+               <Item>'FieldLogEventEnvironment.OSIs64Bit'</Item>
+               <Item>Osis</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="2" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#OSIsAppServer">
+            <Messages>
+             <Message Id="OSIs" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue Name="Member">
+               <Item>OSIs</Item>
+               <Item>'FieldLogEventEnvironment.OSIsAppServer'</Item>
+               <Item>Osis</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="2" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#OSIsFailSafeBoot">
+            <Messages>
+             <Message Id="OSIs" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue Name="Member">
+               <Item>OSIs</Item>
+               <Item>'FieldLogEventEnvironment.OSIsFailSafeBoot'</Item>
+               <Item>Osis</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="2" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="FieldLogException">
+          <Members>
+           <Member Name="#Type">
+            <Messages>
+             <Message TypeName="PropertyNamesShouldNotMatchGetMethods" Category="Microsoft.Naming" CheckId="CA1721" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue Name="BaseType">
+               <Item>'FieldLogException.Type'</Item>
+               <Item>'object.GetType()'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="3" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="FieldLogFileGroupReader">
+          <Messages>
+           <Message TypeName="TypesThatOwnDisposableFieldsShouldBeDisposable" Category="Microsoft.Design" CheckId="CA1001" Created="2015-02-13 09:17:31Z" FixCategory="DependsOnFix">
+            <Issue Name="DependsOnFix">
+             <Item>'FieldLogFileGroupReader'</Item>
+             <Item>'AutoResetEvent', 'ManualResetEvent', 'FileSystemWatcher'</Item>
+            </Issue>
+           </Message>
+          </Messages>
+          <Members>
+           <Member Name="#.ctor(System.String,System.Boolean,System.Threading.EventWaitHandle)">
+            <Messages>
+             <Message TypeName="DoNotIndirectlyExposeMethodsWithLinkDemands" Category="Microsoft.Security" CheckId="CA2122" Created="2015-02-13 09:17:31Z">
+              <Issue>
+               <Item>'FieldLogFileGroupReader.FieldLogFileGroupReader(string, bool, EventWaitHandle)'</Item>
+               <Item>'FileSystemWatcher.Created.add(FileSystemEventHandler)'</Item>
+               <Item>&#xD;&#xA;   -&gt;'FieldLogFileGroupReader.FieldLogFileGroupReader(string, bool, EventWaitHandle)'&#xD;&#xA;   -&gt;'FieldLogFileGroupReader.FieldLogFileGroupReader(string, bool, EventWaitHandle)'</Item>
+              </Issue>
+              <Issue>
+               <Item>'FieldLogFileGroupReader.FieldLogFileGroupReader(string, bool, EventWaitHandle)'</Item>
+               <Item>'FileSystemWatcher.EnableRaisingEvents.set(bool)'</Item>
+               <Item>&#xD;&#xA;   -&gt;'FieldLogFileGroupReader.FieldLogFileGroupReader(string, bool, EventWaitHandle)'&#xD;&#xA;   -&gt;'FieldLogFileGroupReader.FieldLogFileGroupReader(string, bool, EventWaitHandle)'</Item>
+              </Issue>
+              <Issue>
+               <Item>'FieldLogFileGroupReader.FieldLogFileGroupReader(string, bool, EventWaitHandle)'</Item>
+               <Item>'FileSystemWatcher.NotifyFilter.set(NotifyFilters)'</Item>
+               <Item>&#xD;&#xA;   -&gt;'FieldLogFileGroupReader.FieldLogFileGroupReader(string, bool, EventWaitHandle)'&#xD;&#xA;   -&gt;'FieldLogFileGroupReader.FieldLogFileGroupReader(string, bool, EventWaitHandle)'</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#ReadLogItem()">
+            <Messages>
+             <Message TypeName="DoNotIndirectlyExposeMethodsWithLinkDemands" Category="Microsoft.Security" CheckId="CA2122" Created="2015-02-13 09:17:31Z">
+              <Issue>
+               <Item>'FieldLogFileGroupReader.ReadLogItem()'</Item>
+               <Item>'FileSystemWatcher.EnableRaisingEvents.set(bool)'</Item>
+               <Item>&#xD;&#xA;   -&gt;'FieldLogFileGroupReader.ReadLogItem()'&#xD;&#xA;   -&gt;'FieldLogFileGroupReader.ReadLogItem()'</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="FieldLogFileReader">
+          <Members>
+           <Member Name="#ReadLogItem()">
+            <Messages>
+             <Message TypeName="DoNotRaiseReservedExceptionTypes" Category="Microsoft.Usage" CheckId="CA2201" Created="2015-02-13 09:17:31Z">
+              <Issue Name="TooGeneric">
+               <Item>'FieldLogFileReader.ReadLogItem()'</Item>
+               <Item>'Exception'</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#ReadUInt64()">
+            <Messages>
+             <Message TypeName="AvoidUncalledPrivateCode" Category="Microsoft.Performance" CheckId="CA1811" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue>
+               <Item>'FieldLogFileReader.ReadUInt64()'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="15" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="FieldLogFileWriter">
+          <Members>
+           <Member Name="#.ctor(System.String,Unclassified.FieldLog.FieldLogPriority)">
+            <Messages>
+             <Message Id="Unclassified.FieldLog.FieldLogFileWriter.DeviceIoControl(System.IntPtr,System.Int32,System.Int16@,System.Int32,System.IntPtr,System.Int32,System.Int32@,System.IntPtr)" TypeName="DoNotIgnoreMethodResults" Category="Microsoft.Usage" CheckId="CA1806" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue Name="HResultOrErrorCode">
+               <Item>'FieldLogFileWriter.FieldLogFileWriter(string, FieldLogPriority)'</Item>
+               <Item>'FieldLogFileWriter.DeviceIoControl(IntPtr, int, ref short, int, IntPtr, int, ref int, IntPtr)'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="9" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#AddBuffer(System.UInt64)">
+            <Messages>
+             <Message TypeName="AvoidUncalledPrivateCode" Category="Microsoft.Performance" CheckId="CA1811" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue>
+               <Item>'FieldLogFileWriter.AddBuffer(ulong)'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="15" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="FieldLogScopeItem">
+          <Members>
+           <Member Name="#.ctor(Unclassified.FieldLog.FieldLogScopeItem)">
+            <Messages>
+             <Message TypeName="AvoidUncalledPrivateCode" Category="Microsoft.Performance" CheckId="CA1811" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue>
+               <Item>'FieldLogScopeItem.FieldLogScopeItem(FieldLogScopeItem)'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="15" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#Type">
+            <Messages>
+             <Message TypeName="PropertyNamesShouldNotMatchGetMethods" Category="Microsoft.Naming" CheckId="CA1721" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue Name="BaseType">
+               <Item>'FieldLogScopeItem.Type'</Item>
+               <Item>'object.GetType()'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="3" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="FieldLogTraceListener">
+          <Members>
+           <Member Name="#.cctor()">
+            <Messages>
+             <Message TypeName="InitializeReferenceTypeStaticFieldsInline" Category="Microsoft.Performance" CheckId="CA1810" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue>
+               <Item>'FieldLogTraceListener'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="5" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#Start(System.Diagnostics.SourceLevels)">
+            <Messages>
+             <Message TypeName="DoNotIndirectlyExposeMethodsWithLinkDemands" Category="Microsoft.Security" CheckId="CA2122" Created="2015-02-13 09:17:31Z">
+              <Issue>
+               <Item>'FieldLogTraceListener.Start(SourceLevels)'</Item>
+               <Item>'SourceSwitch.Level.set(SourceLevels)'</Item>
+               <Item>&#xD;&#xA;   -&gt;'FieldLogTraceListener.Start(SourceLevels)'&#xD;&#xA;   -&gt;'FieldLogTraceListener.Start(SourceLevels)'&#xD;&#xA;   -&gt;'FieldLogTraceListener.Start()'&#xD;&#xA;   -&gt;'FL.RegisterPresentationTracing()'</Item>
+              </Issue>
+              <Issue>
+               <Item>'FieldLogTraceListener.Start(SourceLevels)'</Item>
+               <Item>'TraceSource.Listeners.get()'</Item>
+               <Item>&#xD;&#xA;   -&gt;'FieldLogTraceListener.Start(SourceLevels)'&#xD;&#xA;   -&gt;'FieldLogTraceListener.Start(SourceLevels)'&#xD;&#xA;   -&gt;'FieldLogTraceListener.Start()'&#xD;&#xA;   -&gt;'FL.RegisterPresentationTracing()'</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#Stop()">
+            <Messages>
+             <Message TypeName="AvoidUncalledPrivateCode" Category="Microsoft.Performance" CheckId="CA1811" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue>
+               <Item>'FieldLogTraceListener.Stop()'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="16" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="FieldLogWebRequestData">
+          <Members>
+           <Member Name="#RequestUrl">
+            <Messages>
+             <Message TypeName="UriPropertiesShouldNotBeStrings" Category="Microsoft.Design" CheckId="CA1056" Created="2015-02-13 09:17:31Z">
+              <Issue>
+               <Item>'FieldLogWebRequestData.RequestUrl'</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="FL">
+          <Members>
+           <Member Name="#.cctor()">
+            <Messages>
+             <Message TypeName="InitializeReferenceTypeStaticFieldsInline" Category="Microsoft.Performance" CheckId="CA1810" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue>
+               <Item>'FL'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="7" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#GetAllWebErrors()">
+            <Messages>
+             <Message TypeName="UsePropertiesWhereAppropriate" Category="Microsoft.Design" CheckId="CA1024" Status="Excluded" Created="2015-02-13 11:01:41Z">
+              <Issue Certainty="50">
+               <Item>'FL.GetAllWebErrors()'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="18" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#LogScope(Unclassified.FieldLog.FieldLogScopeType,System.String,Unclassified.FieldLog.FieldLogWebRequestData)">
+            <Messages>
+             <Message Id="name" TypeName="ReviewUnusedParameters" Category="Microsoft.Usage" CheckId="CA1801" Status="Excluded" Created="2015-02-13 09:17:31Z" FixCategory="DependsOnFix">
+              <Issue>
+               <Item>'name'</Item>
+               <Item>'FL.LogScope(FieldLogScopeType, string, FieldLogWebRequestData)'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="13" />
+               </User>
+              </Notes>
+             </Message>
+             <Message Id="webRequestData" TypeName="ReviewUnusedParameters" Category="Microsoft.Usage" CheckId="CA1801" Status="Excluded" Created="2015-02-13 09:17:31Z" FixCategory="DependsOnFix">
+              <Issue>
+               <Item>'webRequestData'</Item>
+               <Item>'FL.LogScope(FieldLogScopeType, string, FieldLogWebRequestData)'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="12" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#LogStackTrace()">
+            <Messages>
+             <Message TypeName="DoNotRaiseReservedExceptionTypes" Category="Microsoft.Usage" CheckId="CA2201" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue Name="TooGeneric">
+               <Item>'FL.LogStackTrace()'</Item>
+               <Item>'Exception'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="11" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#LogStackTrace(System.String)">
+            <Messages>
+             <Message TypeName="DoNotRaiseReservedExceptionTypes" Category="Microsoft.Usage" CheckId="CA2201" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue Name="TooGeneric">
+               <Item>'FL.LogStackTrace(string)'</Item>
+               <Item>'Exception'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="10" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#LogStackTrace(Unclassified.FieldLog.FieldLogPriority,System.String)">
+            <Messages>
+             <Message TypeName="DoNotRaiseReservedExceptionTypes" Category="Microsoft.Usage" CheckId="CA2201" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue Name="TooGeneric">
+               <Item>'FL.LogStackTrace(FieldLogPriority, string)'</Item>
+               <Item>'Exception'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="11" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#LogStackTrace(Unclassified.FieldLog.FieldLogPriority,System.String,System.Boolean)">
+            <Messages>
+             <Message TypeName="DoNotRaiseReservedExceptionTypes" Category="Microsoft.Usage" CheckId="CA2201" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue Name="TooGeneric">
+               <Item>'FL.LogStackTrace(FieldLogPriority, string, bool)'</Item>
+               <Item>'Exception'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="11" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#LogWebShutdown()">
+            <Messages>
+             <Message Id="System.Type.InvokeMember(System.String,System.Reflection.BindingFlags,System.Reflection.Binder,System.Object,System.Object[])" TypeName="SpecifyCultureInfo" Category="Microsoft.Globalization" CheckId="CA1304" Status="Excluded" Created="2015-02-13 11:01:41Z">
+              <Issue>
+               <Item>'Type.InvokeMember(string, BindingFlags, Binder, object, object[])'</Item>
+               <Item>'FL.LogWebShutdown()'</Item>
+               <Item>'Type.InvokeMember(string, BindingFlags, Binder, object, object[], CultureInfo)'</Item>
+              </Issue>
+              <Issue>
+               <Item>'Type.InvokeMember(string, BindingFlags, Binder, object, object[])'</Item>
+               <Item>'FL.LogWebShutdown()'</Item>
+               <Item>'Type.InvokeMember(string, BindingFlags, Binder, object, object[], CultureInfo)'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="17" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="FL+ShowAppErrorDialogDelegate">
+          <Messages>
+           <Message TypeName="NestedTypesShouldNotBeVisible" Category="Microsoft.Design" CheckId="CA1034" Created="2015-02-13 09:17:31Z">
+            <Issue>
+             <Item>'FL.ShowAppErrorDialogDelegate'</Item>
+            </Issue>
+           </Message>
+          </Messages>
+         </Type>
+         <Type Name="OSInfo">
+          <Members>
+           <Member Name="#.cctor()">
+            <Messages>
+             <Message Id="System.Int32.TryParse(System.String,System.Int32@)" TypeName="DoNotIgnoreMethodResults" Category="Microsoft.Usage" CheckId="CA1806" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue Name="TryParse">
+               <Item>'OSInfo.OSInfo()'</Item>
+               <Item>'int.TryParse(string, out int)'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="8" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#GetAvailableMemorySize()">
+            <Messages>
+             <Message Id="System.Int64.TryParse(System.String,System.Int64@)" TypeName="DoNotIgnoreMethodResults" Category="Microsoft.Usage" CheckId="CA1806" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue Name="TryParse">
+               <Item>'OSInfo.GetAvailableMemorySize()'</Item>
+               <Item>'long.TryParse(string, out long)'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="8" />
+               </User>
+              </Notes>
+             </Message>
+             <Message TypeName="UsePropertiesWhereAppropriate" Category="Microsoft.Design" CheckId="CA1024" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue Certainty="50">
+               <Item>'OSInfo.GetAvailableMemorySize()'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="0" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#GetProcessPeakMemory()">
+            <Messages>
+             <Message TypeName="DoNotIndirectlyExposeMethodsWithLinkDemands" Category="Microsoft.Security" CheckId="CA2122" Created="2015-02-13 09:17:31Z">
+              <Issue>
+               <Item>'OSInfo.GetProcessPeakMemory()'</Item>
+               <Item>'Process.GetCurrentProcess()'</Item>
+               <Item>&#xD;&#xA;   -&gt;'OSInfo.GetProcessPeakMemory()'&#xD;&#xA;   -&gt;'OSInfo.GetProcessPeakMemory()'</Item>
+              </Issue>
+              <Issue>
+               <Item>'OSInfo.GetProcessPeakMemory()'</Item>
+               <Item>'Process.PeakWorkingSet64.get()'</Item>
+               <Item>&#xD;&#xA;   -&gt;'OSInfo.GetProcessPeakMemory()'&#xD;&#xA;   -&gt;'OSInfo.GetProcessPeakMemory()'</Item>
+              </Issue>
+             </Message>
+             <Message TypeName="UsePropertiesWhereAppropriate" Category="Microsoft.Design" CheckId="CA1024" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue Certainty="50">
+               <Item>'OSInfo.GetProcessPeakMemory()'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="0" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#GetProcessPrivateMemory()">
+            <Messages>
+             <Message TypeName="DoNotIndirectlyExposeMethodsWithLinkDemands" Category="Microsoft.Security" CheckId="CA2122" Created="2015-02-13 09:17:31Z">
+              <Issue>
+               <Item>'OSInfo.GetProcessPrivateMemory()'</Item>
+               <Item>'Process.GetCurrentProcess()'</Item>
+               <Item>&#xD;&#xA;   -&gt;'OSInfo.GetProcessPrivateMemory()'&#xD;&#xA;   -&gt;'OSInfo.GetProcessPrivateMemory()'</Item>
+              </Issue>
+              <Issue>
+               <Item>'OSInfo.GetProcessPrivateMemory()'</Item>
+               <Item>'Process.PrivateMemorySize64.get()'</Item>
+               <Item>&#xD;&#xA;   -&gt;'OSInfo.GetProcessPrivateMemory()'&#xD;&#xA;   -&gt;'OSInfo.GetProcessPrivateMemory()'</Item>
+              </Issue>
+             </Message>
+             <Message TypeName="UsePropertiesWhereAppropriate" Category="Microsoft.Design" CheckId="CA1024" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue Certainty="50">
+               <Item>'OSInfo.GetProcessPrivateMemory()'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="0" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#GetTotalMemorySize()">
+            <Messages>
+             <Message Id="System.Int64.TryParse(System.String,System.Int64@)" TypeName="DoNotIgnoreMethodResults" Category="Microsoft.Usage" CheckId="CA1806" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue Name="TryParse">
+               <Item>'OSInfo.GetTotalMemorySize()'</Item>
+               <Item>'long.TryParse(string, out long)'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="8" />
+               </User>
+              </Notes>
+             </Message>
+             <Message TypeName="UsePropertiesWhereAppropriate" Category="Microsoft.Design" CheckId="CA1024" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue Certainty="50">
+               <Item>'OSInfo.GetTotalMemorySize()'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="0" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#GetVersionEx(Unclassified.FieldLog.OSInfo+OSVERSIONINFOEX&amp;)">
+            <Messages>
+             <Message TypeName="UseManagedEquivalentsOfWin32Api" Category="Microsoft.Usage" CheckId="CA2205" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue Name="PlatformInvokeDeclaration">
+               <Item>'OSInfo.GetVersionEx(ref OSInfo.OSVERSIONINFOEX)'</Item>
+               <Item>System.Environment.OSVersion</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="14" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#ReadRegistryVersionIntValue(System.String)">
+            <Messages>
+             <Message Id="System.Int32.TryParse(System.String,System.Int32@)" TypeName="DoNotIgnoreMethodResults" Category="Microsoft.Usage" CheckId="CA1806" Status="Excluded" Created="2015-02-13 09:17:31Z">
+              <Issue Name="TryParse">
+               <Item>'OSInfo.ReadRegistryVersionIntValue(string)'</Item>
+               <Item>'int.TryParse(string, out int)'</Item>
+              </Issue>
+              <Notes>
+               <User Name="yves">
+                <Note Id="8" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+        </Types>
+       </Namespace>
+      </Namespaces>
+     </Module>
+    </Modules>
+   </Target>
+  </Targets>
+  <Notes>
+   <User Name="yves">
+    <Note Id="0" Modified="2015-02-13 09:43:32Z">Not appropriate here.</Note>
+    <Note Id="1" Modified="2015-02-13 10:05:52Z">Exceptional and of short duration here.</Note>
+    <Note Id="2" Modified="2015-02-13 10:07:07Z">It is correct, the words are "OS" and "Is".</Note>
+    <Note Id="3" Modified="2015-02-13 10:12:42Z">I can't remove GetType...</Note>
+    <Note Id="4" Modified="2015-02-13 10:16:37Z">It's more readable like this.</Note>
+    <Note Id="5" Modified="2015-02-13 10:20:09Z">FxCop analysis error.</Note>
+    <Note Id="6" Modified="2015-02-13 10:21:02Z">FxCop analysis error. Not possible in C# 4.0.</Note>
+    <Note Id="7" Modified="2015-02-13 10:23:11Z">FxCop analysis error. Not possible in C# 4.0.</Note>
+    <Note Id="8" Modified="2015-02-13 10:36:51Z">The default value is good. No need to use the return value.</Note>
+    <Note Id="9" Modified="2015-02-13 10:38:16Z">Failures are ignored because the operation is optional and a failure cannot be corrected.</Note>
+    <Note Id="10" Modified="2015-02-13 10:40:16Z">This exception is a dummy and never thrown.</Note>
+    <Note Id="11" Modified="2015-02-13 10:43:32Z">This exception is a dummy and never thrown.</Note>
+    <Note Id="12" Modified="2015-02-13 10:45:15Z">Used in the ASP.NET build configuration.</Note>
+    <Note Id="13" Modified="2015-02-13 10:46:20Z">Used in the ASP.NET build configuration.</Note>
+    <Note Id="14" Modified="2015-02-13 10:48:14Z">The native function returns a lot more information which is required here.</Note>
+    <Note Id="15" Modified="2015-02-13 10:50:29Z">Internal API code.</Note>
+    <Note Id="16" Modified="2015-02-13 10:50:43Z">Public API.</Note>
+    <Note Id="17" Modified="2015-02-13 11:03:00Z">What for?</Note>
+    <Note Id="18" Modified="2015-02-13 11:05:40Z">Conversion that may create a new object.</Note>
+   </User>
+  </Notes>
+  <Rules>
+   <Rule TypeName="AssembliesShouldHaveValidStrongNames" Category="Microsoft.Design" CheckId="CA2210">
+    <Resolution Name="NoStrongName">Sign {0} with a strong name key.</Resolution>
+   </Rule>
+   <Rule TypeName="AvoidUncalledPrivateCode" Category="Microsoft.Performance" CheckId="CA1811">
+    <Resolution Name="Default">{0} appears to have no upstream public or protected callers.</Resolution>
+   </Rule>
+   <Rule TypeName="DoNotCastUnnecessarily" Category="Microsoft.Performance" CheckId="CA1800">
+    <Resolution Name="Parameter">{0}, a parameter, is cast to type {1} multiple times in method {2}. Cache the result of the 'as' operator or direct cast in order to eliminate the redundant {3} instruction.</Resolution>
+   </Rule>
+   <Rule TypeName="DoNotIgnoreMethodResults" Category="Microsoft.Usage" CheckId="CA1806">
+    <Resolution Name="HResultOrErrorCode">{0} calls {1} but does not use the HRESULT or error code that the method returns. This could lead to unexpected behavior in error conditions or low-resource situations. Use the result in a conditional statement, assign the result to a variable, or pass it as an argument to another method.</Resolution>
+    <Resolution Name="TryParse">{0} calls {1} but does not explicitly check whether the conversion succeeded. Either use the return value in a conditional statement or verify that the call site expects that the out argument will be set to the default value when the conversion fails.</Resolution>
+   </Rule>
+   <Rule TypeName="DoNotIndirectlyExposeMethodsWithLinkDemands" Category="Microsoft.Security" CheckId="CA2122">
+    <Resolution Name="Default">{0} calls into {1} which has a LinkDemand. By making this call, {1} is indirectly exposed to user code. Review the following call stack that might expose a way to circumvent security protection: {2}</Resolution>
+   </Rule>
+   <Rule TypeName="DoNotRaiseReservedExceptionTypes" Category="Microsoft.Usage" CheckId="CA2201">
+    <Resolution Name="TooGeneric">{0} creates an exception of type {1}, an exception type that is not sufficiently specific and should never be raised by user code. If this exception instance might be thrown, use a different exception type.</Resolution>
+   </Rule>
+   <Rule TypeName="DoNotUseTimersThatPreventPowerStateChanges" Category="Microsoft.Mobility" CheckId="CA1601">
+    <Resolution Name="Default">Modify the call to {0} in method {1} to set the timer interval to a value that's greater than or equal to one second.</Resolution>
+   </Rule>
+   <Rule TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709">
+    <Resolution Name="Member">Correct the casing of '{0}' in member name {1} by changing it to '{2}'.</Resolution>
+   </Rule>
+   <Rule TypeName="InitializeReferenceTypeStaticFieldsInline" Category="Microsoft.Performance" CheckId="CA1810">
+    <Resolution Name="Default">Initialize all static fields in {0} when those fields are declared and remove the explicit static constructor.</Resolution>
+   </Rule>
+   <Rule TypeName="MarkAssembliesWithClsCompliant" Category="Microsoft.Design" CheckId="CA1014">
+    <Resolution Name="Default">Mark {0} with CLSCompliant(true) because it exposes externally visible types.</Resolution>
+   </Rule>
+   <Rule TypeName="NestedTypesShouldNotBeVisible" Category="Microsoft.Design" CheckId="CA1034">
+    <Resolution Name="Default">Do not nest type {0}. Alternatively, change its accessibility so that it is not externally visible.</Resolution>
+   </Rule>
+   <Rule TypeName="PropertyNamesShouldNotMatchGetMethods" Category="Microsoft.Naming" CheckId="CA1721">
+    <Resolution Name="BaseType">The property name {0} is confusing given the existence of inherited method {1}. Rename or remove this property.</Resolution>
+   </Rule>
+   <Rule TypeName="ReviewUnusedParameters" Category="Microsoft.Usage" CheckId="CA1801">
+    <Resolution Name="Default">Parameter {0} of {1} is never used. Remove the parameter or use it in the method body.</Resolution>
+   </Rule>
+   <Rule TypeName="SpecifyCultureInfo" Category="Microsoft.Globalization" CheckId="CA1304">
+    <Resolution Name="Default">Because the behavior of {0} could vary based on the current user's locale settings, replace this call in {1} with a call to {2}. If the result of {2} will be displayed to the user, specify 'CultureInfo.CurrentCulture' as the 'CultureInfo' parameter. Otherwise, if the result will be stored and accessed by software, such as when it is persisted to disk or to a database, specify 'CultureInfo.InvariantCulture'.</Resolution>
+   </Rule>
+   <Rule TypeName="SpecifyMessageBoxOptions" Category="Microsoft.Globalization" CheckId="CA1300">
+    <Resolution Name="Default">Change {0} to call the MessageBox.Show overload that specifies MessageBoxOptions, and make sure to set MessageBoxOptions.RightAlign and MessageBoxOptions.RtlReading if RightToLeft is set to RightToLeft.Yes on the parent control.</Resolution>
+   </Rule>
+   <Rule TypeName="TypesThatOwnDisposableFieldsShouldBeDisposable" Category="Microsoft.Design" CheckId="CA1001">
+    <Resolution Name="DependsOnFix">Implement IDisposable on {0} because it creates members of the following IDisposable types: {1}. If {0} has previously shipped, adding new members that implement IDisposable to this type is considered a breaking change to existing consumers.</Resolution>
+   </Rule>
+   <Rule TypeName="UriPropertiesShouldNotBeStrings" Category="Microsoft.Design" CheckId="CA1056">
+    <Resolution Name="Default">Change the type of property {0} from string to System.Uri.</Resolution>
+   </Rule>
+   <Rule TypeName="UseManagedEquivalentsOfWin32Api" Category="Microsoft.Usage" CheckId="CA2205">
+    <Resolution Name="PlatformInvokeDeclaration">Remove the declaration for {0}. Callers should use the following managed alternative: {1}</Resolution>
+   </Rule>
+   <Rule TypeName="UsePropertiesWhereAppropriate" Category="Microsoft.Design" CheckId="CA1024">
+    <Resolution Name="Default">Change {0} to a property if appropriate.</Resolution>
+   </Rule>
+  </Rules>
+ </FxCopReport>
+</FxCopProject>

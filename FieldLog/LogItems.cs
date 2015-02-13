@@ -64,7 +64,7 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Initialises a new instance of the FieldLogItem class with Trace priority.
 		/// </summary>
-		public FieldLogItem()
+		protected FieldLogItem()
 			: this(FieldLogPriority.Trace)
 		{
 		}
@@ -73,7 +73,7 @@ namespace Unclassified.FieldLog
 		/// Initialises a new instance of the FieldLogItem class.
 		/// </summary>
 		/// <param name="priority">The priority of the new log item.</param>
-		public FieldLogItem(FieldLogPriority priority)
+		protected FieldLogItem(FieldLogPriority priority)
 		{
 			Time = FL.UtcNow;
 			Priority = priority;
@@ -507,7 +507,7 @@ namespace Unclassified.FieldLog
 						{
 							str = "<" + ex.Message + ">";
 						}
-						if (!str.StartsWith(Environment.NewLine))
+						if (!str.StartsWith(Environment.NewLine, StringComparison.Ordinal))
 						{
 							sb.AppendLine();
 							sb.Append(indent);
@@ -765,7 +765,7 @@ namespace Unclassified.FieldLog
 		/// <param name="type">The scope type.</param>
 		/// <param name="name">The scope name.</param>
 		public FieldLogScopeItem(FieldLogPriority priority, FieldLogScopeType type, string name)
-			: this(FieldLogPriority.Trace, type, name, null)
+			: this(priority, type, name, null)
 		{
 		}
 

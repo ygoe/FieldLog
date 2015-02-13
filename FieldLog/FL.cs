@@ -948,13 +948,13 @@ namespace Unclassified.FieldLog
 		/// calling this method.
 		/// </summary>
 		/// <param name="errorMsg">The error message to display.</param>
-		/// <param name="detailsObject">An object to display in the details grid view. Can be null.</param>
+		/// <param name="details">An object to display in the details grid view. Can be null.</param>
 		/// <remarks>
 		/// A FieldLogItem should be logged before calling this method. This dialog is not modal so
 		/// the application continues to run. Additional errors are collected in the error dialog.
 		/// The dialog is top-most so it will overlay the application window.
 		/// </remarks>
-		public static void ShowErrorDialog(string errorMsg, object detailsObject = null)
+		public static void ShowErrorDialog(string errorMsg, object details = null)
 		{
 			// Wait max. 1 second for the log file path to be set
 			int pathRetry = 20;
@@ -963,7 +963,7 @@ namespace Unclassified.FieldLog
 				Thread.Sleep(50);
 			}
 
-			AppErrorDialog.ShowError(true, errorMsg, detailsObject, false);
+			AppErrorDialog.ShowError(true, errorMsg, details, false);
 		}
 
 		/// <summary>
@@ -3560,7 +3560,7 @@ namespace Unclassified.FieldLog
 					case 4:
 						// Subdirectory in My Documents (if not in service account)
 						logFileBasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), execFile + "-log" + Path.DirectorySeparatorChar + execFile);
-						if (logFileBasePath.ToLowerInvariant().StartsWith(Environment.GetEnvironmentVariable("windir").ToLowerInvariant()))
+						if (logFileBasePath.StartsWith(Environment.GetEnvironmentVariable("windir"), StringComparison.OrdinalIgnoreCase))
 						{
 							// (Environment.SpecialFolder.Windows is not available in .NET 2.0 but
 							// the environment variable %windir% is just as good.)
@@ -3862,7 +3862,7 @@ namespace Unclassified.FieldLog
 				// Check if this file is currently open
 				foreach (var plw in priorityLogWriters.Values)
 				{
-					if (string.Equals(plw.FileName, fileNames[i], StringComparison.InvariantCultureIgnoreCase))
+					if (string.Equals(plw.FileName, fileNames[i], StringComparison.OrdinalIgnoreCase))
 					{
 						fileTimes[i] = DateTime.MaxValue;
 						break;
@@ -3936,7 +3936,7 @@ namespace Unclassified.FieldLog
 			foreach (string fileName in Directory.GetFiles(logDir, logFile + "-" + (int) prio + "-*.fl"))
 			{
 				FileInfo fi = new FileInfo(fileName);
-				if (!string.Equals(fileName, currentFileName, StringComparison.InvariantCultureIgnoreCase) &&
+				if (!string.Equals(fileName, currentFileName, StringComparison.OrdinalIgnoreCase) &&
 					fi.LastWriteTimeUtc < FL.UtcNow.Subtract(keepTime))
 				{
 					// File is not currently open for writing and old enough to be deleted
@@ -4314,10 +4314,10 @@ namespace Unclassified.FieldLog
 		/// <summary>
 		/// Compares two dotted-numeric versions. Anything after numbers and dots is ignored.
 		/// </summary>
-		/// <param name="a">The first version.</param>
-		/// <param name="b">The second version.</param>
+		/// <param name="firstVersion">The first version.</param>
+		/// <param name="secondVersion">The second version.</param>
 		/// <returns>
-		/// A signed number indicating the relative values of <paramref name="a"/> and <paramref name="b"/>.
+		/// A signed number indicating the relative values of <paramref name="firstVersion"/> and <paramref name="secondVersion"/>.
 		/// <list type="table">
 		///   <listheader>
 		///     <term>Return value</term>
@@ -4325,15 +4325,15 @@ namespace Unclassified.FieldLog
 		///   </listheader>
 		///   <item>
 		///     <term>Less than zero</term>
-		///     <description><paramref name="a"/> is less than <paramref name="b"/>.</description>
+		///     <description><paramref name="firstVersion"/> is less than <paramref name="secondVersion"/>.</description>
 		///   </item>
 		///   <item>
 		///     <term>Zero</term>
-		///     <description><paramref name="a"/> is equal to <paramref name="b"/>.</description>
+		///     <description><paramref name="firstVersion"/> is equal to <paramref name="secondVersion"/>.</description>
 		///   </item>
 		///   <item>
 		///     <term>Greater than zero</term>
-		///     <description><paramref name="a"/> is greater than <paramref name="b"/>.</description>
+		///     <description><paramref name="firstVersion"/> is greater than <paramref name="secondVersion"/>.</description>
 		///   </item>
 		/// </list>
 		/// </returns>
@@ -4343,23 +4343,23 @@ namespace Unclassified.FieldLog
 		/// because the AssemblyVersion attribute always contains all four segments but this is not
 		/// how we want to display simpler versions to the user.
 		/// </remarks>
-		public static int CompareVersions(string a, string b)
+		public static int CompareVersions(string firstVersion, string secondVersion)
 		{
 			// Cut off anything that's not numbers and dots
-			a = Regex.Replace(a, @"[^0-9.].*$", "");
-			b = Regex.Replace(b, @"[^0-9.].*$", "");
+			firstVersion = Regex.Replace(firstVersion, @"[^0-9.].*$", "");
+			secondVersion = Regex.Replace(secondVersion, @"[^0-9.].*$", "");
 
-			string[] aStrings = a.Split('.');
-			string[] bStrings = b.Split('.');
-			int length = Math.Max(aStrings.Length, bStrings.Length);
+			string[] firstStrings = firstVersion.Split('.');
+			string[] secondStrings = secondVersion.Split('.');
+			int length = Math.Max(firstStrings.Length, secondStrings.Length);
 			for (int i = 0; i < length; i++)
 			{
-				string aStr = i < aStrings.Length ? aStrings[i] : "0";
-				string bStr = i < bStrings.Length ? bStrings[i] : "0";
-				int aNum = int.Parse(aStr, System.Globalization.CultureInfo.InvariantCulture);
-				int bNum = int.Parse(bStr, System.Globalization.CultureInfo.InvariantCulture);
-				if (aNum < bNum) return -1;
-				if (aNum > bNum) return 1;
+				string firstStr = i < firstStrings.Length ? firstStrings[i] : "0";
+				string secondStr = i < secondStrings.Length ? secondStrings[i] : "0";
+				int firstNum = int.Parse(firstStr, System.Globalization.CultureInfo.InvariantCulture);
+				int secondNum = int.Parse(secondStr, System.Globalization.CultureInfo.InvariantCulture);
+				if (firstNum < secondNum) return -1;
+				if (firstNum > secondNum) return 1;
 			}
 			return 0;
 		}

@@ -6,23 +6,23 @@
 
 # ---------- USAGE ----------
 #
-# psbuild.ps1 <config-parts> [batch]
+# psbuild.ps1 "<config-parts>"
 #
 # config-parts: Space-separated list of selected build script parts. These parts can be tested for
 #               with the IsSelected function.
-# Batch mode:   Specify the parameter "batch" to run the build script non-interactively.
-#               This disables user confirmations and delays.
-#               Recommended for use in automatic build servers.
 #
 # ---------- STARTING ----------
 #
 # Yes, starting PowerShell scripts is a bit complicated. Here's an example batch file for use from
 # the parent directory of this file. Each batch file defines the config parts to run and should be
-# named accordingly. Additional parameters are passed on to PowerShell (for batch mode).
+# named accordingly.
 #
 # @echo off
+# set file=buildscript\psbuild.ps1
+# set config="config-parts..."
+#
 # cd /d "%~dp0"
-# %SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy unrestricted -File buildscript\psbuild.ps1 "config-parts..." %*
+# %SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy unrestricted -File %file% %config%
 # exit /b %errorlevel%
 #
 # ---------- REQUIREMENTS ----------
@@ -34,11 +34,10 @@
 # * $toolsPath\NetRevisionTool (only if automatic VCS versioning is used)
 
 # Initialisation code
-param($configParts, $batchMode = "")
-$batchMode = ($batchMode -eq "batch")
+param($configParts)
 
 #cmd /c color f0
-Clear-Host
+#Clear-Host
 
 $scriptDir = ($MyInvocation.MyCommand.Definition | Split-Path -parent)
 $rootDir = $scriptDir | Split-Path -parent | Split-Path -parent
@@ -60,6 +59,41 @@ $actions = @()
 $absToolsPath = Join-Path $scriptDir $toolsPath
 
 # ==============================  HELPER FUNCTIONS  ==============================
+
+# Some code can be better expressed in C#...
+#
+Add-Type @'
+using System;
+using System.Runtime.InteropServices;
+
+public class Utils
+{
+	[DllImport("kernel32.dll")]
+	private static extern uint GetFileType(IntPtr hFile);
+
+	[DllImport("kernel32.dll")]
+	private static extern IntPtr GetStdHandle(int nStdHandle);
+
+	[DllImport("kernel32.dll")]
+	private static extern IntPtr GetConsoleWindow();
+
+	[DllImport("user32.dll")]
+	private static extern bool IsWindowVisible(IntPtr hWnd);
+
+	public static bool IsInteractiveAndVisible
+	{
+		get
+		{
+			return Environment.UserInteractive &&
+				GetConsoleWindow() != IntPtr.Zero &&
+				IsWindowVisible(GetConsoleWindow()) &&
+				GetFileType(GetStdHandle(-10)) == 2 &&   // STD_INPUT_HANDLE is FILE_TYPE_CHAR
+				GetFileType(GetStdHandle(-11)) == 2 &&   // STD_OUTPUT_HANDLE
+				GetFileType(GetStdHandle(-12)) == 2;     // STD_ERROR_HANDLE
+		}
+	}
+}
+'@
 
 # Returns the file name if the file exists; otherwise, $null.
 #
@@ -174,11 +208,11 @@ function IsInputKey($key)
 # $timeout = The maximum time to wait, in seconds. -1 to wait infinitely.
 # $showDots = $true to show a decreasing amount of dots to indicate the remaining time until timeout.
 #
-# If in batch mode, this function does nothing.
+# If in non-interactive mode, this function does nothing.
 #
 function Wait-Key($msg = $true, $timeout = -1, $showDots = $false)
 {
-	if ($global:batchMode)
+	if (![Utils]::IsInteractiveAndVisible)
 	{
 		return
 	}
@@ -339,7 +373,7 @@ function IsSelected($part)
 function Begin-BuildScript($projectTitle)
 {
 	$Host.UI.RawUI.WindowTitle = "$projectTitle build"
-	Write-Host -ForegroundColor White "$projectTitle build script"
+	Write-Host -ForegroundColor White -BackgroundColor Black "$projectTitle build script"
 	Write-Host ""
 }
 
@@ -409,7 +443,10 @@ function End-BuildScript()
 		
 		$timeSum += $action.time
 		$progressAfter = [int] (100 * $timeSum / $totalTime)
-		& (Join-Path $absToolsPath "FlashConsoleWindow") -progress $progressAfter
+		if ([Utils]::IsInteractiveAndVisible)
+		{
+			& (Join-Path $absToolsPath "FlashConsoleWindow") -progress $progressAfter
+		}
 	}
 	
 	$endTime = Get-Date
@@ -423,8 +460,8 @@ function End-BuildScript()
 	}
 
 	Write-Host ""
-	Write-Host -ForegroundColor DarkGreen "Build succeeded in $duration."
-	if (!$global:batchMode)
+	Write-Host -ForegroundColor Green "Build succeeded in $duration."
+	if ([Utils]::IsInteractiveAndVisible)
 	{
 		& (Join-Path $absToolsPath "FlashConsoleWindow") -progress 100
 		Write-Host "Press any key to exit" -NoNewLine

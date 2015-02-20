@@ -24,6 +24,15 @@ function Create-NuGet($specFile, $outDir, $time)
 # $packageFile = The file path and base name of the .nupkg file to upload to the NuGet gallery (excluding version and extension).
 # $apiKey = Your API key. If empty, the current user configuration is used.
 #
+# The API key should be passed from variables that are defined in the private configuration file
+# which is excluded from the source code repository. Example:
+#
+#    Push-NuGet "MyLib" $nuGetApiKey 30
+#
+# The file _scripts\buildscript\private.ps1 could contain this script:
+#
+#    $nuGetApiKey = "01234567-89ab-cdef-0123-456789abcdef"
+#
 # Requires nuget.exe in the search path.
 #
 function Push-NuGet($packageFile, $apiKey, $time)

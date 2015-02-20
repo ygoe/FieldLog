@@ -2,6 +2,8 @@
 # Project-specific control file
 
 Begin-BuildScript "FieldLog"
+
+# Find revision format from the source code, require Git checkout
 Set-VcsVersion "" "/require git"
 
 # FieldLog.*NET* projects are overlapping, don't build them in parallel
@@ -92,7 +94,7 @@ if (IsSelected "transfer-web")
 # Upload to NuGet
 if (IsSelected "transfer-nuget")
 {
-	Push-NuGet "FieldLog\bin\Unclassified.FieldLog" $nuGetApiKey 20
+	Push-NuGet "FieldLog\bin\Unclassified.FieldLog" $nuGetApiKey 45
 }
 
 End-BuildScript

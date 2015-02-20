@@ -401,7 +401,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>"$(SolutionDir)_scripts\bin\NetRevisionTool.exe" /restore "$(ProjectDir)"
-"$(SolutionDir)_scripts\bin\InsertIcons.exe" "$(TargetPath)" "$(ProjectDir)Images\FLDocument.ico";"$(ProjectDir)Images\FieldLog.ico"</PostBuildEvent>
+"$(SolutionDir)_scripts\bin\InsertIcons.exe" "$(TargetPath)" "$(ProjectDir)Images\FLDocument.ico";"$(ProjectDir)Images\FieldLog.ico" &gt;nul</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

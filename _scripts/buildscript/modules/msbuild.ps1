@@ -32,7 +32,11 @@ function Do-Build-Solution($action)
 	
 	Write-Host ""
 	Write-Host -ForegroundColor DarkCyan "Building $solution for $configuration|$buildPlatform..." -NoNewLine
-	Write-Host -ForegroundColor DarkGray " (Do not press Ctrl+C now)"
+	if ($global:revisionToolUsed)
+	{
+		Write-Host -ForegroundColor DarkGray " (Do not press Ctrl+C now)" -NoNewLine
+	}
+	Write-Host ""
 
 	# Find the MSBuild binary
 	if ((Get-Platform) -eq "x64")

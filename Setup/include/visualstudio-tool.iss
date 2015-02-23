@@ -84,7 +84,7 @@ begin
 		// Visual Studio is installed. Append the tool at the end of the list.
 		str := IntToStr(toolNumKeys);
 		RegWriteStringValue(HKEY_CURRENT_USER, regKey, 'ToolArg' + str, toolArgs);
-		RegWriteStringValue(HKEY_CURRENT_USER, regKey, 'ToolCmd' + str, toolCommand);
+		RegWriteStringValue(HKEY_CURRENT_USER, regKey, 'ToolCmd' + str, ExpandConstant(toolCommand));
 		RegWriteStringValue(HKEY_CURRENT_USER, regKey, 'ToolDir' + str, '');
 		RegWriteDWordValue(HKEY_CURRENT_USER, regKey, 'ToolOpt' + str, 17);
 		RegWriteStringValue(HKEY_CURRENT_USER, regKey, 'ToolSourceKey' + str, '');

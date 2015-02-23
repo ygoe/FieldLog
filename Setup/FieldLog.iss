@@ -207,7 +207,7 @@ Type: dirifempty; Name: "{app}\log"
 Type: dirifempty; Name: "{app}"
 
 [Code]
-function InitializeSetup: boolean;
+function InitializeSetup: Boolean;
 var
 	cmp: Integer;
 begin
@@ -266,10 +266,10 @@ begin
 	if (CurStep = ssPostInstall) and IsTaskSelected('VSTool') then
 	begin
 		// Register FieldLogViewer as external tool in all Visual Studio versions after setup
-		RegisterVSTool('10.0', 'FieldLogViewer', ExpandConstant('{app}') + '\FieldLogViewer.exe', '/w');
-		RegisterVSTool('11.0', 'FieldLogViewer', ExpandConstant('{app}') + '\FieldLogViewer.exe', '/w');
-		RegisterVSTool('12.0', 'FieldLogViewer', ExpandConstant('{app}') + '\FieldLogViewer.exe', '/w');
-		RegisterVSTool('14.0', 'FieldLogViewer', ExpandConstant('{app}') + '\FieldLogViewer.exe', '/w');
+		RegisterVSTool('10.0', 'FieldLogViewer', '{app}\FieldLogViewer.exe', '/w');
+		RegisterVSTool('11.0', 'FieldLogViewer', '{app}\FieldLogViewer.exe', '/w');
+		RegisterVSTool('12.0', 'FieldLogViewer', '{app}\FieldLogViewer.exe', '/w');
+		RegisterVSTool('14.0', 'FieldLogViewer', '{app}\FieldLogViewer.exe', '/w');
 	end;
 end;
 

@@ -14,7 +14,7 @@
 #
 # To disable parallel build, set the variable $noParallelBuild = $true.
 #
-# Requires MSBuild of the .NET Framework 4.0 to be installed.
+# Requires MSBuild from Visual Studio 2015, 2013, 2012 or the .NET Framework 4.0 to be installed.
 #
 function Build-Solution($solution, $configuration, $buildPlatform, $time)
 {
@@ -38,23 +38,39 @@ function Do-Build-Solution($action)
 	}
 	Write-Host ""
 
-	# Find the MSBuild binary
-	if ((Get-Platform) -eq "x64")
+	# Normalise the ProgramFilesx86 directory for all system platforms (how stupid...)
+	$pfx86 = "%ProgramFiles(x86)%"
+	if ((Get-Platform) -eq "x86")
 	{
-		if ($buildPlatform -eq "x86")
+		$pfx86 = "%ProgramFiles%"
+	}
+	
+	# Find the MSBuild binary
+	if ((Get-Platform) -eq "x64" -and $buildPlatform -ne "x86")
+	{
+		$msbuildBin = Check-FileName "$pfx86\MSBuild\14.0\bin\amd64\MSBuild.exe"
+		if (!$msbuildBin)
 		{
-			$msbuildBin = Check-FileName "%windir%\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe"
+			$msbuildBin = Check-FileName "$pfx86\MSBuild\12.0\bin\amd64\MSBuild.exe"
 		}
-		else
+		if (!$msbuildBin)
 		{
 			$msbuildBin = Check-FileName "%windir%\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe"
 		}
 	}
-	if ((Get-Platform) -eq "x86")
+	else
 	{
-		$msbuildBin = Check-FileName "%windir%\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe"
+		$msbuildBin = Check-FileName "$pfx86\MSBuild\14.0\bin\MSBuild.exe"
+		if (!$msbuildBin)
+		{
+			$msbuildBin = Check-FileName "$pfx86\MSBuild\12.0\bin\MSBuild.exe"
+		}
+		if (!$msbuildBin)
+		{
+			$msbuildBin = Check-FileName "%windir%\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe"
+		}
 	}
-	if ($msbuildBin -eq $null)
+	if (!$msbuildBin)
 	{
 		WaitError "MSBuild binary not found"
 		exit 1

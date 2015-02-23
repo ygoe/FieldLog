@@ -375,6 +375,13 @@ function Begin-BuildScript($projectTitle)
 	$Host.UI.RawUI.WindowTitle = "$projectTitle build"
 	Write-Host -ForegroundColor White -BackgroundColor Black "$projectTitle build script"
 	Write-Host ""
+
+	# Set console icon if it exists
+	$iconFile = (Join-Path $scriptDir "psbuild.ico")
+	if (Test-Path $iconFile)
+	{
+		Set-Icon $iconFile
+	}
 }
 
 # Sets the application version from the VCS revision.
@@ -414,6 +421,15 @@ function Set-AssemblyInfoVersion($sourceFile, $attributeName)
 function Disable-ParallelBuild()
 {
 	$global:noParallelBuild = $true
+}
+
+# Sets the console window icon.
+#
+# $iconFile = The name of the icon file to display.
+#
+function Set-Icon($iconFile)
+{
+	& (Join-Path $absToolsPath "FlashConsoleWindow") -icon (MakeRootedPath $iconFile) -appid
 }
 
 # Ends the build script definition and executes the configured actions.

@@ -9,92 +9,95 @@ Set-VcsVersion "" "/require git"
 # FieldLog.*NET* projects are overlapping, don't build them in parallel
 Disable-ParallelBuild
 
+Restore-NuGetTool
+Restore-NuGetPackages "FieldLog.sln"
+
 # Debug builds
-if (IsSelected "build-debug")
+if (IsSelected build-debug)
 {
 	Build-Solution "FieldLog.sln" "Debug" "Any CPU" 8
 
-	if (IsSelected "sign-lib")
+	if (IsSelected sign-lib)
 	{
-		Sign-File "FieldLog\bin\DebugNET40\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword" 1
-		Sign-File "FieldLog\bin\DebugNET20\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword" 1
-		Sign-File "FieldLog\bin\DebugASPNET40\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword" 1
+		Sign-File "FieldLog\bin\DebugNET40\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword"
+		Sign-File "FieldLog\bin\DebugNET20\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword"
+		Sign-File "FieldLog\bin\DebugASPNET40\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword"
 	}
-	if (IsSelected "sign-app")
+	if (IsSelected sign-app)
 	{
-		Sign-File "FieldLogViewer\bin\Debug\FieldLogViewer.exe" "$signKeyFile" "$signPassword" 1
-		Sign-File "PdbConvert\bin\Debug\PdbConvert.exe" "$signKeyFile" "$signPassword" 1
+		Sign-File "FieldLogViewer\bin\Debug\FieldLogViewer.exe" "$signKeyFile" "$signPassword"
+		Sign-File "PdbConvert\bin\Debug\PdbConvert.exe" "$signKeyFile" "$signPassword"
 	}
 }
 
 # Release builds
-if ((IsSelected "build-release") -or (IsSelected "commit") -or (IsSelected "publish"))
+if (IsAnySelected build-release commit publish)
 {
 	Build-Solution "FieldLog.sln" "Release" "Any CPU" 8
 	
 	# Archive debug symbols for later source lookup
 	EnsureDirExists ".local"
-	Exec-Console "PdbConvert\bin\Release\PdbConvert.exe" "$rootDir\FieldLogViewer\bin\Release\* /srcbase $rootDir /optimize /outfile $rootDir\.local\FieldLog-$revId.pdbx" 1
+	Exec-Console "PdbConvert\bin\Release\PdbConvert.exe" "$rootDir\FieldLogViewer\bin\Release\* /srcbase $rootDir /optimize /outfile $rootDir\.local\FieldLog-$revId.pdbx"
 
-	if ((IsSelected "sign-lib") -or (IsSelected "publish"))
+	if (IsAnySelected sign-lib publish)
 	{
-		Sign-File "FieldLog\bin\ReleaseNET40\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword" 1
-		Sign-File "FieldLog\bin\ReleaseNET20\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword" 1
-		Sign-File "FieldLog\bin\ReleaseASPNET40\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword" 1
+		Sign-File "FieldLog\bin\ReleaseNET40\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword"
+		Sign-File "FieldLog\bin\ReleaseNET20\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword"
+		Sign-File "FieldLog\bin\ReleaseASPNET40\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword"
 	}
-	if ((IsSelected "sign-app") -or (IsSelected "publish"))
+	if (IsAnySelected sign-app publish)
 	{
-		Sign-File "FieldLogViewer\bin\Release\FieldLogViewer.exe" "$signKeyFile" "$signPassword" 1
-		Sign-File "PdbConvert\bin\Release\PdbConvert.exe" "$signKeyFile" "$signPassword" 1
+		Sign-File "FieldLogViewer\bin\Release\FieldLogViewer.exe" "$signKeyFile" "$signPassword"
+		Sign-File "PdbConvert\bin\Release\PdbConvert.exe" "$signKeyFile" "$signPassword"
 	}
 
-	Create-NuGet "FieldLog\Unclassified.FieldLog.nuspec" "FieldLog\bin" 2
+	Create-NuGetPackage "FieldLog\Unclassified.FieldLog.nuspec" "FieldLog\bin"
 }
 
 # Release setups
-if ((IsSelected "setup-release") -or (IsSelected "commit") -or (IsSelected "publish"))
+if (IsAnySelected setup-release commit publish)
 {
-	Create-Setup "Setup\FieldLog.iss" Release 1
+	Create-Setup "Setup\FieldLog.iss" "Release"
 
-	if ((IsSelected "sign-setup") -or (IsSelected "publish"))
+	if (IsAnySelected sign-setup publish)
 	{
-		Sign-File "Setup\bin\FieldLogSetup-$revId.exe" "$signKeyFile" "$signPassword" 1
+		Sign-File "Setup\bin\FieldLogSetup-$revId.exe" "$signKeyFile" "$signPassword"
 	}
 }
 
 # Install release setup
-if (IsSelected "install")
+if (IsSelected install)
 {
-	Exec-File "Setup\bin\FieldLogSetup-$revId.exe" "/norestart /verysilent" 1
+	Exec-File "Setup\bin\FieldLogSetup-$revId.exe" "/norestart /verysilent"
 }
 
 # Commit to repository
-if (IsSelected "commit")
+if (IsSelected commit)
 {
 	# Clean up test build files
-	Delete-File "Setup\bin\FieldLogSetup-$revId.exe" 0
-	Delete-File ".local\FieldLog-$revId.pdbx" 0
+	Delete-File "Setup\bin\FieldLogSetup-$revId.exe"
+	Delete-File ".local\FieldLog-$revId.pdbx"
 
-	Git-Commit 5
+	Git-Commit
 }
 
 # Prepare publishing a release
-if (IsSelected "publish")
+if (IsSelected publish)
 {
-	Git-Log ".local\FieldLogChanges.txt" 1
+	Git-Log ".local\FieldLogChanges.txt"
 }
 
 # Copy to website (local)
-if (IsSelected "transfer-web")
+if (IsSelected transfer-web)
 {
-	Copy-File "Setup\bin\FieldLogSetup-$revId.exe" "$webDir\files\source\fieldlog\" 0
-	Copy-File ".local\FieldLogChanges.txt" "$webDir\files\source\fieldlog\" 0
+	Copy-File "Setup\bin\FieldLogSetup-$revId.exe" "$webDir\files\source\fieldlog\"
+	Copy-File ".local\FieldLogChanges.txt" "$webDir\files\source\fieldlog\"
 }
 
 # Upload to NuGet
-if (IsSelected "transfer-nuget")
+if (IsSelected transfer-nuget)
 {
-	Push-NuGet "FieldLog\bin\Unclassified.FieldLog" $nuGetApiKey 45
+	Push-NuGetPackage "FieldLog\bin\Unclassified.FieldLog" $nuGetApiKey 45
 }
 
 End-BuildScript

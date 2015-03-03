@@ -8,7 +8,7 @@
 
 # Builds a Visual Studio solution.
 #
-# $solution = The file name of the solution to build.
+# $solutionFile = The file name of the solution to build.
 # $configuration = The build configuration to select (e.g.: Debug, Release).
 # $buildPlatform = The platform to select (e.g.: x86, x64, Any CPU).
 #
@@ -16,9 +16,9 @@
 #
 # Requires MSBuild from Visual Studio 2015, 2013, 2012 or the .NET Framework 4.0 to be installed.
 #
-function Build-Solution($solution, $configuration, $buildPlatform, $time)
+function Build-Solution($solutionFile, $configuration, $buildPlatform, $time = 5)
 {
-	$action = @{ action = "Do-Build-Solution"; solution = $solution; configuration = $configuration; buildPlatform = $buildPlatform; time = $time }
+	$action = @{ action = "Do-Build-Solution"; solutionFile = $solutionFile; configuration = $configuration; buildPlatform = $buildPlatform; time = $time }
 	$global:actions += $action
 }
 
@@ -26,12 +26,12 @@ function Build-Solution($solution, $configuration, $buildPlatform, $time)
 
 function Do-Build-Solution($action)
 {
-	$solution = $action.solution
+	$solutionFile = $action.solutionFile
 	$configuration = $action.configuration
 	$buildPlatform = $action.buildPlatform
 	
 	Write-Host ""
-	Write-Host -ForegroundColor DarkCyan "Building $solution for $configuration|$buildPlatform..." -NoNewLine
+	Write-Host -ForegroundColor DarkCyan "Building $solutionFile for $configuration|$buildPlatform..." -NoNewLine
 	if ($global:revisionToolUsed)
 	{
 		Write-Host -ForegroundColor DarkGray " (Do not press Ctrl+C now)" -NoNewLine
@@ -79,7 +79,7 @@ function Do-Build-Solution($action)
 	# Set %SuppressNetRevisionTool% and perform NetRevisionTool call once for the entire solution
 	if ($global:revisionToolUsed)
 	{
-		Invoke-Expression ((Join-Path $absToolsPath "NetRevisionTool") + " /multi /patch " + $global:revisionToolOptions + " `"" + (MakeRootedPath $solution) + "`"")
+		Invoke-Expression ((Join-Path $absToolsPath "NetRevisionTool") + " /multi /patch " + $global:revisionToolOptions + " `"" + (MakeRootedPath $solutionFile) + "`"")
 		if ($LASTEXITCODE -ne 0)
 		{
 			WaitError "NetRevisionTool multi-project patch failed"
@@ -106,7 +106,7 @@ function Do-Build-Solution($action)
 	#   1591: Missing XML documentation for public type or member
 
 	$buildError = $false
-	& $msbuildBin /nologo (MakeRootedPath $solution) /t:Rebuild /p:Configuration="$configuration" /p:Platform="$buildPlatform" /v:minimal /p:WarningLevel=1 $mParam
+	& $msbuildBin /nologo (MakeRootedPath $solutionFile) /t:Rebuild /p:Configuration="$configuration" /p:Platform="$buildPlatform" /v:minimal /p:WarningLevel=1 $mParam
 	if (-not $?)
 	{
 		$buildError = $true
@@ -116,7 +116,7 @@ function Do-Build-Solution($action)
 	if ($global:revisionToolUsed)
 	{
 		$env:SuppressNetRevisionTool = ""
-		Invoke-Expression ((Join-Path $absToolsPath "NetRevisionTool") + " /multi /restore " + $global:revisionToolOptions + " `"" + (MakeRootedPath $solution) + "`"")
+		Invoke-Expression ((Join-Path $absToolsPath "NetRevisionTool") + " /multi /restore " + $global:revisionToolOptions + " `"" + (MakeRootedPath $solutionFile) + "`"")
 		if ($LASTEXITCODE -ne 0)
 		{
 			if ($buildError)

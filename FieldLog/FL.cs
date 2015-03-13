@@ -415,6 +415,17 @@ namespace Unclassified.FieldLog
 			if (EntryAssembly != null)
 			{
 				EntryAssemblyLocation = EntryAssembly.Location;
+
+				// Check for presence of log submit tool
+				if (!string.IsNullOrEmpty(EntryAssemblyLocation))
+				{
+					string exeFile = Path.GetDirectoryName(EntryAssemblyLocation);
+					exeFile = Path.Combine(exeFile, "LogSubmit.exe");
+					if (File.Exists(exeFile))
+					{
+						FL.CanSubmitLog = true;
+					}
+				}
 			}
 
 			// Try to get the version string from the FieldLog assembly. This may not be available
@@ -635,6 +646,12 @@ namespace Unclassified.FieldLog
 				return null;
 			}
 		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether the Send Logs option is available from the
+		/// application error dialog.
+		/// </summary>
+		public static bool CanSubmitLog { get; set; }
 
 		/// <summary>
 		/// Gets or sets a value indicating whether FirstChanceException events shall be logged.

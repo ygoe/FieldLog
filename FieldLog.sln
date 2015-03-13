@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FieldLog.ASPNET40", "FieldL
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PdbConvert", "PdbConvert\PdbConvert.csproj", "{42AA33E7-62BF-4EA8-BFA5-D712EA72709C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogSubmit", "LogSubmit\LogSubmit.csproj", "{EC3D68E5-D0F1-469C-A9B2-3C872B6A5CAC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -84,6 +86,14 @@ Global
 		{42AA33E7-62BF-4EA8-BFA5-D712EA72709C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{42AA33E7-62BF-4EA8-BFA5-D712EA72709C}.Release|x86.ActiveCfg = Release|x86
 		{42AA33E7-62BF-4EA8-BFA5-D712EA72709C}.Release|x86.Build.0 = Release|x86
+		{EC3D68E5-D0F1-469C-A9B2-3C872B6A5CAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC3D68E5-D0F1-469C-A9B2-3C872B6A5CAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC3D68E5-D0F1-469C-A9B2-3C872B6A5CAC}.Debug|x86.ActiveCfg = Debug|x86
+		{EC3D68E5-D0F1-469C-A9B2-3C872B6A5CAC}.Debug|x86.Build.0 = Debug|x86
+		{EC3D68E5-D0F1-469C-A9B2-3C872B6A5CAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC3D68E5-D0F1-469C-A9B2-3C872B6A5CAC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC3D68E5-D0F1-469C-A9B2-3C872B6A5CAC}.Release|x86.ActiveCfg = Release|x86
+		{EC3D68E5-D0F1-469C-A9B2-3C872B6A5CAC}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

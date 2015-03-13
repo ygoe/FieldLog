@@ -393,7 +393,11 @@ namespace Unclassified.FieldLog
 			sendCheckBox = new CheckBox();
 			sendCheckBox.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Bottom;
 			sendCheckBox.AutoSize = true;
-			sendCheckBox.Enabled = false;
+			sendCheckBox.Enabled = FL.CanSubmitLog;
+			if (sendCheckBox.Enabled)
+			{
+				sendCheckBox.Checked = true;
+			}
 			sendCheckBox.FlatStyle = FlatStyle.System;
 			sendCheckBox.Margin = new Padding();
 			sendCheckBox.Padding = new Padding();
@@ -432,7 +436,8 @@ namespace Unclassified.FieldLog
 			terminateButton.UseVisualStyleBackColor = true;
 			terminateButton.Click += (s, e) =>
 			{
-				this.Close();
+				StartSubmitTool();
+				Close();
 				FL.Shutdown();
 				Environment.Exit(1);
 			};
@@ -451,7 +456,8 @@ namespace Unclassified.FieldLog
 			continueButton.UseVisualStyleBackColor = true;
 			continueButton.Click += (s, e) =>
 			{
-				this.Close();
+				StartSubmitTool();
+				Close();
 			};
 			buttonsPanel.Controls.Add(continueButton);
 			buttonsPanel.SetRow(continueButton, 0);
@@ -566,6 +572,42 @@ namespace Unclassified.FieldLog
 			{
 				nextButton.Visible = false;
 			}
+		}
+
+		private void StartSubmitTool()
+		{
+			if (sendCheckBox.Checked)
+			{
+				string exeFile = Application.ExecutablePath;
+				if (!string.IsNullOrEmpty(exeFile))
+				{
+					exeFile = Path.GetDirectoryName(exeFile);
+					exeFile = Path.Combine(exeFile, "LogSubmit.exe");
+					if (File.Exists(exeFile))
+					{
+						try
+						{
+							Process.Start(exeFile, "/errordlg /logpath \"" + FL.LogFileBasePath + "\"");
+						}
+						catch (Exception ex)
+						{
+							FL.Critical(ex, "Starting log submit tool");
+							MessageBox.Show(
+								"The log submit tool could not be started." + " " + ex.Message,
+								"Error",
+								MessageBoxButtons.OK,
+								MessageBoxIcon.Error);
+						}
+						return;
+					}
+				}
+			}
+			FL.Error("Could not start log submit tool, path or file not found");
+			MessageBox.Show(
+				"The log submit tool could not be started. The path or file was not found. Please start the tool manually from the application installation directory.",
+				"Error",
+				MessageBoxButtons.OK,
+				MessageBoxIcon.Error);
 		}
 
 		#endregion Private helper methods

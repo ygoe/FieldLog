@@ -1,0 +1,270 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{EC3D68E5-D0F1-469C-A9B2-3C872B6A5CAC}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Unclassified.LogSubmit</RootNamespace>
+    <AssemblyName>LogSubmit</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Debug\LogSubmit.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Release\LogSubmit.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>FieldLog.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CommonFormats.cs" />
+    <Compile Include="ConfigReader.cs" />
+    <Compile Include="Unclassified\UI\SystemMenu.cs" />
+    <Compile Include="Unclassified\UI\ULinkLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Unclassified\Util\AssemblyInfoUtil.cs" />
+    <Compile Include="Views\IView.cs" />
+    <Compile Include="ListViewColumnSorter.cs" />
+    <Compile Include="SevenZip\Common\CRC.cs" />
+    <Compile Include="SevenZip\Common\InBuffer.cs" />
+    <Compile Include="SevenZip\Common\OutBuffer.cs" />
+    <Compile Include="SevenZip\Compress\LZMA\LzmaBase.cs" />
+    <Compile Include="SevenZip\Compress\LZMA\LzmaDecoder.cs" />
+    <Compile Include="SevenZip\Compress\LZMA\LzmaEncoder.cs" />
+    <Compile Include="SevenZip\Compress\LZ\IMatchFinder.cs" />
+    <Compile Include="SevenZip\Compress\LZ\LzBinTree.cs" />
+    <Compile Include="SevenZip\Compress\LZ\LzInWindow.cs" />
+    <Compile Include="SevenZip\Compress\LZ\LzOutWindow.cs" />
+    <Compile Include="SevenZip\Compress\RangeCoder\RangeCoder.cs" />
+    <Compile Include="SevenZip\Compress\RangeCoder\RangeCoderBit.cs" />
+    <Compile Include="SevenZip\Compress\RangeCoder\RangeCoderBitTree.cs" />
+    <Compile Include="SevenZip\ICoder.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tar\DataWriter.cs" />
+    <Compile Include="Tar\IArchiveDataWriter.cs" />
+    <Compile Include="Tar\ITarHeader.cs" />
+    <Compile Include="Tar\LegacyTarWriter.cs" />
+    <Compile Include="Tar\TarException.cs" />
+    <Compile Include="Tar\TarHeader.cs" />
+    <Compile Include="Tar\TarReader.cs" />
+    <Compile Include="Tar\TarWriter.cs" />
+    <Compile Include="Tar\UsTarHeader.cs" />
+    <Compile Include="Transports\FileTransport.cs" />
+    <Compile Include="Transports\MailTransport.cs" />
+    <Compile Include="Transports\TransportBase.cs" />
+    <Compile Include="Unclassified\UI\Animation.cs" />
+    <Compile Include="Unclassified\UI\USizeGrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Unclassified\Util\CommandLineReader.cs" />
+    <Compile Include="Unclassified\Util\CopyEx.cs" />
+    <Compile Include="Unclassified\Util\EnumerableWalker.cs" />
+    <Compile Include="Unclassified\Util\FileDrop.cs" />
+    <Compile Include="Unclassified\Util\PathUtil.cs" />
+    <Compile Include="Unclassified\Util\MessageApi.cs" />
+    <Compile Include="SharedData.cs" />
+    <Compile Include="Unclassified\Util\ShellLinkHelper.cs" />
+    <Compile Include="Views\CompressView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Views\CompressView.Designer.cs">
+      <DependentUpon>CompressView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\FileTransportView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Views\FileTransportView.Designer.cs">
+      <DependentUpon>FileTransportView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MailTransportView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Views\MailTransportView.Designer.cs">
+      <DependentUpon>MailTransportView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\LogSelectionView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Views\LogSelectionView.Designer.cs">
+      <DependentUpon>LogSelectionView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Views\NotesView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Views\NotesView.Designer.cs">
+      <DependentUpon>NotesView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TimeSelectionView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Views\TimeSelectionView.Designer.cs">
+      <DependentUpon>TimeSelectionView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Unclassified\Automation\Window.cs" />
+    <Compile Include="Unclassified\Automation\WindowProperties.cs" />
+    <Compile Include="Unclassified\UI\MouseFilter.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Unclassified\UI\ProgressSpinner.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Unclassified\UI\UIPreferences.cs" />
+    <Compile Include="Unclassified\Util\DelayedCall.cs" />
+    <Compile Include="Unclassified\Util\WinApi.cs" />
+    <Compile Include="Unclassified\Util\WinApi_MouseFilter.cs" />
+    <Compile Include="Views\TransportProgressView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Views\TransportProgressView.Designer.cs">
+      <DependentUpon>TransportProgressView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TransportView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Views\TransportView.Designer.cs">
+      <DependentUpon>TransportView.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Views\CompressView.resx">
+      <DependentUpon>CompressView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\FileTransportView.resx">
+      <DependentUpon>FileTransportView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\MailTransportView.resx">
+      <DependentUpon>MailTransportView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\LogSelectionView.resx">
+      <DependentUpon>LogSelectionView.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="Views\NotesView.resx">
+      <DependentUpon>NotesView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\TimeSelectionView.resx">
+      <DependentUpon>TimeSelectionView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\TransportProgressView.resx">
+      <DependentUpon>TransportProgressView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\TransportView.resx">
+      <DependentUpon>TransportView.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="FieldLog.ico" />
+    <None Include="Resources\FLDocument_48.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>"$(SolutionDir)_scripts\bin\NetRevisionTool.exe" /patch "$(ProjectDir)"</PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>"$(SolutionDir)_scripts\bin\NetRevisionTool.exe" /restore "$(ProjectDir)"</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

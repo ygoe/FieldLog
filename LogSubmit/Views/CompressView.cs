@@ -164,7 +164,7 @@ namespace Unclassified.LogSubmit.Views
 				if (totalSeconds >= 0 && totalSeconds < int.MaxValue)
 				{
 					TimeSpan remainingTime = TimeSpan.FromSeconds((int) (totalSeconds - elapsedSeconds) + 1);
-					RemainingTimeLabel.Text = CommonFormats.TimeSpanToString(remainingTime);
+					RemainingTimeLabel.Text = Tx.TimeSpanRaw(remainingTime, false);
 					RemainingTimeLabel.ForeColor = SystemColors.ControlText;
 				}
 			}
@@ -172,7 +172,7 @@ namespace Unclassified.LogSubmit.Views
 			ProgressInfo pi = args.UserState as ProgressInfo;
 			if (pi != null)
 			{
-				CompressedSizeLabel.Text = CommonFormats.DataSizeToString(pi.CompressedSize);
+				CompressedSizeLabel.Text = Tx.DataSize(pi.CompressedSize);
 				SharedData.Instance.ArchiveFileSize = pi.CompressedSize;
 			}
 		}

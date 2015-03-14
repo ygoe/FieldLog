@@ -30,6 +30,9 @@ namespace Unclassified.LogSubmit.Views
 			InitializeComponent();
 
 			TxDictionaryBinding.AddTextBindings(this);
+			LogBasePathHeader.Text = Tx.T("log selection view.list.log base path");
+			LastUpdateHeader.Text = Tx.T("log selection view.list.last update");
+			SizeHeader.Text = Tx.T("log selection view.list.size");
 
 			Dock = DockStyle.Fill;
 
@@ -122,12 +125,12 @@ namespace Unclassified.LogSubmit.Views
 			using (OpenFileDialog dlg = new OpenFileDialog())
 			{
 				dlg.FileName = SelectedLogDirText.Text;
-				dlg.Filter = Tx.T("log selection.file dialog.filter");
+				dlg.Filter = Tx.T("log selection view.file dialog.filter");
 				if (!string.IsNullOrEmpty(SelectedLogDirText.Text))
 				{
 					dlg.InitialDirectory = Path.GetDirectoryName(SelectedLogDirText.Text);
 				}
-				dlg.Title = Tx.T("log selection.file dialog.title");
+				dlg.Title = Tx.T("log selection view.file dialog.title");
 
 				if (dlg.ShowDialog() == DialogResult.OK)
 				{
@@ -332,7 +335,7 @@ namespace Unclassified.LogSubmit.Views
 
 		public void SetConfigError(Exception ex)
 		{
-			ConfigErrorLabel.Text = Tx.T("log selection.config error", "msg", ex.Message);
+			ConfigErrorLabel.Text = Tx.T("log selection view.config error", "msg", ex.Message);
 			ConfigErrorLabel.Show();
 		}
 
@@ -455,7 +458,7 @@ namespace Unclassified.LogSubmit.Views
 			ListViewItem lvi = new ListViewItem(info.LogBasePath);
 			lvi.Tag = info;
 			lvi.SubItems.Add(CommonFormats.DateTimeToShortString(info.UpdatedTime.ToLocalTime()));
-			lvi.SubItems.Add(CommonFormats.DataSizeToString(info.Size));
+			lvi.SubItems.Add(Tx.DataSize(info.Size));
 			LogDirsListView.Items.Add(lvi);
 			info.ListViewItem = lvi;
 		}
@@ -463,7 +466,7 @@ namespace Unclassified.LogSubmit.Views
 		private void UpdateDirectory(LogBasePathInfo info)
 		{
 			info.ListViewItem.SubItems[1].Text = CommonFormats.DateTimeToShortString(info.UpdatedTime.ToLocalTime());
-			info.ListViewItem.SubItems[2].Text = CommonFormats.DataSizeToString(info.Size);
+			info.ListViewItem.SubItems[2].Text = Tx.DataSize(info.Size);
 		}
 
 		private void CheckLogBasePath(string basePath, Dictionary<string, LogBasePathInfo> logPaths)

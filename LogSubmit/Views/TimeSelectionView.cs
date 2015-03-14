@@ -143,18 +143,7 @@ namespace Unclassified.LogSubmit.Views
 
 			public TimeEntry(TimeSpan span)
 			{
-				if (span.Days >= 1)
-				{
-					Text = Tx.T("Tx:time.span.days", (int) span.Days);
-				}
-				else if (span.Hours >= 1)
-				{
-					Text = Tx.T("Tx:time.span.hours", (int) span.Hours);
-				}
-				if (span.Minutes >= 1)
-				{
-					Text = Tx.T("Tx:time.span.minutes", (int) span.Minutes);
-				}
+				Text = Tx.TimeSpanRaw(span, false);
 				TimeSpan = span;
 			}
 

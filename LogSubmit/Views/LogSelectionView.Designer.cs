@@ -80,7 +80,7 @@
 			this.CurrentLabel.Name = "CurrentLabel";
 			this.CurrentLabel.Size = new System.Drawing.Size(139, 13);
 			this.CurrentLabel.TabIndex = 2;
-			this.CurrentLabel.Text = "[log selection.selected path]";
+			this.CurrentLabel.Text = "[log selection view.selected path]";
 			// 
 			// FindLogsButton
 			// 
@@ -93,7 +93,7 @@
 			this.FindLogsButton.Padding = new System.Windows.Forms.Padding(4, 0, 4, 0);
 			this.FindLogsButton.Size = new System.Drawing.Size(136, 22);
 			this.FindLogsButton.TabIndex = 5;
-			this.FindLogsButton.Text = "[log selection.find logs]";
+			this.FindLogsButton.Text = "[log selection view.find logs]";
 			this.FindLogsButton.UseVisualStyleBackColor = true;
 			this.FindLogsButton.Click += new System.EventHandler(this.FindLogsButton_Click);
 			// 
@@ -156,7 +156,7 @@
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(95, 13);
 			this.label1.TabIndex = 1;
-			this.label1.Text = "[log selection.intro]";
+			this.label1.Text = "[log selection view.intro]";
 			// 
 			// label2
 			// 
@@ -168,7 +168,7 @@
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(125, 18);
 			this.label2.TabIndex = 0;
-			this.label2.Text = "[log selection.title]";
+			this.label2.Text = "[log selection view.title]";
 			// 
 			// ConfigErrorLabel
 			// 

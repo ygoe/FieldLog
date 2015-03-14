@@ -1,0 +1,529 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<translation xml:space="preserve">
+	<culture name="de">
+		<text key="about.title">Über</text>
+		<text key="about.version">Version</text>
+		<text key="button.back">&lt; &amp;Zurück</text>
+		<text key="button.browse">&amp;Durchsuchen…</text>
+		<text key="button.cancel">Abbrechen</text>
+		<text key="button.finish">Beenden</text>
+		<text key="button.next">&amp;Weiter &gt;</text>
+		<text key="compress view.compressed size">Komprimierte Größe:</text>
+		<text key="compress view.intro">Die Protokolldateien werden komprimiert, um die zu übertragende Datenmenge zu reduzieren.</text>
+		<text key="compress view.review size">Bitte prüfen Sie die komprimierte Größe. Wenn Sie die Größe reduzieren müssen, können Sie zurück gehen und einen kürzeren Zeitraum oder weniger Protokolldateien auswählen.</text>
+		<text key="compress view.title">Komprimierung der Daten</text>
+		<text key="file transport view.destination file name">Ziel&amp;dateiname:</text>
+		<text key="file transport view.drag and drop">Tipp:
+Alternativ können Sie das Archiv von diesem Symbol ziehen und direkt im Zielverzeichnis oder einer Anwendung ablegen. Klicken Sie danach auf „Beenden“.</text>
+		<text key="file transport view.file dialog.filter">Protokollarchive|*.tar.lzma|Alle Dateien|*.*</text>
+		<text key="file transport view.file dialog.title">Wählen Sie das Ziel des Protokollarchivs</text>
+		<text key="file transport view.intro">Kopiert das Protokollarchiv auf ein lokales Laufwerk auf Ihrem Computer. Das kann auch ein tragbarer USB-Datenträger sein. Sie müssen die Datei dann selbst zu uns bringen oder sie von einem anderen Computer übertragen.</text>
+		<text key="log selection.config error">Warnung: Die Konfiguration des Übertragungsprogramms konnte nicht gelesen werden. Manche Optionen stehen möglicherweise nicht zur Verfügung. ({msg})</text>
+		<text key="log selection.file dialog.filter">Protokolldateien|*.fl|Alle Dateien|*.*</text>
+		<text key="log selection.file dialog.title">Wählen Sie eine beliebige Datei aus einer Protokolldateigruppe</text>
+		<text key="log selection.find logs">Protokolle auf diesem Computer &amp;finden</text>
+		<text key="log selection.intro">Dieses Programm führt Sie durch die Auswahl und das Übertragen relevanter Protokolldateien an uns.</text>
+		<text key="log selection.selected path">Aktuell ausgewählter Protokollpfad:</text>
+		<text key="log selection.title">Vielen Dank, dass Sie sich die Zeit nehmen, uns Ihr Problem zu melden, damit wir es analysieren und unsere Anwendung verbessern können.</text>
+		<text key="mail transport view.approve note">Hinweis: Ihre Mail-Anwendung kann Sie nach einer Genehmigung des Vorgangs fragen.</text>
+		<text key="mail transport view.intro">Öffnet Ihre Standard-E-Mail-Anwendung und sendet eine Nachricht an uns mit dem Protokollarchiv im Anhang. Sie behalten eine Kopie der Nachricht in Ihrem Gesendet-Ordner.</text>
+		<text key="mail transport view.mail size warning">Warnung: Die Archivgröße überschreitet die maximale empfohlene Größe für E-Mail-Übertragungen. Ihre Nachricht kann vielleicht nicht zugestellt werden. Bitte erwägen Sie die Nutzung einer anderen Übertragungsart oder reduzieren Sie den Zeitraum.</text>
+		<text key="mail transport view.privacy">Datenschutzhinweis: Durch die Nutzung Ihres normalen E-Mail-Kontos erfahren wir Ihre Absender-E-Mail-Adresse. Die Nachricht kann unverschlüsselt über das Internet gesendet werden.</text>
+		<text key="mail transport view.review option">Ich möchte die Nachricht &amp;sehen, bevor sie gesendet wird</text>
+		<text key="menu.about">Ü&amp;ber…</text>
+		<text key="msg.cancel before submit">Das Fehlerprotokoll der Anwendung wurde noch nicht übertragen.
+
+Möchten Sie eine Verknüpfung auf dem Desktop erstellen, um das Protokoll später zu übertragen?
+
+Sie können dieses Übertragungsprogramm auch manuell durch Starten von {cmd} im Installationsverzeichnis der Anwendung aufrufen.</text>
+		<text key="msg.cancelled">Abgebrochen</text>
+		<text key="msg.command line error">Kommandozeilenfehler: {msg}</text>
+		<text key="msg.completed">Fertig</text>
+		<text key="msg.endtime parameter invalid">Der Parameter /endtime ist ungültig: {value}. Stattdessen wird die aktuelle Zeit verwendet.</text>
+		<text key="msg.logpath parameter invalid">Der Parameter /logpath ist ungültig: {value}</text>
+		<text key="msg.no log files selected">Keine Protokolldateien ausgewählt. Bitte prüfen Sie den angegebenen Zeitraum.</text>
+		<text key="msg.previous operation">Der Vorgang konnte nicht gestartet werden, weil ein vorheriger Vorgang noch nicht beendet wurde. Bitte warten Sie, bis der laufende Vorgang beendet ist, und versuchen Sie es erneut, indem Sie zur vorherigen Seite gehen und wieder zu dieser Seite zurückkehren.</text>
+		<text key="msg.remaining time">Verbleibende Zeit:</text>
+		<text key="msg.starting">Starte…</text>
+		<text key="msg.title.error">Fehler</text>
+		<text key="notes view.additional information">Bitte beschreiben Sie, was Sie getan haben, oder machen Sie weitere Angaben, die Sie für die Analyse des Problems für nützlich halten.</text>
+		<text key="notes view.e-mail address">Geben Sie Ihre E-Mail-Adresse an, wenn Sie über weitere Schritte benachrichtigt werden möchten. Das ist optional. Wir können Sie außerdem kontaktieren, falls wir weitere Informationen benötigen.</text>
+		<text key="notes view.privacy">Datenschutzhinweis: Ihre Nachricht kann in einem Fehlerverwaltungssystem gespeichert und veröffentlicht werden. Falls Sie wünschen, dass Ihre Nachricht privat bleibt, teilen Sie das bitte am Anfang Ihrer Eingabe mit. Geben Sie hier niemals geheime Daten wie Kennwörter ein.</text>
+		<text key="notes view.title">Geben Sie zusätzliche Informationen ein</text>
+		<text key="shortcut.name">Protokolle übertragen</text>
+		<text key="time selection.everything">Alles</text>
+		<text key="time selection.intro">Protokolle werden durchgehend geschrieben (und nach einer Weile gelöscht), damit sie zur Verfügung stehen, wenn ein Problem zum ersten Mal auftritt. Die Begrenzung der Zeit reduziert die zu übertragende Datenmenge und die zu analysierenden Protokolleinträge. Der Zeitraum sollte lang genug sein, um alle Ereignisse zu umfassen, die das Problem verursacht haben könnten.</text>
+		<text key="time selection.last log update time">Letzte Änderung der ausgewählten Protokolldateien:</text>
+		<text key="time selection.latest submit start time">Spätester Startzeitpunkt der übertragenen Protokolle:</text>
+		<text key="time selection.learn more">Erfahren Sie mehr darüber, wie FieldLog Protokolldateien verwaltet</text>
+		<text key="time selection.longer">Länger</text>
+		<text key="time selection.note">Hinweis: Die übertragenen Daten können vor dem angezeigten Zeitpunkt beginnen, weil nur vollständige Protokolldateien übertragen werden können.</text>
+		<text key="time selection.shorter">Kürzer</text>
+		<text key="time selection.title">Wählen Sie den zu übertragenden Zeitraum</text>
+		<text key="transport.file">Datei lokal kopieren</text>
+		<text key="transport.mail">E-Mail</text>
+		<text key="transport progress view.delete shortcut">Sie können jetzt die Verknüpfung löschen, mit der Sie dieses Programm gestartet haben.</text>
+		<text key="transport progress view.intro">Fast geschafft! Bitte warten Sie, während die Protokolldaten übertragen werden.</text>
+		<text key="transport progress view.title">Übertragungsfortschritt</text>
+		<text key="transport view.intro">&amp;Wählen Sie die Methode, die für Sie am angenehmsten ist, um uns das Protokollarchiv zuzusenden.</text>
+		<text key="transport view.title">Wählen Sie eine Übertragungsart</text>
+		<text key="Tx:date.day">d.</text>
+		<text key="Tx:date.day.tab">dd.</text>
+		<text key="Tx:date.month.abbr">MMM.</text>
+		<text key="Tx:date.month day">d.M.</text>
+		<text key="Tx:date.month day.abbr">d. MMM.</text>
+		<text key="Tx:date.month day.long">d. MMMM</text>
+		<text key="Tx:date.month day.tab">dd.MM.</text>
+		<text key="Tx:date.year month">M'/'yyyy</text>
+		<text key="Tx:date.year month.abbr">MMM. yyyy</text>
+		<text key="Tx:date.year month.tab">MM'/'yyyy</text>
+		<text key="Tx:date.year month day">d.M.yyyy</text>
+		<text key="Tx:date.year month day.abbr">d. MMM. yyyy</text>
+		<text key="Tx:date.year month day.long">d. MMMM yyyy</text>
+		<text key="Tx:enum.and.combiner">, </text>
+		<text key="Tx:enum.and.last combiner"> und </text>
+		<text key="Tx:enum.or.combiner">, </text>
+		<text key="Tx:enum.or.last combiner"> oder </text>
+		<text key="Tx:number.group separator"> </text>
+		<text key="Tx:number.group separator threshold">10000</text>
+		<text key="Tx:number.negative">−</text>
+		<text key="Tx:number.ordinal">{#}.</text>
+		<text key="Tx:number.unit separator"> </text>
+		<text key="Tx:quote begin">„</text>
+		<text key="Tx:quote end">“</text>
+		<text key="Tx:quote nested begin">‚</text>
+		<text key="Tx:quote nested end">‘</text>
+		<text key="Tx:time.hour">H "Uhr"</text>
+		<text key="Tx:time.hour.tab">HH "Uhr"</text>
+		<text key="Tx:time.hour minute">HH:mm</text>
+		<text key="Tx:time.hour minute.tab">HH:mm</text>
+		<text key="Tx:time.hour minute second">HH:mm:ss</text>
+		<text key="Tx:time.hour minute second.tab">HH:mm:ss</text>
+		<text key="Tx:time.hour minute second ms">HH:mm:ss.fff</text>
+		<text key="Tx:time.hour minute second ms.tab">HH:mm:ss.fff</text>
+		<text key="Tx:time.never">nie</text>
+		<text key="Tx:time.now">jetzt</text>
+		<text key="Tx:time.relative">in {interval}</text>
+		<text key="Tx:time.relative.days">{#} Tagen</text>
+		<text key="Tx:time.relative.days" count="1">{#} Tag</text>
+		<text key="Tx:time.relative.days.single">{#} Tagen</text>
+		<text key="Tx:time.relative.days.single" count="1">einem Tag</text>
+		<text key="Tx:time.relative.hours">{#} Stunden</text>
+		<text key="Tx:time.relative.hours" count="1">{#} Stunde</text>
+		<text key="Tx:time.relative.hours.single">{#} Stunden</text>
+		<text key="Tx:time.relative.hours.single" count="1">einer Stunde</text>
+		<text key="Tx:time.relative.minutes">{#} Minuten</text>
+		<text key="Tx:time.relative.minutes" count="1">{#} Minute</text>
+		<text key="Tx:time.relative.minutes.single">{#} Minuten</text>
+		<text key="Tx:time.relative.minutes.single" count="1">einer Minute</text>
+		<text key="Tx:time.relative.months">{#} Monaten</text>
+		<text key="Tx:time.relative.months" count="1">{#} Monat</text>
+		<text key="Tx:time.relative.months.single">{#} Monaten</text>
+		<text key="Tx:time.relative.months.single" count="1">einem Monat</text>
+		<text key="Tx:time.relative.seconds">{#} Sekunden</text>
+		<text key="Tx:time.relative.seconds" count="1">{#} Sekunde</text>
+		<text key="Tx:time.relative.seconds.single">{#} Sekunden</text>
+		<text key="Tx:time.relative.seconds.single" count="1">einer Sekunde</text>
+		<text key="Tx:time.relative.years">{#} Jahren</text>
+		<text key="Tx:time.relative.years" count="1">{#} Jahr</text>
+		<text key="Tx:time.relative.years.single">{#} Jahren</text>
+		<text key="Tx:time.relative.years.single" count="1">einem Jahr</text>
+		<text key="Tx:time.relative neg">vor {interval}</text>
+		<text key="Tx:time.relative neg.days">{#} Tagen</text>
+		<text key="Tx:time.relative neg.days" count="1">{#} Tag</text>
+		<text key="Tx:time.relative neg.days.single">{#} Tagen</text>
+		<text key="Tx:time.relative neg.days.single" count="1">einem Tag</text>
+		<text key="Tx:time.relative neg.hours">{#} Stunden</text>
+		<text key="Tx:time.relative neg.hours" count="1">{#} Stunde</text>
+		<text key="Tx:time.relative neg.hours.single">{#} Stunden</text>
+		<text key="Tx:time.relative neg.hours.single" count="1">einer Stunde</text>
+		<text key="Tx:time.relative neg.minutes">{#} Minuten</text>
+		<text key="Tx:time.relative neg.minutes" count="1">{#} Minute</text>
+		<text key="Tx:time.relative neg.minutes.single">{#} Minuten</text>
+		<text key="Tx:time.relative neg.minutes.single" count="1">einer Minute</text>
+		<text key="Tx:time.relative neg.months">{#} Monaten</text>
+		<text key="Tx:time.relative neg.months" count="1">{#} Monat</text>
+		<text key="Tx:time.relative neg.months.single">{#} Monaten</text>
+		<text key="Tx:time.relative neg.months.single" count="1">einem Monat</text>
+		<text key="Tx:time.relative neg.seconds">{#} Sekunden</text>
+		<text key="Tx:time.relative neg.seconds" count="1">{#} Sekunde</text>
+		<text key="Tx:time.relative neg.seconds.single">{#} Sekunden</text>
+		<text key="Tx:time.relative neg.seconds.single" count="1">einer Sekunde</text>
+		<text key="Tx:time.relative neg.years">{#} Jahren</text>
+		<text key="Tx:time.relative neg.years" count="1">{#} Jahr</text>
+		<text key="Tx:time.relative neg.years.single">{#} Jahren</text>
+		<text key="Tx:time.relative neg.years.single" count="1">einem Jahr</text>
+		<text key="Tx:time.relative span">{interval} später</text>
+		<text key="Tx:time.relative span.days">{#} Tage</text>
+		<text key="Tx:time.relative span.days" count="1">{#} Tag</text>
+		<text key="Tx:time.relative span.days.single">{#} Tage</text>
+		<text key="Tx:time.relative span.days.single" count="1">einen Tag</text>
+		<text key="Tx:time.relative span.hours">{#} Stunden</text>
+		<text key="Tx:time.relative span.hours" count="1">{#} Stunde</text>
+		<text key="Tx:time.relative span.hours.single">{#} Stunden</text>
+		<text key="Tx:time.relative span.hours.single" count="1">eine Stunde</text>
+		<text key="Tx:time.relative span.minutes">{#} Minuten</text>
+		<text key="Tx:time.relative span.minutes" count="1">{#} Minute</text>
+		<text key="Tx:time.relative span.minutes.single">{#} Minuten</text>
+		<text key="Tx:time.relative span.minutes.single" count="1">eine Minute</text>
+		<text key="Tx:time.relative span.months">{#} Monate</text>
+		<text key="Tx:time.relative span.months" count="1">{#} Monat</text>
+		<text key="Tx:time.relative span.months.single">{#} Monate</text>
+		<text key="Tx:time.relative span.months.single" count="1">einen Monat</text>
+		<text key="Tx:time.relative span.seconds">{#} Sekunden</text>
+		<text key="Tx:time.relative span.seconds" count="1">{#} Sekunde</text>
+		<text key="Tx:time.relative span.seconds.single">{#} Sekunden</text>
+		<text key="Tx:time.relative span.seconds.single" count="1">eine Sekunde</text>
+		<text key="Tx:time.relative span.years">{#} Jahre</text>
+		<text key="Tx:time.relative span.years" count="1">{#} Jahr</text>
+		<text key="Tx:time.relative span.years.single">{#} Jahre</text>
+		<text key="Tx:time.relative span.years.single" count="1">ein Jahr</text>
+		<text key="Tx:time.relative span neg">{interval} vorher</text>
+		<text key="Tx:time.relative span neg.days">{#} Tage</text>
+		<text key="Tx:time.relative span neg.days" count="1">{#} Tag</text>
+		<text key="Tx:time.relative span neg.days.single">{#} Tage</text>
+		<text key="Tx:time.relative span neg.days.single" count="1">einen Tag</text>
+		<text key="Tx:time.relative span neg.hours">{#} Stunden</text>
+		<text key="Tx:time.relative span neg.hours" count="1">{#} Stunde</text>
+		<text key="Tx:time.relative span neg.hours.single">{#} Stunden</text>
+		<text key="Tx:time.relative span neg.hours.single" count="1">eine Stunde</text>
+		<text key="Tx:time.relative span neg.minutes">{#} Minuten</text>
+		<text key="Tx:time.relative span neg.minutes" count="1">{#} Minute</text>
+		<text key="Tx:time.relative span neg.minutes.single">{#} Minuten</text>
+		<text key="Tx:time.relative span neg.minutes.single" count="1">eine Minute</text>
+		<text key="Tx:time.relative span neg.months">{#} Monate</text>
+		<text key="Tx:time.relative span neg.months" count="1">{#} Monat</text>
+		<text key="Tx:time.relative span neg.months.single">{#} Monate</text>
+		<text key="Tx:time.relative span neg.months.single" count="1">einen Monat</text>
+		<text key="Tx:time.relative span neg.seconds">{#} Sekunden</text>
+		<text key="Tx:time.relative span neg.seconds" count="1">{#} Sekunde</text>
+		<text key="Tx:time.relative span neg.seconds.single">{#} Sekunden</text>
+		<text key="Tx:time.relative span neg.seconds.single" count="1">eine Sekunde</text>
+		<text key="Tx:time.relative span neg.years">{#} Jahre</text>
+		<text key="Tx:time.relative span neg.years" count="1">{#} Jahr</text>
+		<text key="Tx:time.relative span neg.years.single">{#} Jahre</text>
+		<text key="Tx:time.relative span neg.years.single" count="1">ein Jahr</text>
+		<text key="Tx:time.span">für {interval}</text>
+		<text key="Tx:time.span.days">{#} Tage</text>
+		<text key="Tx:time.span.days" count="1">{#} Tag</text>
+		<text key="Tx:time.span.days.single">{#} Tage</text>
+		<text key="Tx:time.span.days.single" count="1">einen Tag</text>
+		<text key="Tx:time.span.hours">{#} Stunden</text>
+		<text key="Tx:time.span.hours" count="1">{#} Stunde</text>
+		<text key="Tx:time.span.hours.single">{#} Stunden</text>
+		<text key="Tx:time.span.hours.single" count="1">eine Stunde</text>
+		<text key="Tx:time.span.minutes">{#} Minuten</text>
+		<text key="Tx:time.span.minutes" count="1">{#} Minute</text>
+		<text key="Tx:time.span.minutes.single">{#} Minuten</text>
+		<text key="Tx:time.span.minutes.single" count="1">eine Minute</text>
+		<text key="Tx:time.span.months">{#} Monate</text>
+		<text key="Tx:time.span.months" count="1">{#} Monat</text>
+		<text key="Tx:time.span.months.single">{#} Monate</text>
+		<text key="Tx:time.span.months.single" count="1">einen Monat</text>
+		<text key="Tx:time.span.seconds">{#} Sekunden</text>
+		<text key="Tx:time.span.seconds" count="1">{#} Sekunde</text>
+		<text key="Tx:time.span.seconds.single">{#} Sekunden</text>
+		<text key="Tx:time.span.seconds.single" count="1">eine Sekunde</text>
+		<text key="Tx:time.span.years">{#} Jahre</text>
+		<text key="Tx:time.span.years" count="1">{#} Jahr</text>
+		<text key="Tx:time.span.years.single">{#} Jahre</text>
+		<text key="Tx:time.span.years.single" count="1">ein Jahr</text>
+		<text key="Tx:time.span neg">seit {interval}</text>
+		<text key="Tx:time.span neg.days">{#} Tagen</text>
+		<text key="Tx:time.span neg.days" count="1">{#} Tag</text>
+		<text key="Tx:time.span neg.days.single">{#} Tagen</text>
+		<text key="Tx:time.span neg.days.single" count="1">einem Tag</text>
+		<text key="Tx:time.span neg.hours">{#} Stunden</text>
+		<text key="Tx:time.span neg.hours" count="1">{#} Stunde</text>
+		<text key="Tx:time.span neg.hours.single">{#} Stunden</text>
+		<text key="Tx:time.span neg.hours.single" count="1">einer Stunde</text>
+		<text key="Tx:time.span neg.minutes">{#} Minuten</text>
+		<text key="Tx:time.span neg.minutes" count="1">{#} Minute</text>
+		<text key="Tx:time.span neg.minutes.single">{#} Minuten</text>
+		<text key="Tx:time.span neg.minutes.single" count="1">einer Minute</text>
+		<text key="Tx:time.span neg.months">{#} Monaten</text>
+		<text key="Tx:time.span neg.months" count="1">{#} Monat</text>
+		<text key="Tx:time.span neg.months.single">{#} Monaten</text>
+		<text key="Tx:time.span neg.months.single" count="1">einem Monat</text>
+		<text key="Tx:time.span neg.seconds">{#} Sekunden</text>
+		<text key="Tx:time.span neg.seconds" count="1">{#} Sekunde</text>
+		<text key="Tx:time.span neg.seconds.single">{#} Sekunden</text>
+		<text key="Tx:time.span neg.seconds.single" count="1">einer Sekunde</text>
+		<text key="Tx:time.span neg.years">{#} Jahren</text>
+		<text key="Tx:time.span neg.years" count="1">{#} Jahr</text>
+		<text key="Tx:time.span neg.years.single">{#} Jahren</text>
+		<text key="Tx:time.span neg.years.single" count="1">einem Jahr</text>
+		<text key="window.title">FieldLog-Übertragungsprogramm</text>
+	</culture>
+	<culture name="en" primary="true">
+		<text key="about.title">About</text>
+		<text key="about.version">Version</text>
+		<text key="button.back">&lt; &amp;Back</text>
+		<text key="button.browse">B&amp;rowse…</text>
+		<text key="button.cancel">Cancel</text>
+		<text key="button.finish">Finish</text>
+		<text key="button.next">&amp;Next &gt;</text>
+		<text key="compress view.compressed size">Compressed size:</text>
+		<text key="compress view.intro">The log files are being compressed to reduce the size of the data to transport.</text>
+		<text key="compress view.review size">Please review the compressed data size. If you need to reduce the size you can go back and select a shorter time span or fewer log files.</text>
+		<text key="compress view.title">Compressing data</text>
+		<text key="file transport view.destination file name">&amp;Destination file name:</text>
+		<text key="file transport view.drag and drop">Tip:
+Alternatively, you can drag the archive from this icon and drop it directly into the destination directory or application, then click the “Finish” button.</text>
+		<text key="file transport view.file dialog.filter">Log archives|*.tar.lzma|All files|*.*</text>
+		<text key="file transport view.file dialog.title">Select the log archive destination</text>
+		<text key="file transport view.intro">Copies the log archive to a local disk on your computer. This may also be on a portable or USB drive. You need to carry the file to us yourself then, or transfer it from another computer.</text>
+		<text key="log selection.config error">Warning: The submit tool configuration file could not be read. Some options may not be available. ({msg})</text>
+		<text key="log selection.file dialog.filter">Log files|*.fl|All files|*.*</text>
+		<text key="log selection.file dialog.title">Select any file from a log file group</text>
+		<text key="log selection.find logs">&amp;Find logs on this computer</text>
+		<text key="log selection.intro">This tool will guide you through selecting and submitting relevant log files to us.</text>
+		<text key="log selection.selected path">Currently selected log path:</text>
+		<text key="log selection.title">Thank you for taking the time to report your issue to us so we can analyse it and improve our application.</text>
+		<text key="mail transport view.approve note">Note: Your mail application may ask you to approve the operation.</text>
+		<text key="mail transport view.intro">Opens your default e-mail application and sends a message to us with the log archive attached. You will keep a copy of the message in your Sent folder.</text>
+		<text key="mail transport view.mail size warning">Warning: The archive size exceeds the maximum recommended size to transfer via e-mail. Your message might not be delivered. Please consider using a different transport method or reduce the time span.</text>
+		<text key="mail transport view.privacy">Privacy note: By using your regular e-mail account, we will know your sender e-mail address. The message may be sent unencrypted over the internet.</text>
+		<text key="mail transport view.review option">&amp;Let me review the message before sending it</text>
+		<text key="menu.about">&amp;About…</text>
+		<text key="msg.cancel before submit">The error log of the application has not been submitted yet.
+
+Would you like to create a desktop shortcut to submit the log later?
+
+You can also start this submit tool manually by running {cmd} from the application installation directory.</text>
+		<text key="msg.cancelled">Cancelled</text>
+		<text key="msg.command line error">Command line error: {msg}</text>
+		<text key="msg.completed">Completed</text>
+		<text key="msg.endtime parameter invalid">The /endtime parameter is invalid: {value}. Using current time instead.</text>
+		<text key="msg.logpath parameter invalid">The /logpath parameter is invalid: {value}</text>
+		<text key="msg.no log files selected">No log files selected. Please check the specified time span.</text>
+		<text key="msg.previous operation">The operation could not be started because a previous operation has not yet stopped. Please wait for the current operation to stop and retry by going back and returning to this page again.</text>
+		<text key="msg.remaining time">Remaining time:</text>
+		<text key="msg.starting">Starting…</text>
+		<text key="msg.title.error">Error</text>
+		<text key="notes view.additional information">Please explain what you did or enter any additional information you believe may be useful for analysing the issue.</text>
+		<text key="notes view.e-mail address">Enter your e-mail address below if you wish to be notified about the issue. This is optional. We may also contact you if we need further information.</text>
+		<text key="notes view.privacy">Privacy note: Your message may be stored and published in a bug tracking system. If you wish to keep your message private, please make it clear at the beginning of your input. Never provide secret data like passwords here.</text>
+		<text key="notes view.title">Enter additional information</text>
+		<text key="shortcut.name">Submit logs</text>
+		<text key="time selection.everything">Everything</text>
+		<text key="time selection.intro">Logs are written continuously (and purged after a while) so that we have them when a problem arises, the first time. Limiting the time reduces the amount of data to transfer and the number of log entries to analyse. The time span should be long enough to include any events that may have caused the issue.</text>
+		<text key="time selection.last log update time">Last update time of the selected log files:</text>
+		<text key="time selection.latest submit start time">Latest submitted log starting time:</text>
+		<text key="time selection.learn more">Learn more about how FieldLog manages log files</text>
+		<text key="time selection.longer">Longer</text>
+		<text key="time selection.note">Note: The submitted log data can begin before the displayed starting time because only complete log files can be submitted.</text>
+		<text key="time selection.shorter">Shorter</text>
+		<text key="time selection.title">Select the time span to submit</text>
+		<text key="transport.file">Local file copy</text>
+		<text key="transport.mail">E-mail</text>
+		<text key="transport progress view.delete shortcut">You can now delete the shortcut you used to start this program.</text>
+		<text key="transport progress view.intro">Almost done! Please wait while the log data is transferred.</text>
+		<text key="transport progress view.title">Transport progress</text>
+		<text key="transport view.intro">&amp;Pick whichever method is the most convenient for you to send the log archive to us.</text>
+		<text key="transport view.title">Select the transport method</text>
+		<text key="Tx:byte unit" comment="Default: B" />
+		<text key="Tx:colon" comment="Can be used to insert additional spacing like for French." />
+		<text key="Tx:date.day" comment="Default: %d" />
+		<text key="Tx:date.day.tab" comment="Default: dd" />
+		<text key="Tx:date.dow with date" comment="Combines a day of week with a date. Default: {dow}, {date}" />
+		<text key="Tx:date.month.abbr" comment="Default: MMM" />
+		<text key="Tx:date.month.long" comment="Default: MMMM" />
+		<text key="Tx:date.month day" comment="Default: MM-dd">d/M</text>
+		<text key="Tx:date.month day.abbr" comment="Default: d MMM">d MMM</text>
+		<text key="Tx:date.month day.long" comment="Default: M">d MMMM</text>
+		<text key="Tx:date.month day.tab" comment="Default: MM-dd">dd/MM</text>
+		<text key="Tx:date.year" comment="Default: yyyy" />
+		<text key="Tx:date.year month" comment="Default: yyyy-MM">M/yyyy</text>
+		<text key="Tx:date.year month.abbr" comment="Default: MMM yyyy">MMM yyyy</text>
+		<text key="Tx:date.year month.long" comment="Default: Y" />
+		<text key="Tx:date.year month.tab" comment="Default: yyyy-MM">MM/yyyy</text>
+		<text key="Tx:date.year month day" comment="Default: d">d/M/yyyy</text>
+		<text key="Tx:date.year month day.abbr" comment="Default: d MMM yyyy">d MMM yyyy</text>
+		<text key="Tx:date.year month day.long" comment="Default: d MMMM yyyy">d MMMM yyyy</text>
+		<text key="Tx:date.year month day.tab" comment="Default: d">dd/MM/yyyy</text>
+		<text key="Tx:enum.and.combiner">, </text>
+		<text key="Tx:enum.and.last combiner"> and </text>
+		<text key="Tx:enum.or.combiner">, </text>
+		<text key="Tx:enum.or.last combiner"> or </text>
+		<text key="Tx:number.group separator" comment="Number thousands group separator. International recommendation is a narrow non-breaking space."> </text>
+		<text key="Tx:number.group separator threshold" comment="The minimum value for thousands group separators to be used at all.">1</text>
+		<text key="Tx:number.negative" comment="Negative number prefix.">−</text>
+		<text key="Tx:number.ordinal" comment="Ordinal numbers, male or default.">{#}th</text>
+		<text key="Tx:number.ordinal" count="1" mod="10">{#}st</text>
+		<text key="Tx:number.ordinal" count="2" mod="10">{#}nd</text>
+		<text key="Tx:number.ordinal" count="3" mod="10">{#}rd</text>
+		<text key="Tx:number.ordinal" count="11" mod="100">{#}th</text>
+		<text key="Tx:number.ordinal" count="12" mod="100">{#}th</text>
+		<text key="Tx:number.ordinal" count="13" mod="100">{#}th</text>
+		<text key="Tx:number.ordinal f" comment="Ordinal numbers, female if special." />
+		<text key="Tx:number.unit separator" comment="Separator between a number and its unit. Should be a non-breaking space. Should only be used for relatively short unit symbols, not longer names."> </text>
+		<text key="Tx:quote begin" comment="Opening regular quotation mark.">“</text>
+		<text key="Tx:quote end" comment="Closing regular quotation mark.">”</text>
+		<text key="Tx:quote nested begin" comment="Opening nested/secondary quotation mark.">‘</text>
+		<text key="Tx:quote nested end" comment="Closing nested/secondary quotation mark.">’</text>
+		<text key="Tx:time.am" comment="a.m. (ante meridiem), used for 12-hour clocks.">am</text>
+		<text key="Tx:time.hour" comment="Default: %H">h tt</text>
+		<text key="Tx:time.hour.tab" comment="Default: HH">hh tt</text>
+		<text key="Tx:time.hour minute" comment="Default: t">h:mm tt</text>
+		<text key="Tx:time.hour minute.tab" comment="Default: t">HH:mm</text>
+		<text key="Tx:time.hour minute second" comment="Default: T">h:mm:ss tt</text>
+		<text key="Tx:time.hour minute second.tab" comment="Default: T">HH:mm:ss</text>
+		<text key="Tx:time.hour minute second ms" comment="Default: H:mm:ss.fff">h:mm:ss.fff tt</text>
+		<text key="Tx:time.hour minute second ms.tab" comment="Default: HH:mm:ss.fff">HH:mm:ss.fff</text>
+		<text key="Tx:time.never" comment="No point in time.">never</text>
+		<text key="Tx:time.now" comment="At the current time.">now</text>
+		<text key="Tx:time.pm" comment="p.m. (post meridiem), used for 12-hour clocks.">pm</text>
+		<text key="Tx:time.relative" comment="A point in time in the future.">in {interval}</text>
+		<text key="Tx:time.relative.days">{#} days</text>
+		<text key="Tx:time.relative.days" count="1">{#} day</text>
+		<text key="Tx:time.relative.days.single">{#} days</text>
+		<text key="Tx:time.relative.days.single" count="1">a day</text>
+		<text key="Tx:time.relative.hours">{#} hours</text>
+		<text key="Tx:time.relative.hours" count="1">{#} hour</text>
+		<text key="Tx:time.relative.hours.single">{#} hours</text>
+		<text key="Tx:time.relative.hours.single" count="1">an hour</text>
+		<text key="Tx:time.relative.minutes">{#} minutes</text>
+		<text key="Tx:time.relative.minutes" count="1">{#} minute</text>
+		<text key="Tx:time.relative.minutes.single">{#} minutes</text>
+		<text key="Tx:time.relative.minutes.single" count="1">a minute</text>
+		<text key="Tx:time.relative.months">{#} months</text>
+		<text key="Tx:time.relative.months" count="1">{#} month</text>
+		<text key="Tx:time.relative.months.single">{#} months</text>
+		<text key="Tx:time.relative.months.single" count="1">a month</text>
+		<text key="Tx:time.relative.seconds">{#} seconds</text>
+		<text key="Tx:time.relative.seconds" count="1">{#} second</text>
+		<text key="Tx:time.relative.seconds.single">{#} seconds</text>
+		<text key="Tx:time.relative.seconds.single" count="1">a second</text>
+		<text key="Tx:time.relative.years">{#} years</text>
+		<text key="Tx:time.relative.years" count="1">{#} year</text>
+		<text key="Tx:time.relative.years.single">{#} years</text>
+		<text key="Tx:time.relative.years.single" count="1">a year</text>
+		<text key="Tx:time.relative neg" comment="A point in time in the past.">{interval} ago</text>
+		<text key="Tx:time.relative neg.days">{#} days</text>
+		<text key="Tx:time.relative neg.days" count="1">{#} day</text>
+		<text key="Tx:time.relative neg.days.single">{#} days</text>
+		<text key="Tx:time.relative neg.days.single" count="1">a day</text>
+		<text key="Tx:time.relative neg.hours">{#} hours</text>
+		<text key="Tx:time.relative neg.hours" count="1">{#} hour</text>
+		<text key="Tx:time.relative neg.hours.single">{#} hours</text>
+		<text key="Tx:time.relative neg.hours.single" count="1">an hour</text>
+		<text key="Tx:time.relative neg.minutes">{#} minutes</text>
+		<text key="Tx:time.relative neg.minutes" count="1">{#} minute</text>
+		<text key="Tx:time.relative neg.minutes.single">{#} minutes</text>
+		<text key="Tx:time.relative neg.minutes.single" count="1">a minute</text>
+		<text key="Tx:time.relative neg.months">{#} months</text>
+		<text key="Tx:time.relative neg.months" count="1">{#} month</text>
+		<text key="Tx:time.relative neg.months.single">{#} months</text>
+		<text key="Tx:time.relative neg.months.single" count="1">a month</text>
+		<text key="Tx:time.relative neg.seconds">{#} seconds</text>
+		<text key="Tx:time.relative neg.seconds" count="1">{#} second</text>
+		<text key="Tx:time.relative neg.seconds.single">{#} seconds</text>
+		<text key="Tx:time.relative neg.seconds.single" count="1">a second</text>
+		<text key="Tx:time.relative neg.years">{#} years</text>
+		<text key="Tx:time.relative neg.years" count="1">{#} year</text>
+		<text key="Tx:time.relative neg.years.single">{#} years</text>
+		<text key="Tx:time.relative neg.years.single" count="1">a year</text>
+		<text key="Tx:time.relative span" comment="A point in time after another unspecified time.">{interval} later</text>
+		<text key="Tx:time.relative span.days">{#} days</text>
+		<text key="Tx:time.relative span.days" count="1">{#} day</text>
+		<text key="Tx:time.relative span.days.single">{#} days</text>
+		<text key="Tx:time.relative span.days.single" count="1">a day</text>
+		<text key="Tx:time.relative span.hours">{#} hours</text>
+		<text key="Tx:time.relative span.hours" count="1">{#} hour</text>
+		<text key="Tx:time.relative span.hours.single">{#} hours</text>
+		<text key="Tx:time.relative span.hours.single" count="1">an hour</text>
+		<text key="Tx:time.relative span.minutes">{#} minutes</text>
+		<text key="Tx:time.relative span.minutes" count="1">{#} minute</text>
+		<text key="Tx:time.relative span.minutes.single">{#} minutes</text>
+		<text key="Tx:time.relative span.minutes.single" count="1">a minute</text>
+		<text key="Tx:time.relative span.months">{#} months</text>
+		<text key="Tx:time.relative span.months" count="1">{#} month</text>
+		<text key="Tx:time.relative span.months.single">{#} months</text>
+		<text key="Tx:time.relative span.months.single" count="1">a month</text>
+		<text key="Tx:time.relative span.seconds">{#} seconds</text>
+		<text key="Tx:time.relative span.seconds" count="1">{#} second</text>
+		<text key="Tx:time.relative span.seconds.single">{#} seconds</text>
+		<text key="Tx:time.relative span.seconds.single" count="1">a second</text>
+		<text key="Tx:time.relative span.years">{#} years</text>
+		<text key="Tx:time.relative span.years" count="1">{#} year</text>
+		<text key="Tx:time.relative span.years.single">{#} years</text>
+		<text key="Tx:time.relative span.years.single" count="1">a year</text>
+		<text key="Tx:time.relative span neg" comment="A point in time before another unspecified time.">{interval} before</text>
+		<text key="Tx:time.relative span neg.days">{#} days</text>
+		<text key="Tx:time.relative span neg.days" count="1">{#} day</text>
+		<text key="Tx:time.relative span neg.days.single">{#} days</text>
+		<text key="Tx:time.relative span neg.days.single" count="1">a day</text>
+		<text key="Tx:time.relative span neg.hours">{#} hours</text>
+		<text key="Tx:time.relative span neg.hours" count="1">{#} hour</text>
+		<text key="Tx:time.relative span neg.hours.single">{#} hours</text>
+		<text key="Tx:time.relative span neg.hours.single" count="1">an hour</text>
+		<text key="Tx:time.relative span neg.minutes">{#} minutes</text>
+		<text key="Tx:time.relative span neg.minutes" count="1">{#} minute</text>
+		<text key="Tx:time.relative span neg.minutes.single">{#} minutes</text>
+		<text key="Tx:time.relative span neg.minutes.single" count="1">a minute</text>
+		<text key="Tx:time.relative span neg.months">{#} months</text>
+		<text key="Tx:time.relative span neg.months" count="1">{#} month</text>
+		<text key="Tx:time.relative span neg.months.single">{#} months</text>
+		<text key="Tx:time.relative span neg.months.single" count="1">a month</text>
+		<text key="Tx:time.relative span neg.seconds">{#} seconds</text>
+		<text key="Tx:time.relative span neg.seconds" count="1">{#} second</text>
+		<text key="Tx:time.relative span neg.seconds.single">{#} seconds</text>
+		<text key="Tx:time.relative span neg.seconds.single" count="1">a second</text>
+		<text key="Tx:time.relative span neg.years">{#} years</text>
+		<text key="Tx:time.relative span neg.years" count="1">{#} year</text>
+		<text key="Tx:time.relative span neg.years.single">{#} years</text>
+		<text key="Tx:time.relative span neg.years.single" count="1">a year</text>
+		<text key="Tx:time.span" comment="A time span from now on into the future or based at an unspecified time.">for {interval}</text>
+		<text key="Tx:time.span.days">{#} days</text>
+		<text key="Tx:time.span.days" count="1">{#} day</text>
+		<text key="Tx:time.span.days.single">{#} days</text>
+		<text key="Tx:time.span.days.single" count="1">a day</text>
+		<text key="Tx:time.span.hours">{#} hours</text>
+		<text key="Tx:time.span.hours" count="1">{#} hour</text>
+		<text key="Tx:time.span.hours.single">{#} hours</text>
+		<text key="Tx:time.span.hours.single" count="1">an hour</text>
+		<text key="Tx:time.span.minutes">{#} minutes</text>
+		<text key="Tx:time.span.minutes" count="1">{#} minute</text>
+		<text key="Tx:time.span.minutes.single">{#} minutes</text>
+		<text key="Tx:time.span.minutes.single" count="1">a minute</text>
+		<text key="Tx:time.span.months">{#} months</text>
+		<text key="Tx:time.span.months" count="1">{#} month</text>
+		<text key="Tx:time.span.months.single">{#} months</text>
+		<text key="Tx:time.span.months.single" count="1">a month</text>
+		<text key="Tx:time.span.seconds">{#} seconds</text>
+		<text key="Tx:time.span.seconds" count="1">{#} second</text>
+		<text key="Tx:time.span.seconds.single">{#} seconds</text>
+		<text key="Tx:time.span.seconds.single" count="1">a second</text>
+		<text key="Tx:time.span.years">{#} years</text>
+		<text key="Tx:time.span.years" count="1">{#} year</text>
+		<text key="Tx:time.span.years.single">{#} years</text>
+		<text key="Tx:time.span.years.single" count="1">a year</text>
+		<text key="Tx:time.span neg" comment="A time span from the past until now.">for {interval}</text>
+		<text key="Tx:time.span neg.days">{#} days</text>
+		<text key="Tx:time.span neg.days" count="1">{#} day</text>
+		<text key="Tx:time.span neg.days.single">{#} days</text>
+		<text key="Tx:time.span neg.days.single" count="1">a day</text>
+		<text key="Tx:time.span neg.hours">{#} hours</text>
+		<text key="Tx:time.span neg.hours" count="1">{#} hour</text>
+		<text key="Tx:time.span neg.hours.single">{#} hours</text>
+		<text key="Tx:time.span neg.hours.single" count="1">an hour</text>
+		<text key="Tx:time.span neg.minutes">{#} minutes</text>
+		<text key="Tx:time.span neg.minutes" count="1">{#} minute</text>
+		<text key="Tx:time.span neg.minutes.single">{#} minutes</text>
+		<text key="Tx:time.span neg.minutes.single" count="1">a minute</text>
+		<text key="Tx:time.span neg.months">{#} months</text>
+		<text key="Tx:time.span neg.months" count="1">{#} month</text>
+		<text key="Tx:time.span neg.months.single">{#} months</text>
+		<text key="Tx:time.span neg.months.single" count="1">a month</text>
+		<text key="Tx:time.span neg.seconds">{#} seconds</text>
+		<text key="Tx:time.span neg.seconds" count="1">{#} second</text>
+		<text key="Tx:time.span neg.seconds.single">{#} seconds</text>
+		<text key="Tx:time.span neg.seconds.single" count="1">a second</text>
+		<text key="Tx:time.span neg.years">{#} years</text>
+		<text key="Tx:time.span neg.years" count="1">{#} year</text>
+		<text key="Tx:time.span neg.years.single">{#} years</text>
+		<text key="Tx:time.span neg.years.single" count="1">a year</text>
+		<text key="window.title">FieldLog Submit Tool</text>
+	</culture>
+</translation>

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
-using System.Diagnostics;
-using Unclassified.UI;
+using Unclassified.TxLib;
 
 namespace Unclassified.LogSubmit.Views
 {
@@ -19,23 +19,25 @@ namespace Unclassified.LogSubmit.Views
 
 		public TimeSelectionView()
 		{
-			timeEntries.Add(new TimeEntry { Text = "5 minutes", TimeSpan = TimeSpan.FromMinutes(5) });
-			timeEntries.Add(new TimeEntry { Text = "15 minutes", TimeSpan = TimeSpan.FromMinutes(15) });
-			timeEntries.Add(new TimeEntry { Text = "30 minutes", TimeSpan = TimeSpan.FromMinutes(30) });
-			timeEntries.Add(new TimeEntry { Text = "1 hour", TimeSpan = TimeSpan.FromHours(1) });
-			timeEntries.Add(new TimeEntry { Text = "3 hours", TimeSpan = TimeSpan.FromHours(3) });
-			timeEntries.Add(new TimeEntry { Text = "6 hours", TimeSpan = TimeSpan.FromHours(6) });
-			timeEntries.Add(new TimeEntry { Text = "12 hours", TimeSpan = TimeSpan.FromHours(12) });
-			timeEntries.Add(new TimeEntry { Text = "1 day", TimeSpan = TimeSpan.FromDays(1) });
-			timeEntries.Add(new TimeEntry { Text = "2 days", TimeSpan = TimeSpan.FromDays(2) });
-			timeEntries.Add(new TimeEntry { Text = "3 days", TimeSpan = TimeSpan.FromDays(3) });
-			timeEntries.Add(new TimeEntry { Text = "7 days", TimeSpan = TimeSpan.FromDays(7) });
-			timeEntries.Add(new TimeEntry { Text = "10 days", TimeSpan = TimeSpan.FromDays(10) });
-			timeEntries.Add(new TimeEntry { Text = "14 days", TimeSpan = TimeSpan.FromDays(14) });
-			timeEntries.Add(new TimeEntry { Text = "30 days", TimeSpan = TimeSpan.FromDays(30) });
-			timeEntries.Add(new TimeEntry { Text = "Everything", TimeSpan = TimeSpan.MaxValue });
+			timeEntries.Add(new TimeEntry(TimeSpan.FromMinutes(5)));
+			timeEntries.Add(new TimeEntry(TimeSpan.FromMinutes(15)));
+			timeEntries.Add(new TimeEntry(TimeSpan.FromMinutes(30)));
+			timeEntries.Add(new TimeEntry(TimeSpan.FromHours(1)));
+			timeEntries.Add(new TimeEntry(TimeSpan.FromHours(3)));
+			timeEntries.Add(new TimeEntry(TimeSpan.FromHours(6)));
+			timeEntries.Add(new TimeEntry(TimeSpan.FromHours(12)));
+			timeEntries.Add(new TimeEntry(TimeSpan.FromDays(1)));
+			timeEntries.Add(new TimeEntry(TimeSpan.FromDays(2)));
+			timeEntries.Add(new TimeEntry(TimeSpan.FromDays(3)));
+			timeEntries.Add(new TimeEntry(TimeSpan.FromDays(7)));
+			timeEntries.Add(new TimeEntry(TimeSpan.FromDays(10)));
+			timeEntries.Add(new TimeEntry(TimeSpan.FromDays(14)));
+			timeEntries.Add(new TimeEntry(TimeSpan.FromDays(30)));
+			timeEntries.Add(new TimeEntry { Text = Tx.T("time selection.everything"), TimeSpan = TimeSpan.MaxValue });
 
 			InitializeComponent();
+
+			TxDictionaryBinding.AddTextBindings(this);
 
 			Dock = DockStyle.Fill;
 
@@ -125,7 +127,7 @@ namespace Unclassified.LogSubmit.Views
 			}
 			else
 			{
-				LogMinTimeLabel.Text = "Everything";
+				LogMinTimeLabel.Text = Tx.T("time selection.everything");
 			}
 		}
 
@@ -135,6 +137,27 @@ namespace Unclassified.LogSubmit.Views
 
 		private class TimeEntry
 		{
+			public TimeEntry()
+			{
+			}
+
+			public TimeEntry(TimeSpan span)
+			{
+				if (span.Days >= 1)
+				{
+					Text = Tx.T("Tx:time.span.days", (int) span.Days);
+				}
+				else if (span.Hours >= 1)
+				{
+					Text = Tx.T("Tx:time.span.hours", (int) span.Hours);
+				}
+				if (span.Minutes >= 1)
+				{
+					Text = Tx.T("Tx:time.span.minutes", (int) span.Minutes);
+				}
+				TimeSpan = span;
+			}
+
 			public string Text { get; set; }
 			public TimeSpan TimeSpan { get; set; }
 

@@ -58,7 +58,7 @@
 			this.tableLayoutPanel1.RowCount = 2;
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel1.Size = new System.Drawing.Size(534, 362);
+			this.tableLayoutPanel1.Size = new System.Drawing.Size(574, 362);
 			this.tableLayoutPanel1.TabIndex = 0;
 			// 
 			// BackButton
@@ -66,14 +66,13 @@
 			this.BackButton.AutoSize = true;
 			this.BackButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.BackButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.BackButton.Location = new System.Drawing.Point(287, 330);
+			this.BackButton.Location = new System.Drawing.Point(296, 330);
 			this.BackButton.Margin = new System.Windows.Forms.Padding(6, 0, 0, 0);
 			this.BackButton.MinimumSize = new System.Drawing.Size(75, 0);
 			this.BackButton.Name = "BackButton";
-			this.BackButton.Padding = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			this.BackButton.Size = new System.Drawing.Size(75, 22);
+			this.BackButton.Size = new System.Drawing.Size(84, 22);
 			this.BackButton.TabIndex = 1;
-			this.BackButton.Text = "< &Back";
+			this.BackButton.Text = "[button.back]";
 			this.BackButton.UseVisualStyleBackColor = true;
 			this.BackButton.Click += new System.EventHandler(this.BackButton_Click);
 			// 
@@ -82,14 +81,13 @@
 			this.NextButton.AutoSize = true;
 			this.NextButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.NextButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.NextButton.Location = new System.Drawing.Point(368, 330);
+			this.NextButton.Location = new System.Drawing.Point(386, 330);
 			this.NextButton.Margin = new System.Windows.Forms.Padding(6, 0, 0, 0);
 			this.NextButton.MinimumSize = new System.Drawing.Size(75, 0);
 			this.NextButton.Name = "NextButton";
-			this.NextButton.Padding = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			this.NextButton.Size = new System.Drawing.Size(75, 22);
+			this.NextButton.Size = new System.Drawing.Size(80, 22);
 			this.NextButton.TabIndex = 2;
-			this.NextButton.Text = "&Next >";
+			this.NextButton.Text = "[button.next]";
 			this.NextButton.UseVisualStyleBackColor = true;
 			this.NextButton.Click += new System.EventHandler(this.NextButton_Click);
 			// 
@@ -99,14 +97,13 @@
 			this.MyCancelButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.MyCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
 			this.MyCancelButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.MyCancelButton.Location = new System.Drawing.Point(449, 330);
+			this.MyCancelButton.Location = new System.Drawing.Point(472, 330);
 			this.MyCancelButton.Margin = new System.Windows.Forms.Padding(6, 0, 0, 0);
 			this.MyCancelButton.MinimumSize = new System.Drawing.Size(75, 0);
 			this.MyCancelButton.Name = "MyCancelButton";
-			this.MyCancelButton.Padding = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			this.MyCancelButton.Size = new System.Drawing.Size(75, 22);
+			this.MyCancelButton.Size = new System.Drawing.Size(92, 22);
 			this.MyCancelButton.TabIndex = 3;
-			this.MyCancelButton.Text = "Cancel";
+			this.MyCancelButton.Text = "[button.cancel]";
 			this.MyCancelButton.UseVisualStyleBackColor = true;
 			this.MyCancelButton.Click += new System.EventHandler(this.MyCancelButton_Click);
 			// 
@@ -117,7 +114,7 @@
 			this.ContentPanel.Location = new System.Drawing.Point(8, 11);
 			this.ContentPanel.Margin = new System.Windows.Forms.Padding(0, 0, 0, 10);
 			this.ContentPanel.Name = "ContentPanel";
-			this.ContentPanel.Size = new System.Drawing.Size(516, 309);
+			this.ContentPanel.Size = new System.Drawing.Size(556, 309);
 			this.ContentPanel.TabIndex = 0;
 			// 
 			// progressSpinner1
@@ -142,13 +139,13 @@
 			this.AcceptButton = this.NextButton;
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.CancelButton = this.MyCancelButton;
-			this.ClientSize = new System.Drawing.Size(534, 362);
+			this.ClientSize = new System.Drawing.Size(574, 362);
 			this.Controls.Add(this.tableLayoutPanel1);
 			this.DoubleBuffered = true;
-			this.MinimumSize = new System.Drawing.Size(550, 400);
+			this.MinimumSize = new System.Drawing.Size(590, 400);
 			this.Name = "MainForm";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "FieldLog Submit Tool";
+			this.Text = "[window.title]";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
 			this.Shown += new System.EventHandler(this.MainForm_Shown);
 			this.FontChanged += new System.EventHandler(this.MainForm_FontChanged);

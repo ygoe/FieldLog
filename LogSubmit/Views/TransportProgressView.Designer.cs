@@ -69,9 +69,9 @@
 			this.label1.Location = new System.Drawing.Point(0, 28);
 			this.label1.Margin = new System.Windows.Forms.Padding(0);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(277, 13);
+			this.label1.Size = new System.Drawing.Size(145, 13);
 			this.label1.TabIndex = 7;
-			this.label1.Text = "Almost done! Please wait while the log data is transferred.";
+			this.label1.Text = "[transport progress view.intro]";
 			// 
 			// progressBar1
 			// 
@@ -93,14 +93,14 @@
 			this.TitleLabel.Location = new System.Drawing.Point(0, 0);
 			this.TitleLabel.Margin = new System.Windows.Forms.Padding(0, 0, 0, 10);
 			this.TitleLabel.Name = "TitleLabel";
-			this.TitleLabel.Size = new System.Drawing.Size(135, 18);
+			this.TitleLabel.Size = new System.Drawing.Size(197, 18);
 			this.TitleLabel.TabIndex = 1;
-			this.TitleLabel.Text = "Transport progress";
+			this.TitleLabel.Text = "[transport progress view.title]";
 			// 
 			// RemainingTimeLabel
 			// 
 			this.RemainingTimeLabel.AutoSize = true;
-			this.RemainingTimeLabel.Location = new System.Drawing.Point(86, 87);
+			this.RemainingTimeLabel.Location = new System.Drawing.Point(106, 87);
 			this.RemainingTimeLabel.Margin = new System.Windows.Forms.Padding(4, 10, 0, 0);
 			this.RemainingTimeLabel.Name = "RemainingTimeLabel";
 			this.RemainingTimeLabel.Size = new System.Drawing.Size(28, 13);
@@ -113,9 +113,9 @@
 			this.label3.Location = new System.Drawing.Point(0, 87);
 			this.label3.Margin = new System.Windows.Forms.Padding(0, 10, 0, 0);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(82, 13);
+			this.label3.Size = new System.Drawing.Size(102, 13);
 			this.label3.TabIndex = 5;
-			this.label3.Text = "Remaining time:";
+			this.label3.Text = "[msg.remaining time]";
 			// 
 			// FinishedLabel
 			// 

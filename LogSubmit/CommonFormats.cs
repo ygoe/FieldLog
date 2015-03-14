@@ -28,6 +28,7 @@ namespace Unclassified.LogSubmit
 			return time.ToString("yyyy-MM-dd");
 		}
 
+		// TODO: Replace by TxLib
 		public static string TimeSpanToString(TimeSpan time)
 		{
 			if (time.TotalMinutes >= 55)
@@ -68,6 +69,7 @@ namespace Unclassified.LogSubmit
 			}
 		}
 
+		// TODO: Replace by TxLib
 		public static string DataSizeToString(long size)
 		{
 			if (size > 10 * 1024 * 1024)   // 10 MB

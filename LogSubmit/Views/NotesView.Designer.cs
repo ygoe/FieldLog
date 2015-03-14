@@ -28,7 +28,6 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NotesView));
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
 			this.TitleLabel = new System.Windows.Forms.Label();
 			this.NotesTextBox = new System.Windows.Forms.TextBox();
@@ -69,21 +68,21 @@
 			this.TitleLabel.Location = new System.Drawing.Point(0, 0);
 			this.TitleLabel.Margin = new System.Windows.Forms.Padding(0, 0, 0, 10);
 			this.TitleLabel.Name = "TitleLabel";
-			this.TitleLabel.Size = new System.Drawing.Size(187, 18);
+			this.TitleLabel.Size = new System.Drawing.Size(112, 18);
 			this.TitleLabel.TabIndex = 0;
-			this.TitleLabel.Text = "Enter additional information";
+			this.TitleLabel.Text = "[notes view.title]";
 			// 
 			// NotesTextBox
 			// 
 			this.NotesTextBox.AcceptsReturn = true;
 			this.NotesTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.NotesTextBox.HideSelection = false;
-			this.NotesTextBox.Location = new System.Drawing.Point(2, 105);
+			this.NotesTextBox.Location = new System.Drawing.Point(2, 66);
 			this.NotesTextBox.Margin = new System.Windows.Forms.Padding(2, 0, 0, 0);
 			this.NotesTextBox.Multiline = true;
 			this.NotesTextBox.Name = "NotesTextBox";
 			this.NotesTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-			this.NotesTextBox.Size = new System.Drawing.Size(478, 202);
+			this.NotesTextBox.Size = new System.Drawing.Size(478, 254);
 			this.NotesTextBox.TabIndex = 3;
 			// 
 			// label1
@@ -92,21 +91,19 @@
 			this.label1.Location = new System.Drawing.Point(0, 28);
 			this.label1.Margin = new System.Windows.Forms.Padding(0, 0, 0, 6);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(442, 26);
+			this.label1.Size = new System.Drawing.Size(166, 13);
 			this.label1.TabIndex = 1;
-			this.label1.Text = "Please explain what you did or enter any additional information you believe may b" +
-    "e useful for analysing the issue.";
+			this.label1.Text = "[notes view.additional information]";
 			// 
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(0, 317);
+			this.label2.Location = new System.Drawing.Point(0, 330);
 			this.label2.Margin = new System.Windows.Forms.Padding(0, 10, 0, 6);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(471, 26);
+			this.label2.Size = new System.Drawing.Size(134, 13);
 			this.label2.TabIndex = 4;
-			this.label2.Text = "Enter your e-mail address below if you wish to be notified about the issue. This " +
-    "is optional. We may also contact you if we need further information.";
+			this.label2.Text = "[notes view.e-mail address]";
 			// 
 			// EMailTextBox
 			// 
@@ -125,12 +122,12 @@
 			this.label3.AutoSize = true;
 			this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.label3.ForeColor = System.Drawing.SystemColors.GrayText;
-			this.label3.Location = new System.Drawing.Point(0, 60);
+			this.label3.Location = new System.Drawing.Point(0, 47);
 			this.label3.Margin = new System.Windows.Forms.Padding(0, 0, 0, 6);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(479, 39);
+			this.label3.Size = new System.Drawing.Size(101, 13);
 			this.label3.TabIndex = 2;
-			this.label3.Text = resources.GetString("label3.Text");
+			this.label3.Text = "[notes view.privacy]";
 			// 
 			// NotesView
 			// 

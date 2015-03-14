@@ -75,25 +75,25 @@
 			// 
 			this.CurrentLabel.AutoSize = true;
 			this.tableLayoutPanel1.SetColumnSpan(this.CurrentLabel, 2);
-			this.CurrentLabel.Location = new System.Drawing.Point(0, 79);
+			this.CurrentLabel.Location = new System.Drawing.Point(0, 61);
 			this.CurrentLabel.Margin = new System.Windows.Forms.Padding(0);
 			this.CurrentLabel.Name = "CurrentLabel";
-			this.CurrentLabel.Size = new System.Drawing.Size(135, 13);
+			this.CurrentLabel.Size = new System.Drawing.Size(139, 13);
 			this.CurrentLabel.TabIndex = 2;
-			this.CurrentLabel.Text = "Currently selected log path:";
+			this.CurrentLabel.Text = "[log selection.selected path]";
 			// 
 			// FindLogsButton
 			// 
 			this.FindLogsButton.AutoSize = true;
 			this.FindLogsButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.FindLogsButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.FindLogsButton.Location = new System.Drawing.Point(81, 124);
+			this.FindLogsButton.Location = new System.Drawing.Point(110, 106);
 			this.FindLogsButton.Margin = new System.Windows.Forms.Padding(6, 0, 0, 0);
 			this.FindLogsButton.Name = "FindLogsButton";
 			this.FindLogsButton.Padding = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			this.FindLogsButton.Size = new System.Drawing.Size(152, 22);
+			this.FindLogsButton.Size = new System.Drawing.Size(136, 22);
 			this.FindLogsButton.TabIndex = 5;
-			this.FindLogsButton.Text = "&Find logs on this computer";
+			this.FindLogsButton.Text = "[log selection.find logs]";
 			this.FindLogsButton.UseVisualStyleBackColor = true;
 			this.FindLogsButton.Click += new System.EventHandler(this.FindLogsButton_Click);
 			// 
@@ -107,10 +107,10 @@
 			this.LogDirsListView.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.LogDirsListView.FullRowSelect = true;
 			this.LogDirsListView.HideSelection = false;
-			this.LogDirsListView.Location = new System.Drawing.Point(2, 152);
+			this.LogDirsListView.Location = new System.Drawing.Point(2, 134);
 			this.LogDirsListView.Margin = new System.Windows.Forms.Padding(2, 6, 0, 0);
 			this.LogDirsListView.Name = "LogDirsListView";
-			this.LogDirsListView.Size = new System.Drawing.Size(519, 255);
+			this.LogDirsListView.Size = new System.Drawing.Size(519, 273);
 			this.LogDirsListView.TabIndex = 6;
 			this.LogDirsListView.UseCompatibleStateImageBehavior = false;
 			this.LogDirsListView.View = System.Windows.Forms.View.Details;
@@ -140,7 +140,7 @@
 			this.SelectedLogDirText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tableLayoutPanel1.SetColumnSpan(this.SelectedLogDirText, 2);
-			this.SelectedLogDirText.Location = new System.Drawing.Point(2, 98);
+			this.SelectedLogDirText.Location = new System.Drawing.Point(2, 80);
 			this.SelectedLogDirText.Margin = new System.Windows.Forms.Padding(2, 6, 0, 6);
 			this.SelectedLogDirText.Name = "SelectedLogDirText";
 			this.SelectedLogDirText.ReadOnly = true;
@@ -151,13 +151,12 @@
 			// 
 			this.label1.AutoSize = true;
 			this.tableLayoutPanel1.SetColumnSpan(this.label1, 2);
-			this.label1.Location = new System.Drawing.Point(0, 56);
+			this.label1.Location = new System.Drawing.Point(0, 38);
 			this.label1.Margin = new System.Windows.Forms.Padding(0, 0, 0, 10);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(376, 13);
+			this.label1.Size = new System.Drawing.Size(95, 13);
 			this.label1.TabIndex = 1;
-			this.label1.Text = "This tool will guide you through selecting and submitting relevant log files to u" +
-    "s.";
+			this.label1.Text = "[log selection.intro]";
 			// 
 			// label2
 			// 
@@ -167,10 +166,9 @@
 			this.label2.Location = new System.Drawing.Point(0, 0);
 			this.label2.Margin = new System.Windows.Forms.Padding(0, 0, 0, 20);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(508, 36);
+			this.label2.Size = new System.Drawing.Size(125, 18);
 			this.label2.TabIndex = 0;
-			this.label2.Text = "Thank you for taking the time to report your issue to us so we can analyse it and" +
-    " improve our application.";
+			this.label2.Text = "[log selection.title]";
 			// 
 			// ConfigErrorLabel
 			// 
@@ -193,13 +191,13 @@
 			this.BrowseLogButton.AutoSize = true;
 			this.BrowseLogButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.BrowseLogButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.BrowseLogButton.Location = new System.Drawing.Point(2, 124);
+			this.BrowseLogButton.Location = new System.Drawing.Point(2, 106);
 			this.BrowseLogButton.Margin = new System.Windows.Forms.Padding(2, 0, 0, 0);
 			this.BrowseLogButton.Name = "BrowseLogButton";
 			this.BrowseLogButton.Padding = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			this.BrowseLogButton.Size = new System.Drawing.Size(73, 22);
+			this.BrowseLogButton.Size = new System.Drawing.Size(102, 22);
 			this.BrowseLogButton.TabIndex = 4;
-			this.BrowseLogButton.Text = "B&rowse...";
+			this.BrowseLogButton.Text = "[button.browse]";
 			this.BrowseLogButton.UseVisualStyleBackColor = true;
 			this.BrowseLogButton.Click += new System.EventHandler(this.BrowseLogButton_Click);
 			// 

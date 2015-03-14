@@ -86,6 +86,9 @@
   <ItemGroup>
     <Compile Include="CommonFormats.cs" />
     <Compile Include="ConfigReader.cs" />
+    <Compile Include="Unclassified\TxLib\DateTimeInterval.cs" />
+    <Compile Include="Unclassified\TxLib\Tx.cs" />
+    <Compile Include="Unclassified\TxLib\TxWinForms.cs" />
     <Compile Include="Unclassified\UI\SystemMenu.cs" />
     <Compile Include="Unclassified\UI\ULinkLabel.cs">
       <SubType>Component</SubType>
@@ -239,6 +242,7 @@
     <EmbeddedResource Include="Views\TransportView.resx">
       <DependentUpon>TransportView.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="LogSubmit.txd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

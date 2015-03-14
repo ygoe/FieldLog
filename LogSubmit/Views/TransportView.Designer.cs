@@ -62,9 +62,9 @@
 			this.TitleLabel.Location = new System.Drawing.Point(0, 0);
 			this.TitleLabel.Margin = new System.Windows.Forms.Padding(0, 0, 0, 10);
 			this.TitleLabel.Name = "TitleLabel";
-			this.TitleLabel.Size = new System.Drawing.Size(190, 18);
+			this.TitleLabel.Size = new System.Drawing.Size(134, 18);
 			this.TitleLabel.TabIndex = 0;
-			this.TitleLabel.Text = "Select the transport method";
+			this.TitleLabel.Text = "[transport view.title]";
 			// 
 			// label1
 			// 
@@ -72,10 +72,9 @@
 			this.label1.Location = new System.Drawing.Point(0, 28);
 			this.label1.Margin = new System.Windows.Forms.Padding(0);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(402, 13);
+			this.label1.Size = new System.Drawing.Size(102, 13);
 			this.label1.TabIndex = 1;
-			this.label1.Text = "&Pick whichever method is the most convenient for you to send the log archive to " +
-    "us.";
+			this.label1.Text = "[transport view.intro]";
 			// 
 			// TransportComboBox
 			// 

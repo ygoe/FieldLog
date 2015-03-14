@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Windows.Forms;
-using Unclassified.UI;
 using Unclassified.LogSubmit.Transports;
+using Unclassified.TxLib;
+using Unclassified.UI;
 
 namespace Unclassified.LogSubmit.Views
 {
@@ -21,13 +22,15 @@ namespace Unclassified.LogSubmit.Views
 		{
 			InitializeComponent();
 
+			TxDictionaryBinding.AddTextBindings(this);
+
 			Dock = DockStyle.Fill;
 
 			if (mailTransportView.Transport.CanExecute())
 			{
-				TransportComboBox.Items.Add(new TransportMethod { Text = "E-mail", View = mailTransportView, Transport = mailTransportView.Transport });
+				TransportComboBox.Items.Add(new TransportMethod { Text = Tx.T("transport.mail"), View = mailTransportView, Transport = mailTransportView.Transport });
 			}
-			TransportComboBox.Items.Add(new TransportMethod { Text = "Local file copy", View = fileTransportView, Transport = fileTransportView.Transport });
+			TransportComboBox.Items.Add(new TransportMethod { Text = Tx.T("transport.file"), View = fileTransportView, Transport = fileTransportView.Transport });
 			TransportComboBox.SelectedIndex = 0;
 		}
 

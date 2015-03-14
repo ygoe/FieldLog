@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using Unclassified.LogSubmit.Transports;
+using Unclassified.TxLib;
 
 namespace Unclassified.LogSubmit.Views
 {
@@ -23,6 +19,8 @@ namespace Unclassified.LogSubmit.Views
 		public MailTransportView()
 		{
 			InitializeComponent();
+
+			TxDictionaryBinding.AddTextBindings(this);
 
 			Dock = DockStyle.Fill;
 

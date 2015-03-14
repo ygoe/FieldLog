@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Windows.Forms;
+using Unclassified.TxLib;
 
 namespace Unclassified.LogSubmit.Views
 {
@@ -11,6 +12,8 @@ namespace Unclassified.LogSubmit.Views
 		public NotesView()
 		{
 			InitializeComponent();
+
+			TxDictionaryBinding.AddTextBindings(this);
 
 			Dock = DockStyle.Fill;
 		}

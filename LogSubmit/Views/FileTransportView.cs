@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
+using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using Unclassified.LogSubmit.Transports;
-using System.IO;
+using Unclassified.TxLib;
 using Unclassified.Util;
 
 namespace Unclassified.LogSubmit.Views
@@ -25,6 +21,8 @@ namespace Unclassified.LogSubmit.Views
 		public FileTransportView()
 		{
 			InitializeComponent();
+
+			TxDictionaryBinding.AddTextBindings(this);
 
 			Dock = DockStyle.Fill;
 		}
@@ -50,10 +48,10 @@ namespace Unclassified.LogSubmit.Views
 			{
 				dlg.DefaultExt = "tar.lzma";
 				dlg.FileName = FileNameTextBox.Text;
-				dlg.Filter = "Log archives|*.tar.lzma|All files|*.*";
+				dlg.Filter = Tx.T("file transport view.file dialog.filter");
 				dlg.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
 				dlg.SupportMultiDottedExtensions = true;
-				dlg.Title = "Select the log archive destination";
+				dlg.Title = Tx.T("file transport view.file dialog.title");
 
 				if (dlg.ShowDialog() == DialogResult.OK)
 				{

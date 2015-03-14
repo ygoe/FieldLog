@@ -120,6 +120,10 @@ Source: "example-config.txt"; DestDir: "{app}"; DestName: "FieldLogViewer.exe.fl
 ; PdbConvert tool
 Source: "..\PdbConvert\bin\Release\PdbConvert.exe"; DestDir: "{app}"; Flags: ignoreversion
 
+; LogSubmit tool
+Source: "..\LogSubmit\bin\x86\Release\LogSubmit.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "submit.conf"; DestDir: "{app}"
+
 ; FieldLog assembly
 Source: "..\FieldLog\bin\ReleaseNET20\Unclassified.FieldLog.dll"; DestDir: "{app}\FieldLog assembly (.NET 2.0)"; Flags: ignoreversion
 Source: "..\FieldLog\bin\ReleaseNET20\Unclassified.FieldLog.xml"; DestDir: "{app}\FieldLog assembly (.NET 2.0)"

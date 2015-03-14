@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Unclassified.LogSubmit.Views;
+using Unclassified.TxLib;
 using Unclassified.UI;
 using Unclassified.Util;
 
@@ -50,6 +51,10 @@ namespace Unclassified.LogSubmit
 
 			InitializeComponent();
 
+			// Set the XML file's build action to "Embedded Resource" and "Never copy" for this to work.
+			Tx.LoadFromEmbeddedResource("Unclassified.LogSubmit.LogSubmit.txd");
+			TxDictionaryBinding.AddTextBindings(this);
+
 			// Read configuration file
 			string configFile = Path.Combine(
 				Path.GetDirectoryName(Application.ExecutablePath),
@@ -85,7 +90,7 @@ namespace Unclassified.LogSubmit
 			USizeGrip.AddToForm(this);
 
 			systemMenu = new SystemMenu(this);
-			systemMenu.AddCommand("&About…", OnSysMenuAbout, true);
+			systemMenu.AddCommand(Tx.T("menu.about"), OnSysMenuAbout, true);
 
 			progressPanel = new Panel();
 			progressPanel.Left = 0;
@@ -111,8 +116,8 @@ namespace Unclassified.LogSubmit
 			catch (Exception ex)
 			{
 				MessageBox.Show(
-					"Command line error: " + ex.Message,
-					"Error",
+					Tx.T("msg.command line error", "msg", ex.Message),
+					Tx.T("msg.title.error"),
 					MessageBoxButtons.OK,
 					MessageBoxIcon.Error);
 			}
@@ -129,8 +134,8 @@ namespace Unclassified.LogSubmit
 				catch
 				{
 					MessageBox.Show(
-						"The /logpath parameter is invalid: " + logPathOption.Value,
-						"Error",
+						Tx.T("msg.logpath parameter invalid", "value", logPathOption.Value),
+						Tx.T("msg.title.error"),
 						MessageBoxButtons.OK,
 						MessageBoxIcon.Error);
 					logSelectionView.ResetLogBasePath();
@@ -152,8 +157,8 @@ namespace Unclassified.LogSubmit
 				catch
 				{
 					MessageBox.Show(
-						"The /endtime parameter is invalid: " + endTimeOption.Value + ". Using current time instead.",
-						"Error",
+						Tx.T("msg.endtime parameter invalid", "value", endTimeOption.Value),
+						Tx.T("msg.title.error"),
 						MessageBoxButtons.OK,
 						MessageBoxIcon.Error);
 				}
@@ -191,11 +196,7 @@ namespace Unclassified.LogSubmit
 			if (!FinishEnabled && fromErrorDlgOption.IsSet)
 			{
 				switch (MessageBox.Show(
-					"The error log of the application has not been submitted yet.\n\n" +
-						"Would you like to create a desktop shortcut to submit the log later?\n\n" +
-						"You can also start this submit tool manually by running " +
-						Path.GetFileNameWithoutExtension(Application.ExecutablePath) +
-						" from the application installation directory.",
+					Tx.T("msg.cancel before submit", "cmd", Path.GetFileNameWithoutExtension(Application.ExecutablePath)),
 					Text,
 					MessageBoxButtons.YesNoCancel,
 					MessageBoxIcon.Question))
@@ -209,7 +210,7 @@ namespace Unclassified.LogSubmit
 						}
 						arguments += " /endtime " + appStartTime.ToString("yyyy-MM-dd'T'HH:mm:ss");
 						string desktopDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-						string linkFile = PathUtil.GetUniqueFileName(Path.Combine(desktopDir, "Submit logs.lnk"));
+						string linkFile = PathUtil.GetUniqueFileName(Path.Combine(desktopDir, Tx.T("shortcut.name") + ".lnk"));
 						ShellLinkHelper.CreateLink(linkFile, Application.ExecutablePath, arguments);
 						break;
 					case DialogResult.No:
@@ -236,11 +237,11 @@ namespace Unclassified.LogSubmit
 		{
 			string msg =
 				AssemblyInfoUtil.AppDescription + "\n" +
-				"Version " + AssemblyInfoUtil.AppLongVersion + " (" + AssemblyInfoUtil.AppAsmConfiguration + ")\n" +
+				Tx.T("about.version") + " " + AssemblyInfoUtil.AppLongVersion + " (" + AssemblyInfoUtil.AppAsmConfiguration + ")\n" +
 				AssemblyInfoUtil.AppCopyright + "\n" +
 				"http://unclassified.software/source/fieldlog";
 
-			MessageBox.Show(msg, "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
+			MessageBox.Show(msg, Tx.T("about.title"), MessageBoxButtons.OK, MessageBoxIcon.Information);
 		}
 
 		#endregion Form event handlers
@@ -312,11 +313,11 @@ namespace Unclassified.LogSubmit
 				finishEnabled = value;
 				if (finishEnabled)
 				{
-					MyCancelButton.Text = "Finish";
+					MyCancelButton.Text = Tx.T("button.finish");
 				}
 				else
 				{
-					MyCancelButton.Text = "Cancel";
+					MyCancelButton.Text = Tx.T("button.cancel");
 				}
 				UpdateProgress();
 			}

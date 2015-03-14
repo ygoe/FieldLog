@@ -75,9 +75,9 @@
 			this.TitleLabel.Location = new System.Drawing.Point(0, 0);
 			this.TitleLabel.Margin = new System.Windows.Forms.Padding(0, 0, 0, 10);
 			this.TitleLabel.Name = "TitleLabel";
-			this.TitleLabel.Size = new System.Drawing.Size(129, 18);
+			this.TitleLabel.Size = new System.Drawing.Size(142, 18);
 			this.TitleLabel.TabIndex = 1;
-			this.TitleLabel.Text = "Compressing data";
+			this.TitleLabel.Text = "[compress view.title]";
 			// 
 			// progressBar1
 			// 
@@ -98,9 +98,9 @@
 			this.label1.Location = new System.Drawing.Point(0, 28);
 			this.label1.Margin = new System.Windows.Forms.Padding(0);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(371, 13);
+			this.label1.Size = new System.Drawing.Size(106, 13);
 			this.label1.TabIndex = 3;
-			this.label1.Text = "The log files are being compressed to reduce the size of the data to transport.";
+			this.label1.Text = "[compress view.intro]";
 			// 
 			// label3
 			// 
@@ -108,9 +108,9 @@
 			this.label3.Location = new System.Drawing.Point(0, 87);
 			this.label3.Margin = new System.Windows.Forms.Padding(0, 10, 0, 0);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(82, 13);
+			this.label3.Size = new System.Drawing.Size(102, 13);
 			this.label3.TabIndex = 4;
-			this.label3.Text = "Remaining time:";
+			this.label3.Text = "[msg.remaining time]";
 			// 
 			// label2
 			// 
@@ -118,14 +118,14 @@
 			this.label2.Location = new System.Drawing.Point(0, 106);
 			this.label2.Margin = new System.Windows.Forms.Padding(0, 6, 0, 0);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(89, 13);
+			this.label2.Size = new System.Drawing.Size(164, 13);
 			this.label2.TabIndex = 4;
-			this.label2.Text = "Compressed size:";
+			this.label2.Text = "[compress view.compressed size]";
 			// 
 			// RemainingTimeLabel
 			// 
 			this.RemainingTimeLabel.AutoSize = true;
-			this.RemainingTimeLabel.Location = new System.Drawing.Point(93, 87);
+			this.RemainingTimeLabel.Location = new System.Drawing.Point(168, 87);
 			this.RemainingTimeLabel.Margin = new System.Windows.Forms.Padding(4, 10, 0, 0);
 			this.RemainingTimeLabel.Name = "RemainingTimeLabel";
 			this.RemainingTimeLabel.Size = new System.Drawing.Size(28, 13);
@@ -136,7 +136,7 @@
 			// 
 			this.CompressedSizeLabel.AutoSize = true;
 			this.CompressedSizeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.CompressedSizeLabel.Location = new System.Drawing.Point(93, 106);
+			this.CompressedSizeLabel.Location = new System.Drawing.Point(168, 106);
 			this.CompressedSizeLabel.Margin = new System.Windows.Forms.Padding(4, 6, 0, 0);
 			this.CompressedSizeLabel.Name = "CompressedSizeLabel";
 			this.CompressedSizeLabel.Size = new System.Drawing.Size(36, 13);
@@ -150,10 +150,9 @@
 			this.label4.Location = new System.Drawing.Point(0, 139);
 			this.label4.Margin = new System.Windows.Forms.Padding(0, 20, 0, 0);
 			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(524, 26);
+			this.label4.Size = new System.Drawing.Size(138, 13);
 			this.label4.TabIndex = 3;
-			this.label4.Text = "Please review the compressed data size. If you need to reduce the size you can go" +
-    " back and select a shorter time span or fewer log files.";
+			this.label4.Text = "[compress view.review size]";
 			// 
 			// CompressWorker
 			// 

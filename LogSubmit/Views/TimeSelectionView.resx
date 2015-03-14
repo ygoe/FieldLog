@@ -117,7 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="label1.Text" xml:space="preserve">
-    <value>Logs are written continuously (and purged after a while) so that we have them when a problem arises, the first time. Limiting the time reduces the amount of data to transfer and the number of log entries to analyse. The time span should be long enough to include any events that may have caused the issue.</value>
-  </data>
 </root>

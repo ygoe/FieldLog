@@ -68,22 +68,22 @@
 			this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(0, 36);
+			this.label1.Location = new System.Drawing.Point(0, 23);
 			this.label1.Margin = new System.Windows.Forms.Padding(0, 0, 0, 2);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(108, 18);
+			this.label1.Size = new System.Drawing.Size(194, 18);
 			this.label1.TabIndex = 1;
-			this.label1.Text = "&Destination file name:";
+			this.label1.Text = "[file transport view.destination file name]";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// FileNameTextBox
 			// 
 			this.FileNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.FileNameTextBox.Location = new System.Drawing.Point(112, 36);
+			this.FileNameTextBox.Location = new System.Drawing.Point(198, 23);
 			this.FileNameTextBox.Margin = new System.Windows.Forms.Padding(4, 0, 0, 0);
 			this.FileNameTextBox.Name = "FileNameTextBox";
-			this.FileNameTextBox.Size = new System.Drawing.Size(386, 20);
+			this.FileNameTextBox.Size = new System.Drawing.Size(300, 20);
 			this.FileNameTextBox.TabIndex = 2;
 			this.FileNameTextBox.TextChanged += new System.EventHandler(this.FileNameTextBox_TextChanged);
 			// 
@@ -94,11 +94,9 @@
 			this.label2.Location = new System.Drawing.Point(0, 0);
 			this.label2.Margin = new System.Windows.Forms.Padding(0, 0, 0, 10);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(484, 26);
+			this.label2.Size = new System.Drawing.Size(118, 13);
 			this.label2.TabIndex = 0;
-			this.label2.Text = "Copies the log archive to a local disk on your computer. This may also be on a po" +
-    "rtable or USB drive. You need to carry the file to us yourself then, or transfer" +
-    " it from another computer.";
+			this.label2.Text = "[file transport view.intro]";
 			// 
 			// BrowseButton
 			// 
@@ -106,13 +104,13 @@
 			this.BrowseButton.AutoSize = true;
 			this.BrowseButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.BrowseButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.BrowseButton.Location = new System.Drawing.Point(425, 60);
+			this.BrowseButton.Location = new System.Drawing.Point(396, 47);
 			this.BrowseButton.Margin = new System.Windows.Forms.Padding(4, 4, 0, 0);
 			this.BrowseButton.Name = "BrowseButton";
 			this.BrowseButton.Padding = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			this.BrowseButton.Size = new System.Drawing.Size(73, 22);
+			this.BrowseButton.Size = new System.Drawing.Size(102, 22);
 			this.BrowseButton.TabIndex = 3;
-			this.BrowseButton.Text = "B&rowse...";
+			this.BrowseButton.Text = "[button.browse]";
 			this.BrowseButton.UseVisualStyleBackColor = true;
 			this.BrowseButton.Click += new System.EventHandler(this.BrowseButton_Click);
 			// 
@@ -128,7 +126,7 @@
 			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
 			this.tableLayoutPanel2.Controls.Add(this.FileDragPictureBox, 0, 0);
 			this.tableLayoutPanel2.Controls.Add(this.DragInfoLabel, 1, 0);
-			this.tableLayoutPanel2.Location = new System.Drawing.Point(2, 102);
+			this.tableLayoutPanel2.Location = new System.Drawing.Point(2, 89);
 			this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(2, 20, 0, 0);
 			this.tableLayoutPanel2.Name = "tableLayoutPanel2";
 			this.tableLayoutPanel2.RowCount = 1;
@@ -157,10 +155,9 @@
 			this.DragInfoLabel.Location = new System.Drawing.Point(72, 0);
 			this.DragInfoLabel.Margin = new System.Windows.Forms.Padding(0);
 			this.DragInfoLabel.Name = "DragInfoLabel";
-			this.DragInfoLabel.Size = new System.Drawing.Size(383, 54);
+			this.DragInfoLabel.Size = new System.Drawing.Size(164, 54);
 			this.DragInfoLabel.TabIndex = 0;
-			this.DragInfoLabel.Text = "Tip:\r\nAlternatively, you can drag the archive from this icon and drop it directly" +
-    " into the destination directory or application, then click the “Finish” button.";
+			this.DragInfoLabel.Text = "[file transport view.drag and drop]";
 			this.DragInfoLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			this.DragInfoLabel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.DragInfoLabel_MouseDown);
 			// 

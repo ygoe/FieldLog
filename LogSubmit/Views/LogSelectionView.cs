@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using Unclassified.TxLib;
 using Unclassified.Util;
 
 namespace Unclassified.LogSubmit.Views
@@ -29,6 +28,8 @@ namespace Unclassified.LogSubmit.Views
 		public LogSelectionView()
 		{
 			InitializeComponent();
+
+			TxDictionaryBinding.AddTextBindings(this);
 
 			Dock = DockStyle.Fill;
 
@@ -56,7 +57,7 @@ namespace Unclassified.LogSubmit.Views
 		private void LogSelectionView_FontChanged(object sender, EventArgs args)
 		{
 			int width;
-			
+
 			isUpdatingColumns = true;
 
 			width = TextRenderer.MeasureText(LastUpdateHeader.Text, Font).Width;
@@ -121,12 +122,12 @@ namespace Unclassified.LogSubmit.Views
 			using (OpenFileDialog dlg = new OpenFileDialog())
 			{
 				dlg.FileName = SelectedLogDirText.Text;
-				dlg.Filter = "Log files|*.fl|All files|*.*";
+				dlg.Filter = Tx.T("log selection.file dialog.filter");
 				if (!string.IsNullOrEmpty(SelectedLogDirText.Text))
 				{
 					dlg.InitialDirectory = Path.GetDirectoryName(SelectedLogDirText.Text);
 				}
-				dlg.Title = "Select any file from a log file group";
+				dlg.Title = Tx.T("log selection.file dialog.title");
 
 				if (dlg.ShowDialog() == DialogResult.OK)
 				{
@@ -134,7 +135,7 @@ namespace Unclassified.LogSubmit.Views
 					{
 						ScanDirectoryWorker.CancelAsync();
 					}
-					
+
 					SelectedLogDirText.Text = GetBasePath(dlg.FileName);
 
 					CurrentLabel.Show();
@@ -189,7 +190,7 @@ namespace Unclassified.LogSubmit.Views
 			{
 				data.Value.Size = 0;
 			}
-			
+
 			foreach (var driveInfo in DriveInfo.GetDrives())
 			{
 				if (driveInfo.IsReady &&
@@ -320,7 +321,7 @@ namespace Unclassified.LogSubmit.Views
 				logDirsColumnSorter.SortColumn = 1;
 				logDirsColumnSorter.Order = SortOrder.Descending;
 				logDirsColumnSorter.Update();
-				
+
 				CurrentLabel.Hide();
 				SelectedLogDirText.Hide();
 				LogDirsListView.Show();
@@ -331,7 +332,7 @@ namespace Unclassified.LogSubmit.Views
 
 		public void SetConfigError(Exception ex)
 		{
-			ConfigErrorLabel.Text = "Warning: The submit tool configuration file could not be read. Some options may not be available. (" + ex.Message + ")";
+			ConfigErrorLabel.Text = Tx.T("log selection.config error", "msg", ex.Message);
 			ConfigErrorLabel.Show();
 		}
 

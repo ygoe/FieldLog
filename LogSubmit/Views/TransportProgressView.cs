@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using Unclassified.TxLib;
 
 namespace Unclassified.LogSubmit.Views
 {
@@ -20,6 +21,8 @@ namespace Unclassified.LogSubmit.Views
 		public TransportProgressView()
 		{
 			InitializeComponent();
+
+			TxDictionaryBinding.AddTextBindings(this);
 
 			Dock = DockStyle.Fill;
 		}
@@ -64,7 +67,7 @@ namespace Unclassified.LogSubmit.Views
 			if (args.ProgressPercentage == 0)
 			{
 				startTime = DateTime.UtcNow;
-				RemainingTimeLabel.Text = "Starting…";
+				RemainingTimeLabel.Text = Tx.T("msg.starting");
 				RemainingTimeLabel.ForeColor = SystemColors.ControlText;
 			}
 			else if (args.ProgressPercentage >= 5)
@@ -84,24 +87,24 @@ namespace Unclassified.LogSubmit.Views
 		{
 			if (args.Cancelled)
 			{
-				RemainingTimeLabel.Text = "Cancelled";
+				RemainingTimeLabel.Text = Tx.T("msg.cancelled");
 				RemainingTimeLabel.ForeColor = SystemColors.ControlText;
 				progressBar1.Value = 0;
 			}
 			else if (args.Error != null)
 			{
-				RemainingTimeLabel.Text = "Error: " + args.Error.Message;
+				RemainingTimeLabel.Text = Tx.TC("msg.title.error") + " " + args.Error.Message;
 				RemainingTimeLabel.ForeColor = Color.FromArgb(240, 0, 0);
 			}
 			else
 			{
-				RemainingTimeLabel.Text = "Completed";
+				RemainingTimeLabel.Text = Tx.T("msg.completed");
 				RemainingTimeLabel.ForeColor = Color.FromArgb(0, 160, 0);
 				finished = true;
 
 				if (SharedData.Instance.FromShortcut)
 				{
-					FinishedLabel.Text = "You can now delete the shortcut you used to start this program.";
+					FinishedLabel.Text = Tx.T("transport progress view.delete shortcut");
 					FinishedLabel.Show();
 				}
 
@@ -125,8 +128,8 @@ namespace Unclassified.LogSubmit.Views
 				else
 				{
 					MessageBox.Show(
-						"The operation could not be started because a previous operation has not yet stopped. Please wait for the current operation to stop and retry by going back and returning to this page again.",
-						"Error",
+						Tx.T("msg.previous operation"),
+						Tx.T("msg.title.error"),
 						MessageBoxButtons.OK,
 						MessageBoxIcon.Error);
 				}

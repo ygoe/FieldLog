@@ -16,6 +16,7 @@ Restore-NuGetPackages "FieldLog.sln"
 if (IsSelected build-debug)
 {
 	Build-Solution "FieldLog.sln" "Debug" "Any CPU" 8
+	Build-Solution "FieldLog.sln" "Debug" "x86" 1
 
 	if (IsSelected sign-lib)
 	{
@@ -27,6 +28,8 @@ if (IsSelected build-debug)
 	{
 		Sign-File "FieldLogViewer\bin\Debug\FieldLogViewer.exe" "$signKeyFile" "$signPassword"
 		Sign-File "PdbConvert\bin\Debug\PdbConvert.exe" "$signKeyFile" "$signPassword"
+		Sign-File "LogSubmit\bin\Debug\LogSubmit.exe" "$signKeyFile" "$signPassword"
+		Sign-File "LogSubmit\bin\x86\Debug\LogSubmit.exe" "$signKeyFile" "$signPassword"
 	}
 }
 
@@ -34,6 +37,7 @@ if (IsSelected build-debug)
 if (IsAnySelected build-release commit publish)
 {
 	Build-Solution "FieldLog.sln" "Release" "Any CPU" 8
+	Build-Solution "FieldLog.sln" "Release" "x86" 1
 	
 	# Archive debug symbols for later source lookup
 	EnsureDirExists ".local"
@@ -49,6 +53,8 @@ if (IsAnySelected build-release commit publish)
 	{
 		Sign-File "FieldLogViewer\bin\Release\FieldLogViewer.exe" "$signKeyFile" "$signPassword"
 		Sign-File "PdbConvert\bin\Release\PdbConvert.exe" "$signKeyFile" "$signPassword"
+		Sign-File "LogSubmit\bin\Release\LogSubmit.exe" "$signKeyFile" "$signPassword"
+		Sign-File "LogSubmit\bin\x86\Release\LogSubmit.exe" "$signKeyFile" "$signPassword"
 	}
 
 	Create-NuGetPackage "FieldLog\Unclassified.FieldLog.nuspec" "FieldLog\bin"

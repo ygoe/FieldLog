@@ -131,8 +131,8 @@
 			this.tableLayoutPanel2.Name = "tableLayoutPanel2";
 			this.tableLayoutPanel2.RowCount = 1;
 			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-			this.tableLayoutPanel2.Size = new System.Drawing.Size(496, 54);
+			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 54F));
+			this.tableLayoutPanel2.Size = new System.Drawing.Size(496, 48);
 			this.tableLayoutPanel2.TabIndex = 5;
 			// 
 			// FileDragPictureBox
@@ -141,8 +141,8 @@
 			this.FileDragPictureBox.Location = new System.Drawing.Point(0, 0);
 			this.FileDragPictureBox.Margin = new System.Windows.Forms.Padding(0);
 			this.FileDragPictureBox.Name = "FileDragPictureBox";
-			this.FileDragPictureBox.Size = new System.Drawing.Size(72, 54);
-			this.FileDragPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+			this.FileDragPictureBox.Size = new System.Drawing.Size(72, 48);
+			this.FileDragPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
 			this.FileDragPictureBox.TabIndex = 4;
 			this.FileDragPictureBox.TabStop = false;
 			this.FileDragPictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.FileDragPictureBox_MouseDown);
@@ -155,7 +155,7 @@
 			this.DragInfoLabel.Location = new System.Drawing.Point(72, 0);
 			this.DragInfoLabel.Margin = new System.Windows.Forms.Padding(0);
 			this.DragInfoLabel.Name = "DragInfoLabel";
-			this.DragInfoLabel.Size = new System.Drawing.Size(164, 54);
+			this.DragInfoLabel.Size = new System.Drawing.Size(164, 48);
 			this.DragInfoLabel.TabIndex = 0;
 			this.DragInfoLabel.Text = "[file transport view.drag and drop]";
 			this.DragInfoLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -163,7 +163,8 @@
 			// 
 			// FileTransportView
 			// 
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+			this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 			this.Controls.Add(this.tableLayoutPanel1);
 			this.DoubleBuffered = true;
 			this.Name = "FileTransportView";

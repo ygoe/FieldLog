@@ -68,7 +68,7 @@
 			this.BackButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.BackButton.Location = new System.Drawing.Point(296, 330);
 			this.BackButton.Margin = new System.Windows.Forms.Padding(6, 0, 0, 0);
-			this.BackButton.MinimumSize = new System.Drawing.Size(75, 0);
+			this.BackButton.MinimumSize = new System.Drawing.Size(80, 0);
 			this.BackButton.Name = "BackButton";
 			this.BackButton.Size = new System.Drawing.Size(84, 22);
 			this.BackButton.TabIndex = 1;
@@ -83,7 +83,7 @@
 			this.NextButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.NextButton.Location = new System.Drawing.Point(386, 330);
 			this.NextButton.Margin = new System.Windows.Forms.Padding(6, 0, 0, 0);
-			this.NextButton.MinimumSize = new System.Drawing.Size(75, 0);
+			this.NextButton.MinimumSize = new System.Drawing.Size(80, 0);
 			this.NextButton.Name = "NextButton";
 			this.NextButton.Size = new System.Drawing.Size(80, 22);
 			this.NextButton.TabIndex = 2;
@@ -99,7 +99,7 @@
 			this.MyCancelButton.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.MyCancelButton.Location = new System.Drawing.Point(472, 330);
 			this.MyCancelButton.Margin = new System.Windows.Forms.Padding(6, 0, 0, 0);
-			this.MyCancelButton.MinimumSize = new System.Drawing.Size(75, 0);
+			this.MyCancelButton.MinimumSize = new System.Drawing.Size(80, 0);
 			this.MyCancelButton.Name = "MyCancelButton";
 			this.MyCancelButton.Size = new System.Drawing.Size(92, 22);
 			this.MyCancelButton.TabIndex = 3;
@@ -137,7 +137,8 @@
 			// MainForm
 			// 
 			this.AcceptButton = this.NextButton;
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+			this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 			this.CancelButton = this.MyCancelButton;
 			this.ClientSize = new System.Drawing.Size(574, 362);
 			this.Controls.Add(this.tableLayoutPanel1);

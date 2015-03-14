@@ -78,7 +78,7 @@
 			this.CurrentLabel.Location = new System.Drawing.Point(0, 61);
 			this.CurrentLabel.Margin = new System.Windows.Forms.Padding(0);
 			this.CurrentLabel.Name = "CurrentLabel";
-			this.CurrentLabel.Size = new System.Drawing.Size(139, 13);
+			this.CurrentLabel.Size = new System.Drawing.Size(164, 13);
 			this.CurrentLabel.TabIndex = 2;
 			this.CurrentLabel.Text = "[log selection view.selected path]";
 			// 
@@ -91,7 +91,7 @@
 			this.FindLogsButton.Margin = new System.Windows.Forms.Padding(6, 0, 0, 0);
 			this.FindLogsButton.Name = "FindLogsButton";
 			this.FindLogsButton.Padding = new System.Windows.Forms.Padding(4, 0, 4, 0);
-			this.FindLogsButton.Size = new System.Drawing.Size(136, 22);
+			this.FindLogsButton.Size = new System.Drawing.Size(161, 22);
 			this.FindLogsButton.TabIndex = 5;
 			this.FindLogsButton.Text = "[log selection view.find logs]";
 			this.FindLogsButton.UseVisualStyleBackColor = true;
@@ -154,7 +154,7 @@
 			this.label1.Location = new System.Drawing.Point(0, 38);
 			this.label1.Margin = new System.Windows.Forms.Padding(0, 0, 0, 10);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(95, 13);
+			this.label1.Size = new System.Drawing.Size(120, 13);
 			this.label1.TabIndex = 1;
 			this.label1.Text = "[log selection view.intro]";
 			// 
@@ -166,7 +166,7 @@
 			this.label2.Location = new System.Drawing.Point(0, 0);
 			this.label2.Margin = new System.Windows.Forms.Padding(0, 0, 0, 20);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(125, 18);
+			this.label2.Size = new System.Drawing.Size(158, 18);
 			this.label2.TabIndex = 0;
 			this.label2.Text = "[log selection view.title]";
 			// 
@@ -209,7 +209,8 @@
 			// 
 			// LogSelectionView
 			// 
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+			this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 			this.Controls.Add(this.tableLayoutPanel1);
 			this.DoubleBuffered = true;
 			this.Name = "LogSelectionView";

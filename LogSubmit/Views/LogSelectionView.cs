@@ -396,6 +396,8 @@ namespace Unclassified.LogSubmit.Views
 			{
 				if (IsPath(path, dir)) return true;
 			}
+			if (Path.GetFileName(path) == ".git") return true;
+			if (Path.GetFileName(path) == ".svn") return true;
 			if (level >= 8) return true;
 
 			try

@@ -55,20 +55,6 @@ namespace Unclassified.LogSubmit
 			Tx.LoadFromEmbeddedResource("Unclassified.LogSubmit.LogSubmit.txd");
 			TxDictionaryBinding.AddTextBindings(this);
 
-			// Read configuration file
-			string configFile = Path.Combine(
-				Path.GetDirectoryName(Application.ExecutablePath),
-				"submit.conf");
-			try
-			{
-				ConfigReader config = new ConfigReader(configFile);
-				config.Read();
-			}
-			catch (Exception ex)
-			{
-				logSelectionView.SetConfigError(ex);
-			}
-
 			// Initialise views
 			logSelectionView = new LogSelectionView();
 			timeSelectionView = new TimeSelectionView();
@@ -83,6 +69,20 @@ namespace Unclassified.LogSubmit
 			views.Add(compressView);
 			views.Add(transportView);
 			views.Add(transportProgressView);
+
+			// Read configuration file
+			string configFile = Path.Combine(
+				Path.GetDirectoryName(Application.ExecutablePath),
+				"submit.conf");
+			try
+			{
+				ConfigReader config = new ConfigReader(configFile);
+				config.Read();
+			}
+			catch (Exception ex)
+			{
+				logSelectionView.SetConfigError(ex);
+			}
 
 			// Other initialisation
 			Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);

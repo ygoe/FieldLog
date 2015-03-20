@@ -208,7 +208,7 @@ namespace Unclassified.LogSubmit
 						{
 							arguments += " /logpath \"" + logPathOption.Value + "\"";
 						}
-						arguments += " /endtime " + appStartTime.ToString("yyyy-MM-dd'T'HH:mm:ss");
+						arguments += " /endtime " + appStartTime.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'");
 						string desktopDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
 						string linkFile = PathUtil.GetUniqueFileName(Path.Combine(desktopDir, Tx.T("shortcut.name") + ".lnk"));
 						ShellLinkHelper.CreateLink(linkFile, Application.ExecutablePath, arguments);

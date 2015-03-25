@@ -2597,7 +2597,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			Filters.Add(f);
 
 			f = new FilterViewModel();
-			f.DisplayName = "No trace";
+			f.DisplayName = "No trace priority";
 			fcg = new FilterConditionGroupViewModel(f);
 			fc = new FilterConditionViewModel(fcg);
 			fc.Column = FilterColumn.Priority;
@@ -2607,25 +2607,55 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			f.ConditionGroups.Add(fcg);
 			Filters.Add(f);
 
-			f = new FilterViewModel();
-			f.DisplayName = "No WPF DataBinding";
-			fcg = new FilterConditionGroupViewModel(f);
-			fcg.IsExclude = true;
-			fc = new FilterConditionViewModel(fcg);
-			fc.Column = FilterColumn.Type;
-			fc.Comparison = FilterComparison.Equals;
-			fc.Value = FieldLogItemType.Text.ToString();
-			fcg.Conditions.Add(fc);
-			fc = new FilterConditionViewModel(fcg);
-			fc.Column = FilterColumn.TextText;
-			fc.Comparison = FilterComparison.StartsWith;
-			fc.Value = "WPF DataBinding: ";
-			fcg.Conditions.Add(fc);
+			f = new FilterViewModel
+			{
+				DisplayName = "No WPF Stop messages"
+			};
+			fcg = new FilterConditionGroupViewModel(f)
+			{
+				IsExclude = true
+			};
+			fcg.Conditions.Add(new FilterConditionViewModel(fcg)
+			{
+				Column = FilterColumn.Type,
+				Comparison = FilterComparison.Equals,
+				Value = FieldLogItemType.Text.ToString()
+			});
+			fcg.Conditions.Add(new FilterConditionViewModel(fcg)
+			{
+				Column = FilterColumn.Priority,
+				Comparison = FilterComparison.Equals,
+				Value = FieldLogPriority.Trace.ToString()
+			});
+			fcg.Conditions.Add(new FilterConditionViewModel(fcg)
+			{
+				Column = FilterColumn.TextText,
+				Comparison = FilterComparison.Contains,
+				Value = "WPF: "
+			});
+			fcg.Conditions.Add(new FilterConditionViewModel(fcg)
+			{
+				Column = FilterColumn.TextText,
+				Comparison = FilterComparison.EndsWith,
+				Value = " [Stop]"
+			});
+			fcg.Conditions.Add(new FilterConditionViewModel(fcg)
+			{
+				Column = FilterColumn.TextText,
+				Comparison = FilterComparison.NotStartsWith,
+				Value = "«"
+			});
+			fcg.Conditions.Add(new FilterConditionViewModel(fcg)
+			{
+				Column = FilterColumn.TextText,
+				Comparison = FilterComparison.NotContains,
+				Value = "WPF: Load XAML/BAML"
+			});
 			f.ConditionGroups.Add(fcg);
 			Filters.Add(f);
 
 			f = new FilterViewModel();
-			f.DisplayName = "No Diagnostics.Trace";
+			f.DisplayName = "No Diagnostics.Trace output";
 			fcg = new FilterConditionGroupViewModel(f);
 			fcg.IsExclude = true;
 			fc = new FilterConditionViewModel(fcg);
@@ -2636,7 +2666,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			fc = new FilterConditionViewModel(fcg);
 			fc.Column = FilterColumn.TextText;
 			fc.Comparison = FilterComparison.StartsWith;
-			fc.Value = "Diagnostics.Trace: ";
+			fc.Value = "Trace: ";
 			fcg.Conditions.Add(fc);
 			f.ConditionGroups.Add(fcg);
 			Filters.Add(f);

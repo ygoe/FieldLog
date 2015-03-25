@@ -2784,6 +2784,8 @@ namespace Unclassified.FieldLog
 			Dispatcher.CurrentDispatcher.BeginInvoke(new Action<FieldLogPriority, string, string>(Text), dispPriority, logPriority, text, details);
 		}
 
+		#region Trace for several Dispatcher priorities
+
 		/// <summary>
 		/// Writes a text log item with Trace priority to the log file after the WPF dispatcher has
 		/// processed other queued events of the specified dispatcher priority.
@@ -2868,6 +2870,97 @@ namespace Unclassified.FieldLog
 		{
 			TraceOnDispatcherPriority(DispatcherPriority.DataBind, text, details);
 		}
+
+		#endregion Trace for several Dispatcher priorities
+
+		#region Checkpoint for several Dispatcher priorities
+
+		/// <summary>
+		/// Writes a text log item with Checkpoint priority to the log file after the WPF dispatcher
+		/// has processed other queued events of the specified dispatcher priority.
+		/// </summary>
+		/// <param name="priority">The WPF dispatcher priority to schedule the log message with.</param>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static void CheckpointOnDispatcherPriority(DispatcherPriority priority, string text, string details = null)
+		{
+			Dispatcher.CurrentDispatcher.BeginInvoke(new Action<string, string>(Checkpoint), priority, text, details);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Checkpoint priority to the log file after the WPF dispatcher
+		/// has processed other queued events of Background priority.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static void CheckpointOnBackground(string text, string details = null)
+		{
+			CheckpointOnDispatcherPriority(DispatcherPriority.Background, text, details);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Checkpoint priority to the log file after the WPF dispatcher
+		/// has processed other queued events of Input priority.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static void CheckpointOnInput(string text, string details = null)
+		{
+			CheckpointOnDispatcherPriority(DispatcherPriority.Input, text, details);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Checkpoint priority to the log file after the WPF dispatcher
+		/// has processed other queued events of Loaded priority.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static void CheckpointOnLoaded(string text, string details = null)
+		{
+			CheckpointOnDispatcherPriority(DispatcherPriority.Loaded, text, details);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Checkpoint priority to the log file after the WPF dispatcher
+		/// has processed other queued events of Render priority.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static void CheckpointOnRender(string text, string details = null)
+		{
+			CheckpointOnDispatcherPriority(DispatcherPriority.Render, text, details);
+		}
+
+		/// <summary>
+		/// Writes a text log item with Checkpoint priority to the log file after the WPF dispatcher
+		/// has processed other queued events of DataBind priority.
+		/// </summary>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
+		/// <remarks>
+		/// This method is not available in the NET20 build.
+		/// </remarks>
+		public static void CheckpointOnDataBind(string text, string details = null)
+		{
+			CheckpointOnDispatcherPriority(DispatcherPriority.DataBind, text, details);
+		}
+
+		#endregion Checkpoint for several Dispatcher priorities
 
 		/// <summary>
 		/// Stops a custom timer after the WPF dispatcher has processed other queued events of the

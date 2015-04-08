@@ -353,6 +353,10 @@ namespace Unclassified.FieldLog
 			}
 			MethodName = method.Name;
 
+			// TODO: Include 'extern' indicator from the following tests (needs new file format)
+			//bool isPInvoke = (method.Attributes & MethodAttributes.PinvokeImpl) != 0;
+			//bool isInternalCall = (method.GetMethodImplementationFlags() & MethodImplAttributes.InternalCall) != 0;
+
 			MethodInfo methodInfo = method as MethodInfo;
 			StringBuilder sigSb = new StringBuilder();
 			if (methodInfo != null)

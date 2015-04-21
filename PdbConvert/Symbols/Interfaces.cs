@@ -31,6 +31,70 @@ namespace PdbConvert.Symbols
 		// There are more methods in this interface, but we don't need them.
 	}
 
+	// This is the same interface for what we want to do with it, just give it a different IID.
+	// Source: cor.h
+	[Guid("31bcfce2-dafb-11d2-9f81-00c04f79a0a3")]
+	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[ComVisible(true)]
+	internal interface IMetadataDispenserExPrivate
+	{
+		// We need to be able to call OpenScope, which is the 2nd vtable slot.
+		// Thus we need this one placeholder here to occupy the first slot..
+		void DefineScope_Placeholder();
+
+		//STDMETHOD(OpenScope)(                 // Return code.
+		//  LPCWSTR     szScope,                // [in] The scope to open.
+		//  DWORD       dwOpenFlags,            // [in] Open mode flags.
+		//  REFIID      riid,                   // [in] The interface desired.
+		//  IUnknown    **ppIUnk) PURE;         // [out] Return interface on success.
+		void OpenScope(
+			[In, MarshalAs(UnmanagedType.LPWStr)] string szScope,
+			[In] int dwOpenFlags,
+			[In] ref Guid riid,
+			[Out, MarshalAs(UnmanagedType.IUnknown)] out object punk);
+
+		// There are more methods in this interface, but we don't need them.
+	}
+
+	// Source: metahost.h
+	[Guid("bd39d1d2-ba2f-486a-89b0-b4b0cb466891")]
+	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[ComVisible(true)]
+	internal interface IICLRRuntimeInfoPrivate
+	{
+		void GetVersionString_Placeholder();
+		void GetRuntimeDirectory_Placeholder();
+		void IsLoaded_Placeholder();
+		void LoadErrorString_Placeholder();
+		void LoadLibrary_Placeholder();
+		void GetProcAddress_Placeholder();
+
+		//virtual HRESULT STDMETHODCALLTYPE GetInterface(
+		//	/* [in] */ REFCLSID rclsid,
+		//	/* [in] */ REFIID riid,
+		//	/* [retval][iid_is][out] */	LPVOID* ppUnk) = 0;
+		void GetInterface(
+			ref Guid rclsid,
+			ref Guid riid,
+			[Out, MarshalAs(UnmanagedType.IUnknown)] out object ppUnk);
+	}
+
+	// Source: metahost.h
+	[Guid("d332db9e-b9b3-4125-8207-a14884f53216")]
+	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[ComVisible(true)]
+	internal interface ICLRMetaHostPrivate
+	{
+		//virtual HRESULT STDMETHODCALLTYPE GetRuntime(
+		//	/* [in] */ LPCWSTR pwzVersion,
+		//	/* [in] */ REFIID riid,
+		//	/* [retval][iid_is][out] */	LPVOID* ppRuntime) = 0;
+		void GetRuntime(
+			[In, MarshalAs(UnmanagedType.LPWStr)] string pwzVersion,
+			ref Guid riid,
+			[Out, MarshalAs(UnmanagedType.IUnknown)] out object ppRuntime);
+    }
+
 	// Since we're just blindly passing this interface through managed code to the Symbinder, we
 	// don't care about actually importing the specific methods.
 	// This needs to be public so that we can call Marshal.GetComInterfaceForObject() on it to get

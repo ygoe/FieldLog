@@ -57,18 +57,6 @@ namespace Unclassified.LogSubmit
 
 			// Initialise views
 			logSelectionView = new LogSelectionView();
-			timeSelectionView = new TimeSelectionView();
-			notesView = new NotesView();
-			compressView = new CompressView();
-			transportView = new TransportView();
-			transportProgressView = new TransportProgressView();
-
-			views.Add(logSelectionView);
-			views.Add(timeSelectionView);
-			views.Add(notesView);
-			views.Add(compressView);
-			views.Add(transportView);
-			views.Add(transportProgressView);
 
 			// Read configuration file
 			string configFile = Path.Combine(
@@ -83,6 +71,20 @@ namespace Unclassified.LogSubmit
 			{
 				logSelectionView.SetConfigError(ex);
 			}
+
+			// Initialise more views
+			timeSelectionView = new TimeSelectionView();
+			notesView = new NotesView();
+			compressView = new CompressView();
+			transportView = new TransportView();
+			transportProgressView = new TransportProgressView();
+
+			views.Add(logSelectionView);
+			views.Add(timeSelectionView);
+			views.Add(notesView);
+			views.Add(compressView);
+			views.Add(transportView);
+			views.Add(transportProgressView);
 
 			// Other initialisation
 			Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);

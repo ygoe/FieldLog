@@ -323,6 +323,11 @@ namespace Unclassified.LogSubmit
 			}
 		}
 
+		public void FocusNextButton()
+		{
+			NextButton.Focus();
+		}
+
 		#endregion Public methods
 
 		#region Private methods

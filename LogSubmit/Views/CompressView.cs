@@ -198,6 +198,7 @@ namespace Unclassified.LogSubmit.Views
 				RemainingTimeLabel.ForeColor = Color.FromArgb(0, 160, 0);
 				dataReady = true;
 				UpdateButtons();
+				MainForm.Instance.FocusNextButton();
 			}
 		}
 

@@ -585,12 +585,14 @@ namespace Unclassified.FieldLog
 					exeFile = Path.Combine(exeFile, "LogSubmit.exe");
 					if (File.Exists(exeFile))
 					{
+						// Found the log submit tool, now start it
 						try
 						{
 							Process.Start(exeFile, "/errordlg /logpath \"" + FL.LogFileBasePath + "\"");
 						}
 						catch (Exception ex)
 						{
+							// Start failed, show an error message
 							FL.Critical(ex, "Starting log submit tool");
 							MessageBox.Show(
 								"The log submit tool could not be started." + " " + ex.Message,
@@ -601,13 +603,14 @@ namespace Unclassified.FieldLog
 						return;
 					}
 				}
+				// Log submit tool not found but logs should be sent, show an error message
+				FL.Error("Could not start log submit tool, path or file not found");
+				MessageBox.Show(
+					"The log submit tool could not be started. The path or file was not found. Please start the tool manually from the application installation directory.",
+					"Error",
+					MessageBoxButtons.OK,
+					MessageBoxIcon.Error);
 			}
-			FL.Error("Could not start log submit tool, path or file not found");
-			MessageBox.Show(
-				"The log submit tool could not be started. The path or file was not found. Please start the tool manually from the application installation directory.",
-				"Error",
-				MessageBoxButtons.OK,
-				MessageBoxIcon.Error);
 		}
 
 		#endregion Private helper methods

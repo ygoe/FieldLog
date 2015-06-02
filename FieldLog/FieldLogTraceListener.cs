@@ -309,6 +309,10 @@ namespace Unclassified.FieldLog
 			}
 			else if (source == PresentationTraceSources.FreezableSource.Name)
 			{
+				if (id == 1)
+				{
+					return;   // Don't log this, it appears everywhere and comes from bugs in WPF
+				}
 				HandleFreezableMessage(id, ref msg, ref shortMsg);
 			}
 			else if (source == PresentationTraceSources.HwndHostSource.Name)

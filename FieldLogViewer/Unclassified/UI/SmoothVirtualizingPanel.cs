@@ -154,8 +154,8 @@ namespace Unclassified.UI
 
 		private int GetItemsCount()
 		{
-			ItemsControl itemControl = ItemsControl.GetItemsOwner(this);
-			return itemControl.Items.Count;
+			ItemsControl itemsControl = ItemsControl.GetItemsOwner(this);
+			return itemsControl.Items.Count;
 		}
 
 		/// <summary>

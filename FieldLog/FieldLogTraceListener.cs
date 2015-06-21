@@ -29,7 +29,7 @@ namespace Unclassified.FieldLog
 	/// <remarks>
 	/// This class is largely specific to WPF and not included in the NET20 project.
 	/// </remarks>
-	internal class FieldLogTraceListener : TraceListener
+	public class FieldLogTraceListener : TraceListener
 	{
 		#region Static listener management
 

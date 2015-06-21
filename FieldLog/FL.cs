@@ -812,6 +812,7 @@ namespace Unclassified.FieldLog
 		/// <remarks>
 		/// This method is not available in the NET20 build.
 		/// </remarks>
+		[Obsolete("Use FieldLogTraceListener.Start() instead.")]
 		public static void RegisterPresentationTracing()
 		{
 			// Listen for events on all WPF trace sources

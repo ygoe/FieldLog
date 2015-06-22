@@ -22,7 +22,7 @@ namespace Unclassified.FieldLogViewer
 		{
 			// Set up FieldLog
 			FL.AcceptLogFileBasePath();
-			FL.RegisterPresentationTracing();
+			FieldLogTraceListener.Start();
 			TaskHelper.UnhandledTaskException = ex => FL.Critical(ex, "TaskHelper.UnhandledTaskException", true);
 
 			// Keep the setup away

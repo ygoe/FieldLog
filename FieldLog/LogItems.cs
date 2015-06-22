@@ -18,6 +18,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 #if ASPNET
@@ -377,188 +378,199 @@ namespace Unclassified.FieldLog
 			//       in an object variable, they're either null or the value itself boxed as their
 			//       internal type. (Source: http://stackoverflow.com/a/5194550/143684)
 
-			if (seenObjects != null)
+			try
 			{
-				if (seenObjects.Contains(data))
+				if (seenObjects != null)
 				{
-					return "<reference loop>";
+					if (seenObjects.Contains(data))
+					{
+						return "<reference loop>";
+					}
+					if (seenObjects.Count >= 6)
+					{
+						return "<nesting too deep>";
+					}
 				}
-				if (seenObjects.Count >= 6)
+				if (data == null)
 				{
-					return "<nesting too deep>";
+					return "null";
 				}
-			}
-			if (data == null)
-			{
-				return "null";
-			}
 
-			// Block certain namespaces that contain types that are impossible to dump this way
-			string typeNamespace = data.GetType().Namespace;
-			if (typeNamespace == "System.Reflection" ||
-				typeNamespace == "System.Windows.Media")
+				// Block certain namespaces that contain types that are impossible to dump this way
+				Type dataType = data.GetType();
+				string typeNamespace = dataType.Namespace;
+				string typeName = dataType.Name;
+				if (typeNamespace == "System" && typeName == "Type" ||
+					typeNamespace == "System.Reflection" ||
+					typeNamespace == "System.Windows.Media" ||
+					typeNamespace == "System.Windows.Media.Imaging")
 				// NOTE: This list of namespaces may not be complete.
-			{
-				return "<blocked type in " + typeNamespace + ">";
-			}
-
-			if (data is bool ||
-				data is byte || data is ushort || data is uint || data is ulong ||
-				data is sbyte || data is short || data is int || data is long ||
-				data is float || data is double || data is decimal)
-			{
-				return Convert.ToString(data, CultureInfo.InvariantCulture);
-			}
-			if (data is char)
-			{
-				return "'" + data.ToString().Replace("\\", "\\\\").Replace("'", "\\'") + "'";
-			}
-			if (data is string)
-			{
-				return "\"" + ((string) data).Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
-			}
-			if (data is DateTime)
-			{
-				return ((DateTime) data).ToString("yyyy-MM-dd'T'HH:mm:ss.ffffff");
-			}
-			if (data is DateTimeOffset)
-			{
-				return ((DateTimeOffset) data).ToString("yyyy-MM-dd'T'HH:mm:ss.ffffffK");
-			}
-			if (data is TimeSpan)
-			{
-				return ((TimeSpan) data).ToString();
-			}
-			if (data is DBNull)
-			{
-				return "DBNull";
-			}
-			if (data is Enum)
-			{
-				return ((Enum) data).ToString("G") + " (" + ((Enum) data).ToString("D") + ")";
-			}
-			if (data is Guid)
-			{
-				return ((Guid) data).ToString("B");
-			}
-			if (data is IntPtr)
-			{
-				if (IntPtr.Size == 4)
-					return "0x" + ((IntPtr) data).ToInt32().ToString("X4");
-				return "0x" + ((IntPtr) data).ToInt64().ToString("X8");
-			}
-			if (data is UIntPtr)
-			{
-				if (UIntPtr.Size == 4)
-					return "0x" + ((UIntPtr) data).ToUInt32().ToString("X4");
-				return "0x" + ((UIntPtr) data).ToUInt64().ToString("X8");
-			}
-			if (data is StringBuilder)
-			{
-				return "\"" + ((StringBuilder) data).ToString().Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
-			}
-
-			string indent = new string('\t', level);
-			StringBuilder sb = new StringBuilder();
-			if (level > 0)
-			{
-				sb.AppendLine();
-				sb.Append(indent);
-			}
-			sb.Append("{");
-			int count = 0;
-			if (seenObjects == null) seenObjects = new Stack();
-			seenObjects.Push(data);
-			NameValueCollection nvc = data as NameValueCollection;
-			if (nvc != null)
-			{
-				foreach (var key in nvc.AllKeys)
 				{
-					if (count++ > 0) sb.Append(",");
+					return "<blocked type " + typeNamespace + "." + typeName + ">";
+				}
+
+				if (data is bool ||
+					data is byte || data is ushort || data is uint || data is ulong ||
+					data is sbyte || data is short || data is int || data is long ||
+					data is float || data is double || data is decimal)
+				{
+					return Convert.ToString(data, CultureInfo.InvariantCulture);
+				}
+				if (data is char)
+				{
+					return "'" + data.ToString().Replace("\\", "\\\\").Replace("'", "\\'") + "'";
+				}
+				if (data is string)
+				{
+					return "\"" + ((string) data).Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
+				}
+				if (data is DateTime)
+				{
+					return ((DateTime) data).ToString("yyyy-MM-dd'T'HH:mm:ss.ffffff");
+				}
+				if (data is DateTimeOffset)
+				{
+					return ((DateTimeOffset) data).ToString("yyyy-MM-dd'T'HH:mm:ss.ffffffK");
+				}
+				if (data is TimeSpan)
+				{
+					return ((TimeSpan) data).ToString();
+				}
+				if (data is DBNull)
+				{
+					return "DBNull";
+				}
+				if (data is Enum)
+				{
+					return ((Enum) data).ToString("G") + " (" + ((Enum) data).ToString("D") + ")";
+				}
+				if (data is Guid)
+				{
+					return ((Guid) data).ToString("B");
+				}
+				if (data is IntPtr)
+				{
+					if (IntPtr.Size == 4)
+						return "0x" + ((IntPtr) data).ToInt32().ToString("X4");
+					return "0x" + ((IntPtr) data).ToInt64().ToString("X8");
+				}
+				if (data is UIntPtr)
+				{
+					if (UIntPtr.Size == 4)
+						return "0x" + ((UIntPtr) data).ToUInt32().ToString("X4");
+					return "0x" + ((UIntPtr) data).ToUInt64().ToString("X8");
+				}
+				if (data is StringBuilder)
+				{
+					return "\"" + ((StringBuilder) data).ToString().Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
+				}
+
+				string indent = new string('\t', level);
+				StringBuilder sb = new StringBuilder();
+				if (level > 0)
+				{
 					sb.AppendLine();
 					sb.Append(indent);
-					sb.Append("\t");
-					sb.Append(key);
-					sb.Append(": ");
-					try
-					{
-						sb.Append(FormatValues(nvc[key], level + 1, seenObjects));
-					}
-					catch (Exception ex)
-					{
-						sb.Append("<").Append(ex.Message).Append(">");
-					}
 				}
-			}
-			else
-			{
-				IEnumerable ie = data as IEnumerable;
-				if (ie != null)
+				sb.Append("{");
+				int count = 0;
+				if (seenObjects == null) seenObjects = new Stack();
+				seenObjects.Push(data);
+				NameValueCollection nvc = data as NameValueCollection;
+				if (nvc != null)
 				{
-					foreach (var item in ie)
+					foreach (var key in nvc.AllKeys)
 					{
 						if (count++ > 0) sb.Append(",");
-						string str;
+						sb.AppendLine();
+						sb.Append(indent);
+						sb.Append("\t");
+						sb.Append(key);
+						sb.Append(": ");
 						try
 						{
-							str = FormatValues(item, level + 1, seenObjects);
+							sb.Append(FormatValues(nvc[key], level + 1, seenObjects));
 						}
 						catch (Exception ex)
 						{
-							str = "<" + ex.Message + ">";
+							sb.Append("<").Append(ex.GetType().Name).Append(":").Append(ex.Message).Append(">");
 						}
-						if (!str.StartsWith(Environment.NewLine, StringComparison.Ordinal))
-						{
-							sb.AppendLine();
-							sb.Append(indent);
-							sb.Append("\t");
-						}
-						sb.Append(str);
 					}
 				}
 				else
 				{
-					foreach (var property in data.GetType().GetProperties())
+					IEnumerable ie = data as IEnumerable;
+					if (ie != null)
 					{
-						if (count++ > 0) sb.Append(",");
-						sb.AppendLine();
-						sb.Append(indent);
-						sb.Append("\t");
-						sb.Append(property.Name);
-						sb.Append(": ");
-						try
+						foreach (var item in ie)
 						{
-							sb.Append(FormatValues(property.GetValue(data, null), level + 1, seenObjects));
-						}
-						catch (Exception ex)
-						{
-							sb.Append("<").Append(ex.Message).Append(">");
+							if (count++ > 0) sb.Append(",");
+							string str;
+							try
+							{
+								str = FormatValues(item, level + 1, seenObjects);
+							}
+							catch (Exception ex)
+							{
+								str = "<" + ex.GetType().Name + ":" + ex.Message + ">";
+							}
+							if (!str.StartsWith(Environment.NewLine, StringComparison.Ordinal))
+							{
+								sb.AppendLine();
+								sb.Append(indent);
+								sb.Append("\t");
+							}
+							sb.Append(str);
 						}
 					}
-					foreach (var field in data.GetType().GetFields())
+					else
 					{
-						if (count++ > 0) sb.Append(",");
-						sb.AppendLine();
-						sb.Append(indent);
-						sb.Append("\t");
-						sb.Append(field.Name);
-						sb.Append(": ");
-						try
+						foreach (var property in data.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
 						{
-							sb.Append(FormatValues(field.GetValue(data), level + 1, seenObjects));
+							if (count++ > 0) sb.Append(",");
+							sb.AppendLine();
+							sb.Append(indent);
+							sb.Append("\t");
+							sb.Append(property.Name);
+							sb.Append(": ");
+							try
+							{
+								sb.Append(FormatValues(property.GetValue(data, null), level + 1, seenObjects));
+							}
+							catch (Exception ex)
+							{
+								sb.Append("<").Append(ex.GetType().Name).Append(":").Append(ex.Message).Append(">");
+							}
 						}
-						catch (Exception ex)
+						foreach (var field in data.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
 						{
-							sb.Append("<").Append(ex.Message).Append(">");
+							if (count++ > 0) sb.Append(",");
+							sb.AppendLine();
+							sb.Append(indent);
+							sb.Append("\t");
+							sb.Append(field.Name);
+							sb.Append(": ");
+							try
+							{
+								sb.Append(FormatValues(field.GetValue(data), level + 1, seenObjects));
+							}
+							catch (Exception ex)
+							{
+								sb.Append("<").Append(ex.GetType().Name).Append(":").Append(ex.Message).Append(">");
+							}
 						}
 					}
 				}
+				seenObjects.Pop();
+				sb.AppendLine();
+				sb.Append(indent);
+				sb.Append("}");
+				return sb.ToString();
 			}
-			seenObjects.Pop();
-			sb.AppendLine();
-			sb.Append(indent);
-			sb.Append("}");
-			return sb.ToString();
+			catch (Exception ex)
+			{
+				return "<" + ex.GetType().Name + ":" + ex.Message + ">";
+			}
 		}
 	}
 

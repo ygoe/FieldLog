@@ -400,6 +400,7 @@ namespace Unclassified.FieldLog
 		static FL()
 		{
 			CalibrateTime();
+			if (IsInUnitTest) return;   // Don't do anything else during unit tests
 			CheckTimeThread.Start();
 
 			LogFirstChanceExceptions = true;
@@ -431,7 +432,7 @@ namespace Unclassified.FieldLog
 			// Try to get the version string from the FieldLog assembly. This may not be available
 			// if the assembly was merged or the source code was included in another assembly.
 			Assembly myAssembly = Assembly.GetExecutingAssembly();
-			if (myAssembly != null && myAssembly.GetName().Name.Equals("unclassified.fieldlog", StringComparison.OrdinalIgnoreCase))
+			if (myAssembly != null && myAssembly.GetName().Name.Equals("Unclassified.FieldLog", StringComparison.OrdinalIgnoreCase))
 			{
 				object[] customAttributes = myAssembly.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
@@ -2187,6 +2188,7 @@ namespace Unclassified.FieldLog
 
 		private static void LogInternal(FieldLogItem item)
 		{
+			if (IsInUnitTest) return;
 			//System.Diagnostics.Trace.WriteLine("FieldLog.Log: New item " + item.ToString());
 			// Add the item to the current buffer
 			int size = item.Size;
@@ -2223,6 +2225,7 @@ namespace Unclassified.FieldLog
 		/// <param name="item">The log item to add to the retained items buffer.</param>
 		public static void LogRetained(FieldLogItem item)
 		{
+			if (IsInUnitTest) return;
 			if (threadRetainedItems == null)
 			{
 				threadRetainedItems = new List<FieldLogItem>();
@@ -4637,6 +4640,32 @@ namespace Unclassified.FieldLog
 					return ((AssemblyCopyrightAttribute) customAttributes[0]).Copyright;
 				}
 				return null;
+			}
+		}
+
+		private static bool? isInUnitTest;
+
+		/// <summary>
+		/// Gets a value indicating whether the code is executing in a unit test.
+		/// </summary>
+		public static bool IsInUnitTest
+		{
+			get
+			{
+				if (isInUnitTest == null)
+				{
+					isInUnitTest = false;
+					foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+					{
+						if (assembly.FullName.StartsWith("Microsoft.VisualStudio.QualityTools.UnitTestFramework", StringComparison.OrdinalIgnoreCase) ||
+							assembly.FullName.StartsWith("NUnit.Framework", StringComparison.OrdinalIgnoreCase))
+						{
+							isInUnitTest = true;
+							break;
+						}
+					}
+				}
+				return (bool) isInUnitTest;
 			}
 		}
 

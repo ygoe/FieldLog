@@ -34,16 +34,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 						(this.Exception.Message != null ? this.Exception.Message.Trim().Replace("\r", "").Replace("\n", "↲") : "");
 				}
 
-				string exType = this.Exception.Type;
-				int dotIndex = exType.LastIndexOf('.');
-				if (dotIndex > -1)
-					exType = exType.Substring(dotIndex + 1);
-				if (exType.EndsWith("Exception", StringComparison.InvariantCultureIgnoreCase) &&
-					!exType.Equals("Exception", StringComparison.InvariantCultureIgnoreCase))
-					exType = exType.Substring(0, exType.Length - "Exception".Length + 2);
-
-				return exType + ": " +
-					(this.Exception.Message != null ? this.Exception.Message.Trim().Replace("\r", "").Replace("\n", "↲") : "");
+				return MakeSimpleExMessage(Exception);
 			}
 		}
 
@@ -70,6 +61,64 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		public override void Refresh()
 		{
 			ExceptionVM.Refresh();
+		}
+
+		private string MakeSimpleExMessage(FieldLogException ex)
+		{
+			// Resolve the single inner exception of an AggregateException
+			if (ex.Type == "System.AggregateException" &&
+				ex.InnerExceptions != null &&
+				ex.InnerExceptions.Length == 1)
+			{
+				return "AggEx: " + MakeSimpleExMessage(ex.InnerExceptions[0]);
+			}
+
+			// Remove namespace, abbreviate "Exception" to "Ex", make common names even shorter
+			string exType = ex.Type;
+			if (exType == "System.ArgumentException")
+			{
+				exType = "ArgEx";
+			}
+			else if (exType == "System.ArgumentOutOfRangeException")
+			{
+				exType = "ArgOutOfRangeEx";
+			}
+			else if (exType == "System.ApplicationException")
+			{
+				exType = "ApplEx";
+			}
+			else if (exType == "System.InvalidOperationException")
+			{
+				exType = "InvalidOpEx";
+			}
+			else if (exType == "System.IO.DirectoryNotFoundException")
+			{
+				exType = "DirNotFoundEx";
+			}
+			else if (exType == "System.NotImplementedException")
+			{
+				exType = "NotImplEx";
+			}
+			else if (exType == "System.NullReferenceException")
+			{
+				exType = "NullRefEx";
+			}
+			else if (exType == "System.OperationCanceledException")
+			{
+				exType = "OpCanceledEx";
+			}
+			else
+			{
+				int dotIndex = exType.LastIndexOf('.');
+				if (dotIndex > -1)
+					exType = exType.Substring(dotIndex + 1);
+				if (exType.EndsWith("Exception", StringComparison.Ordinal))
+					exType = exType.Substring(0, exType.Length - "Exception".Length + 2);
+			}
+
+			// Return shortened exception type and exception message in a single line
+			return exType + ": " +
+				(ex.Message != null ? ex.Message.Trim().Replace("\r", "").Replace("\n", "↲") : "");
 		}
 	}
 }

@@ -1152,7 +1152,60 @@ namespace Unclassified.FieldLog
 							}
 						}
 					}
-					else if (FL.CompareVersions(version, "6.3") > 0)
+					else if (version.StartsWith("10.0", StringComparison.Ordinal))
+					{
+						if (productType == VER_NT_WORKSTATION)
+						{
+							Version = OSVersion.Windows10;
+
+							switch (sku)
+							{
+								case 98:
+								case 99:
+								case 100:
+								case 101:
+									Edition = OSEdition.Windows10Home;
+									break;
+								case 48:
+								case 49:
+								case 69:
+								case 103:
+									Edition = OSEdition.Windows10Pro;
+									break;
+								case 4:
+								case 27:
+								case 70:
+								case 84:
+									Edition = OSEdition.Windows10Enterprise;
+									break;
+								default:
+									// Oops, try something else
+									if ((productSuite & VER_SUITE_PERSONAL) != 0)
+									{
+										Edition = OSEdition.Windows10Home;
+									}
+									else
+									{
+										if (ReadRegistryVersionValue("EditionId") == "Enterprise")
+										{
+											Edition = OSEdition.Windows10Enterprise;
+										}
+										else
+										{
+											Edition = OSEdition.Windows10Pro;
+										}
+									}
+									break;
+							}
+						}
+						else
+						{
+							Type = OSType.Server;
+							Version = OSVersion.WindowsServer10;
+							// TODO: Server editions to be determined
+						}
+					}
+					else if (FL.CompareVersions(version, "10") > 0)
 					{
 						Version = OSVersion.WindowsFuture;
 					}
@@ -1443,6 +1496,18 @@ namespace Unclassified.FieldLog
 			}
 		}
 
+		/// <summary>
+		/// Gets a value indicating whether the OS version is Windows 10 (Server TBD) or newer.
+		/// </summary>
+		public static bool IsWindows10OrNewer
+		{
+			get
+			{
+				return OSInfo.Type == OSType.Client && OSInfo.Version >= OSVersion.Windows10 ||
+					(OSInfo.Type == OSType.Server || OSInfo.Type == OSType.ServerCore) && OSInfo.Version >= OSVersion.WindowsServer10;
+			}
+		}
+
 		#endregion OS version helper properties
 	}
 
@@ -1455,6 +1520,8 @@ namespace Unclassified.FieldLog
 	/// </summary>
 	public enum OSType
 	{
+		// NOTE: The numeric values are stored in log files. Do not change existing values.
+
 		/// <summary>A client system.</summary>
 		[Description("Client")]
 		Client,
@@ -1471,6 +1538,11 @@ namespace Unclassified.FieldLog
 	/// </summary>
 	public enum OSVersion
 	{
+		// NOTE: The numeric values are stored in log files. Do not change existing values. The
+		// order of the items is laid out so that new Windows versions can be added at the end of
+		// each the client and server section (just before a field with a specified number) without
+		// pushing the following group behind.
+
 		/// <summary>Unknown version.</summary>
 		[Description("Unknown")]
 		Unknown = 0,
@@ -1509,6 +1581,9 @@ namespace Unclassified.FieldLog
 		/// <summary>Windows 8.1.</summary>
 		[Description("Windows 8.1")]
 		Windows81,
+		/// <summary>Windows 10.</summary>
+		[Description("Windows 10")]
+		Windows10,
 
 		/// <summary>Windows 2000 Server.</summary>
 		[Description("Windows 2000 Server")]
@@ -1535,6 +1610,10 @@ namespace Unclassified.FieldLog
 		[Description("Windows Server 2012 R2")]
 		WindowsServer2012R2,
 
+		/// <summary>Windows Server "10" (TBD).</summary>
+		[Description("Windows Server \"10\"")]
+		WindowsServer10,
+
 		/// <summary>A future version of Windows not yet known by this implementation.</summary>
 		[Description("Future Windows version")]
 		WindowsFuture = 200
@@ -1545,6 +1624,11 @@ namespace Unclassified.FieldLog
 	/// </summary>
 	public enum OSEdition
 	{
+		// NOTE: The numeric values are stored in log files. Do not change existing values. The
+		// order of the items is laid out so that new Windows versions can be added at the end of
+		// each the client and server section (just before a field with a specified number) without
+		// pushing the following group behind.
+
 		/// <summary>No special edition.</summary>
 		[Description("No special edition")]
 		None = 0,
@@ -1628,6 +1712,16 @@ namespace Unclassified.FieldLog
 		/// <summary>Windows 8 Enterprise.</summary>
 		[Description("Windows 8 Enterprise")]
 		Windows8Enterprise,
+
+		/// <summary>Windows 10 Home.</summary>
+		[Description("Windows 10 Home")]
+		Windows10Home,
+		/// <summary>Windows 10 Pro.</summary>
+		[Description("Windows 10 Pro")]
+		Windows10Pro,
+		/// <summary>Windows 10 Enterprise.</summary>
+		[Description("Windows 10 Enterprise")]
+		Windows10Enterprise,
 
 		/// <summary>Windows Server 2003/2003 R2 Web.</summary>
 		[Description("Windows Server 2003/2003 R2 Web")]

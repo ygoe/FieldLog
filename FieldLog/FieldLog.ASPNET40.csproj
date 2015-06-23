@@ -96,6 +96,7 @@
     <Compile Include="Enums.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="FieldLogEventEnvironment.cs" />
+    <Compile Include="FieldLogExtensionMethods.cs" />
     <Compile Include="FieldLogFileGroupReader.cs" />
     <Compile Include="FieldLogFileEnumerator.cs" />
     <Compile Include="FieldLogFileReader.cs" />

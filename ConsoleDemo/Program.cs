@@ -42,6 +42,7 @@ namespace ConsoleDemo
 			//BatchActivity();
 			//TestTimerPrecision();
 			//TestOutputDebugString();
+			//TestTaskLogging();
 
 			//NestTest(null);
 			//GenericTest<string>("");
@@ -305,6 +306,14 @@ namespace ConsoleDemo
 
 				Thread.Sleep(8000);
 			}
+		}
+
+		private static void TestTaskLogging()
+		{
+			Task.Factory
+				.StartNew(() => { throw new InvalidOperationException("Test exception"); })
+				.LogFaulted("Demo")
+				.Wait();
 		}
 	}
 }

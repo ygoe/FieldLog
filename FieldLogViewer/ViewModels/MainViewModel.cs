@@ -2655,6 +2655,23 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			Filters.Add(f);
 
 			f = new FilterViewModel();
+			f.DisplayName = "No WPF tracing";
+			fcg = new FilterConditionGroupViewModel(f);
+			fcg.IsExclude = true;
+			fc = new FilterConditionViewModel(fcg);
+			fc.Column = FilterColumn.Type;
+			fc.Comparison = FilterComparison.Equals;
+			fc.Value = FieldLogItemType.Text.ToString();
+			fcg.Conditions.Add(fc);
+			fc = new FilterConditionViewModel(fcg);
+			fc.Column = FilterColumn.TextText;
+			fc.Comparison = FilterComparison.StartsWith;
+			fc.Value = "WPF: ";
+			fcg.Conditions.Add(fc);
+			f.ConditionGroups.Add(fcg);
+			Filters.Add(f);
+
+			f = new FilterViewModel();
 			f.DisplayName = "No Diagnostics.Trace output";
 			fcg = new FilterConditionGroupViewModel(f);
 			fcg.IsExclude = true;

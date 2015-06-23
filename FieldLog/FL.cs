@@ -202,6 +202,14 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		private static AutoResetEvent newBufferEvent = new AutoResetEvent(false);
 		/// <summary>
+		/// The generation requested for flushing to disk.
+		/// </summary>
+		private static int pendingFlushGeneration;
+		/// <summary>
+		/// The confirmed generation flushed to disk by the send thread.
+		/// </summary>
+		private static int confirmedFlushGeneration;
+		/// <summary>
 		/// Timeout for sending buffers before reaching their maximum size.
 		/// </summary>
 		private static Timer sendTimeout = new Timer(OnSendTimeout);
@@ -490,6 +498,7 @@ namespace Unclassified.FieldLog
 			LogScope(FieldLogScopeType.LogStart, fieldLogVersion != null ? "FieldLog version: " + fieldLogVersion : null);
 			AppDomain.CurrentDomain.ProcessExit += AppDomain_ProcessExit;
 			AppDomain.CurrentDomain.DomainUnload += AppDomain_DomainUnload;
+			Console.CancelKeyPress += Console_CancelKeyPress;
 
 			if (!Debugger.IsAttached)
 			{
@@ -549,6 +558,17 @@ namespace Unclassified.FieldLog
 			Trace("AppDomain.DomainUnload");
 			// Flush log files, if not already done by the application
 			Shutdown();
+		}
+
+		/// <summary>
+		/// Called when Ctrl+C is pressed in the console window.
+		/// </summary>
+		/// <param name="sender">Unused.</param>
+		/// <param name="args">Data about the event.</param>
+		private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs args)
+		{
+			Trace("Console cancel key pressed: " + args.SpecialKey);
+			Flush();
 		}
 
 		/// <summary>
@@ -3344,7 +3364,17 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		public static void Flush()
 		{
+			int myGen = Interlocked.Increment(ref pendingFlushGeneration);
 			CheckAddBuffer(0);
+#if !NET20
+			SpinWait.SpinUntil(() => confirmedFlushGeneration >= myGen, 10000);
+#else
+			int count = 1000;
+			while (confirmedFlushGeneration < myGen && count-- > 0)
+			{
+				Thread.Sleep(10);
+			}
+#endif
 		}
 
 		/// <summary>
@@ -3367,7 +3397,7 @@ namespace Unclassified.FieldLog
 			lock (currentBufferLock)
 			{
 				// Send all remaining buffers
-				Flush();
+				CheckAddBuffer(0);
 				// Shut down the send thread
 				lock (sendThread)
 				{
@@ -3506,6 +3536,12 @@ namespace Unclassified.FieldLog
 					// Clear the backlog counter after the work to avoid dead-locks while waiting
 					// for it
 					WriteItemsBacklog = 0;
+
+					// Confirm a pending flush generation
+					if (pendingFlushGeneration > confirmedFlushGeneration)
+					{
+						confirmedFlushGeneration = pendingFlushGeneration;
+					}
 				}
 			}
 		}

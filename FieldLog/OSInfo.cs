@@ -1201,7 +1201,7 @@ namespace Unclassified.FieldLog
 						else
 						{
 							Type = OSType.Server;
-							Version = OSVersion.WindowsServer10;
+							Version = OSVersion.WindowsServer2016;
 							// TODO: Server editions to be determined
 						}
 					}
@@ -1504,7 +1504,7 @@ namespace Unclassified.FieldLog
 			get
 			{
 				return OSInfo.Type == OSType.Client && OSInfo.Version >= OSVersion.Windows10 ||
-					(OSInfo.Type == OSType.Server || OSInfo.Type == OSType.ServerCore) && OSInfo.Version >= OSVersion.WindowsServer10;
+					(OSInfo.Type == OSType.Server || OSInfo.Type == OSType.ServerCore) && OSInfo.Version >= OSVersion.WindowsServer2016;
 			}
 		}
 
@@ -1609,10 +1609,9 @@ namespace Unclassified.FieldLog
 		/// <summary>Windows Server 2012 R2.</summary>
 		[Description("Windows Server 2012 R2")]
 		WindowsServer2012R2,
-
-		/// <summary>Windows Server "10" (TBD).</summary>
-		[Description("Windows Server \"10\"")]
-		WindowsServer10,
+		/// <summary>Windows Server 2016.</summary>
+		[Description("Windows Server 2016")]
+		WindowsServer2016,
 
 		/// <summary>A future version of Windows not yet known by this implementation.</summary>
 		[Description("Future Windows version")]

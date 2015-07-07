@@ -10,6 +10,7 @@ namespace Unclassified.UI
 
 	// Source: http://stackoverflow.com/a/4398752/143684
 	// Extended as in: http://10rem.net/blog/2011/03/09/creating-a-custom-markup-extension-in-wpf-and-soon-silverlight
+
 	/// <summary>
 	/// Provides enumeration values in XAML.
 	/// </summary>
@@ -76,7 +77,10 @@ namespace Unclassified.UI
 		[ConstructorArgument("enumType")]
 		public Type EnumType
 		{
-			get { return enumType; }
+			get
+			{
+				return enumType;
+			}
 			set
 			{
 				if (value != enumType)
@@ -156,11 +160,19 @@ namespace Unclassified.UI
 		/// <returns></returns>
 		public static string GetDescription(Type enumType, object enumValue)
 		{
-			var descriptionAttribute = enumType
-				.GetField(enumValue.ToString())
-				.GetCustomAttributes(typeof(DescriptionAttribute), false)
-				.FirstOrDefault() as DescriptionAttribute;
-			return descriptionAttribute != null ? descriptionAttribute.Description : enumValue.ToString();
+			try
+			{
+				var descriptionAttribute = enumType
+					.GetField(enumValue.ToString())
+					.GetCustomAttributes(typeof(DescriptionAttribute), false)
+					.FirstOrDefault() as DescriptionAttribute;
+				return descriptionAttribute != null ? descriptionAttribute.Description : enumValue.ToString();
+			}
+			catch (NullReferenceException)
+			{
+				return null;
+				// TODO,CSHARP6: Use ?. operator (also elsewhere) and remove try/catch
+			}
 		}
 
 		/// <summary>
@@ -235,12 +247,15 @@ namespace Unclassified.UI
 		private Type enumType;
 
 		/// <summary>
-		/// Gets or sets the enumeration type.
+		/// Gets the enumeration type.
 		/// </summary>
 		[ConstructorArgument("enumType")]
 		public Type EnumType
 		{
-			get { return enumType; }
+			get
+			{
+				return enumType;
+			}
 			private set
 			{
 				if (value != enumType)

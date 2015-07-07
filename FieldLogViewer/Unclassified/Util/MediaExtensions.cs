@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
@@ -144,6 +145,35 @@ namespace Unclassified.Util
 		public static FontFamily FindMonospaceFontFamily()
 		{
 			return FindAvailableFontFamily("Consolas", "Andale Mono", "Lucida Console", "Courier New");
+		}
+
+		/// <summary>
+		/// Measures the size of a string with the current type face.
+		/// </summary>
+		/// <param name="typeface">The type face.</param>
+		/// <param name="text">The text to measure.</param>
+		/// <param name="emSize">The font size.</param>
+		/// <param name="fullPixels">Specifies whether the size is rounded to the next full pixel.</param>
+		/// <returns></returns>
+		public static Size MeasureText(this Typeface typeface, string text, double emSize, bool fullPixels)
+		{
+			FormattedText ft = new FormattedText(
+				text,
+				CultureInfo.CurrentCulture,
+				FlowDirection.LeftToRight,
+				typeface,
+				emSize,
+				Brushes.Black,
+				null,
+				TextFormattingMode.Display);
+			if (fullPixels)
+			{
+				return new Size(Math.Ceiling(ft.Width), Math.Ceiling(ft.Height));
+			}
+			else
+			{
+				return new Size(ft.Width, ft.Height);
+			}
 		}
 
 		#endregion Fonts

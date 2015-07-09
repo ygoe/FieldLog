@@ -334,11 +334,19 @@ namespace Unclassified.UI
 		/// <returns></returns>
 		public static string GetDescription(T enumValue)
 		{
-			var descriptionAttribute = typeof(T)
-				.GetField(enumValue.ToString())
-				.GetCustomAttributes(typeof(DescriptionAttribute), false)
-				.FirstOrDefault() as DescriptionAttribute;
-			return descriptionAttribute != null ? descriptionAttribute.Description : enumValue.ToString();
+			try
+			{
+				var descriptionAttribute = typeof(T)
+					.GetField(enumValue.ToString())
+					.GetCustomAttributes(typeof(DescriptionAttribute), false)
+					.FirstOrDefault() as DescriptionAttribute;
+				return descriptionAttribute != null ? descriptionAttribute.Description : enumValue.ToString();
+			}
+			catch (NullReferenceException)
+			{
+				return null;
+				// TODO,CSHARP6: Use ?. operator (also elsewhere) and remove try/catch
+			}
 		}
 
 		/// <summary>

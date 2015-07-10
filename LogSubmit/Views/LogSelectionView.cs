@@ -139,7 +139,23 @@ namespace Unclassified.LogSubmit.Views
 						ScanDirectoryWorker.CancelAsync();
 					}
 
-					SelectedLogDirText.Text = GetBasePath(dlg.FileName);
+					string basePath = GetBasePath(dlg.FileName);
+					SelectedLogDirText.Text = basePath;
+					try
+					{
+						SetLogBasePath(basePath);
+					}
+					catch
+					{
+						MessageBox.Show(
+							Tx.T("msg.logpath parameter invalid", "value", basePath),
+							Tx.T("msg.title.error"),
+							MessageBoxButtons.OK,
+							MessageBoxIcon.Error);
+						ResetLogBasePath();
+						FindLogBasePath();
+						return;
+					}
 
 					CurrentLabel.Show();
 					SelectedLogDirText.Show();

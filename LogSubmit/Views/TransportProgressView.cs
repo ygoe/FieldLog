@@ -96,8 +96,8 @@ namespace Unclassified.LogSubmit.Views
 				RemainingTimeLabel.Text = Tx.TC("msg.title.error") + " " + args.Error.Message;
 				RemainingTimeLabel.ForeColor = Color.FromArgb(240, 0, 0);
 
-				FinishedLabel.Text = Tx.T("transport progress view.select another transport");
-				FinishedLabel.Show();
+				FinishedInfoLabel.Text = Tx.T("transport progress view.select another transport");
+				FinishedInfoLabel.Show();
 			}
 			else
 			{
@@ -105,10 +105,12 @@ namespace Unclassified.LogSubmit.Views
 				RemainingTimeLabel.ForeColor = Color.FromArgb(0, 160, 0);
 				finished = true;
 
+				SuccessPanel.Show();
+
 				if (SharedData.Instance.FromShortcut)
 				{
-					FinishedLabel.Text = Tx.T("transport progress view.delete shortcut");
-					FinishedLabel.Show();
+					FinishedInfoLabel.Text = Tx.T("transport progress view.delete shortcut");
+					FinishedInfoLabel.Show();
 				}
 
 				UpdateButtons();
@@ -149,7 +151,8 @@ namespace Unclassified.LogSubmit.Views
 			}
 			if (!forward)
 			{
-				FinishedLabel.Hide();
+				SuccessPanel.Hide();
+				FinishedInfoLabel.Hide();
 				MainForm.Instance.FinishEnabled = false;
 			}
 		}

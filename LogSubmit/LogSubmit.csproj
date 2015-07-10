@@ -259,6 +259,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FieldLog.ico" />
+    <Content Include="Resources\check_green.png" />
     <None Include="Resources\FLDocument_48.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

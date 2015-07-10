@@ -70,6 +70,7 @@ Sie können dieses Übertragungsprogramm auch manuell durch Starten von {cmd} im
 		<text key="transport progress view.delete shortcut">Sie können jetzt die Verknüpfung löschen, mit der Sie dieses Programm gestartet haben.</text>
 		<text key="transport progress view.intro">Fast geschafft! Bitte warten Sie, während die Protokolldaten übertragen werden.</text>
 		<text key="transport progress view.select another transport">Bitte versuchen Sie, eine andere Übertragungsart auszuwählen.</text>
+		<text key="transport progress view.success">Ihre Logdateien wurden übertragen. Sie können dieses Fenster jetzt schließen.</text>
 		<text key="transport progress view.title">Übertragungsfortschritt</text>
 		<text key="transport view.intro">&amp;Wählen Sie die Methode, die für Sie am angenehmsten ist, um uns das Protokollarchiv zuzusenden.</text>
 		<text key="transport view.title">Wählen Sie eine Übertragungsart</text>
@@ -331,6 +332,7 @@ You can also start this submit tool manually by running {cmd} from the applicati
 		<text key="transport progress view.delete shortcut">You can now delete the shortcut you used to start this program.</text>
 		<text key="transport progress view.intro">Almost done! Please wait while the log data is transferred.</text>
 		<text key="transport progress view.select another transport">Please try to select another transport method.</text>
+		<text key="transport progress view.success">Your log files have been submitted. You can close this window now.</text>
 		<text key="transport progress view.title">Transport progress</text>
 		<text key="transport view.intro">&amp;Pick whichever method is the most convenient for you to send the log archive to us.</text>
 		<text key="transport view.title">Select the transport method</text>

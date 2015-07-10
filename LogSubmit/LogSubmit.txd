@@ -43,6 +43,8 @@ Sie können dieses Übertragungsprogramm auch manuell durch Starten von {cmd} im
 		<text key="msg.command line error">Kommandozeilenfehler: {msg}</text>
 		<text key="msg.completed">Fertig</text>
 		<text key="msg.endtime parameter invalid">Der Parameter /endtime ist ungültig: {value}. Stattdessen wird die aktuelle Zeit verwendet.</text>
+		<text key="msg.error.mapi x64">Vielleicht unterstützt Ihre Standard-E-Mail-Anwendung kein 64-Bit-MAPI.</text>
+		<text key="msg.error.outlook fallback failed">Outlook ist verfügbar, aber ebenfalls fehlgeschlagen:</text>
 		<text key="msg.logpath parameter invalid">Der Parameter /logpath ist ungültig: {value}</text>
 		<text key="msg.no log files selected">Keine Protokolldateien ausgewählt. Bitte prüfen Sie den angegebenen Zeitraum.</text>
 		<text key="msg.previous operation">Der Vorgang konnte nicht gestartet werden, weil ein vorheriger Vorgang noch nicht beendet wurde. Bitte warten Sie, bis der laufende Vorgang beendet ist, und versuchen Sie es erneut, indem Sie zur vorherigen Seite gehen und wieder zu dieser Seite zurückkehren.</text>
@@ -67,6 +69,7 @@ Sie können dieses Übertragungsprogramm auch manuell durch Starten von {cmd} im
 		<text key="transport.mail">E-Mail</text>
 		<text key="transport progress view.delete shortcut">Sie können jetzt die Verknüpfung löschen, mit der Sie dieses Programm gestartet haben.</text>
 		<text key="transport progress view.intro">Fast geschafft! Bitte warten Sie, während die Protokolldaten übertragen werden.</text>
+		<text key="transport progress view.select another transport">Bitte versuchen Sie, eine andere Übertragungsart auszuwählen.</text>
 		<text key="transport progress view.title">Übertragungsfortschritt</text>
 		<text key="transport view.intro">&amp;Wählen Sie die Methode, die für Sie am angenehmsten ist, um uns das Protokollarchiv zuzusenden.</text>
 		<text key="transport view.title">Wählen Sie eine Übertragungsart</text>
@@ -301,6 +304,8 @@ You can also start this submit tool manually by running {cmd} from the applicati
 		<text key="msg.command line error">Command line error: {msg}</text>
 		<text key="msg.completed">Completed</text>
 		<text key="msg.endtime parameter invalid">The /endtime parameter is invalid: {value}. Using current time instead.</text>
+		<text key="msg.error.mapi x64">Maybe your default e-mail application does not support 64 bit MAPI.</text>
+		<text key="msg.error.outlook fallback failed">Outlook is available but failed, too:</text>
 		<text key="msg.logpath parameter invalid">The /logpath parameter is invalid: {value}</text>
 		<text key="msg.no log files selected">No log files selected. Please check the specified time span.</text>
 		<text key="msg.previous operation">The operation could not be started because a previous operation has not yet stopped. Please wait for the current operation to stop and retry by going back and returning to this page again.</text>
@@ -325,6 +330,7 @@ You can also start this submit tool manually by running {cmd} from the applicati
 		<text key="transport.mail">E-mail</text>
 		<text key="transport progress view.delete shortcut">You can now delete the shortcut you used to start this program.</text>
 		<text key="transport progress view.intro">Almost done! Please wait while the log data is transferred.</text>
+		<text key="transport progress view.select another transport">Please try to select another transport method.</text>
 		<text key="transport progress view.title">Transport progress</text>
 		<text key="transport view.intro">&amp;Pick whichever method is the most convenient for you to send the log archive to us.</text>
 		<text key="transport view.title">Select the transport method</text>

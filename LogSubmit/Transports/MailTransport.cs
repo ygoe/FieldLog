@@ -1,13 +1,18 @@
 ﻿using System;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
+using Unclassified.TxLib;
 using Unclassified.Util;
 
 namespace Unclassified.LogSubmit.Transports
 {
 	internal class MailTransport : TransportBase
 	{
+		private const int olMailItem = 0;
+
+		private dynamic outlookApp;
+		private string body;
+
 		public string RecipientAddress { get; set; }
 		public string Subject { get; set; }
 
@@ -23,7 +28,7 @@ namespace Unclassified.LogSubmit.Transports
 
 		protected override void OnExecute(BackgroundWorker backgroundWorker)
 		{
-			string body = "This is a log archive submitted by the FieldLog submit tool.";
+			body = "This is a log archive submitted by the FieldLog submit tool.";
 
 			MessageApi mapi = new MessageApi();
 			mapi.AddRecipientTo(RecipientAddress);
@@ -47,9 +52,52 @@ namespace Unclassified.LogSubmit.Transports
 				string x64Note = "";
 				if (IntPtr.Size == 8)
 				{
-					x64Note = " Maybe your default e-mail application does not support 64 bit MAPI.";
+					x64Note = " " + Tx.T("msg.error.mapi x64");
 				}
-				throw new Exception("MAPI: " + mapi.LastError + "." + x64Note);
+				string mapiError = "MAPI: " + mapi.LastError + "." + x64Note;
+				if (mapi.LastError == MessageApi.MessageApiError.GeneralFailure &&
+					IsOutlookAvailable())
+				{
+					try
+					{
+						SendWithOutlookDynamic();
+					}
+					catch (Exception ex)
+					{
+						throw new Exception(mapiError + " " + Tx.T("msg.error.outlook fallback failed") + " " + ex.Message);
+					}
+				}
+				else
+				{
+					throw new Exception(mapiError);
+				}
+			}
+		}
+
+		private bool IsOutlookAvailable()
+		{
+			Type outlookAppType = Type.GetTypeFromProgID("Outlook.Application");
+			if (outlookAppType == null)
+				return false;
+			outlookApp = Activator.CreateInstance(outlookAppType);
+			return outlookApp != null;
+		}
+
+		private void SendWithOutlookDynamic()
+		{
+			var outlookMsg = outlookApp.CreateItem(olMailItem);
+			outlookMsg.Recipients.Add(RecipientAddress);
+			outlookMsg.Subject = Subject;
+			outlookMsg.Body = body;
+			outlookMsg.Attachments.Add(SharedData.Instance.ArchiveFileName);
+			if (SharedData.Instance.InteractiveEMail)
+			{
+				outlookMsg.Display();
+			}
+			else
+			{
+				outlookMsg.Save();
+				outlookMsg.Send();
 			}
 		}
 	}

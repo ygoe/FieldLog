@@ -95,6 +95,9 @@ namespace Unclassified.LogSubmit.Views
 			{
 				RemainingTimeLabel.Text = Tx.TC("msg.title.error") + " " + args.Error.Message;
 				RemainingTimeLabel.ForeColor = Color.FromArgb(240, 0, 0);
+
+				FinishedLabel.Text = Tx.T("transport progress view.select another transport");
+				FinishedLabel.Show();
 			}
 			else
 			{
@@ -146,6 +149,7 @@ namespace Unclassified.LogSubmit.Views
 			}
 			if (!forward)
 			{
+				FinishedLabel.Hide();
 				MainForm.Instance.FinishEnabled = false;
 			}
 		}

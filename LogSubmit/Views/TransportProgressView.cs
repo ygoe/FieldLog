@@ -13,6 +13,7 @@ namespace Unclassified.LogSubmit.Views
 
 		private bool finished;
 		private DateTime startTime;
+		private DateTime lastProgressTime;
 
 		#endregion Private data
 
@@ -33,9 +34,6 @@ namespace Unclassified.LogSubmit.Views
 
 		private void TransportWorker_DoWork(object sender, DoWorkEventArgs args)
 		{
-			// Quickly set the UI state
-			TransportWorker.ReportProgress(0);
-
 			var transport = SharedData.Instance.Transport;
 
 			transport.ProgressChanged += transport_ProgressChanged;
@@ -53,7 +51,7 @@ namespace Unclassified.LogSubmit.Views
 				args.Cancel = true;
 				return;
 			}
-			TransportWorker.ReportProgress(100);
+			TransportWorker.ReportProgress(1000);
 		}
 
 		private void transport_ProgressChanged(object sender, ProgressChangedEventArgs args)
@@ -63,22 +61,23 @@ namespace Unclassified.LogSubmit.Views
 
 		private void TransportWorker_ProgressChanged(object sender, ProgressChangedEventArgs args)
 		{
-			progressBar1.Value = args.ProgressPercentage;
+			progressBar1.Value = args.ProgressPercentage;   // Permille
 			if (args.ProgressPercentage == 0)
 			{
 				startTime = DateTime.UtcNow;
-				RemainingTimeLabel.Text = Tx.T("msg.starting");
-				RemainingTimeLabel.ForeColor = SystemColors.ControlText;
 			}
-			else if (args.ProgressPercentage >= 5)
+			else if (args.ProgressPercentage >= 20)   // Permille
 			{
-				double elapsedSeconds = (DateTime.UtcNow - startTime).TotalSeconds;
-				double totalSeconds = elapsedSeconds * 100 / args.ProgressPercentage;
-				if (totalSeconds >= 0 && totalSeconds < int.MaxValue)
+				if (DateTime.UtcNow > lastProgressTime.AddMilliseconds(500))
 				{
-					TimeSpan remainingTime = TimeSpan.FromSeconds((int) (totalSeconds - elapsedSeconds));
-					RemainingTimeLabel.Text = Tx.TimeSpanRaw(remainingTime, false);
-					RemainingTimeLabel.ForeColor = SystemColors.ControlText;
+					lastProgressTime = DateTime.UtcNow;
+					double elapsedSeconds = (DateTime.UtcNow - startTime).TotalSeconds;
+					double totalSeconds = elapsedSeconds * 1000 / args.ProgressPercentage;
+					if (totalSeconds >= 0 && totalSeconds < int.MaxValue)
+					{
+						TimeSpan remainingTime = TimeSpan.FromSeconds((int) Math.Ceiling(totalSeconds - elapsedSeconds));
+						RemainingTimeLabel.Text = Tx.TimeSpanRaw(remainingTime, false);
+					}
 				}
 			}
 		}
@@ -88,13 +87,14 @@ namespace Unclassified.LogSubmit.Views
 			if (args.Cancelled)
 			{
 				RemainingTimeLabel.Text = Tx.T("msg.cancelled");
-				RemainingTimeLabel.ForeColor = SystemColors.ControlText;
 				progressBar1.Value = 0;
 			}
 			else if (args.Error != null)
 			{
-				RemainingTimeLabel.Text = Tx.TC("msg.title.error") + " " + args.Error.Message;
-				RemainingTimeLabel.ForeColor = Color.FromArgb(240, 0, 0);
+				RemainingTimeLabel.Text = Tx.T("msg.title.error");
+
+				ErrorLabel.Text = args.Error.Message;
+				ErrorPanel.Show();
 
 				FinishedInfoLabel.Text = Tx.T("transport progress view.select another transport");
 				FinishedInfoLabel.Show();
@@ -102,7 +102,6 @@ namespace Unclassified.LogSubmit.Views
 			else
 			{
 				RemainingTimeLabel.Text = Tx.T("msg.completed");
-				RemainingTimeLabel.ForeColor = Color.FromArgb(0, 160, 0);
 				finished = true;
 
 				SuccessPanel.Show();
@@ -128,6 +127,7 @@ namespace Unclassified.LogSubmit.Views
 				finished = false;
 				if (!TransportWorker.IsBusy)
 				{
+					RemainingTimeLabel.Text = Tx.T("msg.starting");
 					TransportWorker.RunWorkerAsync();
 				}
 				else
@@ -151,6 +151,7 @@ namespace Unclassified.LogSubmit.Views
 			}
 			if (!forward)
 			{
+				ErrorPanel.Hide();
 				SuccessPanel.Hide();
 				FinishedInfoLabel.Hide();
 				MainForm.Instance.FinishEnabled = false;

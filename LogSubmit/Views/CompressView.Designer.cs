@@ -86,6 +86,7 @@
 			this.tableLayoutPanel1.SetColumnSpan(this.progressBar1, 2);
 			this.progressBar1.Location = new System.Drawing.Point(2, 61);
 			this.progressBar1.Margin = new System.Windows.Forms.Padding(2, 20, 0, 0);
+			this.progressBar1.Maximum = 1000;
 			this.progressBar1.Name = "progressBar1";
 			this.progressBar1.Size = new System.Drawing.Size(539, 16);
 			this.progressBar1.Style = System.Windows.Forms.ProgressBarStyle.Continuous;

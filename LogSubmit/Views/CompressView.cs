@@ -20,6 +20,7 @@ namespace Unclassified.LogSubmit.Views
 		private string archiveFileName1;
 		private string archiveFileName2;
 		private long totalLogSize;
+		private DateTime lastProgressTime;
 
 		//private FileStream gzFile;
 		//private GZipStream gzStream;
@@ -138,7 +139,7 @@ namespace Unclassified.LogSubmit.Views
 				CompressArchive();
 
 				FileInfo archiveInfo = new FileInfo(archiveFileName2);
-				CompressWorker.ReportProgress(100, new ProgressInfo { CompressedSize = archiveInfo.Length });
+				CompressWorker.ReportProgress(1000, new ProgressInfo { CompressedSize = archiveInfo.Length });
 			}
 			catch (ObjectDisposedException)
 			{
@@ -150,6 +151,13 @@ namespace Unclassified.LogSubmit.Views
 
 		private void CompressWorker_ProgressChanged(object sender, ProgressChangedEventArgs args)
 		{
+			bool someTimePassed = false;
+			if (DateTime.UtcNow > lastProgressTime.AddMilliseconds(500))
+			{
+				lastProgressTime = DateTime.UtcNow;
+				someTimePassed = true;
+			}
+			
 			progressBar1.Value = args.ProgressPercentage;
 			if (args.ProgressPercentage == 0)
 			{
@@ -157,23 +165,29 @@ namespace Unclassified.LogSubmit.Views
 				RemainingTimeLabel.Text = Tx.T("msg.starting");
 				RemainingTimeLabel.ForeColor = SystemColors.ControlText;
 			}
-			else if (args.ProgressPercentage >= 5)
+			else if (args.ProgressPercentage >= 20)   // Permille
 			{
-				double elapsedSeconds = (DateTime.UtcNow - startTime).TotalSeconds;
-				double totalSeconds = elapsedSeconds * 100 / args.ProgressPercentage;
-				if (totalSeconds >= 0 && totalSeconds < int.MaxValue)
+				if (someTimePassed)
 				{
-					TimeSpan remainingTime = TimeSpan.FromSeconds((int) (totalSeconds - elapsedSeconds) + 1);
-					RemainingTimeLabel.Text = Tx.TimeSpanRaw(remainingTime, false);
-					RemainingTimeLabel.ForeColor = SystemColors.ControlText;
+					double elapsedSeconds = (DateTime.UtcNow - startTime).TotalSeconds;
+					double totalSeconds = elapsedSeconds * 1000 / args.ProgressPercentage;   // Permille
+					if (totalSeconds >= 0 && totalSeconds < int.MaxValue)
+					{
+						TimeSpan remainingTime = TimeSpan.FromSeconds((int) Math.Ceiling(totalSeconds - elapsedSeconds));
+						RemainingTimeLabel.Text = Tx.TimeSpanRaw(remainingTime, false);
+						RemainingTimeLabel.ForeColor = SystemColors.ControlText;
+					}
 				}
 			}
 
 			ProgressInfo pi = args.UserState as ProgressInfo;
 			if (pi != null)
 			{
-				CompressedSizeLabel.Text = Tx.DataSize(pi.CompressedSize);
 				SharedData.Instance.ArchiveFileSize = pi.CompressedSize;
+				if (someTimePassed)
+				{
+					CompressedSizeLabel.Text = Tx.DataSize(pi.CompressedSize);
+				}
 			}
 		}
 
@@ -196,6 +210,7 @@ namespace Unclassified.LogSubmit.Views
 			{
 				RemainingTimeLabel.Text = Tx.T("msg.completed");
 				RemainingTimeLabel.ForeColor = Color.FromArgb(0, 160, 0);
+				CompressedSizeLabel.Text = Tx.DataSize(SharedData.Instance.ArchiveFileSize);
 				dataReady = true;
 				UpdateButtons();
 				MainForm.Instance.FocusNextButton();
@@ -435,9 +450,9 @@ namespace Unclassified.LogSubmit.Views
 		public void SetProgress(long inSize, long outSize)
 		{
 			// Called every 100 milliseconds
-			int percent = (int) (Math.Round(100.0 * inSize / totalLogSize));
-			if (percent > 100) percent = 100;
-			CompressWorker.ReportProgress(percent, new ProgressInfo { CompressedSize = outSize });
+			int permille = (int) (Math.Round(1000.0 * inSize / totalLogSize));
+			if (permille > 1000) permille = 1000;
+			CompressWorker.ReportProgress(permille, new ProgressInfo { CompressedSize = outSize });
 		}
 
 		#endregion ICodeProgress members

@@ -89,6 +89,7 @@
   <ItemGroup>
     <Compile Include="CommonFormats.cs" />
     <Compile Include="ConfigReader.cs" />
+    <Compile Include="Transports\HttpTransport.cs" />
     <Compile Include="Unclassified\TxLib\DateTimeInterval.cs" />
     <Compile Include="Unclassified\TxLib\Tx.cs" />
     <Compile Include="Unclassified\TxLib\TxWinForms.cs" />
@@ -97,6 +98,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Unclassified\Util\AssemblyInfoUtil.cs" />
+    <Compile Include="Unclassified\Util\HttpClient.cs" />
     <Compile Include="Views\IView.cs" />
     <Compile Include="ListViewColumnSorter.cs" />
     <Compile Include="SevenZip\Common\CRC.cs" />
@@ -150,6 +152,12 @@
     </Compile>
     <Compile Include="Views\FileTransportView.Designer.cs">
       <DependentUpon>FileTransportView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\HttpTransportView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Views\HttpTransportView.Designer.cs">
+      <DependentUpon>HttpTransportView.cs</DependentUpon>
     </Compile>
     <Compile Include="Views\MailTransportView.cs">
       <SubType>UserControl</SubType>
@@ -213,6 +221,9 @@
     <EmbeddedResource Include="Views\FileTransportView.resx">
       <DependentUpon>FileTransportView.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Views\HttpTransportView.resx">
+      <DependentUpon>HttpTransportView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Views\MailTransportView.resx">
       <DependentUpon>MailTransportView.cs</DependentUpon>
     </EmbeddedResource>
@@ -260,6 +271,7 @@
   <ItemGroup>
     <Content Include="FieldLog.ico" />
     <Content Include="Resources\check_green.png" />
+    <Content Include="Resources\error_red.png" />
     <None Include="Resources\FLDocument_48.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

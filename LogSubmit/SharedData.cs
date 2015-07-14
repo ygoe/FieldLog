@@ -43,6 +43,8 @@ namespace Unclassified.LogSubmit
 		public List<string> TempFiles { get; private set; }
 		public bool InteractiveEMail { get; set; }
 		public string MailTransportRecipientAddress { get; set; }
+		public string HttpTransportUrl { get; set; }
+		public string HttpTransportToken { get; set; }
 
 		#endregion Data properties
 	}

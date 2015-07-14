@@ -18,6 +18,7 @@ Alternativ können Sie das Archiv von diesem Symbol ziehen und direkt im Zielver
 		<text key="file transport view.file dialog.filter">Protokollarchive|*.tar.lzma|Alle Dateien|*.*</text>
 		<text key="file transport view.file dialog.title">Wählen Sie das Ziel des Protokollarchivs</text>
 		<text key="file transport view.intro">Kopiert das Protokollarchiv auf ein lokales Laufwerk auf Ihrem Computer. Das kann auch ein tragbarer USB-Datenträger sein. Sie müssen die Datei dann selbst zu uns bringen oder sie von einem anderen Computer übertragen.</text>
+		<text key="http transport view.intro">Lädt das Protokollarchiv zu unserem Webservice hoch.</text>
 		<text key="log selection view.config error">Warnung: Die Konfiguration des Übertragungsprogramms konnte nicht gelesen werden. Manche Optionen stehen möglicherweise nicht zur Verfügung. ({msg})</text>
 		<text key="log selection view.file dialog.filter">Protokolldateien|*.fl|Alle Dateien|*.*</text>
 		<text key="log selection view.file dialog.title">Wählen Sie eine beliebige Datei aus einer Protokolldateigruppe</text>
@@ -43,6 +44,11 @@ Sie können dieses Übertragungsprogramm auch manuell durch Starten von {cmd} im
 		<text key="msg.command line error">Kommandozeilenfehler: {msg}</text>
 		<text key="msg.completed">Fertig</text>
 		<text key="msg.endtime parameter invalid">Der Parameter /endtime ist ungültig: {value}. Stattdessen wird die aktuelle Zeit verwendet.</text>
+		<text key="msg.error.http response file hash">Die Serverantwort enthält einen falschen SHA-1-Hashwert für die Datei.</text>
+		<text key="msg.error.http response file size">Die Serverantwort enthält die falsche Dateigröße ({actual} statt {expected}).</text>
+		<text key="msg.error.http response pattern">Die Serverantwort wurde nicht erkannt.</text>
+		<text key="msg.error.http response status">Der Webserver antwortete mit einem Fehler: {code}: {msg}</text>
+		<text key="msg.error.http response token">Die Serverantwort enthält das falsche Token.</text>
 		<text key="msg.error.mapi x64">Vielleicht unterstützt Ihre Standard-E-Mail-Anwendung kein 64-Bit-MAPI.</text>
 		<text key="msg.error.outlook fallback failed">Outlook ist verfügbar, aber ebenfalls fehlgeschlagen:</text>
 		<text key="msg.logpath parameter invalid">Der Parameter /logpath ist ungültig: {value}</text>
@@ -66,6 +72,7 @@ Sie können dieses Übertragungsprogramm auch manuell durch Starten von {cmd} im
 		<text key="time selection.shorter">Kürzer</text>
 		<text key="time selection.title">Wählen Sie den zu übertragenden Zeitraum</text>
 		<text key="transport.file">Datei lokal kopieren</text>
+		<text key="transport.http">Webservice</text>
 		<text key="transport.mail">E-Mail</text>
 		<text key="transport progress view.delete shortcut">Sie können jetzt die Verknüpfung löschen, mit der Sie dieses Programm gestartet haben.</text>
 		<text key="transport progress view.intro">Fast geschafft! Bitte warten Sie, während die Protokolldaten übertragen werden.</text>
@@ -280,6 +287,7 @@ Alternatively, you can drag the archive from this icon and drop it directly into
 		<text key="file transport view.file dialog.filter">Log archives|*.tar.lzma|All files|*.*</text>
 		<text key="file transport view.file dialog.title">Select the log archive destination</text>
 		<text key="file transport view.intro">Copies the log archive to a local disk on your computer. This may also be on a portable or USB drive. You need to carry the file to us yourself then, or transfer it from another computer.</text>
+		<text key="http transport view.intro">Uploads the log archive to our web service.</text>
 		<text key="log selection view.config error">Warning: The submit tool configuration file could not be read. Some options may not be available. ({msg})</text>
 		<text key="log selection view.file dialog.filter">Log files|*.fl|All files|*.*</text>
 		<text key="log selection view.file dialog.title">Select any file from a log file group</text>
@@ -305,6 +313,11 @@ You can also start this submit tool manually by running {cmd} from the applicati
 		<text key="msg.command line error">Command line error: {msg}</text>
 		<text key="msg.completed">Completed</text>
 		<text key="msg.endtime parameter invalid">The /endtime parameter is invalid: {value}. Using current time instead.</text>
+		<text key="msg.error.http response file hash">The server response included the wrong SHA-1 file hash.</text>
+		<text key="msg.error.http response file size">The server response included the wrong file size ({actual} instead of {expected}).</text>
+		<text key="msg.error.http response pattern">The server response was not recognised.</text>
+		<text key="msg.error.http response status">The web server answered with an error: {code}: {msg}</text>
+		<text key="msg.error.http response token">The server response included the wrong token.</text>
 		<text key="msg.error.mapi x64">Maybe your default e-mail application does not support 64 bit MAPI.</text>
 		<text key="msg.error.outlook fallback failed">Outlook is available but failed, too:</text>
 		<text key="msg.logpath parameter invalid">The /logpath parameter is invalid: {value}</text>
@@ -328,6 +341,7 @@ You can also start this submit tool manually by running {cmd} from the applicati
 		<text key="time selection.shorter">Shorter</text>
 		<text key="time selection.title">Select the time span to submit</text>
 		<text key="transport.file">Local file copy</text>
+		<text key="transport.http">Web service</text>
 		<text key="transport.mail">E-mail</text>
 		<text key="transport progress view.delete shortcut">You can now delete the shortcut you used to start this program.</text>
 		<text key="transport progress view.intro">Almost done! Please wait while the log data is transferred.</text>

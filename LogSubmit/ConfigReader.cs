@@ -34,6 +34,12 @@ namespace Unclassified.LogSubmit
 							case "transport.mail.address":
 								SharedData.Instance.MailTransportRecipientAddress = value;
 								break;
+							case "transport.http.url":
+								SharedData.Instance.HttpTransportUrl = value;
+								break;
+							case "transport.http.token":
+								SharedData.Instance.HttpTransportToken = value;
+								break;
 						}
 					}
 				}

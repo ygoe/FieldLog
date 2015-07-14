@@ -11,8 +11,9 @@ namespace Unclassified.LogSubmit.Views
 	{
 		#region Private data
 
-		private FileTransportView fileTransportView = new FileTransportView();
+		private HttpTransportView httpTransportView = new HttpTransportView();
 		private MailTransportView mailTransportView = new MailTransportView();
+		private FileTransportView fileTransportView = new FileTransportView();
 
 		#endregion Private data
 
@@ -26,6 +27,10 @@ namespace Unclassified.LogSubmit.Views
 
 			Dock = DockStyle.Fill;
 
+			if (httpTransportView.Transport.CanExecute())
+			{
+				TransportComboBox.Items.Add(new TransportMethod { Text = Tx.T("transport.http"), View = httpTransportView, Transport = httpTransportView.Transport });
+			}
 			if (mailTransportView.Transport.CanExecute())
 			{
 				TransportComboBox.Items.Add(new TransportMethod { Text = Tx.T("transport.mail"), View = mailTransportView, Transport = mailTransportView.Transport });
@@ -38,10 +43,11 @@ namespace Unclassified.LogSubmit.Views
 
 		#region Event handlers
 
-		private void TransportView_FontChanged(object sender, EventArgs e)
+		private void TransportView_FontChanged(object sender, EventArgs args)
 		{
-			UIPreferences.UpdateFont(fileTransportView, fileTransportView.Font, Font);
+			UIPreferences.UpdateFont(httpTransportView, httpTransportView.Font, Font);
 			UIPreferences.UpdateFont(mailTransportView, mailTransportView.Font, Font);
+			UIPreferences.UpdateFont(fileTransportView, fileTransportView.Font, Font);
 		}
 
 		#endregion Event handlers

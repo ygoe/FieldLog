@@ -193,7 +193,7 @@ namespace Unclassified.FieldLogViewer
 				message = unexpectedError;
 			}
 			MessageBox.Show(
-				message + " " + exMsg,
+				message + " " + exMsg + "\n\n" + detailsLogged,
 				messageBoxTitle,
 				MessageBoxButton.OK,
 				MessageBoxImage.Warning);
@@ -208,21 +208,14 @@ namespace Unclassified.FieldLogViewer
 		public static void ErrorMessage(string message, Exception ex, string context)
 		{
 			FL.Error(ex, context);
-			string exMsg = ex.Message;
-			var aex = ex as AggregateException;
-			if (aex != null && aex.InnerExceptions.Count == 1)
+			if (message != null)
 			{
-				exMsg = aex.InnerExceptions[0].Message;
+				FL.ShowErrorDialog(message, ex);
 			}
-			if (message == null)
+			else
 			{
-				message = unexpectedError;
+				FL.ShowErrorDialog(ex);
 			}
-			MessageBox.Show(
-				message + " " + exMsg + "\n\n" + detailsLogged,
-				messageBoxTitle,
-				MessageBoxButton.OK,
-				MessageBoxImage.Error);
 		}
 
 		public static bool YesNoQuestion(string message)

@@ -965,7 +965,8 @@ namespace Unclassified.FieldLog
 		}
 
 		/// <summary>
-		/// Shows the default error dialog for an exception, initiated by user code.
+		/// Shows the default error dialog for an exception, initiated by user code. An event should
+		/// be logged before calling this method.
 		/// </summary>
 		/// <param name="ex">The exception to display.</param>
 		/// <remarks>
@@ -976,8 +977,30 @@ namespace Unclassified.FieldLog
 		public static void ShowErrorDialog(Exception ex)
 		{
 			// Prepare messages to display
-			string errorMsg;
-			errorMsg = ExceptionUserMessageRecursive(ex).TrimEnd();
+			string errorMsg = ExceptionUserMessageRecursive(ex).TrimEnd();
+
+			ShowErrorDialog(errorMsg, ex);
+		}
+
+		/// <summary>
+		/// Shows the default error dialog for an exception, initiated by user code. An event should
+		/// be logged before calling this method.
+		/// </summary>
+		/// <param name="messagePrefix">The message to display before the exception message.</param>
+		/// <param name="ex">The exception to display.</param>
+		/// <remarks>
+		/// A FieldLogItem should be logged before calling this method. This dialog is not modal so
+		/// the application continues to run. Additional errors are collected in the error dialog.
+		/// The dialog is top-most so it will overlay the application window.
+		/// </remarks>
+		public static void ShowErrorDialog(string messagePrefix, Exception ex)
+		{
+			// Prepare messages to display
+			if (!string.IsNullOrEmpty(messagePrefix))
+			{
+				messagePrefix += " ";
+			}
+			string errorMsg = messagePrefix + ExceptionUserMessageRecursive(ex).TrimEnd();
 
 			ShowErrorDialog(errorMsg, ex);
 		}

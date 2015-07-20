@@ -415,7 +415,7 @@ namespace Unclassified.LogSubmit.Views
 		private void AddFile(string fileName, int userId = 0, int groupId = 0, int mode = 33188 /* 0100644 */)
 		{
 			FileInfo fi = new FileInfo(fileName);
-			using (var stream = File.OpenRead(fileName))
+			using (var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 			{
 				tarWriter.Write(stream, fi.Length, fi.Name, userId, groupId, mode, fi.LastWriteTimeUtc);
 			}
@@ -429,7 +429,7 @@ namespace Unclassified.LogSubmit.Views
 			EnsureDirectory(destFileName, userId, groupId);
 
 			FileInfo fi = new FileInfo(fileName);
-			using (var stream = File.OpenRead(fileName))
+			using (var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 			{
 				tarWriter.Write(stream, fi.Length, destFileName, userId, groupId, mode, fi.LastWriteTimeUtc);
 			}

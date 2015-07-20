@@ -475,7 +475,10 @@ namespace Unclassified.FieldLog
 						{
 							using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"))
 							{
-								AppCompatLayer = key.GetValue(FL.EntryAssemblyLocation) as string;
+								if (key != null)
+								{
+									AppCompatLayer = key.GetValue(FL.EntryAssemblyLocation) as string;
+								}
 							}
 						}
 					}

@@ -1002,7 +1002,7 @@ namespace Unclassified.FieldLog
 			}
 			string errorMsg = messagePrefix + ExceptionUserMessageRecursive(ex).TrimEnd();
 
-			ShowErrorDialog(errorMsg, ex);
+			ShowErrorDialog(errorMsg, (object) ex);
 		}
 
 		/// <summary>

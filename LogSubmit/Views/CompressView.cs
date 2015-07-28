@@ -69,7 +69,11 @@ namespace Unclassified.LogSubmit.Views
 				{
 					string dir = Path.GetDirectoryName(basePath);
 					string baseName = Path.GetFileName(basePath);
-					foreach (string logFile in Directory.GetFiles(dir, baseName + "-*-*.fl"))
+					var interestingFiles =
+						Directory.GetFiles(dir, baseName + "-?-*.fl")
+						.Concat(Directory.GetFiles(dir, baseName + "-scr-*.png"))
+						.Concat(Directory.GetFiles(dir, baseName + "-scr-*.jpg"));
+					foreach (string logFile in interestingFiles)
 					{
 						FileInfo fi = new FileInfo(logFile);
 						if (fi.LastWriteTimeUtc >= minTime)

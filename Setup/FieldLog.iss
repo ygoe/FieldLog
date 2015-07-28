@@ -122,7 +122,7 @@ Source: "..\PdbConvert\bin\Release\PdbConvert.exe"; DestDir: "{app}"; Flags: ign
 
 ; LogSubmit tool
 Source: "..\LogSubmit\bin\x86\Release\LogSubmit.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "submit.conf"; DestDir: "{app}"
+Source: "submit.config"; DestDir: "{app}"
 
 ; FieldLog assembly
 Source: "..\FieldLog\bin\ReleaseNET20\Unclassified.FieldLog.dll"; DestDir: "{app}\FieldLog assembly (.NET 2.0)"; Flags: ignoreversion
@@ -164,6 +164,9 @@ Name: "{app}\log"; Permissions: users-modify
 [InstallDelete]
 ; Delete user configuration files if the task is selected
 Type: files; Name: "{userappdata}\Unclassified\FieldLog\FieldLogViewer.conf"; Tasks: DeleteConfig
+
+; Older version of submit.config (added 2015-07)
+Type: files; Name: "{app}\submit.conf"
 
 [Registry]
 ; Register .fl file name extension

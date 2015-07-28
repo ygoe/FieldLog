@@ -202,12 +202,14 @@ namespace Unclassified.FieldLogViewer
 		public static void ErrorMessage(string message)
 		{
 			FL.Error(message);
+			FieldLogScreenshot.CreateForMainWindow();
 			MessageBox.Show(message, messageBoxTitle, MessageBoxButton.OK, MessageBoxImage.Error);
 		}
 
 		public static void ErrorMessage(string message, Exception ex, string context)
 		{
 			FL.Error(ex, context);
+			FieldLogScreenshot.CreateForMainWindow();
 			if (message != null)
 			{
 				FL.ShowErrorDialog(message, ex);

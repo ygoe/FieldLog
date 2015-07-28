@@ -273,7 +273,15 @@ namespace Unclassified.LogSubmit.Views
 			DateTime updatedTime = DateTime.MinValue;
 			string dir = Path.GetDirectoryName(basePath);
 			string baseName = Path.GetFileName(basePath);
-			foreach (string logFile in Directory.GetFiles(dir, baseName + "-*-*.fl"))
+			foreach (string logFile in Directory.GetFiles(dir, baseName + "-?-*.fl"))
+			{
+				FileInfo fi = new FileInfo(logFile);
+				if (fi.LastWriteTimeUtc > updatedTime)
+				{
+					updatedTime = fi.LastWriteTimeUtc;
+				}
+			}
+			foreach (string logFile in Directory.GetFiles(dir, baseName + "-scr-*.*"))
 			{
 				FileInfo fi = new FileInfo(logFile);
 				if (fi.LastWriteTimeUtc > updatedTime)
@@ -384,7 +392,7 @@ namespace Unclassified.LogSubmit.Views
 
 		private string GetBasePath(string path)
 		{
-			Match match = Regex.Match(path, @"^(.+)-[0-9]-[0-9]{18}\.fl$");
+			Match match = Regex.Match(path, @"^(.+)-(?:[0-9]-[0-9]{18}\.fl|scr-[0-9]{18}\.(?:png|jpg))$");
 			if (match.Success)
 			{
 				return match.Groups[1].Value;
@@ -418,11 +426,17 @@ namespace Unclassified.LogSubmit.Views
 
 			try
 			{
-				foreach (string file in Directory.GetFiles(path, "*.fl"))
+				var interestingFiles =
+					Directory.GetFiles(path, "*-?-*.fl")
+					.Concat(Directory.GetFiles(path, "*-scr-*.png"))
+					.Concat(Directory.GetFiles(path, "*-scr-*.jpg"));
+				foreach (string file in interestingFiles)
 				{
 					if (ScanDirectoryWorker.CancellationPending) return false;
 
 					string basePath = GetBasePath(file);
+					if (basePath == null) continue;
+
 					FileInfo fi = new FileInfo(file);
 					DateTime updatedTime = fi.LastWriteTimeUtc;
 					LogBasePathInfo info;
@@ -494,7 +508,7 @@ namespace Unclassified.LogSubmit.Views
 
 			try
 			{
-				foreach (string logFile in Directory.GetFiles(dir, baseName + "-*-*.fl"))
+				foreach (string logFile in Directory.GetFiles(dir, baseName + "-?-*.fl"))
 				{
 					FileInfo fi = new FileInfo(logFile);
 					DateTime updatedTime = fi.LastWriteTimeUtc;

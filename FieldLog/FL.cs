@@ -346,12 +346,14 @@ namespace Unclassified.FieldLog
 		/// been run. Used for ASP.NET.
 		/// </summary>
 		private static bool didDuplicateLogStartCheck;
+#if !NET20
 		/// <summary>
 		/// The level of first-chance exception handling. If this goes up, there is an exception
 		/// in the exception handler. If this goes uncontrolled, it leads to a
 		/// StackOverflowException that crashes the application.
 		/// </summary>
 		private static int firstChanceExceptionLevel;
+#endif
 
 		#endregion Private static data
 
@@ -4069,6 +4071,8 @@ namespace Unclassified.FieldLog
 				}
 				fileTimes[oldestIndex] = DateTime.MaxValue;   // Don't consider this file again
 			}
+
+			FieldLogScreenshot.Purge();
 		}
 
 		/// <summary>
@@ -4106,11 +4110,12 @@ namespace Unclassified.FieldLog
 			}
 
 			int deletedCount = 0;
+			DateTime purgeTime = FL.UtcNow.Subtract(keepTime);
 			foreach (string fileName in Directory.GetFiles(logDir, logFile + "-" + (int) prio + "-*.fl"))
 			{
 				FileInfo fi = new FileInfo(fileName);
 				if (!string.Equals(fileName, currentFileName, StringComparison.OrdinalIgnoreCase) &&
-					fi.LastWriteTimeUtc < FL.UtcNow.Subtract(keepTime))
+					fi.LastWriteTimeUtc < purgeTime)
 				{
 					// File is not currently open for writing and old enough to be deleted
 					try
@@ -4252,6 +4257,12 @@ namespace Unclassified.FieldLog
 									break;
 								case "checktimethreshold":
 									FL.CheckTimeThreshold = (int) ParseConfigNumber(value, FL.CheckTimeThreshold);
+									break;
+								case "maxscreenshotsize":
+									FieldLogScreenshot.MaxTotalSize = ParseConfigNumber(value, FieldLogScreenshot.MaxTotalSize);
+									break;
+								case "keepscreenshot":
+									FieldLogScreenshot.KeepTime = ParseConfigTimeSpan(value, FieldLogScreenshot.KeepTime);
 									break;
 							}
 						}

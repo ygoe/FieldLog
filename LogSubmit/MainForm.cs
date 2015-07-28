@@ -61,7 +61,7 @@ namespace Unclassified.LogSubmit
 			// Read configuration file
 			string configFile = Path.Combine(
 				Path.GetDirectoryName(Application.ExecutablePath),
-				"submit.conf");
+				"submit.config");
 			try
 			{
 				ConfigReader config = new ConfigReader(configFile);

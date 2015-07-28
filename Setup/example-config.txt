@@ -13,16 +13,18 @@
 # (minutes), h (hours) and d (days). Changes to this file are applied automatically at runtime
 # with a few seconds delay.
 #
-# See http://dev.unclassified.de/source/fieldlog/devguide#config for more information.
+# See http://unclassified.software/source/fieldlog/devguide#config for more information.
 
-#path=C:\path\to\prefix
-maxfilesize=150k
-maxtotalsize=200M
-keeptrace=24h
-keepcheckpoint=24h
-keepinfo=30d
-keepnotice=30d
-keepwarning=90d
-keeperror=90d
-keepcritical=90d
-checktimethreshold=100
+#path = C:\path\to\prefix
+maxfilesize = 150k
+maxtotalsize = 200M
+keeptrace = 24h
+keepcheckpoint = 24h
+keepinfo = 30d
+keepnotice = 30d
+keepwarning = 90d
+keeperror = 90d
+keepcritical = 90d
+checktimethreshold = 100
+maxscreenshotsize = 50M
+keepscreenshot = 1d

@@ -1,10 +1,8 @@
 ﻿using System.Reflection;
-using System.Runtime.InteropServices;
 
 [assembly: AssemblyProduct("PdbConvert")]
 [assembly: AssemblyTitle("PdbConvert")]
 [assembly: AssemblyDescription("Converts .pdb debug symbols to a portable XML file.")]
-
 [assembly: AssemblyCopyright("© Yves Goergen, GNU GPL v3")]
 [assembly: AssemblyCompany("unclassified software development")]
 

@@ -82,12 +82,12 @@ namespace Unclassified.UI
 			}
 		}
 
-		protected override void OnParentChanged(EventArgs e)
+		protected override void OnParentChanged(EventArgs args)
 		{
 			if (prevParent != null)
 				prevParent.Resize -= ParentForm_Resize;
 
-			base.OnParentChanged(e);
+			base.OnParentChanged(args);
 			// Update this value whenever the parent Form has changed, or in case it wasn't set yet before
 			KeepBottomRight = KeepBottomRight;
 
@@ -95,7 +95,7 @@ namespace Unclassified.UI
 			prevParent.Resize += ParentForm_Resize;
 		}
 
-		private void ParentForm_Resize(object sender, EventArgs e)
+		private void ParentForm_Resize(object sender, EventArgs args)
 		{
 			if (prevParent != null)
 			{
@@ -161,7 +161,7 @@ namespace Unclassified.UI
 			// Responding to the hit test message does all the magic. :-)
 			if (m.Msg == WinApi.WM_NCHITTEST)
 			{
-				m.Result = new IntPtr((int) WinApi.WindowHitTestRegions.BottomRightSizeableCorner);
+				m.Result = new IntPtr((int)WinApi.WindowHitTestRegions.BottomRightSizeableCorner);
 			}
 			else
 			{

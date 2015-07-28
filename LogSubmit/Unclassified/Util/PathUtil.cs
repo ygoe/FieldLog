@@ -23,7 +23,7 @@ namespace Unclassified.Util
 				path = Path.Combine(dir, baseName + "[" + count + "]" + ext);
 			}
 		}
-		
+
 		// Source: http://unclassified.software/source/getrelativepath
 		/// <summary>
 		/// Determines the relative path of the specified path relative to a base path.

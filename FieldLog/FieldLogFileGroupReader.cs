@@ -84,7 +84,7 @@ namespace Unclassified.FieldLog
 				Match m = Regex.Match(basePath, @"-([0-9])-[0-9]{18}\.fl");
 				if (m.Success)
 				{
-					FieldLogPriority prio = (FieldLogPriority) int.Parse(m.Groups[1].Value);
+					FieldLogPriority prio = (FieldLogPriority)int.Parse(m.Groups[1].Value);
 					AddNewReader(prio, basePath, false);
 				}
 				else
@@ -164,7 +164,7 @@ namespace Unclassified.FieldLog
 					Match m = Regex.Match(args.FullPath, @"-([0-9])-[0-9]{18}\.fl");
 					if (m.Success)
 					{
-						FieldLogPriority prio = (FieldLogPriority) int.Parse(m.Groups[1].Value);
+						FieldLogPriority prio = (FieldLogPriority)int.Parse(m.Groups[1].Value);
 						AddNewReader(prio, args.FullPath, true);
 					}
 				}
@@ -186,7 +186,7 @@ namespace Unclassified.FieldLog
 
 				string logDir = Path.GetDirectoryName(basePath);
 				string logFile = Path.GetFileName(basePath);
-				List<string> fileNames = new List<string>(Directory.GetFiles(logDir, logFile + "-" + (int) prio + "-*.fl"));
+				List<string> fileNames = new List<string>(Directory.GetFiles(logDir, logFile + "-" + (int)prio + "-*.fl"));
 				fileNames.Sort();
 				foreach (string fileName in fileNames)
 				{
@@ -230,7 +230,7 @@ namespace Unclassified.FieldLog
 				// This is the first file of this priority
 				readers[prio] = new FieldLogFileEnumerator(reader);
 				readers[prio].Error += FieldLogFileEnumerator_Error;
-				readTasks[(int) prio] = Task<bool>.Factory.StartNew(readers[prio].MoveNext);
+				readTasks[(int)prio] = Task<bool>.Factory.StartNew(readers[prio].MoveNext);
 
 				// Signal the blocking ReadLogItem method that there's a new reader now
 				newFilePrioEvent.Set();
@@ -245,12 +245,12 @@ namespace Unclassified.FieldLog
 			}
 		}
 
-		private void FieldLogFileEnumerator_Error(object sender, ErrorEventArgs e)
+		private void FieldLogFileEnumerator_Error(object sender, ErrorEventArgs args)
 		{
 			ErrorEventHandler handler = Error;
 			if (handler != null)
 			{
-				handler(sender, e);
+				handler(sender, args);
 			}
 		}
 
@@ -291,7 +291,7 @@ namespace Unclassified.FieldLog
 							if (availableTask == readTasks[prioInt])
 							{
 								// A reader enumerator task has finished, consider its result
-								FieldLogPriority prio = (FieldLogPriority) prioInt;
+								FieldLogPriority prio = (FieldLogPriority)prioInt;
 								if (availableTask.Result)
 								{
 									// A new item of this priority is available.
@@ -352,7 +352,7 @@ namespace Unclassified.FieldLog
 					// We found an item.
 					// Create new task for the next item of this priority
 					var task = Task<bool>.Factory.StartNew(readers[minTimePrio].MoveNext);
-					readTasks[(int) minTimePrio] = task;
+					readTasks[(int)minTimePrio] = task;
 					// Now return the next log item in time of all that are currently available
 					return minTimeItem;
 				}

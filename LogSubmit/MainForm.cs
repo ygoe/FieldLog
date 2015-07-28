@@ -346,12 +346,12 @@ namespace Unclassified.LogSubmit
 			if (oldView != null)
 			{
 				if (view == oldView) return;
-				((IView) oldView).Deactivate(forward);
+				((IView)oldView).Deactivate(forward);
 			}
 			ContentPanel.Controls.Clear();
 
 			ContentPanel.Controls.Add(view);
-			((IView) view).Activate(forward);
+			((IView)view).Activate(forward);
 			UpdateProgress();
 		}
 

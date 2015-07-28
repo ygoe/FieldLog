@@ -32,18 +32,18 @@ namespace Unclassified.LogSubmit.Tar
 			Close();
 		}
 
-		#endregion
+		#endregion IDisposable Members
 
 		public void WriteDirectoryEntry(string path, int userId, int groupId, int mode)
 		{
-			if(string.IsNullOrEmpty(path))
+			if (string.IsNullOrEmpty(path))
 				throw new ArgumentNullException("path");
 			if (path[path.Length - 1] != '/')
 			{
 				path += '/';
 			}
 			DateTime lastWriteTime;
-			if(Directory.Exists(path))
+			if (Directory.Exists(path))
 			{
 				lastWriteTime = Directory.GetLastWriteTime(path);
 			}
@@ -62,25 +62,25 @@ namespace Unclassified.LogSubmit.Tar
 			WriteDirectoryEntry(directory, 0, 0, 0755);
 
 			string[] files = Directory.GetFiles(directory);
-			foreach(var fileName in files)
+			foreach (var fileName in files)
 			{
 				Write(fileName);
 			}
 
 			string[] directories = Directory.GetDirectories(directory);
-			foreach(var dirName in directories)
+			foreach (var dirName in directories)
 			{
 				WriteDirectoryEntry(dirName, 0, 0, 0755);
-				if(doRecursive)
+				if (doRecursive)
 				{
-					WriteDirectory(dirName,true);
+					WriteDirectory(dirName, true);
 				}
 			}
 		}
 
 		public void Write(string fileName)
 		{
-			if(string.IsNullOrEmpty(fileName))
+			if (string.IsNullOrEmpty(fileName))
 				throw new ArgumentNullException("fileName");
 			using (FileStream file = File.OpenRead(fileName))
 			{
@@ -90,7 +90,7 @@ namespace Unclassified.LogSubmit.Tar
 
 		public void Write(FileStream file)
 		{
-			string path = Path.GetFullPath(file.Name).Replace(Path.GetPathRoot(file.Name),string.Empty);
+			string path = Path.GetFullPath(file.Name).Replace(Path.GetPathRoot(file.Name), string.Empty);
 			path = path.Replace(Path.DirectorySeparatorChar, '/');
 			Write(file, file.Length, path, 61, 61, 511, File.GetLastWriteTime(file.Name));
 		}
@@ -104,7 +104,7 @@ namespace Unclassified.LogSubmit.Tar
 		{
 			IArchiveDataWriter writer = new DataWriter(OutStream, dataSizeInBytes);
 			WriteHeader(name, lastModificationTime, dataSizeInBytes, userId, groupId, mode, EntryType.File);
-			while(writer.CanWrite)
+			while (writer.CanWrite)
 			{
 				writeDelegate(writer);
 			}
@@ -114,11 +114,11 @@ namespace Unclassified.LogSubmit.Tar
 		public virtual void Write(Stream data, long dataSizeInBytes, string name, int userId, int groupId, int mode,
 								  DateTime lastModificationTime)
 		{
-			if(isClosed)
+			if (isClosed)
 				throw new TarException("Can not write to the closed writer");
 			WriteHeader(name, lastModificationTime, dataSizeInBytes, userId, groupId, mode, EntryType.File);
 			WriteContent(dataSizeInBytes, data);
-			AlignTo512(dataSizeInBytes,false);
+			AlignTo512(dataSizeInBytes, false);
 		}
 
 		protected void WriteContent(long count, Stream data)
@@ -140,7 +140,7 @@ namespace Unclassified.LogSubmit.Tar
 			}
 			if (count > 0)
 			{
-				int bytesRead = data.Read(buffer, 0, (int) count);
+				int bytesRead = data.Read(buffer, 0, (int)count);
 				if (bytesRead < 0)
 					throw new IOException("LegacyTarWriter unable to read from provided stream");
 				if (bytesRead == 0)
@@ -159,22 +159,21 @@ namespace Unclassified.LogSubmit.Tar
 		protected virtual void WriteHeader(string name, DateTime lastModificationTime, long count, int userId, int groupId, int mode, EntryType entryType)
 		{
 			var header = new TarHeader
-						 {
-							 FileName = name,
-							 LastModification = lastModificationTime,
-							 SizeInBytes = count,
-							 UserId = userId,
-							 GroupId = groupId,
-							 Mode = mode,
-							 EntryType = entryType
-						 };
+			{
+				FileName = name,
+				LastModification = lastModificationTime,
+				SizeInBytes = count,
+				UserId = userId,
+				GroupId = groupId,
+				Mode = mode,
+				EntryType = entryType
+			};
 			OutStream.Write(header.GetHeaderValue(), 0, header.HeaderSize);
 		}
 
-
-		public void AlignTo512(long size,bool acceptZero)
+		public void AlignTo512(long size, bool acceptZero)
 		{
-			size = size%512;
+			size = size % 512;
 			if (size == 0 && !acceptZero) return;
 			while (size < 512)
 			{
@@ -186,8 +185,8 @@ namespace Unclassified.LogSubmit.Tar
 		public virtual void Close()
 		{
 			if (isClosed) return;
-			AlignTo512(0,true);
-			AlignTo512(0,true);
+			AlignTo512(0, true);
+			AlignTo512(0, true);
 			isClosed = true;
 		}
 	}

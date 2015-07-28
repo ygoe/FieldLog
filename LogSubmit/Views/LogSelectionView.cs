@@ -194,11 +194,11 @@ namespace Unclassified.LogSubmit.Views
 			{
 				SharedData.Instance.LogBasePaths = LogDirsListView.SelectedItems
 					.OfType<ListViewItem>()
-					.Select(lvi => ((LogBasePathInfo) lvi.Tag).LogBasePath)
+					.Select(lvi => ((LogBasePathInfo)lvi.Tag).LogBasePath)
 					.ToArray();
 				SharedData.Instance.LastLogUpdateTime = LogDirsListView.SelectedItems
 					.OfType<ListViewItem>()
-					.Select(lvi => ((LogBasePathInfo) lvi.Tag).UpdatedTime)
+					.Select(lvi => ((LogBasePathInfo)lvi.Tag).UpdatedTime)
 					.Max();
 			}
 		}
@@ -414,7 +414,8 @@ namespace Unclassified.LogSubmit.Views
 			DirectoryInfo di = new DirectoryInfo(path);
 			if (level >= 1 &&
 				(di.Attributes & FileAttributes.Hidden) != 0 &&
-				(di.Attributes & FileAttributes.System) != 0) return true;
+				(di.Attributes & FileAttributes.System) != 0)
+				return true;
 
 			foreach (string dir in ignoredDirectories)
 			{

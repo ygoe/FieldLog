@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using Unclassified.Util;
 
@@ -21,9 +20,9 @@ namespace Unclassified.LogSubmit.Transports
 
 		private void OnCopyProgress(object sender, CopyExEventArgs args)
 		{
-			if ((int) args.Progress > progress)
+			if ((int)args.Progress > progress)
 			{
-				progress = (int) args.Progress;
+				progress = (int)args.Progress;
 				ReportProgress(progress);
 			}
 

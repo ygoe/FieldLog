@@ -17,7 +17,7 @@ namespace Unclassified.Util
 	/// // Variable to keep track of the instance. This is not required for normal operation.
 	/// private DelayedCall dc = null;
 	///
-	/// private void button1_Click(object sender, EventArgs e)
+	/// private void button1_Click(object sender, EventArgs args)
 	/// {
 	///     // Change button text in 2 seconds
 	///     dc = DelayedCall<string>.Start(SetButtonText, "I was clicked", 2000);
@@ -28,7 +28,7 @@ namespace Unclassified.Util
 	///     button1.Text = newText;
 	/// }
 	///
-	/// private void HurryUpButton_Click(object sender, EventArgs e)
+	/// private void HurryUpButton_Click(object sender, EventArgs args)
 	/// {
 	///     // Invoke SetButtonText now, if the timeout isn't elapsed yet
 	///     if (dc != null) dc.Fire();
@@ -81,7 +81,7 @@ namespace Unclassified.Util
 		/// Synchronisation context to invoke the callback method in.
 		/// </summary>
 		protected SynchronizationContext context;
-		
+
 		// More information on the SynchronizationContext thing: http://www.codeproject.com/cs/threads/SyncContextTutorial.asp
 
 		/// <summary>
@@ -505,7 +505,7 @@ namespace Unclassified.Util
 			{
 				lock (timerLock)
 				{
-					return (int) timer.Interval;
+					return (int)timer.Interval;
 				}
 			}
 			set

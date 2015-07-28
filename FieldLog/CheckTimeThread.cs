@@ -62,9 +62,9 @@ namespace Unclassified.FieldLog
 		private static void ThreadProc()
 		{
 #if NET20
-			localOffset = (int) TimeZone.CurrentTimeZone.GetUtcOffset(DateTime.UtcNow).TotalMinutes;
+			localOffset = (int)TimeZone.CurrentTimeZone.GetUtcOffset(DateTime.UtcNow).TotalMinutes;
 #else
-			localOffset = (int) TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).TotalMinutes;
+			localOffset = (int)TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).TotalMinutes;
 #endif
 			// Only check for offset changes every new minute (plus 1 second safety margin) to save
 			// resources for clearing the TimeZoneInfo cache
@@ -104,10 +104,10 @@ namespace Unclassified.FieldLog
 				{
 					// Clear the cache to get the real current setting
 #if NET20
-					int newLocalOffset = (int) TimeZone.CurrentTimeZone.GetUtcOffset(DateTime.UtcNow).TotalMinutes;
+					int newLocalOffset = (int)TimeZone.CurrentTimeZone.GetUtcOffset(DateTime.UtcNow).TotalMinutes;
 #else
 					TimeZoneInfo.ClearCachedData();
-					int newLocalOffset = (int) TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).TotalMinutes;
+					int newLocalOffset = (int)TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).TotalMinutes;
 #endif
 					if (newLocalOffset != localOffset)
 					{

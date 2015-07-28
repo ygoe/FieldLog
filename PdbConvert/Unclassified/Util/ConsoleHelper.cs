@@ -2,8 +2,8 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Threading;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace Unclassified.Util
 {
@@ -303,7 +303,10 @@ namespace Unclassified.Util
 		/// </remarks>
 		public static string ProgressTitle
 		{
-			get { return progressTitle; }
+			get
+			{
+				return progressTitle;
+			}
 			set
 			{
 				if (value != progressTitle)
@@ -323,7 +326,10 @@ namespace Unclassified.Util
 		/// </remarks>
 		public static int ProgressValue
 		{
-			get { return progressValue; }
+			get
+			{
+				return progressValue;
+			}
 			set
 			{
 				if (value != progressValue)
@@ -344,7 +350,10 @@ namespace Unclassified.Util
 		/// </remarks>
 		public static int ProgressTotal
 		{
-			get { return progressTotal; }
+			get
+			{
+				return progressTotal;
+			}
 			set
 			{
 				if (value != progressTotal)
@@ -371,7 +380,10 @@ namespace Unclassified.Util
 		/// </remarks>
 		public static bool ProgressHasWarning
 		{
-			get { return progressHasWarning; }
+			get
+			{
+				return progressHasWarning;
+			}
 			set
 			{
 				if (value != progressHasWarning)
@@ -391,7 +403,10 @@ namespace Unclassified.Util
 		/// </remarks>
 		public static bool ProgressHasError
 		{
-			get { return progressHasError; }
+			get
+			{
+				return progressHasError;
+			}
 			set
 			{
 				if (value != progressHasError)
@@ -424,7 +439,7 @@ namespace Unclassified.Util
 				{
 					graphLength = Console.WindowWidth - Console.CursorLeft - 4;
 				}
-				int graphPart = progressTotal > 0 ? (int) Math.Round((double) value / progressTotal * graphLength) : 0;
+				int graphPart = progressTotal > 0 ? (int)Math.Round((double)value / progressTotal * graphLength) : 0;
 
 				ConsoleColor graphColor;
 				if (progressHasError)
@@ -588,7 +603,7 @@ namespace Unclassified.Util
 				182,   // Application 1
 				183    // Application 2
 			};
-			return !ignore.Contains((int) key);
+			return !ignore.Contains((int)key);
 		}
 
 		/// <summary>

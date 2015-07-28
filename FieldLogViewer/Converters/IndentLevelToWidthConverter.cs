@@ -13,8 +13,8 @@ namespace Unclassified.FieldLogViewer.Converters
 				values[0] is int &&
 				values[1] is int)
 			{
-				int level = (int) values[0];
-				int indentSize = (int) values[1];
+				int level = (int)values[0];
+				int indentSize = (int)values[1];
 
 				return new Thickness(level * indentSize, 0, 0, 0);
 			}

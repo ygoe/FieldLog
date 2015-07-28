@@ -17,7 +17,7 @@ namespace PdbConvert.Symbols
 
 	public enum HResult
 	{
-		E_FAIL = unchecked((int) 0x80004005),
-		E_PDB_NOT_FOUND = unchecked((int) 0x806D0005),
+		E_FAIL = unchecked((int)0x80004005),
+		E_PDB_NOT_FOUND = unchecked((int)0x806D0005),
 	}
 }

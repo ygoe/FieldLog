@@ -48,7 +48,7 @@ namespace Unclassified.LogSubmit.Views
 
 		#region Event handlers
 
-		private void TimeSelectionView_SizeChanged(object sender, EventArgs e)
+		private void TimeSelectionView_SizeChanged(object sender, EventArgs args)
 		{
 			SetTimeSpanLabelMargin();
 		}
@@ -57,7 +57,7 @@ namespace Unclassified.LogSubmit.Views
 
 		#region Control event handlers
 
-		private void TimeTrackBar_ValueChanged(object sender, EventArgs e)
+		private void TimeTrackBar_ValueChanged(object sender, EventArgs args)
 		{
 			TimeEntry te = timeEntries[(timeEntries.Count - 1) - TimeTrackBar.Value];
 			SharedData.Instance.LogTimeSpan = te.TimeSpan;
@@ -68,9 +68,9 @@ namespace Unclassified.LogSubmit.Views
 			UpdateTimeLabels();
 		}
 
-		private void WebLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+		private void WebLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs args)
 		{
-			Process.Start("http://unclassified.software/source/fieldlog");
+			Process.Start("http://unclassified.software/fieldlog?ref=inapp-logsubmit");
 		}
 
 		#endregion Control event handlers

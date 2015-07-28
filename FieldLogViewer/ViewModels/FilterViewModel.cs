@@ -52,7 +52,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		private bool isLoading;
 		private bool isReordering;
 
-		private void ConditionGroups_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		private void ConditionGroups_CollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
 		{
 			if (ConditionGroups.Count > 0)
 			{
@@ -137,7 +137,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public ObservableCollection<FilterConditionGroupViewModel> ConditionGroups
 		{
-			get { return GetValue<ObservableCollection<FilterConditionGroupViewModel>>("ConditionGroups"); }
+			get
+			{
+				return GetValue<ObservableCollection<FilterConditionGroupViewModel>>("ConditionGroups");
+			}
 			private set
 			{
 				if (SetValue(value, "ConditionGroups"))

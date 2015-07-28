@@ -103,7 +103,10 @@ namespace Unclassified.UI
 		private bool scrollToPixel = true;
 		public bool ScrollToPixel
 		{
-			get { return scrollToPixel; }
+			get
+			{
+				return scrollToPixel;
+			}
 			set
 			{
 				if (value != scrollToPixel)
@@ -149,7 +152,7 @@ namespace Unclassified.UI
 		/// </summary>
 		private void UpdateViewportParameters()
 		{
-			itemsPerPage = (int) Math.Floor(ViewportHeight / ItemHeight);
+			itemsPerPage = (int)Math.Floor(ViewportHeight / ItemHeight);
 		}
 
 		private int GetItemsCount()
@@ -164,7 +167,7 @@ namespace Unclassified.UI
 		/// <returns></returns>
 		private int GetFirstVisibleIndex()
 		{
-			return (int) Math.Floor(offset.Y / ItemHeight);
+			return (int)Math.Floor(offset.Y / ItemHeight);
 		}
 
 		/// <summary>
@@ -173,7 +176,7 @@ namespace Unclassified.UI
 		/// <returns></returns>
 		private int GetLastVisibleIndex()
 		{
-			return Math.Min((int) Math.Ceiling((offset.Y + viewport.Height) / ItemHeight) - 1, GetItemsCount() - 1);
+			return Math.Min((int)Math.Ceiling((offset.Y + viewport.Height) / ItemHeight) - 1, GetItemsCount() - 1);
 		}
 
 		/// <summary>

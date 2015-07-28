@@ -12,7 +12,7 @@ namespace PdbConvert.Symbols
 		public SymbolBinder()
 		{
 			Guid CLSID_CorSymBinder = new Guid("0A29FF9E-7F9C-4437-8B11-F424491E3931");
-			unmanagedBinder = (ISymUnmanagedBinder3) Activator.CreateInstance(Type.GetTypeFromCLSID(CLSID_CorSymBinder));
+			unmanagedBinder = (ISymUnmanagedBinder3)Activator.CreateInstance(Type.GetTypeFromCLSID(CLSID_CorSymBinder));
 		}
 
 		public ISymbolReader GetReader(IntPtr importer, string filename, string searchPath)
@@ -56,7 +56,7 @@ namespace PdbConvert.Symbols
 			try
 			{
 				uImporter = Marshal.GetIUnknownForObject(importer);
-				int hr = ((ISymUnmanagedBinder2) unmanagedBinder).GetReaderForFile2(uImporter, fileName, searchPath, (int) searchPolicy, out symReader);
+				int hr = ((ISymUnmanagedBinder2)unmanagedBinder).GetReaderForFile2(uImporter, fileName, searchPath, (int)searchPolicy, out symReader);
 				if (IsFailingResultNormal(hr))
 				{
 					return null;
@@ -78,7 +78,7 @@ namespace PdbConvert.Symbols
 			try
 			{
 				uImporter = Marshal.GetIUnknownForObject(importer);
-				int hr = ((ISymUnmanagedBinder3) unmanagedBinder).GetReaderFromCallback(uImporter, fileName, searchPath, (int) searchPolicy, callback, out reader);
+				int hr = ((ISymUnmanagedBinder3)unmanagedBinder).GetReaderFromCallback(uImporter, fileName, searchPath, (int)searchPolicy, callback, out reader);
 				if (IsFailingResultNormal(hr))
 				{
 					return null;
@@ -100,7 +100,7 @@ namespace PdbConvert.Symbols
 			try
 			{
 				uImporter = Marshal.GetIUnknownForObject(importer);
-				int hr = ((ISymUnmanagedBinder2) unmanagedBinder).GetReaderFromStream(uImporter, stream, out reader);
+				int hr = ((ISymUnmanagedBinder2)unmanagedBinder).GetReaderFromStream(uImporter, stream, out reader);
 				if (IsFailingResultNormal(hr))
 				{
 					return null;
@@ -118,7 +118,7 @@ namespace PdbConvert.Symbols
 		private static bool IsFailingResultNormal(int hr)
 		{
 			// If a pdb is not found, that's a pretty common thing.
-			if (hr == (int) HResult.E_PDB_NOT_FOUND)
+			if (hr == (int)HResult.E_PDB_NOT_FOUND)
 			{
 				return true;
 			}

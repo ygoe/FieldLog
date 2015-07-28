@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 
 namespace Unclassified.Util
 {
@@ -98,7 +97,7 @@ namespace Unclassified.Util
 			message.recips = GetRecipients(out message.recipCount);
 			message.files = GetAttachments(out message.fileCount);
 
-			lastError = (MessageApiError) MAPISendMail(IntPtr.Zero, IntPtr.Zero, message, flags, 0);
+			lastError = (MessageApiError)MAPISendMail(IntPtr.Zero, IntPtr.Zero, message, flags, 0);
 			Cleanup(message);
 			return lastError == MessageApiError.Success;
 		}

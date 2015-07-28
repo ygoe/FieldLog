@@ -57,7 +57,7 @@ namespace Unclassified.Util
 		/// <returns></returns>
 		public static Color MakeTransparent(this Color color, float opacity = 0.5f)
 		{
-			return Color.FromArgb((byte) (color.A * opacity), color.R, color.G, color.B);
+			return Color.FromArgb((byte)(color.A * opacity), color.R, color.G, color.B);
 		}
 
 		/// <summary>
@@ -68,7 +68,7 @@ namespace Unclassified.Util
 		/// <returns></returns>
 		public static SolidColorBrush MakeTransparent(this SolidColorBrush brush, float opacity = 0.5f)
 		{
-			return new SolidColorBrush(Color.FromArgb((byte) (brush.Color.A * opacity), brush.Color.R, brush.Color.G, brush.Color.B));
+			return new SolidColorBrush(Color.FromArgb((byte)(brush.Color.A * opacity), brush.Color.R, brush.Color.G, brush.Color.B));
 		}
 
 		#endregion Colour blending
@@ -82,7 +82,7 @@ namespace Unclassified.Util
 		/// <returns>The grey colour value.</returns>
 		public static Color ToGray(this Color color)
 		{
-			byte grey = (byte) (color.R * 0.3 + color.G * 0.59 + color.B * 0.11);
+			byte grey = (byte)(color.R * 0.3 + color.G * 0.59 + color.B * 0.11);
 			return Color.FromArgb(color.A, grey, grey, grey);
 		}
 

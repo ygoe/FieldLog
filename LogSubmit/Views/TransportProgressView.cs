@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Unclassified.TxLib;
@@ -75,7 +74,7 @@ namespace Unclassified.LogSubmit.Views
 					double totalSeconds = elapsedSeconds * 1000 / args.ProgressPercentage;
 					if (totalSeconds >= 0 && totalSeconds < int.MaxValue)
 					{
-						TimeSpan remainingTime = TimeSpan.FromSeconds((int) Math.Ceiling(totalSeconds - elapsedSeconds));
+						TimeSpan remainingTime = TimeSpan.FromSeconds((int)Math.Ceiling(totalSeconds - elapsedSeconds));
 						RemainingTimeLabel.Text = Tx.TimeSpanRaw(remainingTime, false);
 					}
 				}

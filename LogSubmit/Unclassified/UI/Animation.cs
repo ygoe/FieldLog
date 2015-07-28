@@ -46,17 +46,17 @@ namespace Unclassified.UI
 	/// <seealso cref="http://unclassified.software/source/animation"/>
 	public class Animation
 	{
-		AnimationTypes type;
-		object target;
-		int offset;
-		AnimationFinishedHandler handler;
-		int start;
-		int end;
-		int interval;
-		int duration;
-		int timePassed;
-		bool cancellationPending = false;
-		AnimationCallback callback;
+		private AnimationTypes type;
+		private object target;
+		private int offset;
+		private AnimationFinishedHandler handler;
+		private int start;
+		private int end;
+		private int interval;
+		private int duration;
+		private int timePassed;
+		private bool cancellationPending = false;
+		private AnimationCallback callback;
 
 		public Animation(AnimationTypes type, object target, int offset, AnimationFinishedHandler handler)
 			: this(type, target, offset, handler, 0, null, 0)
@@ -101,14 +101,14 @@ namespace Unclassified.UI
 				case AnimationTypes.FadeIn:
 					f = target as Form;
 					if (f == null) return;
-					start = (int) (f.Opacity * 100);
+					start = (int)(f.Opacity * 100);
 					end = start + offset;
 					if (this.duration == 0) this.duration = 250;
 					break;
 				case AnimationTypes.FadeOut:
 					f = target as Form;
 					if (f == null) return;
-					start = (int) (f.Opacity * 100);
+					start = (int)(f.Opacity * 100);
 					end = start + offset;
 					if (this.duration == 0) this.duration = 2000;
 					break;
@@ -133,7 +133,7 @@ namespace Unclassified.UI
 
 		private double MakeCurve()
 		{
-			double timePercent = (double) timePassed / (double) duration;
+			double timePercent = (double)timePassed / (double)duration;
 
 			// we use the sine function from 3pi/2 to 5pi/2
 			// scale down linear time percentage from 0...1 to 3pi/2 to 5pi/2
@@ -166,7 +166,7 @@ namespace Unclassified.UI
 				{
 					case AnimationTypes.ResizeVert:
 						c = target as Control;
-						c.Height = start + (int) ((end - start) * MakeCurve());
+						c.Height = start + (int)((end - start) * MakeCurve());
 						wa = Screen.FromControl(c).WorkingArea;
 						if (c is Form && c.Bottom > wa.Bottom)
 						{
@@ -179,7 +179,7 @@ namespace Unclassified.UI
 						break;
 					case AnimationTypes.ResizeHoriz:
 						c = target as Control;
-						c.Width = start + (int) ((end - start) * MakeCurve());
+						c.Width = start + (int)((end - start) * MakeCurve());
 						wa = Screen.FromControl(c).WorkingArea;
 						if (c is Form && c.Right > wa.Right)
 						{
@@ -192,14 +192,14 @@ namespace Unclassified.UI
 						break;
 					case AnimationTypes.FadeIn:
 						f = target as Form;
-						f.Opacity = (double) (start + ((end - start) * MakeCurve())) / 100;
+						f.Opacity = (double)(start + ((end - start) * MakeCurve())) / 100;
 						break;
 					case AnimationTypes.FadeOut:
 						f = target as Form;
-						f.Opacity = (double) (start + ((end - start) * MakeCurve())) / 100;
+						f.Opacity = (double)(start + ((end - start) * MakeCurve())) / 100;
 						break;
 					case AnimationTypes.Callback:
-						callback(target, start + (int) ((end - start) * MakeCurve()));
+						callback(target, start + (int)((end - start) * MakeCurve()));
 						break;
 				}
 

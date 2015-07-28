@@ -76,7 +76,7 @@ namespace Unclassified.FieldLogViewer.SourceInfo
 			{
 				throw new NotSupportedException("The obfuscation map file is not supported. Unload all other map files and try again.");
 			}
-			
+
 			if (!fileNames.Contains(fileName, StringComparer.OrdinalIgnoreCase))
 			{
 				fileNames.Add(fileName);

@@ -40,7 +40,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 					case FieldLogScopeType.LogShutdown: return "Log shutdown";
 					case FieldLogScopeType.WebRequestStart: return "Web request start";
 					case FieldLogScopeType.WebRequestEnd: return "Web request end";
-					default: return "Unknown (" + (int) this.Type + ")";
+					default: return "Unknown (" + (int)this.Type + ")";
 				}
 			}
 		}
@@ -181,7 +181,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		{
 			if (Type == FieldLogScopeType.LogStart)
 			{
-				utcOffset = (int) Item.EnvironmentData.LocalTimeZoneOffset.TotalMinutes;
+				utcOffset = (int)Item.EnvironmentData.LocalTimeZoneOffset.TotalMinutes;
 				return true;
 			}
 			utcOffset = 0;

@@ -163,7 +163,7 @@ namespace Unclassified.Util
 		{
 			lastRequestedUri = uri;
 
-			HttpWebRequest request = (HttpWebRequest) HttpWebRequest.Create(uri);
+			HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uri);
 			if (backgroundWorker != null)
 			{
 				request.AllowWriteStreamBuffering = false;
@@ -195,7 +195,7 @@ namespace Unclassified.Util
 									return;
 								}
 								requestStream.Write(buffer, 0, bytesRead);
-								int permille = (int) (postStream.Position * 1000 / postStream.Length);
+								int permille = (int)(postStream.Position * 1000 / postStream.Length);
 								backgroundWorker.ReportProgress(permille);
 							}
 						}
@@ -226,15 +226,15 @@ namespace Unclassified.Util
 			HttpWebResponse response;
 			try
 			{
-				response = (HttpWebResponse) request.GetResponse();
+				response = (HttpWebResponse)request.GetResponse();
 			}
 			catch (WebException ex)
 			{
-				response = (HttpWebResponse) ex.Response;
+				response = (HttpWebResponse)ex.Response;
 			}
 			try
 			{
-				lastHttpStatusCode = (int) response.StatusCode;
+				lastHttpStatusCode = (int)response.StatusCode;
 				lastRedirectUrlString = null;
 				lastResponseData = null;
 

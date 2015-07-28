@@ -77,9 +77,9 @@ namespace Unclassified.LogSubmit.Transports
 				{
 					// From BitConverter.ToString and private GetHexValue
 					int i = b / 16;
-					formatted.Append((char) (i < 10 ? i + 48 : i - 10 + 97));
+					formatted.Append((char)(i < 10 ? i + 48 : i - 10 + 97));
 					i = b % 16;
-					formatted.Append((char) (i < 10 ? i + 48 : i - 10 + 97));
+					formatted.Append((char)(i < 10 ? i + 48 : i - 10 + 97));
 				}
 				return formatted.ToString();
 			}

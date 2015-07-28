@@ -35,7 +35,6 @@ namespace PdbConvert.Symbols
 			internal static extern object CLRCreateInstance(
 				[MarshalAs(UnmanagedType.LPStruct)] Guid clsid,
 				[MarshalAs(UnmanagedType.LPStruct)] Guid riid);
-
 		}
 
 		// If you want a SymbolReader for a given exe, just use this function.
@@ -61,7 +60,7 @@ namespace PdbConvert.Symbols
 			//NativeMethods.CoCreateInstance(ref dispenserClassID, null, 1, ref dispenserIID, out objDispenser);
 			// NEW:
 			// Source: https://social.msdn.microsoft.com/Forums/en-US/3a0a48bf-a308-45c7-8dcc-f85eaf1d32e5
-			ICLRMetaHostPrivate metaHost = (ICLRMetaHostPrivate) NativeMethods.CLRCreateInstance(metaHostClassID, metaHostIID);
+			ICLRMetaHostPrivate metaHost = (ICLRMetaHostPrivate)NativeMethods.CLRCreateInstance(metaHostClassID, metaHostIID);
 			object objRuntime;
 			metaHost.GetRuntime("v4.0.30319", ref runtimeInfoIID, out objRuntime);
 			IICLRRuntimeInfoPrivate runtime = (IICLRRuntimeInfoPrivate)objRuntime;

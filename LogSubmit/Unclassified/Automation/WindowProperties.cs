@@ -21,7 +21,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 using System;
-using System.Text.RegularExpressions;
 
 namespace Unclassified.Automation
 {
@@ -55,7 +54,7 @@ namespace Unclassified.Automation
 				className = value;
 			}
 		}
-		
+
 		public int ProcessId
 		{
 			get

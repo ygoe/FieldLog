@@ -266,7 +266,7 @@ namespace Unclassified.Util
 			if (list.Count == 0)
 			{
 				// Easy...
-				list.Add((T) newItem);
+				list.Add((T)newItem);
 				return list.Count - 1;
 			}
 
@@ -311,7 +311,7 @@ namespace Unclassified.Util
 				index++;
 			}
 
-			list.Insert(index, (T) newItem);
+			list.Insert(index, (T)newItem);
 			return index;
 		}
 

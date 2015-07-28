@@ -9,13 +9,13 @@ using Unclassified.FieldLog;
 
 namespace LogBenchmark
 {
-	class Program
+	internal class Program
 	{
 		/// <summary>
 		/// Application entry point.
 		/// </summary>
 		/// <param name="args">Command line arguments</param>
-		static void Main(string[] args)
+		private static void Main(string[] args)
 		{
 			new Program().Run();
 		}
@@ -24,37 +24,37 @@ namespace LogBenchmark
 		/// Indicates whether the test progress in % is displayed. Takes a considerable amount of
 		/// time and doesn't seem to be too deterministic so it influences the test results.
 		/// </summary>
-		bool showProgress = false;
+		private bool showProgress = false;
 		/// <summary>
 		/// Indicates whether the user must confirm to continue after each test. Doesn't seem to
 		/// make any difference on the test results.
 		/// </summary>
-		bool waitBetweenTests = false;
+		private bool waitBetweenTests = false;
 		/// <summary>
 		/// The type of messages to write.
 		/// 0: Dynamically concatenated strings.
 		/// 1: Prepared concatenated strings.
 		/// 2: Constant strings.
 		/// </summary>
-		int messageType = 1;
+		private int messageType = 1;
 		/// <summary>
 		/// Indicates whether the fieldLog benchmark writes text messages or scopes.
 		/// </summary>
-		bool flScope = false;
+		private bool flScope = false;
 		/// <summary>
 		/// Indicates whether FL.NewScope should determine the current method name through reflection.
 		/// </summary>
-		bool flScopeReflection = false;
+		private bool flScopeReflection = false;
 		/// <summary>
 		/// The iteration time for the empty loop for reference. Intended to compensate the progress
 		/// display, otherwise not necessary.
 		/// </summary>
-		long emptyLoopTime;
+		private long emptyLoopTime;
 
 		/// <summary>
 		/// Runs the tests.
 		/// </summary>
-		void Run()
+		private void Run()
 		{
 			Console.WriteLine("Log benchmark");
 			Console.WriteLine();
@@ -70,7 +70,7 @@ namespace LogBenchmark
 					File.Delete(file);
 				}
 			}
-			
+
 			FL.AcceptLogFileBasePath();
 
 			// Wait a bit for the system to calm down from starting this program
@@ -112,7 +112,7 @@ namespace LogBenchmark
 			Console.ReadLine();
 		}
 
-		void PressEnterToContinue()
+		private void PressEnterToContinue()
 		{
 			if (waitBetweenTests)
 			{
@@ -127,7 +127,7 @@ namespace LogBenchmark
 			System.Threading.Thread.Sleep(1000);
 		}
 
-		void RunEmptyLoop(long iterations)
+		private void RunEmptyLoop(long iterations)
 		{
 			Stopwatch stopwatch = new Stopwatch();
 
@@ -157,7 +157,7 @@ namespace LogBenchmark
 
 			stopwatch.Stop();
 
-			long nanoseconds = (long) Math.Round((decimal) stopwatch.ElapsedTicks / Stopwatch.Frequency * 1000000000 / iterations);
+			long nanoseconds = (long)Math.Round((decimal)stopwatch.ElapsedTicks / Stopwatch.Frequency * 1000000000 / iterations);
 			Console.WriteLine("  " + nanoseconds.ToString().PadLeft(8) + " ns/call");
 
 			emptyLoopTime = nanoseconds;
@@ -167,7 +167,7 @@ namespace LogBenchmark
 			GC.Collect();
 		}
 
-		void RunLock(long iterations)
+		private void RunLock(long iterations)
 		{
 			Stopwatch stopwatch = new Stopwatch();
 			object syncLock = new object();
@@ -201,7 +201,7 @@ namespace LogBenchmark
 
 			stopwatch.Stop();
 
-			long nanoseconds = (long) Math.Round((decimal) stopwatch.ElapsedTicks / Stopwatch.Frequency * 1000000000 / iterations);
+			long nanoseconds = (long)Math.Round((decimal)stopwatch.ElapsedTicks / Stopwatch.Frequency * 1000000000 / iterations);
 			nanoseconds -= emptyLoopTime;
 			Console.WriteLine("  " + nanoseconds.ToString().PadLeft(8) + " ns/call");
 			Console.WriteLine();
@@ -209,7 +209,7 @@ namespace LogBenchmark
 			GC.Collect();
 		}
 
-		void RunFieldLogText(long iterations)
+		private void RunFieldLogText(long iterations)
 		{
 			Stopwatch stopwatch = new Stopwatch();
 
@@ -260,7 +260,7 @@ namespace LogBenchmark
 
 			stopwatch.Stop();
 
-			long nanoseconds = (long) Math.Round((decimal) stopwatch.ElapsedTicks / Stopwatch.Frequency * 1000000000 / iterations);
+			long nanoseconds = (long)Math.Round((decimal)stopwatch.ElapsedTicks / Stopwatch.Frequency * 1000000000 / iterations);
 			nanoseconds -= emptyLoopTime;
 			Console.WriteLine("  " + nanoseconds.ToString().PadLeft(8) + " ns/call");
 
@@ -276,7 +276,7 @@ namespace LogBenchmark
 			GC.Collect();
 		}
 
-		void RunFieldLogScope(long iterations)
+		private void RunFieldLogScope(long iterations)
 		{
 			Stopwatch stopwatch = new Stopwatch();
 
@@ -320,7 +320,7 @@ namespace LogBenchmark
 
 			stopwatch.Stop();
 
-			long nanoseconds = (long) Math.Round((decimal) stopwatch.ElapsedTicks / Stopwatch.Frequency * 1000000000 / iterations);
+			long nanoseconds = (long)Math.Round((decimal)stopwatch.ElapsedTicks / Stopwatch.Frequency * 1000000000 / iterations);
 			nanoseconds -= emptyLoopTime;
 			Console.WriteLine("  " + nanoseconds.ToString().PadLeft(8) + " ns/call");
 
@@ -336,7 +336,7 @@ namespace LogBenchmark
 			GC.Collect();
 		}
 
-		void RunDebugOutputString(long iterations)
+		private void RunDebugOutputString(long iterations)
 		{
 			Stopwatch stopwatch = new Stopwatch();
 
@@ -384,7 +384,7 @@ namespace LogBenchmark
 
 			stopwatch.Stop();
 
-			long nanoseconds = (long) Math.Round((decimal) stopwatch.ElapsedTicks / Stopwatch.Frequency * 1000000000 / iterations);
+			long nanoseconds = (long)Math.Round((decimal)stopwatch.ElapsedTicks / Stopwatch.Frequency * 1000000000 / iterations);
 			nanoseconds -= emptyLoopTime;
 			Console.WriteLine("  " + nanoseconds.ToString().PadLeft(8) + " ns/call");
 			Console.WriteLine();
@@ -392,7 +392,7 @@ namespace LogBenchmark
 			GC.Collect();
 		}
 
-		void RunFileAppend(long iterations)
+		private void RunFileAppend(long iterations)
 		{
 			Stopwatch stopwatch = new Stopwatch();
 			object syncLock = new object();
@@ -458,7 +458,7 @@ namespace LogBenchmark
 			writer.Close();
 			closeStopwatch.Stop();
 
-			long nanoseconds = (long) Math.Round((decimal) stopwatch.ElapsedTicks / Stopwatch.Frequency * 1000000000 / iterations);
+			long nanoseconds = (long)Math.Round((decimal)stopwatch.ElapsedTicks / Stopwatch.Frequency * 1000000000 / iterations);
 			nanoseconds -= emptyLoopTime;
 			Console.WriteLine("  " + nanoseconds.ToString().PadLeft(8) + " ns/call");
 
@@ -468,7 +468,7 @@ namespace LogBenchmark
 			GC.Collect();
 		}
 
-		void RunFileOpenAppend(long iterations)
+		private void RunFileOpenAppend(long iterations)
 		{
 			Stopwatch stopwatch = new Stopwatch();
 			object syncLock = new object();
@@ -530,7 +530,7 @@ namespace LogBenchmark
 
 			stopwatch.Stop();
 
-			long nanoseconds = (long) Math.Round((decimal) stopwatch.ElapsedTicks / Stopwatch.Frequency * 1000000000 / iterations);
+			long nanoseconds = (long)Math.Round((decimal)stopwatch.ElapsedTicks / Stopwatch.Frequency * 1000000000 / iterations);
 			nanoseconds -= emptyLoopTime;
 			Console.WriteLine("  " + nanoseconds.ToString().PadLeft(8) + " ns/call");
 			Console.WriteLine();

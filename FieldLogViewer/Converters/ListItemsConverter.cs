@@ -12,9 +12,9 @@ namespace Unclassified.FieldLogViewer.Converters
 
 		public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
 		{
-			IList selectedItems = (IList) values[0];
-			int selectedCount = (int) values[1];
-			int itemsCount = (int) values[2];
+			IList selectedItems = (IList)values[0];
+			int selectedCount = (int)values[1];
+			int itemsCount = (int)values[2];
 
 			if (itemsCount == 0)
 			{
@@ -22,9 +22,9 @@ namespace Unclassified.FieldLogViewer.Converters
 					"Nothing available",
 					"Currently no log items are available. Either load a log file, wait for new log items to be written or adjust your filter to see existing log items."
 					/*, "ArrowUp"*/)
-					{
-						ShowAutoLoadCheckBox = MainViewModel.Instance != null && MainViewModel.Instance.LoadedBasePath == null
-					};
+				{
+					ShowAutoLoadCheckBox = MainViewModel.Instance != null && MainViewModel.Instance.LoadedBasePath == null
+				};
 			}
 
 			if (selectedItems.Count == 0)

@@ -51,11 +51,11 @@ namespace Unclassified.LogSubmit
 		/// <returns>The result of the comparison. "0" if equal, negative if 'x' is less than 'y' and positive if 'x' is greater than 'y'</returns>
 		public int Compare(object obj1, object obj2)
 		{
-			ListViewItem item1 = (ListViewItem) obj1;
-			ListViewItem item2 = (ListViewItem) obj2;
+			ListViewItem item1 = (ListViewItem)obj1;
+			ListViewItem item2 = (ListViewItem)obj2;
 
-			var info1 = (LogSelectionView.LogBasePathInfo) item1.Tag;
-			var info2 = (LogSelectionView.LogBasePathInfo) item2.Tag;
+			var info1 = (LogSelectionView.LogBasePathInfo)item1.Tag;
+			var info2 = (LogSelectionView.LogBasePathInfo)item2.Tag;
 
 			string textX = item1.SubItems[SortColumn].Text;
 			string textY = item2.SubItems[SortColumn].Text;

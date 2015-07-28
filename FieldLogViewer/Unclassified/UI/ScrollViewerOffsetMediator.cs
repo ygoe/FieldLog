@@ -17,7 +17,7 @@ namespace Unclassified.UI
 		/// </summary>
 		public ScrollViewer ScrollViewer
 		{
-			get { return (ScrollViewer) GetValue(ScrollViewerProperty); }
+			get { return (ScrollViewer)GetValue(ScrollViewerProperty); }
 			set { SetValue(ScrollViewerProperty, value); }
 		}
 
@@ -27,10 +27,10 @@ namespace Unclassified.UI
 			typeof(ScrollViewerOffsetMediator),
 			new PropertyMetadata(OnScrollViewerChanged));
 
-		private static void OnScrollViewerChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+		private static void OnScrollViewerChanged(DependencyObject o, DependencyPropertyChangedEventArgs args)
 		{
-			var mediator = (ScrollViewerOffsetMediator) o;
-			var scrollViewer = (ScrollViewer) e.NewValue;
+			var mediator = (ScrollViewerOffsetMediator)o;
+			var scrollViewer = (ScrollViewer)args.NewValue;
 			if (scrollViewer != null)
 			{
 				scrollViewer.ScrollToVerticalOffset(mediator.VerticalOffset);
@@ -42,7 +42,7 @@ namespace Unclassified.UI
 		/// </summary>
 		public double VerticalOffset
 		{
-			get { return (double) GetValue(VerticalOffsetProperty); }
+			get { return (double)GetValue(VerticalOffsetProperty); }
 			set { SetValue(VerticalOffsetProperty, value); }
 		}
 
@@ -52,12 +52,12 @@ namespace Unclassified.UI
 			typeof(ScrollViewerOffsetMediator),
 			new PropertyMetadata(OnVerticalOffsetChanged));
 
-		public static void OnVerticalOffsetChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+		public static void OnVerticalOffsetChanged(DependencyObject o, DependencyPropertyChangedEventArgs args)
 		{
-			var mediator = (ScrollViewerOffsetMediator) o;
+			var mediator = (ScrollViewerOffsetMediator)o;
 			if (mediator.ScrollViewer != null)
 			{
-				mediator.ScrollViewer.ScrollToVerticalOffset((double) e.NewValue);
+				mediator.ScrollViewer.ScrollToVerticalOffset((double)args.NewValue);
 			}
 		}
 
@@ -69,7 +69,7 @@ namespace Unclassified.UI
 		/// </remarks>
 		public double ScrollableHeightMultiplier
 		{
-			get { return (double) GetValue(ScrollableHeightMultiplierProperty); }
+			get { return (double)GetValue(ScrollableHeightMultiplierProperty); }
 			set { SetValue(ScrollableHeightMultiplierProperty, value); }
 		}
 
@@ -79,13 +79,13 @@ namespace Unclassified.UI
 			typeof(ScrollViewerOffsetMediator),
 			new PropertyMetadata(OnScrollableHeightMultiplierChanged));
 
-		public static void OnScrollableHeightMultiplierChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+		public static void OnScrollableHeightMultiplierChanged(DependencyObject o, DependencyPropertyChangedEventArgs args)
 		{
-			var mediator = (ScrollViewerOffsetMediator) o;
+			var mediator = (ScrollViewerOffsetMediator)o;
 			var scrollViewer = mediator.ScrollViewer;
 			if (scrollViewer != null)
 			{
-				scrollViewer.ScrollToVerticalOffset((double) e.NewValue * scrollViewer.ScrollableHeight);
+				scrollViewer.ScrollToVerticalOffset((double)args.NewValue * scrollViewer.ScrollableHeight);
 			}
 		}
 	}

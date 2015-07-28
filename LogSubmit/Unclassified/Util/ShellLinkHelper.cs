@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
@@ -11,7 +10,7 @@ namespace Unclassified.Util
 	{
 		public static void CreateLink(string linkFileName, string startPath, string arguments)
 		{
-			IShellLink link = (IShellLink) new ShellLink();
+			IShellLink link = (IShellLink)new ShellLink();
 
 			// Setup shortcut information
 			//link.SetDescription("My Description");
@@ -20,7 +19,7 @@ namespace Unclassified.Util
 			link.SetIconLocation(startPath, 0);
 
 			// Save it
-			IPersistFile file = (IPersistFile) link;
+			IPersistFile file = (IPersistFile)link;
 			file.Save(linkFileName, false);
 		}
 

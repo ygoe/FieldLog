@@ -25,7 +25,7 @@ namespace Unclassified.FieldLogViewer.Views
 
 		#endregion Constructors
 
-		private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs args)
 		{
 			var comboBox = sender as ComboBox;
 			if (comboBox == null) return;
@@ -36,7 +36,7 @@ namespace Unclassified.FieldLogViewer.Views
 			textBox.SelectAll();
 		}
 
-		private void Window_Closed(object sender, EventArgs e)
+		private void Window_Closed(object sender, EventArgs args)
 		{
 			MainWindow.Instance.Focus();
 		}

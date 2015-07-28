@@ -73,10 +73,10 @@ namespace Unclassified.FieldLogViewer.Views
 
 		#region Window event handlers
 
-		private void Window_Loaded(object sender, RoutedEventArgs e)
+		private void Window_Loaded(object sender, RoutedEventArgs args)
 		{
 			if (App.Settings.ToolBarInWindowFrame &&
-				WindowManager.ExtendFrameIntoClientArea(this, 0, (int) ToolBar.ActualHeight, 0, 0))
+				WindowManager.ExtendFrameIntoClientArea(this, 0, (int)ToolBar.ActualHeight, 0, 0))
 			{
 				Background = Brushes.Transparent;
 				ToolBar.Background = null;
@@ -86,11 +86,11 @@ namespace Unclassified.FieldLogViewer.Views
 			}
 		}
 
-		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs args)
 		{
 		}
 
-		private void Window_Closed(object sender, EventArgs e)
+		private void Window_Closed(object sender, EventArgs args)
 		{
 			MainViewModel vm = DataContext as MainViewModel;
 			if (vm != null)
@@ -99,7 +99,7 @@ namespace Unclassified.FieldLogViewer.Views
 			}
 		}
 
-		private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+		private void Window_SizeChanged(object sender, SizeChangedEventArgs args)
 		{
 			if (ActualHeight > 0)
 			{
@@ -130,7 +130,7 @@ namespace Unclassified.FieldLogViewer.Views
 			InvalidateScrollmap();
 		}
 
-		private void Window_Activated(object sender, EventArgs e)
+		private void Window_Activated(object sender, EventArgs args)
 		{
 			if (isFlashing)
 			{
@@ -139,19 +139,19 @@ namespace Unclassified.FieldLogViewer.Views
 			}
 		}
 
-		private void Window_Deactivated(object sender, EventArgs e)
+		private void Window_Deactivated(object sender, EventArgs args)
 		{
 		}
 
-		private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+		private void Window_PreviewKeyDown(object sender, KeyEventArgs args)
 		{
 		}
 
-		protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+		protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs args)
 		{
-			base.OnPropertyChanged(e);
+			base.OnPropertyChanged(args);
 
-			if (e.Property == DataContextProperty)
+			if (args.Property == DataContextProperty)
 			{
 				var viewModel = DataContext as MainViewModel;
 				if (viewModel != null)
@@ -177,16 +177,16 @@ namespace Unclassified.FieldLogViewer.Views
 
 		#region Control event handlers
 
-		private void SplitButton_Click(object sender, RoutedEventArgs e)
+		private void SplitButton_Click(object sender, RoutedEventArgs args)
 		{
 			// TODO: Drop-down menu background, padding, and drop shadow
 
-			var splitButton = e.Source as SplitButton;
-			var menuItem = e.OriginalSource as MenuItem;
+			var splitButton = args.Source as SplitButton;
+			var menuItem = args.OriginalSource as MenuItem;
 			if (menuItem != null)
 			{
 				splitButton.IsSubmenuOpen = false;
-				
+
 				MainViewModel vm = DataContext as MainViewModel;
 				if (vm != null)
 				{
@@ -195,7 +195,7 @@ namespace Unclassified.FieldLogViewer.Views
 			}
 		}
 
-		private void SmoothVirtualizingPanel_Loaded(object sender, RoutedEventArgs e)
+		private void SmoothVirtualizingPanel_Loaded(object sender, RoutedEventArgs args)
 		{
 			logItemsHostPanel = sender as SmoothVirtualizingPanel;
 			if (scrollmapUpdatePending)
@@ -205,11 +205,11 @@ namespace Unclassified.FieldLogViewer.Views
 			}
 		}
 
-		private void LogItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		private void LogItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
 		{
-			InvalidateScrollmap(e.Action != NotifyCollectionChangedAction.Add);
+			InvalidateScrollmap(args.Action != NotifyCollectionChangedAction.Add);
 
-			if (e.Action == NotifyCollectionChangedAction.Add)
+			if (args.Action == NotifyCollectionChangedAction.Add)
 			{
 				DateTime now = DateTime.UtcNow;
 
@@ -265,7 +265,7 @@ namespace Unclassified.FieldLogViewer.Views
 						if (!isScrollAnimationPosted)
 						{
 							Dispatcher.BeginInvoke(
-								(Action) delegate
+								(Action)delegate
 								{
 									isScrollAnimationPosted = false;
 									logItemsScrollPixelDc.Reset();
@@ -316,16 +316,16 @@ namespace Unclassified.FieldLogViewer.Views
 			}
 		}
 
-		private void logItemsScroll_ScrollChanged(object sender, ScrollChangedEventArgs e)
+		private void logItemsScroll_ScrollChanged(object sender, ScrollChangedEventArgs args)
 		{
 			bool cond = logItemsScroll.VerticalOffset >= logItemsScroll.ScrollableHeight - 50;
 			// e.VerticalChange can actually be 0, so test for positive and negative values explicitly
-			if (e.VerticalChange > 0)
+			if (args.VerticalChange > 0)
 			{
 				// Scrolled down, can only set flag if in range
 				logItemsScrolledNearEnd |= cond;
 			}
-			else if (e.VerticalChange < 0)
+			else if (args.VerticalChange < 0)
 			{
 				// Scrolled up, can only clear flag if out of range
 				logItemsScrolledNearEnd &= cond;
@@ -342,7 +342,7 @@ namespace Unclassified.FieldLogViewer.Views
 			}
 		}
 
-		private void LogItemsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		private void LogItemsList_SelectionChanged(object sender, SelectionChangedEventArgs args)
 		{
 			MainViewModel.Instance.SelectedItems = LogItemsList.SelectedItems.OfType<LogItemViewModelBase>().ToList();
 			InvalidateScrollmap(false);
@@ -537,15 +537,15 @@ namespace Unclassified.FieldLogViewer.Views
 				logItemsHostPanel.ItemHeight > 0)
 			{
 				bool selectionIsVisible;
-				int topVisibleIndex = (int) (logItemsScroll.VerticalOffset / logItemsHostPanel.ItemHeight);
-				int bottomVisibleIndex = (int) ((logItemsScroll.VerticalOffset + LogItemsList.ActualHeight) / logItemsHostPanel.ItemHeight);
+				int topVisibleIndex = (int)(logItemsScroll.VerticalOffset / logItemsHostPanel.ItemHeight);
+				int bottomVisibleIndex = (int)((logItemsScroll.VerticalOffset + LogItemsList.ActualHeight) / logItemsHostPanel.ItemHeight);
 				if (LogItemsList.SelectedIndex > -1 &&
 					LogItemsList.SelectedIndex >= topVisibleIndex &&
 					LogItemsList.SelectedIndex <= bottomVisibleIndex)
 				{
 					// Selection is visible. Save selection index and offset.
 					savedScrollItem = LogItemsList.SelectedItem;
-					savedScrollOffset = LogItemsList.SelectedIndex * logItemsHostPanel.ItemHeight - (int) logItemsScroll.VerticalOffset;
+					savedScrollOffset = LogItemsList.SelectedIndex * logItemsHostPanel.ItemHeight - (int)logItemsScroll.VerticalOffset;
 					selectionIsVisible = true;
 
 					// Remember selection in case it gets lost in the next filtered view
@@ -555,7 +555,7 @@ namespace Unclassified.FieldLogViewer.Views
 				else
 				{
 					// Selection not visible. Save center visible item index and offset.
-					int centerVisibleIndex = (int) ((logItemsScroll.VerticalOffset + LogItemsList.ActualHeight / 2) / logItemsHostPanel.ItemHeight);
+					int centerVisibleIndex = (int)((logItemsScroll.VerticalOffset + LogItemsList.ActualHeight / 2) / logItemsHostPanel.ItemHeight);
 					if (centerVisibleIndex < 0)
 						centerVisibleIndex = 0;
 					if (centerVisibleIndex >= LogItemsList.Items.Count)
@@ -563,7 +563,7 @@ namespace Unclassified.FieldLogViewer.Views
 					if (centerVisibleIndex != -1)
 					{
 						savedScrollItem = LogItemsList.Items[centerVisibleIndex];
-						savedScrollOffset = centerVisibleIndex * logItemsHostPanel.ItemHeight - (int) logItemsScroll.VerticalOffset;
+						savedScrollOffset = centerVisibleIndex * logItemsHostPanel.ItemHeight - (int)logItemsScroll.VerticalOffset;
 					}
 					else
 					{
@@ -577,7 +577,7 @@ namespace Unclassified.FieldLogViewer.Views
 				// If nothing was selected now:
 				// Compare current scrolling with when it was last restored
 				if (!selectionIsVisible &&
-					(int) logItemsScroll.VerticalOffset != prevOffset)
+					(int)logItemsScroll.VerticalOffset != prevOffset)
 				{
 					// Scroll was changed, forget previous selection
 					prevSelectedItem = null;
@@ -660,7 +660,7 @@ namespace Unclassified.FieldLogViewer.Views
 					// visible again, we can scroll directly to it and select it.
 					// Read from logItemsHostPanel instead of the ScrollViewer logItemsScroll
 					// because we've only just set the value there and need that current value.
-					prevOffset = (int) logItemsHostPanel.VerticalOffset;
+					prevOffset = (int)logItemsHostPanel.VerticalOffset;
 				}
 			}
 		}

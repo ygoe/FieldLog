@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Xml;
-using System.Text.RegularExpressions;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace Unclassified.FieldLogViewer.SourceInfo
 {
@@ -78,7 +77,7 @@ namespace Unclassified.FieldLogViewer.SourceInfo
 			{
 				throw new NotSupportedException("The obfuscation map file is not supported. Unload all other map files and try again.");
 			}
-			
+
 			if (!fileNames.Contains(fileName, StringComparer.OrdinalIgnoreCase))
 			{
 				fileNames.Add(fileName);
@@ -206,7 +205,7 @@ namespace Unclassified.FieldLogViewer.SourceInfo
 				StringBuilder paramsSb = new StringBuilder();
 				SplitAndTranslateParameters(module, parameters, paramsSb);
 				parameters = paramsSb.ToString();
-	
+
 				StringBuilder sigSb = new StringBuilder();
 				sigSb.Append(returnType);
 				sigSb.Append("(");
@@ -276,7 +275,8 @@ namespace Unclassified.FieldLogViewer.SourceInfo
 
 			// Generic arguments remain untranslated
 			if (typeName == "!0" || typeName == "!1" || typeName == "!2" || typeName == "!3" ||
-				typeName == "!!0" || typeName == "!!1" || typeName == "!!2" || typeName == "!!3") return typeName;
+				typeName == "!!0" || typeName == "!!1" || typeName == "!!2" || typeName == "!!3")
+				return typeName;
 
 			// Find the type entry
 			Dictionary<string, string> moduleTypes;

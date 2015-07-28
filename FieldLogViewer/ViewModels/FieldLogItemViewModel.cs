@@ -76,7 +76,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 					case FieldLogPriority.Warning: return "Warning";
 					case FieldLogPriority.Error: return "Error";
 					case FieldLogPriority.Critical: return "Critical";
-					default: return "Unknown (" + (int) this.Priority + ")";
+					default: return "Unknown (" + (int)this.Priority + ")";
 				}
 			}
 		}
@@ -182,7 +182,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public bool IsSelected
 		{
-			get { return GetValue<bool>("IsSelected"); }
+			get
+			{
+				return GetValue<bool>("IsSelected");
+			}
 			set
 			{
 				if (SetValue(value, "IsSelected"))

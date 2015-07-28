@@ -278,9 +278,9 @@ namespace Unclassified.FieldLog
 			env.OSIsFailSafeBoot = OSInfo.IsFailSafeBoot;
 			env.AppCompatLayer = OSInfo.AppCompatLayer;
 			env.ClrType = OSInfo.ClrType;
-			env.MouseButtons = (byte) OSInfo.MouseButtons;
-			env.MaxTouchPoints = (byte) OSInfo.MaxTouchPoints;
-			env.ScreenDpi = (ushort) OSInfo.ScreenDpi;
+			env.MouseButtons = (byte)OSInfo.MouseButtons;
+			env.MaxTouchPoints = (byte)OSInfo.MaxTouchPoints;
+			env.ScreenDpi = (ushort)OSInfo.ScreenDpi;
 
 			env.CultureName = Thread.CurrentThread.CurrentCulture.Name;
 			env.CurrentDirectory = Environment.CurrentDirectory;
@@ -299,7 +299,7 @@ namespace Unclassified.FieldLog
 				envSb.Append("\n");
 			}
 			env.EnvironmentVariables = envSb.ToString().TrimEnd();
-			env.CpuCount = (ushort) Environment.ProcessorCount;
+			env.CpuCount = (ushort)Environment.ProcessorCount;
 			env.HostName = Environment.MachineName;
 			env.UserName = Environment.UserDomainName + "\\" + Environment.UserName;
 			env.IsInteractive = Environment.UserInteractive;
@@ -320,14 +320,14 @@ namespace Unclassified.FieldLog
 			env.AvailableMemory = OSInfo.GetAvailableMemorySize();
 			env.ProcessId = System.Diagnostics.Process.GetCurrentProcess().Id;
 			env.IsAdministrator = OSInfo.IsCurrentUserLocalAdministrator();
-			env.PrimaryScreenWidth = (ushort) System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width;
-			env.PrimaryScreenHeight = (ushort) System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height;
-			env.PrimaryScreenBitsPerPixel = (byte) System.Windows.Forms.Screen.PrimaryScreen.BitsPerPixel;
-			env.PrimaryScreenWorkingAreaLeft = (ushort) System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Left;
-			env.PrimaryScreenWorkingAreaTop = (ushort) System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Top;
-			env.PrimaryScreenWorkingAreaWidth = (ushort) System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Width;
-			env.PrimaryScreenWorkingAreaHeight = (ushort) System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Height;
-			env.ScreenCount = (byte) System.Windows.Forms.Screen.AllScreens.Length;
+			env.PrimaryScreenWidth = (ushort)System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width;
+			env.PrimaryScreenHeight = (ushort)System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height;
+			env.PrimaryScreenBitsPerPixel = (byte)System.Windows.Forms.Screen.PrimaryScreen.BitsPerPixel;
+			env.PrimaryScreenWorkingAreaLeft = (ushort)System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Left;
+			env.PrimaryScreenWorkingAreaTop = (ushort)System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Top;
+			env.PrimaryScreenWorkingAreaWidth = (ushort)System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Width;
+			env.PrimaryScreenWorkingAreaHeight = (ushort)System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Height;
+			env.ScreenCount = (byte)System.Windows.Forms.Screen.AllScreens.Length;
 
 			// Source: http://www.informit.com/guides/content.aspx?g=dotnet&seqNum=682
 			int ptrSize = IntPtr.Size;
@@ -371,9 +371,9 @@ namespace Unclassified.FieldLog
 		/// <param name="writer">Log file writer.</param>
 		internal void Write(FieldLogFileWriter writer)
 		{
-			writer.AddBuffer((byte) OSType);
-			writer.AddBuffer((byte) OSVersion);
-			writer.AddBuffer((byte) OSEdition);
+			writer.AddBuffer((byte)OSType);
+			writer.AddBuffer((byte)OSVersion);
+			writer.AddBuffer((byte)OSEdition);
 			writer.AddBuffer(OSServicePack);
 			writer.AddBuffer(OSBuild);
 			writer.AddBuffer(OSServicePackBuild);
@@ -397,7 +397,7 @@ namespace Unclassified.FieldLog
 			writer.AddBuffer(AppVersion);
 			writer.AddBuffer(AppAsmConfiguration);
 			writer.AddBuffer(ClrVersion);
-			writer.AddBuffer((short) LocalTimeZoneOffset.TotalMinutes);
+			writer.AddBuffer((short)LocalTimeZoneOffset.TotalMinutes);
 			writer.AddBuffer(ProcessMemory);
 			writer.AddBuffer(PeakProcessMemory);
 			writer.AddBuffer(TotalMemory);
@@ -430,9 +430,9 @@ namespace Unclassified.FieldLog
 		internal static FieldLogEventEnvironment Read(FieldLogFileReader reader)
 		{
 			FieldLogEventEnvironment env = new FieldLogEventEnvironment();
-			env.OSType = (OSType) reader.ReadByte();
-			env.OSVersion = (OSVersion) reader.ReadByte();
-			env.OSEdition = (OSEdition) reader.ReadByte();
+			env.OSType = (OSType)reader.ReadByte();
+			env.OSVersion = (OSVersion)reader.ReadByte();
+			env.OSEdition = (OSEdition)reader.ReadByte();
 			env.OSServicePack = reader.ReadString();
 			env.OSBuild = reader.ReadInt32();
 			env.OSServicePackBuild = reader.ReadInt32();

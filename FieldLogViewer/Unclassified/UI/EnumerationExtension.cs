@@ -131,7 +131,7 @@ namespace Unclassified.UI
 		/// <returns></returns>
 		public IEnumerable<EnumerationExtension.EnumerationMember> ProvideTypedValue()
 		{
-			return (EnumerationExtension.EnumerationMember[]) ProvideValue(null);
+			return (EnumerationExtension.EnumerationMember[])ProvideValue(null);
 		}
 
 		/// <summary>
@@ -306,7 +306,7 @@ namespace Unclassified.UI
 		/// <returns></returns>
 		public IEnumerable<EnumerationExtension<T>.EnumerationMember> ProvideTypedValue()
 		{
-			return (EnumerationExtension<T>.EnumerationMember[]) ProvideValue(null);
+			return (EnumerationExtension<T>.EnumerationMember[])ProvideValue(null);
 		}
 
 		/// <summary>

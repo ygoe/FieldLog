@@ -63,10 +63,15 @@ namespace PdbConvert.Symbols
 	internal interface IICLRRuntimeInfoPrivate
 	{
 		void GetVersionString_Placeholder();
+
 		void GetRuntimeDirectory_Placeholder();
+
 		void IsLoaded_Placeholder();
+
 		void LoadErrorString_Placeholder();
+
 		void LoadLibrary_Placeholder();
+
 		void GetProcAddress_Placeholder();
 
 		//virtual HRESULT STDMETHODCALLTYPE GetInterface(
@@ -93,7 +98,7 @@ namespace PdbConvert.Symbols
 			[In, MarshalAs(UnmanagedType.LPWStr)] string pwzVersion,
 			ref Guid riid,
 			[Out, MarshalAs(UnmanagedType.IUnknown)] out object ppRuntime);
-    }
+	}
 
 	// Since we're just blindly passing this interface through managed code to the Symbinder, we
 	// don't care about actually importing the specific methods.

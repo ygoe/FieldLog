@@ -161,7 +161,7 @@ namespace Unclassified.LogSubmit.Views
 				lastProgressTime = DateTime.UtcNow;
 				someTimePassed = true;
 			}
-			
+
 			progressBar1.Value = args.ProgressPercentage;
 			if (args.ProgressPercentage == 0)
 			{
@@ -177,7 +177,7 @@ namespace Unclassified.LogSubmit.Views
 					double totalSeconds = elapsedSeconds * 1000 / args.ProgressPercentage;   // Permille
 					if (totalSeconds >= 0 && totalSeconds < int.MaxValue)
 					{
-						TimeSpan remainingTime = TimeSpan.FromSeconds((int) Math.Ceiling(totalSeconds - elapsedSeconds));
+						TimeSpan remainingTime = TimeSpan.FromSeconds((int)Math.Ceiling(totalSeconds - elapsedSeconds));
 						RemainingTimeLabel.Text = Tx.TimeSpanRaw(remainingTime, false);
 						RemainingTimeLabel.ForeColor = SystemColors.ControlText;
 					}
@@ -454,7 +454,7 @@ namespace Unclassified.LogSubmit.Views
 		public void SetProgress(long inSize, long outSize)
 		{
 			// Called every 100 milliseconds
-			int permille = (int) (Math.Round(1000.0 * inSize / totalLogSize));
+			int permille = (int)(Math.Round(1000.0 * inSize / totalLogSize));
 			if (permille > 1000) permille = 1000;
 			CompressWorker.ReportProgress(permille, new ProgressInfo { CompressedSize = outSize });
 		}

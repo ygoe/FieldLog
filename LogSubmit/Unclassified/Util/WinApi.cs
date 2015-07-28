@@ -7,14 +7,15 @@ namespace Unclassified.Util
 	public partial class WinApi
 	{
 		#region SystemParameterInfo
-		[DllImport("user32.dll", SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		static extern bool SystemParametersInfo(SPI uiAction, uint uiParam, IntPtr pvParam, SPIF fWinIni);
 
 		[DllImport("user32.dll", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		static extern bool SystemParametersInfo(SPI uiAction, uint uiParam, String pvParam, SPIF fWinIni);
-		
+		private static extern bool SystemParametersInfo(SPI uiAction, uint uiParam, IntPtr pvParam, SPIF fWinIni);
+
+		[DllImport("user32.dll", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		private static extern bool SystemParametersInfo(SPI uiAction, uint uiParam, String pvParam, SPIF fWinIni);
+
 		[DllImport("user32.dll", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool SystemParametersInfo(SPI uiAction, uint uiParam, ref ANIMATIONINFO pvParam, SPIF fWinIni);
@@ -68,7 +69,7 @@ namespace Unclassified.Util
 			/// <param name="iMinAnimate">If non-zero and SPI_SETANIMATION is specified, enables minimize/restore animation.</param>
 			public ANIMATIONINFO(System.Int32 iMinAnimate)
 			{
-				this.cbSize = (System.UInt32) Marshal.SizeOf(typeof(ANIMATIONINFO));
+				this.cbSize = (System.UInt32)Marshal.SizeOf(typeof(ANIMATIONINFO));
 				this.iMinAnimate = iMinAnimate;
 			}
 
@@ -82,6 +83,7 @@ namespace Unclassified.Util
 			/// </summary>
 			public System.Int32 iMinAnimate;
 		}
+
 		#endregion SystemParameterInfo
 
 		public static bool IsMinimizeRestoreAnimationEnabled()

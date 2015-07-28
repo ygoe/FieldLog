@@ -119,7 +119,7 @@ namespace PdbConvert.Symbols
 			get
 			{
 				int count;
-				((ISymUnmanagedScope2) unmanagedScope).GetConstantCount(out count);
+				((ISymUnmanagedScope2)unmanagedScope).GetConstantCount(out count);
 				return count;
 			}
 		}
@@ -127,9 +127,9 @@ namespace PdbConvert.Symbols
 		public ISymbolConstant[] GetConstants()
 		{
 			int count;
-			((ISymUnmanagedScope2) unmanagedScope).GetConstants(0, out count, null);
+			((ISymUnmanagedScope2)unmanagedScope).GetConstants(0, out count, null);
 			ISymUnmanagedConstant[] uConstants = new ISymUnmanagedConstant[count];
-			((ISymUnmanagedScope2) unmanagedScope).GetConstants(count, out count, uConstants);
+			((ISymUnmanagedScope2)unmanagedScope).GetConstants(count, out count, uConstants);
 
 			int i;
 			ISymbolConstant[] constants = new ISymbolConstant[count];

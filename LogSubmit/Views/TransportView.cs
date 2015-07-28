@@ -56,7 +56,7 @@ namespace Unclassified.LogSubmit.Views
 
 		private void TransportComboBox_SelectedIndexChanged(object sender, EventArgs args)
 		{
-			TransportMethod method = (TransportMethod) TransportComboBox.SelectedItem;
+			TransportMethod method = (TransportMethod)TransportComboBox.SelectedItem;
 			SetView(method.View);
 			SharedData.Instance.Transport = method.Transport;
 		}
@@ -68,13 +68,13 @@ namespace Unclassified.LogSubmit.Views
 		public void Activate(bool forward)
 		{
 			Control view = GetView();
-			if (view != null) ((IView) view).Activate(forward);
+			if (view != null) ((IView)view).Activate(forward);
 		}
 
 		public void Deactivate(bool forward)
 		{
 			Control view = GetView();
-			if (view != null) ((IView) view).Deactivate(forward);
+			if (view != null) ((IView)view).Deactivate(forward);
 		}
 
 		#endregion Public methods
@@ -93,14 +93,14 @@ namespace Unclassified.LogSubmit.Views
 			if (oldView != null)
 			{
 				if (view == oldView) return;
-				((IView) oldView).Deactivate(true);
+				((IView)oldView).Deactivate(true);
 			}
 			ContentPanel.Controls.Clear();
 
 			ContentPanel.Controls.Add(view);
 			if (MainForm.Instance != null)
 			{
-				((IView) view).Activate(true);
+				((IView)view).Activate(true);
 			}
 		}
 

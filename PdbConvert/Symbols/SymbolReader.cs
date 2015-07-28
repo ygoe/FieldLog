@@ -53,7 +53,7 @@ namespace PdbConvert.Symbols
 			{
 				SymbolToken entryPoint;
 				int hr = unmanagedReader.GetUserEntryPoint(out entryPoint);
-				if (hr == (int) HResult.E_FAIL)
+				if (hr == (int)HResult.E_FAIL)
 				{
 					// Not all assemblies have entry points
 					// dlls for example...
@@ -71,7 +71,7 @@ namespace PdbConvert.Symbols
 		{
 			ISymUnmanagedMethod unmanagedMethod;
 			int hr = unmanagedReader.GetMethod(method, out unmanagedMethod);
-			if (hr == (int) HResult.E_FAIL)
+			if (hr == (int)HResult.E_FAIL)
 			{
 				// This means that the method has no symbol info because it's probably empty
 				// This can happen for virtual methods with no IL
@@ -88,7 +88,7 @@ namespace PdbConvert.Symbols
 		{
 			ISymUnmanagedMethod unmanagedMethod;
 			int hr = unmanagedReader.GetMethodByVersion(method, version, out unmanagedMethod);
-			if (hr == (int) HResult.E_FAIL)
+			if (hr == (int)HResult.E_FAIL)
 			{
 				// This means that the method has no symbol info because it's probably empty
 				// This can happen for virtual methods with no IL
@@ -136,7 +136,7 @@ namespace PdbConvert.Symbols
 		public ISymbolMethod GetMethodFromDocumentPosition(ISymbolDocument document, int line, int column)
 		{
 			ISymUnmanagedMethod unmanagedMethod;
-			unmanagedReader.GetMethodFromDocumentPosition(((SymbolDocument) document).InternalDocument, line, column, out unmanagedMethod);
+			unmanagedReader.GetMethodFromDocumentPosition(((SymbolDocument)document).InternalDocument, line, column, out unmanagedMethod);
 			return new SymbolMethod(unmanagedMethod);
 		}
 
@@ -211,9 +211,9 @@ namespace PdbConvert.Symbols
 			ISymbolMethod[] methods;
 			int count;
 			uint i;
-			unmanagedReader.GetMethodsFromDocumentPosition(((SymbolDocument) document).InternalDocument, line, column, 0, out count, null);
+			unmanagedReader.GetMethodsFromDocumentPosition(((SymbolDocument)document).InternalDocument, line, column, 0, out count, null);
 			unmanagedMethods = new ISymUnmanagedMethod[count];
-			unmanagedReader.GetMethodsFromDocumentPosition(((SymbolDocument) document).InternalDocument, line, column, count, out count, unmanagedMethods);
+			unmanagedReader.GetMethodsFromDocumentPosition(((SymbolDocument)document).InternalDocument, line, column, count, out count, unmanagedMethods);
 			methods = new ISymbolMethod[count];
 
 			for (i = 0; i < count; i++)
@@ -226,35 +226,35 @@ namespace PdbConvert.Symbols
 		public int GetDocumentVersion(ISymbolDocument document, out bool isCurrent)
 		{
 			int version;
-			unmanagedReader.GetDocumentVersion(((SymbolDocument) document).InternalDocument, out version, out isCurrent);
+			unmanagedReader.GetDocumentVersion(((SymbolDocument)document).InternalDocument, out version, out isCurrent);
 			return version;
 		}
 
 		public int GetMethodVersion(ISymbolMethod method)
 		{
 			int version;
-			unmanagedReader.GetMethodVersion(((SymbolMethod) method).InternalMethod, out version);
+			unmanagedReader.GetMethodVersion(((SymbolMethod)method).InternalMethod, out version);
 			return version;
 		}
 
 		public void UpdateSymbolStore(IStream stream, SymbolLineDelta[] iSymbolLineDeltas)
 		{
-			((ISymUnmanagedEncUpdate) unmanagedReader).UpdateSymbolStore2(stream, iSymbolLineDeltas, iSymbolLineDeltas.Length);
+			((ISymUnmanagedEncUpdate)unmanagedReader).UpdateSymbolStore2(stream, iSymbolLineDeltas, iSymbolLineDeltas.Length);
 		}
 
 		public int GetLocalVariableCount(SymbolToken mdMethodToken)
 		{
 			int count;
-			((ISymUnmanagedEncUpdate) unmanagedReader).GetLocalVariableCount(mdMethodToken, out count);
+			((ISymUnmanagedEncUpdate)unmanagedReader).GetLocalVariableCount(mdMethodToken, out count);
 			return count;
 		}
 
 		public ISymbolVariable[] GetLocalVariables(SymbolToken mdMethodToken)
 		{
 			int count;
-			((ISymUnmanagedEncUpdate) unmanagedReader).GetLocalVariables(mdMethodToken, 0, null, out count);
+			((ISymUnmanagedEncUpdate)unmanagedReader).GetLocalVariables(mdMethodToken, 0, null, out count);
 			ISymUnmanagedVariable[] unmanagedVariables = new ISymUnmanagedVariable[count];
-			((ISymUnmanagedEncUpdate) unmanagedReader).GetLocalVariables(mdMethodToken, count, unmanagedVariables, out count);
+			((ISymUnmanagedEncUpdate)unmanagedReader).GetLocalVariables(mdMethodToken, count, unmanagedVariables, out count);
 
 			ISymbolVariable[] variables = new ISymbolVariable[count];
 			uint i;
@@ -268,16 +268,16 @@ namespace PdbConvert.Symbols
 		public int GetSymbolSearchInfoCount()
 		{
 			int count;
-			((ISymUnmanagedReaderSymbolSearchInfo) unmanagedReader).GetSymbolSearchInfoCount(out count);
+			((ISymUnmanagedReaderSymbolSearchInfo)unmanagedReader).GetSymbolSearchInfoCount(out count);
 			return count;
 		}
 
 		public ISymbolSearchInfo[] GetSymbolSearchInfo()
 		{
 			int count;
-			((ISymUnmanagedReaderSymbolSearchInfo) unmanagedReader).GetSymbolSearchInfo(0, out count, null);
+			((ISymUnmanagedReaderSymbolSearchInfo)unmanagedReader).GetSymbolSearchInfo(0, out count, null);
 			ISymUnmanagedSymbolSearchInfo[] unmanagedSearchInfo = new ISymUnmanagedSymbolSearchInfo[count];
-			((ISymUnmanagedReaderSymbolSearchInfo) unmanagedReader).GetSymbolSearchInfo(count, out count, unmanagedSearchInfo);
+			((ISymUnmanagedReaderSymbolSearchInfo)unmanagedReader).GetSymbolSearchInfo(count, out count, unmanagedSearchInfo);
 
 			ISymbolSearchInfo[] searchInfo = new ISymbolSearchInfo[count];
 

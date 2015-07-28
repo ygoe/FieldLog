@@ -21,12 +21,9 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
 using Unclassified.Util;
 
 namespace Unclassified.Automation
@@ -37,6 +34,7 @@ namespace Unclassified.Automation
 
 		[DllImport("user32")]
 		private static extern int EnumWindows(EnumWindowsDelegate cb, IntPtr lParam);
+
 		[DllImport("user32")]
 		private static extern int GetWindowThreadProcessId(IntPtr hWnd, out int processId);
 
@@ -103,7 +101,7 @@ namespace Unclassified.Automation
 		{
 			get
 			{
-				return (uint) WinApi.GetWindowLong(handle, WinApi.GWL_STYLE).ToInt64();
+				return (uint)WinApi.GetWindowLong(handle, WinApi.GWL_STYLE).ToInt64();
 			}
 		}
 
@@ -111,7 +109,7 @@ namespace Unclassified.Automation
 		{
 			get
 			{
-				return (uint) WinApi.GetWindowLong(handle, WinApi.GWL_EXSTYLE).ToInt64();
+				return (uint)WinApi.GetWindowLong(handle, WinApi.GWL_EXSTYLE).ToInt64();
 			}
 		}
 

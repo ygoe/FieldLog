@@ -114,7 +114,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public FilterViewModel SelectedFilter
 		{
-			get { return GetValue<FilterViewModel>("SelectedFilter"); }
+			get
+			{
+				return GetValue<FilterViewModel>("SelectedFilter");
+			}
 			set
 			{
 				if (SetValue(value, "SelectedFilter"))

@@ -116,19 +116,18 @@ namespace PdbConvert.Symbols
 		public int GetOffset(ISymbolDocument document, int line, int column)
 		{
 			int retVal;
-			unmanagedMethod.GetOffset(((SymbolDocument) document).InternalDocument, line, column, out retVal);
+			unmanagedMethod.GetOffset(((SymbolDocument)document).InternalDocument, line, column, out retVal);
 			return retVal;
 		}
 
 		public int[] GetRanges(ISymbolDocument document, int line, int column)
 		{
 			int cRanges;
-			unmanagedMethod.GetRanges(((SymbolDocument) document).InternalDocument, line, column, 0, out cRanges, null);
+			unmanagedMethod.GetRanges(((SymbolDocument)document).InternalDocument, line, column, 0, out cRanges, null);
 			int[] ranges = new int[cRanges];
-			unmanagedMethod.GetRanges(((SymbolDocument) document).InternalDocument, line, column, cRanges, out cRanges, ranges);
+			unmanagedMethod.GetRanges(((SymbolDocument)document).InternalDocument, line, column, cRanges, out cRanges, ranges);
 			return ranges;
 		}
-
 
 		public ISymbolVariable[] GetParameters()
 		{
@@ -194,9 +193,9 @@ namespace PdbConvert.Symbols
 		public String GetFileNameFromOffset(int dwOffset)
 		{
 			int cchName;
-			((ISymENCUnmanagedMethod) unmanagedMethod).GetFileNameFromOffset(dwOffset, 0, out cchName, null);
+			((ISymENCUnmanagedMethod)unmanagedMethod).GetFileNameFromOffset(dwOffset, 0, out cchName, null);
 			StringBuilder name = new StringBuilder(cchName);
-			((ISymENCUnmanagedMethod) unmanagedMethod).GetFileNameFromOffset(dwOffset, cchName, out cchName, name);
+			((ISymENCUnmanagedMethod)unmanagedMethod).GetFileNameFromOffset(dwOffset, cchName, out cchName, name);
 			return name.ToString();
 		}
 
@@ -208,7 +207,7 @@ namespace PdbConvert.Symbols
 			out int pdwStartOffset)
 		{
 			int line;
-			((ISymENCUnmanagedMethod) unmanagedMethod).GetLineFromOffset(
+			((ISymENCUnmanagedMethod)unmanagedMethod).GetLineFromOffset(
 				dwOffset, out line, out pcolumn, out pendLine, out pendColumn, out pdwStartOffset);
 			return line;
 		}

@@ -1,10 +1,8 @@
 ﻿using System.Reflection;
-using System.Runtime.InteropServices;
 
 [assembly: AssemblyProduct("OSInfoTest")]
 [assembly: AssemblyTitle("OSInfoTest")]
 [assembly: AssemblyDescription("Prints detected OS information data to the console.")]
-
 [assembly: AssemblyCopyright("© Yves Goergen, GNU GPL v3")]
 [assembly: AssemblyCompany("unclassified software development")]
 

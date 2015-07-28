@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Unclassified.FieldLog;
 
 namespace ConsoleDemo
 {
-	class NestHost
+	internal class NestHost
 	{
 		public class Nest1
 		{
@@ -19,17 +17,17 @@ namespace ConsoleDemo
 		}
 	}
 
-	class GenericClass<T>
+	internal class GenericClass<T>
 	{
 		public static void Method<U>(T obj, U obj2)
 		{
 			FL.LogStackTrace();
 		}
 	}
-	
-	class Program
+
+	internal class Program
 	{
-		static void Main(string[] args)
+		private static void Main(string[] args)
 		{
 			FL.AcceptLogFileBasePath();
 
@@ -49,19 +47,19 @@ namespace ConsoleDemo
 			//GenericClass<int>.Method<string>(0, "");
 		}
 
-		static int NestTest(ConsoleDemo.NestHost.Nest1.Nest2 obj)
+		private static int NestTest(ConsoleDemo.NestHost.Nest1.Nest2 obj)
 		{
 			FL.LogStackTrace();
 			return 0;
 		}
 
-		static int GenericTest<T>(T value)
+		private static int GenericTest<T>(T value)
 		{
 			FL.LogStackTrace();
 			return 0;
 		}
 
-		static void LoadTest()
+		private static void LoadTest()
 		{
 			Console.WriteLine("Load test pattern...");
 
@@ -70,13 +68,13 @@ namespace ConsoleDemo
 				FL.Trace("Load test - " + i);
 				if ((i % 100) == 0)
 					FL.Error("Load test error message");
-				
+
 				if ((i % 10000) == 0)
 					Console.WriteLine("    now at " + i);
 			}
 		}
 
-		static void ConstantFlow()
+		private static void ConstantFlow()
 		{
 			Console.WriteLine("Constant item flow pattern...");
 
@@ -96,7 +94,7 @@ namespace ConsoleDemo
 			}
 		}
 
-		static void NormalActivity()
+		private static void NormalActivity()
 		{
 			Console.WriteLine("Normal application activity pattern...");
 
@@ -182,7 +180,7 @@ namespace ConsoleDemo
 				//cti.Stop();
 			}
 			Thread.Sleep(1200);
-			
+
 			FL.Info("Information item");
 			FL.Notice("Notice item");
 			FL.Warning("Warning item");

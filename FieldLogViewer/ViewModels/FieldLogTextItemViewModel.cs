@@ -14,6 +14,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public new FieldLogTextItem Item { get; private set; }
 		public string Text { get { return this.Item.Text; } }
+
 		public string Details
 		{
 			get

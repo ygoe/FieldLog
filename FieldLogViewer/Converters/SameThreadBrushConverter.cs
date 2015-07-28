@@ -16,10 +16,10 @@ namespace Unclassified.FieldLogViewer.Converters
 				values[2] is Guid &&
 				values[3] is Guid)
 			{
-				int threadId1 = (int) values[0];
-				int threadId2 = (int) values[1];
-				Guid sessionId1 = (Guid) values[2];
-				Guid sessionId2 = (Guid) values[3];
+				int threadId1 = (int)values[0];
+				int threadId2 = (int)values[1];
+				Guid sessionId1 = (Guid)values[2];
+				Guid sessionId2 = (Guid)values[3];
 
 				if (threadId1 == threadId2 && sessionId1 == sessionId2)
 				{

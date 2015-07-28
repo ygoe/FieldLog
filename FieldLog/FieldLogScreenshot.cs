@@ -134,7 +134,7 @@ namespace Unclassified.FieldLog
 		/// </remarks>
 		public static void CreateForWindow(Window window)
 		{
-			Rectangle rect = new Rectangle((int) window.Left, (int) window.Top, (int) window.Width, (int) window.Height);
+			Rectangle rect = new Rectangle((int)window.Left, (int)window.Top, (int)window.Width, (int)window.Height);
 			CreateForRectangle(rect);
 		}
 
@@ -314,7 +314,7 @@ namespace Unclassified.FieldLog
 				throw new Exception("JPEG codec not found");
 
 			EncoderParameters ep = new EncoderParameters(1);
-			ep.Param[0] = new EncoderParameter(Encoder.Quality, (long) quality);
+			ep.Param[0] = new EncoderParameter(Encoder.Quality, (long)quality);
 
 			img.Save(filename, codec, ep);
 		}

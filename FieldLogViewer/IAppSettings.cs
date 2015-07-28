@@ -78,7 +78,7 @@ namespace Unclassified.FieldLogViewer
 		/// <summary>
 		/// Gets or sets the time zone to use for displaying log item times.
 		/// </summary>
-		[DefaultValue((int) ItemTimeType.Remote)]
+		[DefaultValue((int)ItemTimeType.Remote)]
 		ItemTimeType ItemTimeMode { get; set; }
 
 		/// <summary>

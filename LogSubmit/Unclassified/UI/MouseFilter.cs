@@ -33,7 +33,7 @@ namespace Unclassified
 	/// Provides mouse filtering features like hiding the cursor after a timeout of inactivity or dispatching
 	/// mouse wheel input the the control below the mouse cursor.
 	/// </summary>
-	class MouseFilter : Component, IMessageFilter
+	internal class MouseFilter : Component, IMessageFilter
 	{
 		// AutoHideCursor variables
 		private bool autoHideCursor = false;
@@ -49,6 +49,7 @@ namespace Unclassified
 		/// </summary>
 		[Description("Fired when the mouse cursor was hidden.")]
 		public event EventHandler MouseHidden;
+
 		/// <summary>
 		/// Fired when the mouse cursor was shown.
 		/// </summary>
@@ -92,7 +93,10 @@ namespace Unclassified
 		[Description("Hides the mouse cursor after a while of inactivity.")]
 		public bool AutoHideCursor
 		{
-			get { return autoHideCursor; }
+			get
+			{
+				return autoHideCursor;
+			}
 			set
 			{
 				autoHideCursor = value;
@@ -165,7 +169,7 @@ namespace Unclassified
 					// but also do not scroll anything else outside the popup)
 					return true;
 				}
-				
+
 				// Regular window surface: find the deepest control below the mouse cursor
 				Control control = Form.ActiveForm;
 				while (control != null)
@@ -198,10 +202,10 @@ namespace Unclassified
 
 							return true;   // Block this message
 						}
-						
+
 						c = c.Parent;
 					}
-					
+
 					// NOTE: Possible performance improvement: Flag the re-posted message so that we can
 					//       recognise it faster when it re-arrives here and we can let it pass.
 					//       Use either a very high delta value (HIWORD(wParam)) or one of the modifier

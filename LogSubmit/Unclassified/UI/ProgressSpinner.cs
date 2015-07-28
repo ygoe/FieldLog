@@ -13,6 +13,7 @@ namespace Unclassified.UI
 	public class ProgressSpinner : Control
 	{
 		#region Designer code
+
 		private System.ComponentModel.IContainer components = null;
 
 		protected override void Dispose(bool disposing)
@@ -28,6 +29,7 @@ namespace Unclassified.UI
 		{
 			components = new System.ComponentModel.Container();
 		}
+
 		#endregion Designer code
 
 		private Timer timer;
@@ -59,11 +61,14 @@ namespace Unclassified.UI
 		[Category("Appearance")]
 		public int Value
 		{
-			get { return progress; }
+			get
+			{
+				return progress;
+			}
 			set
 			{
 				if (value != -1 && (value < minimum || value > maximum))
-					throw new ArgumentOutOfRangeException("Progress value must be -1 or between Minimum and Maximum.", (Exception) null);
+					throw new ArgumentOutOfRangeException("Progress value must be -1 or between Minimum and Maximum.", (Exception)null);
 				progress = value;
 				Refresh();
 			}
@@ -77,13 +82,16 @@ namespace Unclassified.UI
 		[Category("Appearance")]
 		public int Minimum
 		{
-			get { return minimum; }
+			get
+			{
+				return minimum;
+			}
 			set
 			{
 				if (value < 0)
-					throw new ArgumentOutOfRangeException("Minimum value must be >= 0.", (Exception) null);
+					throw new ArgumentOutOfRangeException("Minimum value must be >= 0.", (Exception)null);
 				if (value >= maximum)
-					throw new ArgumentOutOfRangeException("Minimum value must be < Maximum.", (Exception) null);
+					throw new ArgumentOutOfRangeException("Minimum value must be < Maximum.", (Exception)null);
 				minimum = value;
 				if (progress != -1 && progress < minimum)
 					progress = minimum;
@@ -99,11 +107,14 @@ namespace Unclassified.UI
 		[Category("Appearance")]
 		public int Maximum
 		{
-			get { return maximum; }
+			get
+			{
+				return maximum;
+			}
 			set
 			{
 				if (value <= minimum)
-					throw new ArgumentOutOfRangeException("Maximum value must be > Minimum.", (Exception) null);
+					throw new ArgumentOutOfRangeException("Maximum value must be > Minimum.", (Exception)null);
 				maximum = value;
 				if (progress > maximum)
 					progress = maximum;
@@ -131,11 +142,14 @@ namespace Unclassified.UI
 		[Category("Behavior")]
 		public float Speed
 		{
-			get { return speed; }
+			get
+			{
+				return speed;
+			}
 			set
 			{
 				if (value <= 0 || value > 10)
-					throw new ArgumentOutOfRangeException("Speed value must be > 0 and <= 10.", (Exception) null);
+					throw new ArgumentOutOfRangeException("Speed value must be > 0 and <= 10.", (Exception)null);
 				speed = value;
 			}
 		}
@@ -153,6 +167,7 @@ namespace Unclassified.UI
 		}
 
 		#region Hidden properties
+
 		[Browsable(false)]
 		public override Font Font
 		{
@@ -180,6 +195,7 @@ namespace Unclassified.UI
 			get { return false; }
 			set { }
 		}
+
 		#endregion Hidden properties
 
 		public ProgressSpinner()
@@ -207,7 +223,7 @@ namespace Unclassified.UI
 			Refresh();
 		}
 
-		void timer_Tick(object sender, EventArgs e)
+		private void timer_Tick(object sender, EventArgs args)
 		{
 			angle += 6f * speed * (backwards ? -1 : 1);
 			Refresh();
@@ -215,8 +231,8 @@ namespace Unclassified.UI
 
 		protected override void OnPaint(PaintEventArgs pe)
 		{
-			Pen forePen = new Pen(ForeColor, (float) Width / 5);
-			int padding = (int) Math.Ceiling((float) Width / 10);
+			Pen forePen = new Pen(ForeColor, (float)Width / 5);
+			int padding = (int)Math.Ceiling((float)Width / 10);
 
 			pe.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
 
@@ -226,9 +242,9 @@ namespace Unclassified.UI
 				// We have a progress value, draw a solid arc line
 				// angle is the back end of the line.
 				// angle +/- progress is the front end of the line
-				
+
 				float sweepAngle;
-				float progFrac = (float) (progress - minimum) / (float) (maximum - minimum);
+				float progFrac = (float)(progress - minimum) / (float)(maximum - minimum);
 				if (ensureVisible)
 					sweepAngle = 30 + 300f * progFrac;
 				else

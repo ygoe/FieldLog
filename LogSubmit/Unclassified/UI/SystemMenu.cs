@@ -140,9 +140,9 @@ namespace Unclassified.UI
 
 		private void OnSysCommandMessage(ref Message msg)
 		{
-			if ((long) msg.WParam > 0 && (long) msg.WParam <= lastId)
+			if ((long)msg.WParam > 0 && (long)msg.WParam <= lastId)
 			{
-				actions[(int) msg.WParam - 1]();
+				actions[(int)msg.WParam - 1]();
 			}
 		}
 

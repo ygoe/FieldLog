@@ -22,7 +22,7 @@ namespace Unclassified.Util
 				object[] customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
-					return ((AssemblyFileVersionAttribute) customAttributes[0]).Version;
+					return ((AssemblyFileVersionAttribute)customAttributes[0]).Version;
 				}
 				// Assembly identity version, always present.
 				// The AssemblyVersionAttribute is accessed like this, the attribute itself is not
@@ -50,13 +50,13 @@ namespace Unclassified.Util
 				object[] customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
-					return ((AssemblyInformationalVersionAttribute) customAttributes[0]).InformationalVersion;
+					return ((AssemblyInformationalVersionAttribute)customAttributes[0]).InformationalVersion;
 				}
 				// Win32 file resource version
 				customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
-					return ((AssemblyFileVersionAttribute) customAttributes[0]).Version;
+					return ((AssemblyFileVersionAttribute)customAttributes[0]).Version;
 				}
 				// Assembly identity version, always present.
 				// The AssemblyVersionAttribute is accessed like this, the attribute itself is not
@@ -77,7 +77,7 @@ namespace Unclassified.Util
 				object[] customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyConfigurationAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
-					return ((AssemblyConfigurationAttribute) customAttributes[0]).Configuration;
+					return ((AssemblyConfigurationAttribute)customAttributes[0]).Configuration;
 				}
 				return null;
 			}
@@ -94,12 +94,12 @@ namespace Unclassified.Util
 				object[] customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyProductAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
-					return ((AssemblyProductAttribute) customAttributes[0]).Product;
+					return ((AssemblyProductAttribute)customAttributes[0]).Product;
 				}
 				customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
-					return ((AssemblyTitleAttribute) customAttributes[0]).Title;
+					return ((AssemblyTitleAttribute)customAttributes[0]).Title;
 				}
 				return null;
 			}
@@ -116,7 +116,7 @@ namespace Unclassified.Util
 				object[] customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
-					return ((AssemblyDescriptionAttribute) customAttributes[0]).Description;
+					return ((AssemblyDescriptionAttribute)customAttributes[0]).Description;
 				}
 				return null;
 			}
@@ -133,7 +133,7 @@ namespace Unclassified.Util
 				object[] customAttributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
-					return ((AssemblyCopyrightAttribute) customAttributes[0]).Copyright;
+					return ((AssemblyCopyrightAttribute)customAttributes[0]).Copyright;
 				}
 				return null;
 			}

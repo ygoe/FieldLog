@@ -1429,7 +1429,7 @@ namespace Unclassified.FieldLog
 			System.Management.ManagementClass mc = new System.Management.ManagementClass(wmiClass);
 			foreach (System.Management.ManagementObject mo in mc.GetInstances())
 			{
-				if (wmiCondition == null || (mo[wmiCondition] is bool && (bool) mo[wmiCondition]))
+				if (wmiCondition == null || (mo[wmiCondition] is bool && (bool)mo[wmiCondition]))
 				{
 					try
 					{

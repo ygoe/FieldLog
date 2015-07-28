@@ -16,10 +16,10 @@ namespace Unclassified.FieldLogViewer.Converters
 				values[2] is Guid &&
 				values[3] is Guid)
 			{
-				uint webRequestId1 = (uint) values[0];
-				uint webRequestId2 = (uint) values[1];
-				Guid sessionId1 = (Guid) values[2];
-				Guid sessionId2 = (Guid) values[3];
+				uint webRequestId1 = (uint)values[0];
+				uint webRequestId2 = (uint)values[1];
+				Guid sessionId1 = (Guid)values[2];
+				Guid sessionId2 = (Guid)values[3];
 
 				if (webRequestId1 == webRequestId2 && sessionId1 == sessionId2)
 				{

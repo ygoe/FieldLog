@@ -80,7 +80,6 @@ namespace PdbConvert.Symbols
 			return data;
 		}
 
-
 		public int FindClosestLine(int line)
 		{
 			int closestLine;

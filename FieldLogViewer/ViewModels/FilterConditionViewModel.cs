@@ -79,7 +79,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public FilterColumn Column
 		{
-			get { return GetValue<FilterColumn>("Column"); }
+			get
+			{
+				return GetValue<FilterColumn>("Column");
+			}
 			set
 			{
 				if (SetValue(value, "Column"))
@@ -120,7 +123,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public FilterComparison Comparison
 		{
-			get { return GetValue<FilterComparison>("Comparison"); }
+			get
+			{
+				return GetValue<FilterComparison>("Comparison");
+			}
 			set
 			{
 				if (SetValue(value, "Comparison"))
@@ -133,7 +139,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public string Value
 		{
-			get { return GetValue<string>("Value"); }
+			get
+			{
+				return GetValue<string>("Value");
+			}
 			set
 			{
 				if (SetValue(value, "Value"))
@@ -318,7 +327,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public bool IsEnabled
 		{
-			get { return GetValue<bool>("IsEnabled"); }
+			get
+			{
+				return GetValue<bool>("IsEnabled");
+			}
 			set
 			{
 				if (SetValue(value, "IsEnabled"))
@@ -366,8 +378,8 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			// chunk[0] and chunk[1] are control fields already parsed along the way down here
 			enableFilterChangedEvent = false;
 			IsEnabled = chunks[2] == "on";
-			Column = (FilterColumn) Enum.Parse(typeof(FilterColumn), chunks[3]);
-			Comparison = (FilterComparison) Enum.Parse(typeof(FilterComparison), chunks[4]);
+			Column = (FilterColumn)Enum.Parse(typeof(FilterColumn), chunks[3]);
+			Comparison = (FilterComparison)Enum.Parse(typeof(FilterComparison), chunks[4]);
 			Value = chunks[5];
 			enableFilterChangedEvent = true;
 		}
@@ -776,7 +788,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 					flItem = item as FieldLogItemViewModel;
 					if (flItem != null && flItem.LastWebRequestStartItem != null)
 					{
-						result = CompareInt((int) Math.Round(flItem.LastWebRequestStartItem.WebRequestDataVM.RequestDuration.TotalMilliseconds));
+						result = CompareInt((int)Math.Round(flItem.LastWebRequestStartItem.WebRequestDataVM.RequestDuration.TotalMilliseconds));
 					}
 					break;
 			}

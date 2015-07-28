@@ -22,7 +22,7 @@ namespace Unclassified.UI
 					object o = cursorsKey.GetValue("Hand");
 					if (o is string)
 					{
-						IntPtr cursorHandle = WinApi.LoadCursorFromFile((string) o);
+						IntPtr cursorHandle = WinApi.LoadCursorFromFile((string)o);
 						return new Cursor(cursorHandle);
 					}
 				}

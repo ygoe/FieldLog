@@ -46,18 +46,18 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		private bool isReordering;
 
-		private void Conditions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		private void Conditions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
 		{
-			if (e.OldItems != null)
+			if (args.OldItems != null)
 			{
-				foreach (FilterConditionViewModel c in e.OldItems)
+				foreach (FilterConditionViewModel c in args.OldItems)
 				{
 					c.PropertyChanged -= condition_PropertyChanged;
 				}
 			}
-			if (e.NewItems != null)
+			if (args.NewItems != null)
 			{
-				foreach (FilterConditionViewModel c in e.NewItems)
+				foreach (FilterConditionViewModel c in args.NewItems)
 				{
 					c.PropertyChanged += condition_PropertyChanged;
 				}
@@ -87,7 +87,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
-		private void condition_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		private void condition_PropertyChanged(object sender, PropertyChangedEventArgs args)
 		{
 			CheckConditionsConsistency();
 		}
@@ -127,7 +127,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public ObservableCollection<FilterConditionViewModel> Conditions
 		{
-			get { return GetValue<ObservableCollection<FilterConditionViewModel>>("Conditions"); }
+			get
+			{
+				return GetValue<ObservableCollection<FilterConditionViewModel>>("Conditions");
+			}
 			private set
 			{
 				if (SetValue(value, "Conditions"))
@@ -158,7 +161,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public bool IsExclude
 		{
-			get { return GetValue<bool>("IsExclude"); }
+			get
+			{
+				return GetValue<bool>("IsExclude");
+			}
 			set
 			{
 				if (SetValue(value, "IsExclude"))
@@ -179,7 +185,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public bool IsEnabled
 		{
-			get { return GetValue<bool>("IsEnabled"); }
+			get
+			{
+				return GetValue<bool>("IsEnabled");
+			}
 			set
 			{
 				if (SetValue(value, "IsEnabled"))

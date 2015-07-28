@@ -106,7 +106,7 @@ namespace Unclassified.Util
 			if (callbackReason == CopyProgressCallbackReason.CALLBACK_CHUNK_FINISHED)
 			{
 				bool cancel;
-				OnProgressChanged((double) totalBytesTransferred / totalFileSize * 100, out cancel);
+				OnProgressChanged((double)totalBytesTransferred / totalFileSize * 100, out cancel);
 				if (cancel)
 				{
 					return CopyProgressResult.PROGRESS_CANCEL;

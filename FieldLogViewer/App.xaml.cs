@@ -13,9 +13,9 @@ namespace Unclassified.FieldLogViewer
 	{
 		#region Startup
 
-		protected override void OnStartup(StartupEventArgs e)
+		protected override void OnStartup(StartupEventArgs args)
 		{
-			base.OnStartup(e);
+			base.OnStartup(args);
 
 			// Make some more worker threads for the ThreadPool. We need around 10 threads for
 			// reading a set of log files, and since some of them may be waiting for a long time,
@@ -41,16 +41,16 @@ namespace Unclassified.FieldLogViewer
 
 			//viewModel.AddObfuscationMap(@"D:\tmp\Map.xml");
 
-			if (e.Args.Length > 0)
+			if (args.Args.Length > 0)
 			{
 				bool singleFile = false;
-				string fileName = e.Args[0];
+				string fileName = args.Args[0];
 				if (fileName == "/s")
 				{
-					if (e.Args.Length > 1)
+					if (args.Args.Length > 1)
 					{
 						singleFile = true;
-						fileName = e.Args[1];
+						fileName = args.Args[1];
 					}
 					else
 					{

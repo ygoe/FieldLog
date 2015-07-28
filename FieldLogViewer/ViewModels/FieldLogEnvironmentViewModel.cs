@@ -228,7 +228,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			{
 				if (Environment != null)
 				{
-					int utcOffset = (int) Environment.LocalTimeZoneOffset.TotalMinutes;
+					int utcOffset = (int)Environment.LocalTimeZoneOffset.TotalMinutes;
 					int hours = utcOffset / 60;
 					int mins = Math.Abs(utcOffset) % 60;
 					return hours.ToString("+00;-00;+00") + ":" + mins.ToString("00");

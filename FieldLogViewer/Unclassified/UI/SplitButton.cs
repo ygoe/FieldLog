@@ -48,10 +48,10 @@ namespace Unclassified.UI
 			EventManager.RegisterClassHandler(typeof(SplitButton), Mouse.MouseDownEvent, new MouseButtonEventHandler(OnMouseButtonDown), true);
 		}
 
-		private static void OnIsSubmenuOpenChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+		private static void OnIsSubmenuOpenChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
 		{
 			SplitButton splitButton = sender as SplitButton;
-			if ((bool) e.NewValue)
+			if ((bool)args.NewValue)
 			{
 				openSplitButton = splitButton;
 
@@ -85,7 +85,7 @@ namespace Unclassified.UI
 			}
 		}
 
-		private static void OnLostMouseCapture(object sender, MouseEventArgs e)
+		private static void OnLostMouseCapture(object sender, MouseEventArgs args)
 		{
 			SplitButton splitButton = sender as SplitButton;
 			Mouse.RemoveLostMouseCaptureHandler(splitButton, OnLostMouseCapture);
@@ -94,15 +94,15 @@ namespace Unclassified.UI
 				System.Windows.Threading.DispatcherPriority.Input);
 		}
 
-		private static void OnPreviewKeyDown(object sender, KeyEventArgs e)
+		private static void OnPreviewKeyDown(object sender, KeyEventArgs args)
 		{
 			if (openSplitButton != null)
 			{
-				if (e.Key == Key.Escape ||
-					e.Key == Key.System)
+				if (args.Key == Key.Escape ||
+					args.Key == Key.System)
 				{
 					openSplitButton.CloseSubmenu();
-					e.Handled = true;
+					args.Handled = true;
 				}
 			}
 		}
@@ -113,11 +113,11 @@ namespace Unclassified.UI
 		private static object CoerceIsSubmenuOpen(DependencyObject element, object value)
 		{
 			SplitButton splitButton = element as SplitButton;
-			if ((bool) value)
+			if ((bool)value)
 			{
 				if (!splitButton.IsLoaded)
 				{
-					splitButton.Loaded += delegate(object sender, RoutedEventArgs e)
+					splitButton.Loaded += delegate (object sender, RoutedEventArgs args)
 					{
 						splitButton.CoerceValue(IsSubmenuOpenProperty);
 					};
@@ -126,13 +126,13 @@ namespace Unclassified.UI
 				}
 			}
 
-			return (bool) value && splitButton.HasItems;
+			return (bool)value && splitButton.HasItems;
 		}
 
-		private static void OnMenuItemClick(object sender, RoutedEventArgs e)
+		private static void OnMenuItemClick(object sender, RoutedEventArgs args)
 		{
 			SplitButton splitButton = sender as SplitButton;
-			MenuItem menuItem = e.OriginalSource as MenuItem;
+			MenuItem menuItem = args.OriginalSource as MenuItem;
 
 			// To make the ButtonClickEvent get fired as we expected, you should mark the ClickEvent
 			// as handled to prevent the event from popping up to the button portion of the SplitButton.
@@ -140,11 +140,11 @@ namespace Unclassified.UI
 				menuItem.Parent != null &&
 				!typeof(MenuItem).IsAssignableFrom(menuItem.Parent.GetType()))
 			{
-				e.Handled = true;
+				args.Handled = true;
 			}
 		}
 
-		private static void OnMouseButtonDown(object sender, MouseButtonEventArgs e)
+		private static void OnMouseButtonDown(object sender, MouseButtonEventArgs args)
 		{
 			SplitButton splitButton = sender as SplitButton;
 			//if (!splitButton.IsKeyboardFocusWithin)
@@ -153,15 +153,15 @@ namespace Unclassified.UI
 			//    return;
 			//}
 
-			if (Mouse.Captured == splitButton && e.OriginalSource == splitButton)
+			if (Mouse.Captured == splitButton && args.OriginalSource == splitButton)
 			{
 				splitButton.CloseSubmenu();
 				return;
 			}
 
-			if (e.Source is MenuItem)
+			if (args.Source is MenuItem)
 			{
-				MenuItem menuItem = (MenuItem) e.Source;
+				MenuItem menuItem = (MenuItem)args.Source;
 				if (!menuItem.HasItems)
 				{
 					splitButton.CloseSubmenu();
@@ -185,7 +185,7 @@ namespace Unclassified.UI
 		/// </summary>
 		public CornerRadius CornerRadius
 		{
-			get { return (CornerRadius) GetValue(CornerRadiusProperty); }
+			get { return (CornerRadius)GetValue(CornerRadiusProperty); }
 			set { SetValue(CornerRadiusProperty, value); }
 		}
 
@@ -211,13 +211,13 @@ namespace Unclassified.UI
 			}
 		}
 
-		private void OnHeaderButtonMouseDown(object sender, RoutedEventArgs e)
+		private void OnHeaderButtonMouseDown(object sender, RoutedEventArgs args)
 		{
 			// Close the popup as soon as the mouse is pressed on the button part
 			CloseSubmenu();
 		}
 
-		private void OnHeaderButtonClick(object sender, RoutedEventArgs e)
+		private void OnHeaderButtonClick(object sender, RoutedEventArgs args)
 		{
 			// Close the popup in case the Click event was invoked somehow without pressing the mouse
 			CloseSubmenu();

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 using Unclassified.FieldLog;
@@ -16,7 +14,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		public DebugMessageViewModel(int pid, string text, bool isGlobal)
 		{
 			this.Time = FL.UtcNow;
-			this.UtcOffset = (int) DateTimeOffset.Now.Offset.TotalMinutes;
+			this.UtcOffset = (int)DateTimeOffset.Now.Offset.TotalMinutes;
 			this.ProcessId = pid;
 			this.Message = (text ?? "").TrimEnd();
 			this.IsGlobal = isGlobal;
@@ -46,6 +44,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		public int ProcessId { get; private set; }
 		public string Message { get; private set; }
 		public bool IsGlobal { get; private set; }
+
 		public string TypeImageSource
 		{
 			get
@@ -53,6 +52,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 				return IsGlobal ? "/Images/Windows_System_14.png" : "/Images/Windows_User_14.png";
 			}
 		}
+
 		public string PrioImageSource { get { return "/Images/Transparent_14.png"; } }
 
 		public string SourceString

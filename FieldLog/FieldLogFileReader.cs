@@ -363,7 +363,7 @@ namespace Unclassified.FieldLog
 				do
 				{
 					// Remember the log item start position in the file
-					pos = (int) fileStream.Position;
+					pos = (int)fileStream.Position;
 					bool localWaitMode = WaitMode;
 					if (!localWaitMode && pos == fileStream.Length)
 					{
@@ -391,8 +391,8 @@ namespace Unclassified.FieldLog
 						}
 					}
 					// Parse type and length data
-					type = (FieldLogItemType) ((bytes[0] & 0xF0) >> 4);
-					bytes[0] = (byte) (bytes[0] & 0x0F);
+					type = (FieldLogItemType)((bytes[0] & 0xF0) >> 4);
+					bytes[0] = (byte)(bytes[0] & 0x0F);
 					if (BitConverter.IsLittleEndian)
 						Array.Reverse(bytes);
 					length = BitConverter.ToInt32(bytes, 0);
@@ -422,6 +422,7 @@ namespace Unclassified.FieldLog
 		}
 
 #if !NET20
+
 		/// <summary>
 		/// Reads the next complete log item from the file.
 		/// </summary>
@@ -433,6 +434,7 @@ namespace Unclassified.FieldLog
 		{
 			return new Task<FieldLogItem>(ReadLogItem);
 		}
+
 #endif
 
 		#endregion Log item read methods

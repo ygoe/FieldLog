@@ -16,13 +16,13 @@ namespace Unclassified.FieldLogViewer.Converters
 				values[2] is bool &&
 				values[3] is int)
 			{
-				DateTime itemTime = (DateTime) values[0];
-				bool showRelativeTime = (bool) values[2];
-				int utcOffset = (int) values[3];
+				DateTime itemTime = (DateTime)values[0];
+				bool showRelativeTime = (bool)values[2];
+				int utcOffset = (int)values[3];
 
 				if (showRelativeTime && values[1] != DependencyProperty.UnsetValue)
 				{
-					DateTime selectedTime = (DateTime) values[1];
+					DateTime selectedTime = (DateTime)values[1];
 
 					TimeSpan diff = itemTime - selectedTime;
 					// U+2005 4-per-m space, U+2006 6-per-m space, U+2007 Figure space
@@ -91,8 +91,8 @@ namespace Unclassified.FieldLogViewer.Converters
 				values[0] is DateTime &&
 				values[1] is int)
 			{
-				DateTime itemTime = (DateTime) values[0];
-				int utcOffset = (int) values[1];
+				DateTime itemTime = (DateTime)values[0];
+				int utcOffset = (int)values[1];
 
 				switch (App.Settings.ItemTimeMode)
 				{

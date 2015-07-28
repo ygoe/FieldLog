@@ -56,7 +56,7 @@ namespace PdbConvert.Symbols
 			{
 				int retVal;
 				unmanagedVariable.GetAddressKind(out retVal);
-				return (SymAddressKind) retVal;
+				return (SymAddressKind)retVal;
 			}
 		}
 

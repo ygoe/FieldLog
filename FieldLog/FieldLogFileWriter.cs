@@ -182,7 +182,7 @@ namespace Unclassified.FieldLog
 		{
 			get
 			{
-				return (int) fileStream.Position;
+				return (int)fileStream.Position;
 			}
 		}
 
@@ -209,15 +209,15 @@ namespace Unclassified.FieldLog
 			while (fileStream.Position < fileStream.Length)
 			{
 				// Remember the log item start position in the file
-				int pos = (int) fileStream.Position;
+				int pos = (int)fileStream.Position;
 				// Read the item type and length
 				if (fileStream.Read(bytes, 0, bytes.Length) < bytes.Length)
 				{
 					throw new FormatException("Invalid log file to append to. Log item header too short.");
 				}
 				// Parse type and length data
-				FieldLogItemType type = (FieldLogItemType) ((bytes[0] & 0xF0) >> 4);
-				bytes[0] = (byte) (bytes[0] & 0x0F);
+				FieldLogItemType type = (FieldLogItemType)((bytes[0] & 0xF0) >> 4);
+				bytes[0] = (byte)(bytes[0] & 0x0F);
 				if (BitConverter.IsLittleEndian)
 					Array.Reverse(bytes);
 				int length = BitConverter.ToInt32(bytes, 0);
@@ -263,12 +263,12 @@ namespace Unclassified.FieldLog
 					return pos;
 				}
 
-				pos = (int) fileStream.Position;   // Log files are restricted to < 2 GiB by convention
+				pos = (int)fileStream.Position;   // Log files are restricted to < 2 GiB by convention
 				byte[] bytes = Encoding.UTF8.GetBytes(text);
 				byte[] lengthBytes = BitConverter.GetBytes(bytes.Length);
 				if (BitConverter.IsLittleEndian)
 					Array.Reverse(lengthBytes);
-				lengthBytes[0] = (byte) (lengthBytes[0] & 0x0F | ((byte) FieldLogItemType.StringData << 4));
+				lengthBytes[0] = (byte)(lengthBytes[0] & 0x0F | ((byte)FieldLogItemType.StringData << 4));
 
 				fileStream.Write(lengthBytes, 0, lengthBytes.Length);
 				fileStream.Write(bytes, 0, bytes.Length);
@@ -292,7 +292,7 @@ namespace Unclassified.FieldLog
 		/// <param name="itemType">Log item type.</param>
 		internal void SetItemType(FieldLogItemType itemType)
 		{
-			this.itemType = (byte) itemType;
+			this.itemType = (byte)itemType;
 		}
 
 		/// <summary>
@@ -414,7 +414,7 @@ namespace Unclassified.FieldLog
 			byte[] bytes = BitConverter.GetBytes(length);
 			if (BitConverter.IsLittleEndian)
 				Array.Reverse(bytes);
-			bytes[0] |= (byte) (itemType << 4);
+			bytes[0] |= (byte)(itemType << 4);
 			fileStream.Write(bytes, 0, bytes.Length);
 
 			fileStream.Write(buffer.ToArray(), 0, buffer.Count);
@@ -446,14 +446,14 @@ namespace Unclassified.FieldLog
 				{
 					uint highDword;
 					uint size = GetCompressedFileSizeW(fileName, out highDword);
-					return (int) size;
+					return (int)size;
 				}
 				catch
 				{
 					supportsGetCompressedFileSize = false;
 				}
 			}
-			return (int) new FileInfo(fileName).Length;
+			return (int)new FileInfo(fileName).Length;
 		}
 
 		#endregion Public methods

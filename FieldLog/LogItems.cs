@@ -90,7 +90,7 @@ namespace Unclassified.FieldLog
 				object value = HttpContext.Current.Items[FL.HttpContextKey_WebRequestId];
 				if (value is uint)
 				{
-					WebRequestId = (uint) value;
+					WebRequestId = (uint)value;
 				}
 			}
 #endif
@@ -133,7 +133,7 @@ namespace Unclassified.FieldLog
 		{
 			writer.AddBuffer(Time.Ticks);
 			writer.AddBuffer(EventCounter);
-			writer.AddBuffer((byte) Priority);
+			writer.AddBuffer((byte)Priority);
 			writer.AddBuffer(SessionId.ToByteArray());
 			writer.AddBuffer(ThreadId);
 			writer.AddBuffer(WebRequestId);
@@ -159,7 +159,7 @@ namespace Unclassified.FieldLog
 				case FieldLogItemType.RepeatedScope:
 					return FieldLogScopeItem.Read(reader, type == FieldLogItemType.RepeatedScope);
 			}
-			throw new ArgumentException("Unsupported log item type (" + (int) type + ")");
+			throw new ArgumentException("Unsupported log item type (" + (int)type + ")");
 		}
 
 		/// <summary>
@@ -172,7 +172,7 @@ namespace Unclassified.FieldLog
 			FileFormatVersion = reader.FormatVersion;
 			Time = new DateTime(reader.ReadInt64(), DateTimeKind.Utc);
 			EventCounter = reader.ReadInt32();
-			Priority = (FieldLogPriority) reader.ReadByte();
+			Priority = (FieldLogPriority)reader.ReadByte();
 			SessionId = new Guid(reader.ReadBytes(16));
 			ThreadId = reader.ReadInt32();
 			if (reader.FormatVersion >= 2)
@@ -422,19 +422,19 @@ namespace Unclassified.FieldLog
 				}
 				if (data is string)
 				{
-					return "\"" + ((string) data).Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
+					return "\"" + ((string)data).Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
 				}
 				if (data is DateTime)
 				{
-					return ((DateTime) data).ToString("yyyy-MM-dd'T'HH:mm:ss.ffffff");
+					return ((DateTime)data).ToString("yyyy-MM-dd'T'HH:mm:ss.ffffff");
 				}
 				if (data is DateTimeOffset)
 				{
-					return ((DateTimeOffset) data).ToString("yyyy-MM-dd'T'HH:mm:ss.ffffffK");
+					return ((DateTimeOffset)data).ToString("yyyy-MM-dd'T'HH:mm:ss.ffffffK");
 				}
 				if (data is TimeSpan)
 				{
-					return ((TimeSpan) data).ToString();
+					return ((TimeSpan)data).ToString();
 				}
 				if (data is DBNull)
 				{
@@ -442,27 +442,27 @@ namespace Unclassified.FieldLog
 				}
 				if (data is Enum)
 				{
-					return ((Enum) data).ToString("G") + " (" + ((Enum) data).ToString("D") + ")";
+					return ((Enum)data).ToString("G") + " (" + ((Enum)data).ToString("D") + ")";
 				}
 				if (data is Guid)
 				{
-					return ((Guid) data).ToString("B");
+					return ((Guid)data).ToString("B");
 				}
 				if (data is IntPtr)
 				{
 					if (IntPtr.Size == 4)
-						return "0x" + ((IntPtr) data).ToInt32().ToString("X4");
-					return "0x" + ((IntPtr) data).ToInt64().ToString("X8");
+						return "0x" + ((IntPtr)data).ToInt32().ToString("X4");
+					return "0x" + ((IntPtr)data).ToInt64().ToString("X8");
 				}
 				if (data is UIntPtr)
 				{
 					if (UIntPtr.Size == 4)
-						return "0x" + ((UIntPtr) data).ToUInt32().ToString("X4");
-					return "0x" + ((UIntPtr) data).ToUInt64().ToString("X8");
+						return "0x" + ((UIntPtr)data).ToUInt32().ToString("X4");
+					return "0x" + ((UIntPtr)data).ToUInt64().ToString("X8");
 				}
 				if (data is StringBuilder)
 				{
-					return "\"" + ((StringBuilder) data).ToString().Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
+					return "\"" + ((StringBuilder)data).ToString().Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
 				}
 
 				string indent = new string('\t', level);
@@ -856,7 +856,7 @@ namespace Unclassified.FieldLog
 		{
 			writer.SetItemType(IsRepeated ? FieldLogItemType.RepeatedScope : FieldLogItemType.Scope);
 			base.Write(writer);
-			writer.AddBuffer((byte) Type);
+			writer.AddBuffer((byte)Type);
 			writer.AddBuffer(Level);
 			writer.AddBuffer(Name);
 
@@ -890,7 +890,7 @@ namespace Unclassified.FieldLog
 			FieldLogScopeItem item = new FieldLogScopeItem();
 			item.ReadBaseData(reader);
 			item.IsRepeated = isRepeated;
-			item.Type = (FieldLogScopeType) reader.ReadByte();
+			item.Type = (FieldLogScopeType)reader.ReadByte();
 			item.Level = reader.ReadInt32();
 			item.Name = reader.ReadString();
 

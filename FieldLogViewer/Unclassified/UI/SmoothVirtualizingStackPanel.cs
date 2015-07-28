@@ -118,7 +118,7 @@ namespace Unclassified.UI
 		/// </summary>
 		private void UpdateViewportParameters()
 		{
-			itemsPerPage = (int) Math.Floor(ViewportHeight / ItemHeight);
+			itemsPerPage = (int)Math.Floor(ViewportHeight / ItemHeight);
 		}
 
 		private int GetItemsCount()

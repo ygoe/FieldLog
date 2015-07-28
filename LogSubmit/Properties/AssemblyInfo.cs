@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Windows;
 
 [assembly: AssemblyProduct("FieldLog")]
 [assembly: AssemblyTitle("LogSubmit")]
@@ -24,4 +23,5 @@ using System.Windows;
 [assembly: AssemblyConfiguration("Release")]
 #endif
 
+// Other attributes
 [assembly: ComVisible(false)]

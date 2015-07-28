@@ -32,6 +32,7 @@ namespace Unclassified.FieldLog
 		#region Delegates and types
 
 		private delegate void AddErrorDelegate(bool canContinue, string errorMsg, object ex, bool terminateTimerEnabled);
+
 		private delegate void VoidMethod();   // = Action in .NET 4
 
 		private class ErrorInfo
@@ -158,12 +159,12 @@ namespace Unclassified.FieldLog
 			// thread. Setting TopMost again after a short while helps to bring it in the foreground
 			// again.
 			System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
-			timer.Tick += delegate(object sender, EventArgs args)
+			timer.Tick += delegate (object sender, EventArgs args)
 				{
 					// Just to be sure, also set Visible, it doesn't hurt
 					currentInstance.Visible = true;
 					currentInstance.TopMost = true;
-					
+
 					// Come back, but not so soon
 					timer.Interval *= 2;
 				};
@@ -479,7 +480,7 @@ namespace Unclassified.FieldLog
 				terminateTimer.Interval = 500;
 				terminateTimer.Tick += (s, e) =>
 				{
-					int secondsToShutdown = (int) Math.Round((shutdownTime - DateTime.UtcNow).TotalSeconds);
+					int secondsToShutdown = (int)Math.Round((shutdownTime - DateTime.UtcNow).TotalSeconds);
 					if (secondsToShutdown < 0)
 						secondsToShutdown = 0;
 					terminateButton.Text = FL.AppErrorDialogTerminate + " (" + secondsToShutdown + ")";

@@ -24,6 +24,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("Release")]
 #endif
 
+// Other attributes
 [assembly: ComVisible(false)]
 [assembly: ThemeInfo(
 	// Where theme specific resource dictionaries are located

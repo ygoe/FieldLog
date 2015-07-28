@@ -137,35 +137,35 @@ namespace Unclassified.FieldLog
 						dataSb.Append(" (").Append(value.GetType().Name).Append("): ").Append(Convert.ToString(value, CultureInfo.InvariantCulture));
 						if (value is byte)
 						{
-							dataSb.Append(" (0x").Append(((byte) value).ToString("X2")).Append(")");
+							dataSb.Append(" (0x").Append(((byte)value).ToString("X2")).Append(")");
 						}
 						if (value is sbyte)
 						{
-							dataSb.Append(" (0x").Append(((sbyte) value).ToString("X2")).Append(")");
+							dataSb.Append(" (0x").Append(((sbyte)value).ToString("X2")).Append(")");
 						}
 						if (value is ushort)
 						{
-							dataSb.Append(" (0x").Append(((ushort) value).ToString("X4")).Append(")");
+							dataSb.Append(" (0x").Append(((ushort)value).ToString("X4")).Append(")");
 						}
 						if (value is short)
 						{
-							dataSb.Append(" (0x").Append(((short) value).ToString("X")).Append(")");
+							dataSb.Append(" (0x").Append(((short)value).ToString("X")).Append(")");
 						}
 						if (value is uint)
 						{
-							dataSb.Append(" (0x").Append(((uint) value).ToString("X8")).Append(")");
+							dataSb.Append(" (0x").Append(((uint)value).ToString("X8")).Append(")");
 						}
 						if (value is int)
 						{
-							dataSb.Append(" (0x").Append(((int) value).ToString("X8")).Append(")");
+							dataSb.Append(" (0x").Append(((int)value).ToString("X8")).Append(")");
 						}
 						if (value is ulong)
 						{
-							dataSb.Append(" (0x").Append(((ulong) value).ToString("X16")).Append(")");
+							dataSb.Append(" (0x").Append(((ulong)value).ToString("X16")).Append(")");
 						}
 						if (value is long)
 						{
-							dataSb.Append(" (0x").Append(((long) value).ToString("X16")).Append(")");
+							dataSb.Append(" (0x").Append(((long)value).ToString("X16")).Append(")");
 						}
 					}
 					else

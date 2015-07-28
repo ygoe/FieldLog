@@ -393,6 +393,7 @@ namespace Unclassified.FieldLog
 		/// applications.
 		/// </summary>
 		internal static Assembly EntryAssembly;
+
 		/// <summary>
 		/// The entry assembly's Location value. This is determined by other means for ASP.NET
 		/// applications.
@@ -447,7 +448,7 @@ namespace Unclassified.FieldLog
 				object[] customAttributes = myAssembly.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
-					fieldLogVersion = ((AssemblyInformationalVersionAttribute) customAttributes[0]).InformationalVersion;
+					fieldLogVersion = ((AssemblyInformationalVersionAttribute)customAttributes[0]).InformationalVersion;
 				}
 			}
 
@@ -768,26 +769,26 @@ namespace Unclassified.FieldLog
 
 			// Handle UI thread exceptions
 			System.Windows.Forms.Application.ThreadException +=
-				delegate(object sender, System.Threading.ThreadExceptionEventArgs e)
+				delegate (object sender, System.Threading.ThreadExceptionEventArgs args)
 				{
-					FL.Critical(e.Exception, "WinForms.ThreadException", true);
+					FL.Critical(args.Exception, "WinForms.ThreadException", true);
 				};
 			// Set the unhandled exception mode to force all Windows Forms errors to go through our handler
 			System.Windows.Forms.Application.SetUnhandledExceptionMode(System.Windows.Forms.UnhandledExceptionMode.CatchException);
 
 			// Handle non-UI thread exceptions
 			AppDomain.CurrentDomain.UnhandledException +=
-				delegate(object sender, UnhandledExceptionEventArgs e)
+				delegate (object sender, UnhandledExceptionEventArgs args)
 				{
-					FL.Critical(e.ExceptionObject as Exception, "AppDomain.UnhandledException", true);
+					FL.Critical(args.ExceptionObject as Exception, "AppDomain.UnhandledException", true);
 				};
 
 #if !NET20
 			// Log first-chance exceptions, also from try/catch blocks
 			AppDomain.CurrentDomain.FirstChanceException +=
-				delegate(object sender, System.Runtime.ExceptionServices.FirstChanceExceptionEventArgs e)
+				delegate (object sender, System.Runtime.ExceptionServices.FirstChanceExceptionEventArgs args)
 				{
-					if (e.Exception.GetType() == typeof(Microsoft.CSharp.RuntimeBinder.RuntimeBinderException))
+					if (args.Exception.GetType() == typeof(Microsoft.CSharp.RuntimeBinder.RuntimeBinderException))
 					{
 						// This is normal for dynamic types, ignore it.
 						// (Trying to process exceptions on dynamic types only causes more pain.)
@@ -799,7 +800,7 @@ namespace Unclassified.FieldLog
 					{
 						if (localLevel <= 4 && LogFirstChanceExceptions && !isShutdown)
 						{
-							FL.Exception(FieldLogPriority.Trace, e.Exception, "AppDomain.FirstChanceException", new StackTrace(1, true));
+							FL.Exception(FieldLogPriority.Trace, args.Exception, "AppDomain.FirstChanceException", new StackTrace(1, true));
 						}
 					}
 					finally
@@ -812,23 +813,24 @@ namespace Unclassified.FieldLog
 			// happens rarely, this event may never be fired, which makes this handler somewhat
 			// useless. But in case we have a chance, we'll happily log the event.
 			System.Threading.Tasks.TaskScheduler.UnobservedTaskException +=
-				delegate(object sender, System.Threading.Tasks.UnobservedTaskExceptionEventArgs e)
+				delegate (object sender, System.Threading.Tasks.UnobservedTaskExceptionEventArgs args)
 				{
-					FL.Trace(e.Exception, "TaskScheduler.UnobservedTaskException");
+					FL.Trace(args.Exception, "TaskScheduler.UnobservedTaskException");
 				};
 
 			// Handle WPF UI thread exceptions
 			// (The essence of System.Windows.Application.DispatcherUnhandledException)
 			Dispatcher.CurrentDispatcher.UnhandledException +=
-				delegate(object sender, DispatcherUnhandledExceptionEventArgs e)
+				delegate (object sender, DispatcherUnhandledExceptionEventArgs args)
 				{
-					FL.Critical(e.Exception, "WPF.DispatcherUnhandledException", true);
-					e.Handled = true;
+					FL.Critical(args.Exception, "WPF.DispatcherUnhandledException", true);
+					args.Handled = true;
 				};
 #endif
 		}
 
 #if !NET20
+
 		/// <summary>
 		/// Registers presentation trace handlers for a WPF application.
 		/// </summary>
@@ -841,6 +843,7 @@ namespace Unclassified.FieldLog
 			// Listen for events on all WPF trace sources
 			FieldLogTraceListener.Start();
 		}
+
 #endif
 
 		private static void DefaultShowAppErrorDialog(FieldLogExceptionItem exItem, bool allowContinue)
@@ -860,7 +863,7 @@ namespace Unclassified.FieldLog
 
 			// Safety timer to terminate the process if user feedback is unexpected
 			System.Threading.Timer timer = new System.Threading.Timer(
-				delegate(object state)
+				delegate (object state)
 				{
 					FL.Warning("Process waiting for user feedback terminated by safety timer.");
 					Shutdown();
@@ -1004,7 +1007,7 @@ namespace Unclassified.FieldLog
 			}
 			string errorMsg = messagePrefix + ExceptionUserMessageRecursive(ex).TrimEnd();
 
-			ShowErrorDialog(errorMsg, (object) ex);
+			ShowErrorDialog(errorMsg, (object)ex);
 		}
 
 		/// <summary>
@@ -1125,6 +1128,7 @@ namespace Unclassified.FieldLog
 		}
 
 #if !NET20
+
 		/// <summary>
 		/// Sets all application error dialog texts using a translator function.
 		/// </summary>
@@ -1173,9 +1177,11 @@ namespace Unclassified.FieldLog
 			AppErrorDialogWeb = safeTranslator("AppErrorDialogWeb") ?? AppErrorDialogWeb;
 			AppErrorDialogWebDescription = safeTranslator("AppErrorDialogWebDescription") ?? AppErrorDialogWebDescription;
 		}
+
 #endif
 
 #if ASPNET
+
 		/// <summary>
 		/// Writes a complete application error web page to the response, replacing all previous
 		/// content, and sets the HTTP response code to 500.
@@ -1283,6 +1289,7 @@ namespace Unclassified.FieldLog
 			}
 			return null;
 		}
+
 #endif
 
 		#endregion Application error handling
@@ -2144,7 +2151,7 @@ namespace Unclassified.FieldLog
 
 				// Interlocked.Increment is only available for Int32 but it handles the overflow, so
 				// we can safely cast it to UInt32 to use the other half of the value space.
-				uint newWebRequestId = unchecked((uint) Interlocked.Increment(ref lastWebRequestId));
+				uint newWebRequestId = unchecked((uint)Interlocked.Increment(ref lastWebRequestId));
 				HttpContext.Current.Items[HttpContextKey_WebRequestId] = newWebRequestId;
 				FieldLogScopeItem scopeItem = new FieldLogScopeItem(FieldLogPriority.Trace, type, name, webRequestData);
 				Log(scopeItem);
@@ -2306,7 +2313,7 @@ namespace Unclassified.FieldLog
 
 		private static void LogTimeoutCallback(object item)
 		{
-			Log((FieldLogItem) item);
+			Log((FieldLogItem)item);
 		}
 
 		#endregion Timeout log methods
@@ -2371,6 +2378,7 @@ namespace Unclassified.FieldLog
 		}
 
 #if !NET20
+
 		/// <summary>
 		/// Wraps an Action delegate in a FieldLogScope to mark its entering and returning.
 		/// </summary>
@@ -2508,6 +2516,7 @@ namespace Unclassified.FieldLog
 				return func(arg1, arg2);
 			}
 		}
+
 #endif
 
 		#endregion Scope helpers
@@ -2655,6 +2664,7 @@ namespace Unclassified.FieldLog
 		}
 
 #if !NET20
+
 		/// <summary>
 		/// Wraps an Action delegate in a CustomTimerScope to measure the time that the action
 		/// takes to execute.
@@ -2810,6 +2820,7 @@ namespace Unclassified.FieldLog
 				return func(arg1, arg2);
 			}
 		}
+
 #endif
 
 		#endregion Custom time measurement
@@ -2817,6 +2828,7 @@ namespace Unclassified.FieldLog
 		#region WPF Dispatcher log methods
 
 #if !NET20
+
 		/// <summary>
 		/// Writes a text log item to the log file after the WPF dispatcher has processed other
 		/// queued events of the specified dispatcher priority.
@@ -3044,6 +3056,7 @@ namespace Unclassified.FieldLog
 			CustomTimerInfo cti = StartTimer(key);
 			disp.BeginInvoke(new Action<bool>(cti.Stop), priority, false);
 		}
+
 #endif
 
 		#endregion WPF Dispatcher log methods
@@ -3051,6 +3064,7 @@ namespace Unclassified.FieldLog
 		#region ASP.NET log methods
 
 #if ASPNET
+
 		/// <summary>
 		/// Starts logging for ASP.NET applications.
 		/// </summary>
@@ -3295,7 +3309,7 @@ namespace Unclassified.FieldLog
 			// The shutdown message is not publicly available, let's try to get it anyway
 			try
 			{
-				HttpRuntime runtime = (HttpRuntime) typeof(HttpRuntime).InvokeMember(
+				HttpRuntime runtime = (HttpRuntime)typeof(HttpRuntime).InvokeMember(
 					"_theRuntime",
 					BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.GetField,
 					null,
@@ -3303,7 +3317,7 @@ namespace Unclassified.FieldLog
 					null);
 				if (runtime != null)
 				{
-					details = (string) runtime.GetType().InvokeMember(
+					details = (string)runtime.GetType().InvokeMember(
 						"_shutDownMessage",
 						BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField,
 						null,
@@ -3319,6 +3333,7 @@ namespace Unclassified.FieldLog
 
 			Trace("ASP.NET shutdown reason: " + text, details);
 		}
+
 #endif
 
 		#endregion ASP.NET log methods
@@ -3894,7 +3909,7 @@ namespace Unclassified.FieldLog
 					DateTime latestFileTime = DateTime.MinValue;
 					string latestFileName = null;
 					long minFileSize = 20 * 1024;   // 20 KiB
-					foreach (string fileName in Directory.GetFiles(logDir, logFile + "-" + (int) logItem.Priority + "-*.fl"))
+					foreach (string fileName in Directory.GetFiles(logDir, logFile + "-" + (int)logItem.Priority + "-*.fl"))
 					{
 						FileInfo fi = new FileInfo(fileName);
 						if (fi.Length >= maxFileSize) continue;   // File is already large enough
@@ -3909,7 +3924,7 @@ namespace Unclassified.FieldLog
 					if (latestFileName == null)
 					{
 						// No suitable file found, create a new one
-						latestFileName = logFileBasePath + "-" + (int) logItem.Priority + "-" + FL.UtcNow.Ticks + ".fl";
+						latestFileName = logFileBasePath + "-" + (int)logItem.Priority + "-" + FL.UtcNow.Ticks + ".fl";
 					}
 
 					bool needNewFile = false;
@@ -3929,7 +3944,7 @@ namespace Unclassified.FieldLog
 					if (needNewFile)
 					{
 						Thread.Sleep(0);   // Ensure that a different file name will be used
-						latestFileName = logFileBasePath + "-" + (int) logItem.Priority + "-" + FL.UtcNow.Ticks + ".fl";
+						latestFileName = logFileBasePath + "-" + (int)logItem.Priority + "-" + FL.UtcNow.Ticks + ".fl";
 						writer = new FieldLogFileWriter(latestFileName, logItem.Priority);
 					}
 					priorityLogWriters[logItem.Priority] = writer;
@@ -4111,7 +4126,7 @@ namespace Unclassified.FieldLog
 
 			int deletedCount = 0;
 			DateTime purgeTime = FL.UtcNow.Subtract(keepTime);
-			foreach (string fileName in Directory.GetFiles(logDir, logFile + "-" + (int) prio + "-*.fl"))
+			foreach (string fileName in Directory.GetFiles(logDir, logFile + "-" + (int)prio + "-*.fl"))
 			{
 				FileInfo fi = new FileInfo(fileName);
 				if (!string.Equals(fileName, currentFileName, StringComparison.OrdinalIgnoreCase) &&
@@ -4212,7 +4227,7 @@ namespace Unclassified.FieldLog
 									// and get any meaningless (possibly negative) value
 									if (lng <= int.MaxValue)
 									{
-										maxFileSize = (int) lng;
+										maxFileSize = (int)lng;
 									}
 									else
 									{
@@ -4256,7 +4271,7 @@ namespace Unclassified.FieldLog
 									priorityKeepTimes[FieldLogPriority.Critical] = ParseConfigTimeSpan(value, priorityKeepTimes[FieldLogPriority.Critical]);
 									break;
 								case "checktimethreshold":
-									FL.CheckTimeThreshold = (int) ParseConfigNumber(value, FL.CheckTimeThreshold);
+									FL.CheckTimeThreshold = (int)ParseConfigNumber(value, FL.CheckTimeThreshold);
 									break;
 								case "maxscreenshotsize":
 									FieldLogScreenshot.MaxTotalSize = ParseConfigNumber(value, FieldLogScreenshot.MaxTotalSize);
@@ -4332,7 +4347,7 @@ namespace Unclassified.FieldLog
 			FL.Trace("FieldLog configuration file re-read", sb.ToString());
 		}
 
-		private static void configFileWatcher_Event(object sender, FileSystemEventArgs e)
+		private static void configFileWatcher_Event(object sender, FileSystemEventArgs args)
 		{
 			Thread.Sleep(500);
 			lock (sendThread)
@@ -4486,7 +4501,7 @@ namespace Unclassified.FieldLog
 				object[] customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
-					return ((AssemblyFileVersionAttribute) customAttributes[0]).Version;
+					return ((AssemblyFileVersionAttribute)customAttributes[0]).Version;
 				}
 				// Assembly identity version, always present.
 				// The AssemblyVersionAttribute is accessed like this, the attribute itself is not
@@ -4608,13 +4623,13 @@ namespace Unclassified.FieldLog
 				object[] customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
-					return ((AssemblyInformationalVersionAttribute) customAttributes[0]).InformationalVersion;
+					return ((AssemblyInformationalVersionAttribute)customAttributes[0]).InformationalVersion;
 				}
 				// Win32 file resource version
 				customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
-					return ((AssemblyFileVersionAttribute) customAttributes[0]).Version;
+					return ((AssemblyFileVersionAttribute)customAttributes[0]).Version;
 				}
 				// Assembly identity version, always present.
 				// The AssemblyVersionAttribute is accessed like this, the attribute itself is not
@@ -4639,7 +4654,7 @@ namespace Unclassified.FieldLog
 				object[] customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyConfigurationAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
-					return ((AssemblyConfigurationAttribute) customAttributes[0]).Configuration;
+					return ((AssemblyConfigurationAttribute)customAttributes[0]).Configuration;
 				}
 				return null;
 			}
@@ -4660,12 +4675,12 @@ namespace Unclassified.FieldLog
 				object[] customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyProductAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
-					return ((AssemblyProductAttribute) customAttributes[0]).Product;
+					return ((AssemblyProductAttribute)customAttributes[0]).Product;
 				}
 				customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
-					return ((AssemblyTitleAttribute) customAttributes[0]).Title;
+					return ((AssemblyTitleAttribute)customAttributes[0]).Title;
 				}
 				return null;
 			}
@@ -4686,7 +4701,7 @@ namespace Unclassified.FieldLog
 				object[] customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
-					return ((AssemblyDescriptionAttribute) customAttributes[0]).Description;
+					return ((AssemblyDescriptionAttribute)customAttributes[0]).Description;
 				}
 				return null;
 			}
@@ -4707,7 +4722,7 @@ namespace Unclassified.FieldLog
 				object[] customAttributes = EntryAssembly.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
 				if (customAttributes != null && customAttributes.Length > 0)
 				{
-					return ((AssemblyCopyrightAttribute) customAttributes[0]).Copyright;
+					return ((AssemblyCopyrightAttribute)customAttributes[0]).Copyright;
 				}
 				return null;
 			}
@@ -4735,7 +4750,7 @@ namespace Unclassified.FieldLog
 						}
 					}
 				}
-				return (bool) isInUnitTest;
+				return (bool)isInUnitTest;
 			}
 		}
 

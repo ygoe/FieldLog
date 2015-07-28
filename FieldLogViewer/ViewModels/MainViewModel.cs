@@ -186,7 +186,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public bool AutoLoadLog
 		{
-			get { return autoLoadLog; }
+			get
+			{
+				return autoLoadLog;
+			}
 			set
 			{
 				if (value != autoLoadLog)
@@ -1130,7 +1133,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public bool IsLocalDebugMonitorActive
 		{
-			get { return localDebugMonitor.IsActive; }
+			get
+			{
+				return localDebugMonitor.IsActive;
+			}
 			set
 			{
 				try
@@ -1154,7 +1160,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public bool IsGlobalDebugMonitorActive
 		{
-			get { return globalDebugMonitor.IsActive; }
+			get
+			{
+				return globalDebugMonitor.IsActive;
+			}
 			set
 			{
 				try
@@ -1207,7 +1216,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public List<LogItemViewModelBase> SelectedItems
 		{
-			get { return GetValue<List<LogItemViewModelBase>>("SelectedItems"); }
+			get
+			{
+				return GetValue<List<LogItemViewModelBase>>("SelectedItems");
+			}
 			set
 			{
 				if (SetValue(value, "SelectedItems"))
@@ -1219,7 +1231,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public bool IsLoadingFiles
 		{
-			get { return GetValue<bool>("IsLoadingFiles"); }
+			get
+			{
+				return GetValue<bool>("IsLoadingFiles");
+			}
 			set
 			{
 				if (SetValue(value, "IsLoadingFiles"))
@@ -1246,7 +1261,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public bool IsLoadingFilesAgain
 		{
-			get { return GetValue<bool>("IsLoadingFilesAgain"); }
+			get
+			{
+				return GetValue<bool>("IsLoadingFilesAgain");
+			}
 			set
 			{
 				if (SetValue(value, "IsLoadingFilesAgain"))
@@ -1313,7 +1331,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public FilterViewModel SelectedFilter
 		{
-			get { return GetValue<FilterViewModel>("SelectedFilter"); }
+			get
+			{
+				return GetValue<FilterViewModel>("SelectedFilter");
+			}
 			set
 			{
 				if (SetValue(value, "SelectedFilter"))
@@ -1336,7 +1357,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		public string AdhocSearchText
 		{
-			get { return GetValue<string>("AdhocSearchText"); }
+			get
+			{
+				return GetValue<string>("AdhocSearchText");
+			}
 			set
 			{
 				if (SetValue(value, "AdhocSearchText"))
@@ -1672,17 +1696,17 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		/// <summary>
 		/// Filter implementation for the collection view returned by FilteredLogItemsView.
 		/// </summary>
-		private void filteredLogItems_Filter(object sender, FilterEventArgs e)
+		private void filteredLogItems_Filter(object sender, FilterEventArgs args)
 		{
 			if (SelectedFilter != null)
 			{
-				e.Accepted =
-					SelectedFilter.IsMatch(e.Item) &&
-					(adhocFilterCondition == null || adhocFilterCondition.IsMatch(e.Item));
+				args.Accepted =
+					SelectedFilter.IsMatch(args.Item) &&
+					(adhocFilterCondition == null || adhocFilterCondition.IsMatch(args.Item));
 			}
 			else
 			{
-				e.Accepted = true;
+				args.Accepted = true;
 			}
 		}
 
@@ -1916,7 +1940,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			// now waiting for more items to be written to the log files.
 			EventWaitHandle readWaitHandle = new AutoResetEvent(false);
 			readWaitHandle.WaitAction(
-				() => dispatcher.Invoke((Action) OnReadWaiting),
+				() => dispatcher.Invoke((Action)OnReadWaiting),
 				() => !isLiveStopped);
 
 			// Create the log file group reader and read each next item
@@ -1976,7 +2000,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 							continue;
 						}
 					}
-					seenScopeItemVMs.Add((FieldLogScopeItemViewModel) itemVM);
+					seenScopeItemVMs.Add((FieldLogScopeItemViewModel)itemVM);
 				}
 
 				InsertLogItemThread(itemVM);
@@ -2070,15 +2094,15 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		/// Handles an error while reading the log files.
 		/// </summary>
 		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void logFileGroupReader_Error(object sender, ErrorEventArgs e)
+		/// <param name="args"></param>
+		private void logFileGroupReader_Error(object sender, ErrorEventArgs args)
 		{
 			if (!dispatcher.CheckAccess())
 			{
 				dispatcher.BeginInvoke(
 					new ErrorEventHandler(logFileGroupReader_Error),
 					sender,
-					e);
+					args);
 			}
 			else
 			{
@@ -2087,7 +2111,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 					allowDialogCancellation: true,
 					title: "FieldLogViewer",
 					mainInstruction: "An error occured while reading the log files.",
-					content: e.GetException().Message + "\n\n" +
+					content: args.GetException().Message + "\n\n" +
 						"For details, including the exact problem and the offending file name and position, please open FieldLogViewer's log file from " +
 						FL.LogFileBasePath + ".\n\n" +
 						"If you continue reading, the loaded items may be incomplete or may not appear until you click the Stop button.",

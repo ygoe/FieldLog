@@ -115,21 +115,21 @@ namespace Unclassified.FieldLog
 			// Total time
 			// (Add 5 ticks for simple microseconds rounding)
 			long roundTicks = ticks + 5;
-			int seconds = (int) (roundTicks / 10000000);
-			int ms = (int) ((roundTicks % 10000000) / 10000);
-			int us = (int) ((roundTicks % 10000) / 10);
+			int seconds = (int)(roundTicks / 10000000);
+			int ms = (int)((roundTicks % 10000000) / 10000);
+			int us = (int)((roundTicks % 10000) / 10);
 
 			// Per call, this time (since last item)
 			long roundTicksTt = ticksTt + 5;
-			int secondsTt = (int) (roundTicksTt / 10000000);
-			int msTt = (int) ((roundTicksTt % 10000000) / 10000);
-			int usTt = (int) ((roundTicksTt % 10000) / 10);
+			int secondsTt = (int)(roundTicksTt / 10000000);
+			int msTt = (int)((roundTicksTt % 10000000) / 10000);
+			int usTt = (int)((roundTicksTt % 10000) / 10);
 
 			// Per call time
 			long roundTicksPc = ticksPc + 5;
-			int secondsPc = (int) (roundTicksPc / 10000000);
-			int msPc = (int) ((roundTicksPc % 10000000) / 10000);
-			int usPc = (int) ((roundTicksPc % 10000) / 10);
+			int secondsPc = (int)(roundTicksPc / 10000000);
+			int msPc = (int)((roundTicksPc % 10000000) / 10000);
+			int usPc = (int)((roundTicksPc % 10000) / 10);
 
 			string text = "Custom timer " + key + " at " + localCounter;
 			string details =

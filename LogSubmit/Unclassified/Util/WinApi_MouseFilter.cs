@@ -24,7 +24,6 @@ using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
-using Microsoft.Win32;
 
 namespace Unclassified.Util
 {
@@ -41,18 +40,25 @@ namespace Unclassified.Util
 
 		[DllImport("user32")]
 		public static extern bool IsWindow(IntPtr hWnd);
+
 		[DllImport("user32")]
 		public static extern bool IsWindowVisible(IntPtr hWnd);
+
 		[DllImport("user32")]
 		public static extern int GetClassName(IntPtr hWnd, [MarshalAs(UnmanagedType.LPStr)] StringBuilder buf, int nMaxCount);
+
 		[DllImport("user32.dll")]
 		public static extern bool GetWindowRect(IntPtr hWnd, out Rectangle lpRect);
+
 		[DllImport("user32")]
 		public static extern int GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
+
 		[DllImport("user32")]
 		public static extern bool PostMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
 		[DllImport("user32.dll")]
 		public static extern bool ClientToScreen(IntPtr hWnd, ref Point lpPoint);
+
 		[DllImport("user32.dll")]
 		public static extern bool ScreenToClient(IntPtr hWnd, ref Point lpPoint);
 
@@ -60,6 +66,7 @@ namespace Unclassified.Util
 		//public static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
 		[DllImport("user32.dll", EntryPoint = "GetWindowLong")]
 		private static extern IntPtr GetWindowLongPtr32(IntPtr hWnd, int nIndex);
+
 		[DllImport("user32.dll", EntryPoint = "GetWindowLongPtr")]
 		private static extern IntPtr GetWindowLongPtr64(IntPtr hWnd, int nIndex);
 

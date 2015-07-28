@@ -37,7 +37,7 @@ namespace Unclassified.LogSubmit.Views
 
 		#region Control event handlers
 
-		private void InteractiveCheckBox_CheckedChanged(object sender, EventArgs e)
+		private void InteractiveCheckBox_CheckedChanged(object sender, EventArgs args)
 		{
 			DirectInfoLabel.Visible = !InteractiveCheckBox.Checked;
 		}

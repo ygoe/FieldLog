@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Xml;
+using Unclassified.FieldLog;
 
 namespace Unclassified.FieldLogViewer.SourceInfo
 {
@@ -180,9 +181,19 @@ namespace Unclassified.FieldLogViewer.SourceInfo
 			originalNameWithSignature = null;
 			originalToken = 0;
 
+			try
+			{
+				module = Path.GetFileNameWithoutExtension(module);
+			}
+			catch (ArgumentException ex)
+			{
+				FL.Warning(ex);
+			}
+			module = module.ToLowerInvariant();
+
 			Dictionary<int, Tuple<string, int>> dict;
 			Tuple<string, int> tuple;
-			if (data.TryGetValue(Path.GetFileNameWithoutExtension(module).ToLowerInvariant(), out dict) &&
+			if (data.TryGetValue(module, out dict) &&
 				dict.TryGetValue(token, out tuple))
 			{
 				originalName = tuple.Item1;

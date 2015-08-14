@@ -14,7 +14,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 	{
 		public FieldLogStackFrameViewModel(FieldLogStackFrame stackFrame)
 		{
-			this.StackFrame = stackFrame;
+			StackFrame = stackFrame;
 
 			// Initially format source string
 			Refresh();
@@ -59,7 +59,17 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			StringBuilder sb = new StringBuilder();
 			if (!string.IsNullOrEmpty(StackFrame.Module))
 			{
-				sb.Append("[").Append(Path.GetFileNameWithoutExtension(StackFrame.Module)).Append("]");
+				try
+				{
+					sb.Append("[").Append(Path.GetFileNameWithoutExtension(StackFrame.Module)).Append("]");
+				}
+				catch (ArgumentException ex)
+				{
+					// Reported on 2015-08-09: ArgumentException("Illegal characters in path."); not sure what the offending string was.
+					FL.TraceData("StackFrame.Module", StackFrame.Module);
+					FL.Warning(ex);
+					sb.Append("[").Append(StackFrame.Module).Append("]");
+				}
 				if (StackFrame.Token != 0)
 				{
 					sb.Append(" @").Append(StackFrame.Token.ToString("x8"));

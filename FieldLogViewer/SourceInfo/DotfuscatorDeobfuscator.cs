@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+using Unclassified.FieldLog;
 
 namespace Unclassified.FieldLogViewer.SourceInfo
 {
@@ -188,7 +189,15 @@ namespace Unclassified.FieldLogViewer.SourceInfo
 			originalNameWithSignature = null;
 			originalToken = 0;
 
-			module = Path.GetFileNameWithoutExtension(module).ToLowerInvariant();
+			try
+			{
+				module = Path.GetFileNameWithoutExtension(module);
+			}
+			catch (ArgumentException ex)
+			{
+				FL.Warning(ex);
+			}
+			module = module.ToLowerInvariant();
 
 			// Resolve the signature first: it is logged with obfuscated type names and the map file
 			// contains original names

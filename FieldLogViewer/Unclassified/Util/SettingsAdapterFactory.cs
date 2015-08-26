@@ -1566,7 +1566,7 @@ namespace Unclassified.Util
 				catch (FormatException ex)
 				{
 					// Ignore entries that cannot be converted to the requested type (for key and value)
-					FL.Warning(ex, "Converting entry from NameValueCollection");
+					FieldLog.FL.Warning(ex, "Converting entry from NameValueCollection");
 				}
 #else
 				catch (FormatException)

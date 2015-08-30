@@ -1983,6 +1983,42 @@ namespace Unclassified.FieldLog
 		}
 
 		/// <summary>
+		/// Appends more text to the last retained text log item. If there is no retained log item
+		/// or the last item is no text item, a new retained text item is added.
+		/// </summary>
+		/// <param name="priority">The priority of the log item.</param>
+		/// <param name="text">The text message.</param>
+		public static void TextRetainedAppend(FieldLogPriority priority, string text)
+		{
+			TextRetainedAppend(priority, text, null);
+		}
+
+		/// <summary>
+		/// Appends more text to the last retained text log item. If there is no retained log item
+		/// or the last item is no text item, a new retained text item is added.
+		/// </summary>
+		/// <param name="priority">The priority of the log item.</param>
+		/// <param name="text">The text message.</param>
+		/// <param name="details">The additional details of the log event.</param>
+		public static void TextRetainedAppend(FieldLogPriority priority, string text, string details)
+		{
+			FieldLogTextItem lastItem;
+			if (threadRetainedItems != null &&
+				threadRetainedItems.Count > 0 &&
+				(lastItem = threadRetainedItems[threadRetainedItems.Count - 1] as FieldLogTextItem) != null)
+			{
+				if (!string.IsNullOrEmpty(text))
+					lastItem.AppendDetails(priority, text);
+				if (!string.IsNullOrEmpty(details))
+					lastItem.AppendDetails(priority, details);
+			}
+			else
+			{
+				TextRetained(priority, text, details);
+			}
+		}
+
+		/// <summary>
 		/// Writes a data log item to the log file.
 		/// </summary>
 		/// <param name="priority">The priority of the log item.</param>

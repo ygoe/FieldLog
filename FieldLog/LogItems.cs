@@ -43,7 +43,7 @@ namespace Unclassified.FieldLog
 		/// <summary>Gets the exact time when the log item was generated.</summary>
 		public DateTime Time { get; private set; }
 		/// <summary>Gets the priority of the log item.</summary>
-		public FieldLogPriority Priority { get; private set; }
+		public FieldLogPriority Priority { get; protected set; }
 		/// <summary>Gets the current unique process execution ID of the log item.</summary>
 		public Guid SessionId { get; private set; }
 		/// <summary>Gets the current thread ID of the log item.</summary>
@@ -243,6 +243,22 @@ namespace Unclassified.FieldLog
 
 			Size += (Text != null ? Text.Length * 2 : 0) +
 				(Details != null ? Details.Length * 2 : 0);
+		}
+
+		/// <summary>
+		/// Appends more text to the details of the log item.
+		/// </summary>
+		/// <param name="priority">The new priority of the log item. This will only be changed if the priority is increased.</param>
+		/// <param name="text">The text to append.</param>
+		public void AppendDetails(FieldLogPriority priority, string text)
+		{
+			if (priority > Priority)
+			{
+				Priority = priority;
+			}
+			Details += (Details != null && !Details.EndsWith("\n") ? Environment.NewLine : "") +
+				text;
+			Size += text.Length * 2;
 		}
 
 		/// <summary>

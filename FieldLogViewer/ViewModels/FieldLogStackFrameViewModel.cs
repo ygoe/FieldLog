@@ -59,17 +59,17 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			StringBuilder sb = new StringBuilder();
 			if (!string.IsNullOrEmpty(StackFrame.Module))
 			{
+				string moduleName = StackFrame.Module;
 				try
 				{
-					sb.Append("[").Append(Path.GetFileNameWithoutExtension(StackFrame.Module)).Append("]");
+					moduleName = Path.GetFileNameWithoutExtension(moduleName);
 				}
-				catch (ArgumentException ex)
+				catch (ArgumentException)
 				{
-					// Reported on 2015-08-09: ArgumentException("Illegal characters in path."); not sure what the offending string was.
-					FL.TraceData("StackFrame.Module", StackFrame.Module);
-					FL.Warning(ex);
-					sb.Append("[").Append(StackFrame.Module).Append("]");
+					// Module name could be "<Unknown>" or "<Im Speichermodul>", the framework
+					// ignores this exception as well.
 				}
+				sb.Append("[").Append(moduleName).Append("]");
 				if (StackFrame.Token != 0)
 				{
 					sb.Append(" @").Append(StackFrame.Token.ToString("x8"));

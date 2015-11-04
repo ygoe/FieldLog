@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -1334,6 +1335,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 	#region Filter definition enums
 
+	[Obfuscation(Exclude = true, ApplyToMembers = true, Feature = "renaming")]
 	internal enum FilterColumn
 	{
 		[Description("Any text content")]
@@ -1447,6 +1449,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		WebRequestDuration,
 	}
 
+	[Obfuscation(Exclude = true, ApplyToMembers = true, Feature = "renaming")]
 	internal enum FilterComparison
 	{
 		[UseForEnumColumn, UseForNumberColumn, UseForStringColumn]
@@ -1520,6 +1523,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		NotInList,
 	}
 
+	[Obfuscation(Exclude = true, ApplyToMembers = true, Feature = "renaming")]
 	internal enum FilterItemType
 	{
 		[Description("Any item type")]
@@ -1542,6 +1546,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		DebugOutput,
 	}
 
+	[Obfuscation(Exclude = true, ApplyToMembers = true, Feature = "renaming")]
 	internal enum FilterPriority
 	{
 		[Description("Trace")]
@@ -1560,6 +1565,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		Critical
 	}
 
+	[Obfuscation(Exclude = true, ApplyToMembers = true, Feature = "renaming")]
 	internal enum FilterScopeType
 	{
 		[Description("Enter")]

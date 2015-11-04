@@ -228,7 +228,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 			// First compare the items by time (close is equal)
 			const long closeTicks = 10000000;   // 1 second
-			long timeDiff = this.Time.Ticks - other.Time.Ticks;
+			long timeDiff = Time.Ticks - other.Time.Ticks;
 			if (timeDiff > closeTicks)
 			{
 				return 1;
@@ -256,7 +256,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 
 			// Otherwise stay with the time
-			return this.Time.CompareTo(other.Time);
+			return Time.CompareTo(other.Time);
 		}
 	}
 }

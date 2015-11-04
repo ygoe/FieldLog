@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
 using Unclassified.FieldLog;
@@ -7,6 +8,8 @@ using Unclassified.UI;
 
 namespace Unclassified.FieldLogViewer.ViewModels
 {
+	// Type name used in XAML
+	[Obfuscation(Exclude = true, ApplyToMembers = false, Feature = "renaming")]
 	internal class DebugMessageViewModel : LogItemViewModelBase
 	{
 		#region Constructor

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
 using Unclassified.FieldLog;
@@ -9,6 +10,8 @@ using Unclassified.Util;
 
 namespace Unclassified.FieldLogViewer.ViewModels
 {
+	// Type name used in XAML
+	[Obfuscation(Exclude = true, ApplyToMembers = false, Feature = "renaming")]
 	internal class FieldLogExceptionViewModel : ViewModelBase
 	{
 		public FieldLogExceptionViewModel(FieldLogException exception)

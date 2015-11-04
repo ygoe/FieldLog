@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using Unclassified.FieldLog;
 
 namespace Unclassified.FieldLogViewer.ViewModels
 {
+	// Type name used in XAML
+	[Obfuscation(Exclude = true, ApplyToMembers = false, Feature = "renaming")]
 	internal class FieldLogDataItemViewModel : FieldLogItemViewModel
 	{
 		public FieldLogDataItemViewModel(FieldLogDataItem item)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
@@ -195,6 +196,7 @@ namespace Unclassified.FieldLogViewer.Views
 			}
 		}
 
+		[Obfuscation(Exclude = true, Feature = "renaming")]
 		private void SmoothVirtualizingPanel_Loaded(object sender, RoutedEventArgs args)
 		{
 			logItemsHostPanel = sender as SmoothVirtualizingPanel;

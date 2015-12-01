@@ -3834,6 +3834,24 @@ namespace Unclassified.FieldLog
 				{
 					if (logFileBasePath == null) continue;
 
+					switch (Environment.OSVersion.Platform)
+					{
+						case PlatformID.Win32NT:
+						case PlatformID.Win32S:
+						case PlatformID.Win32Windows:
+						case PlatformID.WinCE:
+							if (logFileBasePath.StartsWith(Environment.SystemDirectory, StringComparison.OrdinalIgnoreCase))
+							{
+								// Trying to write to the protected SYSTEM or NETWORK SERVICE account
+								// directory. Don't do that, the user will not be able to retrieve the
+								// log files from there. Fall back to other options.
+								continue;
+							}
+							break;
+						default:   // Unix/Linux
+							break;
+					}
+
 					// First try to create the directory, if it doesn't exist yet
 					string logDir = Path.GetDirectoryName(logFileBasePath);
 					Directory.CreateDirectory(logDir);

@@ -202,6 +202,13 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		private static AutoResetEvent newBufferEvent = new AutoResetEvent(false);
 		/// <summary>
+		/// Indicates whether any relevant log item has been logged. This is anything other than
+		/// LogStart, LogShutdown, and first-chance exception items. As long as this field is set to
+		/// false, nothing is written to log files. This prevents writing log files that only
+		/// contain log start and end items but nothing interesting.
+		/// </summary>
+		private static bool hadRelevantLogItem;
+		/// <summary>
 		/// The generation requested for flushing to disk.
 		/// </summary>
 		private static int pendingFlushGeneration;
@@ -2296,6 +2303,23 @@ namespace Unclassified.FieldLog
 					eventCounter++;
 					item.EventCounter = eventCounter;
 				}
+				// Check for relevant item
+				if (!hadRelevantLogItem)
+				{
+					bool isRelevant = true;
+					var scopeItem = item as FieldLogScopeItem;
+					if (scopeItem != null &&
+						(scopeItem.Type == FieldLogScopeType.LogStart || scopeItem.Type == FieldLogScopeType.LogShutdown))
+					{
+						isRelevant = false;
+					}
+					var exItem = item as FieldLogExceptionItem;
+					if (exItem != null && exItem.Context == "AppDomain.FirstChanceException")
+					{
+						isRelevant = false;
+					}
+					if (isRelevant) hadRelevantLogItem = true;
+				}
 				// Buffer works...
 				CheckAddBuffer(size);
 				currentBuffer.Add(item);
@@ -3406,6 +3430,7 @@ namespace Unclassified.FieldLog
 			List<FieldLogItem> myBuffer;
 			lock (currentBufferLock)
 			{
+				if (!hadRelevantLogItem) return;
 				// Check maximum buffer size
 				if (addSize != 0 && currentBufferSize + addSize <= maxBufferSize) return;
 				// Check used buffer

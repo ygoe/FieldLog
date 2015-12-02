@@ -374,7 +374,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		private void OnLoadObfuscationMap()
 		{
 			OpenFileDialog dlg = new OpenFileDialog();
-			dlg.Filter = "Obfuscation map files|*.xml;*.xml.gz|All files|*.*";
+			dlg.Filter = "Obfuscation map files|*.mapz;*.xml;*.xml.gz|All files|*.*";
 			dlg.InitialDirectory = Path.GetDirectoryName(loadedBasePath);
 			dlg.Multiselect = true;
 			dlg.Title = "Select the obfuscation map file(s) to load";

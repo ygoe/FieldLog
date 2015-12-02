@@ -31,7 +31,8 @@ namespace Unclassified.FieldLogViewer.SourceInfo
 		public static bool SupportsFile(string fileName)
 		{
 			XmlDocument xdoc = new XmlDocument();
-			if (Path.GetExtension(fileName).Equals(".gz", StringComparison.OrdinalIgnoreCase))
+			if (Path.GetExtension(fileName).Equals(".gz", StringComparison.OrdinalIgnoreCase) ||
+				Path.GetExtension(fileName).Equals(".mapz", StringComparison.OrdinalIgnoreCase))
 			{
 				using (FileStream fileStream = new FileStream(fileName, FileMode.Open))
 				using (GZipStream gzStream = new GZipStream(fileStream, CompressionMode.Decompress))

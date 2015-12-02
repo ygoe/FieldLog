@@ -127,13 +127,9 @@ namespace PdbConvert
 				// Remove all files with no remaining methods
 				doc.SelectNodes("/symbols/module/files/file")
 					.OfType<XmlNode>()
-					.ForEachSafe(n =>
-					{
-						if (n.SelectNodes("../../methods/method/sequencePoints/entry[@fileRef='" + n.Attributes["id"].Value + "']").Count == 0)
-						{
-							n.ParentNode.RemoveChild(n);
-						}
-					});
+					.AsParallel()
+					.Where(n => n.SelectNodes("../../methods/method/sequencePoints/entry[@fileRef='" + n.Attributes["id"].Value + "']").Count == 0)
+					.ForEachSafe(n => n.ParentNode.RemoveChild(n));
 			}
 
 			if (noNamesOption.IsSet)

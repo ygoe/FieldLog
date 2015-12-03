@@ -69,7 +69,7 @@ namespace Unclassified.FieldLog
 		/// <param name="window"></param>
 		public static void CreateForWindowScreen(Form window)
 		{
-			Screen windowScreen = Screen.FromControl(window);
+			Screen windowScreen = window != null ? Screen.FromControl(window) : Screen.PrimaryScreen;
 			Rectangle rect = windowScreen.Bounds;
 			CreateForRectangle(rect);
 		}
@@ -85,7 +85,7 @@ namespace Unclassified.FieldLog
 		/// </remarks>
 		public static void CreateForWindowScreen(Window window)
 		{
-			Screen windowScreen = Screen.FromHandle(new WindowInteropHelper(window).Handle);
+			Screen windowScreen = window != null ? Screen.FromHandle(new WindowInteropHelper(window).Handle) : Screen.PrimaryScreen;
 			Rectangle rect = windowScreen.Bounds;
 			CreateForRectangle(rect);
 		}
@@ -119,6 +119,7 @@ namespace Unclassified.FieldLog
 		/// <param name="window"></param>
 		public static void CreateForWindow(Form window)
 		{
+			if (window == null) return;
 			Rectangle rect = window.Bounds;
 			CreateForRectangle(rect);
 		}
@@ -134,6 +135,7 @@ namespace Unclassified.FieldLog
 		/// </remarks>
 		public static void CreateForWindow(Window window)
 		{
+			if (window == null) return;
 			Rectangle rect = new Rectangle((int)window.Left, (int)window.Top, (int)window.Width, (int)window.Height);
 			CreateForRectangle(rect);
 		}

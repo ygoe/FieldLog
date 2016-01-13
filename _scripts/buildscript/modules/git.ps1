@@ -92,16 +92,16 @@ function Do-Git-Export($action)
 	{
 		$gitBin = Check-RegFilename "hklm:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Git_is1" "InstallLocation"
 		$gitBin = Check-Filename "$gitBin\bin\git.exe"
-		if ($gitBin -eq $null)
-		{
-			$gitBin = Check-RegFilename "hkcu:\Software\Microsoft\Windows\CurrentVersion\Uninstall\Git_is1" "InstallLocation"
-			$gitBin = Check-Filename "$gitBin\bin\git.exe"
-			if ($gitBin -eq $null)
-			{
-				WaitError "Git binary not found"
-				exit 1
-			}
-		}
+	}
+	if ($gitBin -eq $null)
+	{
+		$gitBin = Check-RegFilename "hkcu:\Software\Microsoft\Windows\CurrentVersion\Uninstall\Git_is1" "InstallLocation"
+		$gitBin = Check-Filename "$gitBin\bin\git.exe"
+	}
+	if ($gitBin -eq $null)
+	{
+		WaitError "Git binary not found"
+		exit 1
 	}
 
 	# Find the 7-Zip binary
@@ -184,16 +184,16 @@ function Do-Git-Log($action)
 	{
 		$gitBin = Check-RegFilename "hklm:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Git_is1" "InstallLocation"
 		$gitBin = Check-Filename "$gitBin\bin\git.exe"
-		if ($gitBin -eq $null)
-		{
-			$gitBin = Check-RegFilename "hkcu:\Software\Microsoft\Windows\CurrentVersion\Uninstall\Git_is1" "InstallLocation"
-			$gitBin = Check-Filename "$gitBin\bin\git.exe"
-			if ($gitBin -eq $null)
-			{
-				WaitError "Git binary not found"
-				exit 1
-			}
-		}
+	}
+	if ($gitBin -eq $null)
+	{
+		$gitBin = Check-RegFilename "hkcu:\Software\Microsoft\Windows\CurrentVersion\Uninstall\Git_is1" "InstallLocation"
+		$gitBin = Check-Filename "$gitBin\bin\git.exe"
+	}
+	if ($gitBin -eq $null)
+	{
+		WaitError "Git binary not found"
+		exit 1
 	}
 
 	# Read the output log file and determine the last added revision

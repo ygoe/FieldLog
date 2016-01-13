@@ -106,7 +106,7 @@ if (IsSelected transfer-web)
 # Upload to NuGet
 if (IsSelected transfer-nuget)
 {
-	Push-NuGetPackage "FieldLog\bin\Unclassified.FieldLog" $nuGetApiKey 45
+	Push-NuGetPackage "FieldLog\bin\Unclassified.FieldLog" $nuGetApiKey 15
 }
 
 End-BuildScript

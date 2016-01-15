@@ -346,7 +346,17 @@ namespace Unclassified.FieldLog
 
 			if (method.DeclaringType != null)
 			{
-				Module = method.DeclaringType.Module.FullyQualifiedName;
+				if (!method.DeclaringType.Module.Name.Contains("<"))
+				{
+					// FullyQualifiedName calls Path.GetFullPathInternal() which eventually throws
+					// an ArgumentException if it gets invalid characters in a path. Don't try that
+					// during error handling...
+					Module = method.DeclaringType.Module.FullyQualifiedName;
+				}
+				else
+				{
+					Module = method.DeclaringType.Module.Name;
+				}
 				Token = method.MetadataToken;
 				ILOffset = stackFrame.GetILOffset();
 				TypeName = FormatTypeName(method.DeclaringType);

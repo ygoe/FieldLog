@@ -60,14 +60,17 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			if (!string.IsNullOrEmpty(StackFrame.Module))
 			{
 				string moduleName = StackFrame.Module;
-				try
+				if (!moduleName.Contains("<"))
 				{
-					moduleName = Path.GetFileNameWithoutExtension(moduleName);
-				}
-				catch (ArgumentException)
-				{
-					// Module name could be "<Unknown>" or "<Im Speichermodul>", the framework
-					// ignores this exception as well.
+					try
+					{
+						moduleName = Path.GetFileNameWithoutExtension(moduleName);
+					}
+					catch (ArgumentException)
+					{
+						// Module name could be "<Unknown>" or "<Im Speichermodul>", the framework
+						// ignores this exception as well.
+					}
 				}
 				sb.Append("[").Append(moduleName).Append("]");
 				if (StackFrame.Token != 0)

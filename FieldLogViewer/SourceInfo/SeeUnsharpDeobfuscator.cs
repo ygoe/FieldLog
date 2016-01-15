@@ -183,13 +183,16 @@ namespace Unclassified.FieldLogViewer.SourceInfo
 			originalNameWithSignature = null;
 			originalToken = 0;
 
-			try
+			if (!module.Contains("<"))
 			{
-				module = Path.GetFileNameWithoutExtension(module);
-			}
-			catch (ArgumentException ex)
-			{
-				FL.Warning(ex);
+				try
+				{
+					module = Path.GetFileNameWithoutExtension(module);
+				}
+				catch (ArgumentException ex)
+				{
+					FL.Warning(ex);
+				}
 			}
 			module = module.ToLowerInvariant();
 

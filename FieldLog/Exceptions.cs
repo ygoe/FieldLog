@@ -78,7 +78,14 @@ namespace Unclassified.FieldLog
 			Type exType = ex.GetType();
 
 			Type = exType.FullName;
-			TypeModule = exType.Module.FullyQualifiedName;
+			if (!exType.Module.Name.Contains("<"))
+			{
+				TypeModule = exType.Module.FullyQualifiedName;
+			}
+			else
+			{
+				TypeModule = exType.Module.Name;
+			}
 			Token = exType.MetadataToken;
 			Message = ex.Message.TrimEnd();
 			StackTrace stackTrace = customStackTrace;
@@ -343,25 +350,31 @@ namespace Unclassified.FieldLog
 		public FieldLogStackFrame(StackFrame stackFrame)
 		{
 			MethodBase method = stackFrame.GetMethod();
+			Module module;
 
+			MethodName = method.Name;
 			if (method.DeclaringType != null)
 			{
-				if (!method.DeclaringType.Module.Name.Contains("<"))
-				{
-					// FullyQualifiedName calls Path.GetFullPathInternal() which eventually throws
-					// an ArgumentException if it gets invalid characters in a path. Don't try that
-					// during error handling...
-					Module = method.DeclaringType.Module.FullyQualifiedName;
-				}
-				else
-				{
-					Module = method.DeclaringType.Module.Name;
-				}
-				Token = method.MetadataToken;
-				ILOffset = stackFrame.GetILOffset();
+				module = method.DeclaringType.Module;
 				TypeName = FormatTypeName(method.DeclaringType);
 			}
-			MethodName = method.Name;
+			else
+			{
+				module = method.Module;
+			}
+			if (!module.Name.Contains("<"))
+			{
+				// FullyQualifiedName calls Path.GetFullPathInternal() which eventually throws
+				// an ArgumentException if it gets invalid characters in a path. Don't try that
+				// during error handling...
+				Module = module.FullyQualifiedName;
+			}
+			else
+			{
+				Module = module.Name;
+			}
+			Token = method.MetadataToken;
+			ILOffset = stackFrame.GetILOffset();
 
 			// TODO: Include 'extern' indicator from the following tests (needs new file format)
 			//bool isPInvoke = (method.Attributes & MethodAttributes.PinvokeImpl) != 0;

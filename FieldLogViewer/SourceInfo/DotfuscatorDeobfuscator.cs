@@ -189,6 +189,8 @@ namespace Unclassified.FieldLogViewer.SourceInfo
 			originalNameWithSignature = null;
 			originalToken = 0;
 
+			if (module == null) return false;
+
 			if (!module.Contains("<"))
 			{
 				try

@@ -110,6 +110,8 @@ namespace Unclassified.FieldLogViewer.SourceInfo
 			endLine = 0;
 			endColumn = 0;
 
+			if (module == null || module.Contains("<"))
+				return false;   // Module not known, we can't find the source for that
 			if (ilOffset < 0)
 				return false;   // IL offset not known, we can't find the source for that
 

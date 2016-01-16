@@ -371,7 +371,9 @@ namespace Unclassified.FieldLog
 			}
 			else
 			{
-				Module = module.Name;
+				// Try to find the name of the assembly instead
+				Module = module.Assembly.GetName().Name;
+				//Module = module.Name;
 			}
 			Token = method.MetadataToken;
 			ILOffset = stackFrame.GetILOffset();

@@ -225,17 +225,17 @@ namespace Unclassified.FieldLog
 				title = appName + " – " + title;
 			}
 
-			this.BackColor = SystemColors.Window;
-			this.ControlBox = false;
-			this.MinimizeBox = false;
-			this.MaximizeBox = false;
-			this.Font = SystemFonts.MessageBoxFont;
-			this.FormBorderStyle = FormBorderStyle.FixedDialog;
-			this.ShowInTaskbar = false;
-			this.Size = new Size(550, 300);
-			this.StartPosition = FormStartPosition.CenterScreen;
-			this.Text = title;
-			this.TopMost = true;
+			BackColor = SystemColors.Window;
+			ControlBox = false;
+			MinimizeBox = false;
+			MaximizeBox = false;
+			Font = SystemFonts.MessageBoxFont;
+			FormBorderStyle = FormBorderStyle.FixedDialog;
+			ShowInTaskbar = false;
+			Size = new Size(550, 300);
+			StartPosition = FormStartPosition.CenterScreen;
+			Text = title;
+			TopMost = true;
 
 			tablePanel = new TableLayoutPanel();
 			tablePanel.Dock = DockStyle.Fill;
@@ -248,7 +248,7 @@ namespace Unclassified.FieldLog
 			tablePanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 			tablePanel.ColumnCount = 1;
 			tablePanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-			this.Controls.Add(tablePanel);
+			Controls.Add(tablePanel);
 
 			introLabel = new Label();
 			introLabel.BackColor = Color.FromArgb(221, 74, 59);
@@ -259,7 +259,7 @@ namespace Unclassified.FieldLog
 				SystemFonts.MessageBoxFont.FontFamily,
 				SystemFonts.MessageBoxFont.SizeInPoints * 1.3f,
 				SystemFonts.MessageBoxFont.Style);
-			introLabel.MaximumSize = new Size(this.ClientSize.Width, 0);
+			introLabel.MaximumSize = new Size(ClientSize.Width, 0);
 			introLabel.Padding = new Padding(6, 4, 7, 6);
 			introLabel.Margin = new Padding();
 			introLabel.UseCompatibleTextRendering = false;
@@ -279,7 +279,9 @@ namespace Unclassified.FieldLog
 
 			errorLabel = new Label();
 			errorLabel.AutoSize = true;
-			errorLabel.MaximumSize = new Size(this.ClientSize.Width - 20, 0);
+			// Always keep the vertical scrollbar width free because the label wouldn't get smaller
+			// when the vertical scrollbar appears and then the horizontal scrollbar kicks in as well.
+			errorLabel.MaximumSize = new Size(errorPanel.ClientSize.Width - SystemInformation.VerticalScrollBarWidth - 2, 0);
 			errorLabel.Padding = new Padding();
 			errorLabel.Margin = new Padding();
 			errorLabel.UseCompatibleTextRendering = false;
@@ -288,7 +290,7 @@ namespace Unclassified.FieldLog
 
 			logLabel = new LinkLabel();
 			logLabel.AutoSize = true;
-			logLabel.MaximumSize = new Size(this.ClientSize.Width - 20, 0);
+			logLabel.MaximumSize = new Size(ClientSize.Width - 20, 0);
 			logLabel.Margin = new Padding(8, 6, 10, 0);
 			logLabel.Padding = new Padding();
 			if (FL.LogFileBasePath != null)
@@ -369,8 +371,8 @@ namespace Unclassified.FieldLog
 			detailsLabel.LinkClicked += (s, e) =>
 			{
 				detailsLabel.Hide();
-				this.Height += 300;
-				this.Top -= Math.Min(this.Top - 4, 150);
+				Height += 300;
+				Top -= Math.Min(Top - 4, 150);
 				tablePanel.RowStyles[4].Height = 350;
 				grid.Visible = true;
 			};

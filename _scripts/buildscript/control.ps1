@@ -12,66 +12,32 @@ Disable-ParallelBuild
 Restore-NuGetTool
 Restore-NuGetPackages "FieldLog.sln"
 
-# Debug builds
-if (IsSelected build-debug)
-{
-	Build-Solution "FieldLog.sln" "Debug" "Any CPU" 8
-	Build-Solution "FieldLog.sln" "Debug" "x86" 1
-
-	if (IsSelected sign-lib)
-	{
-		Sign-File "FieldLog\bin\DebugNET40\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword"
-		Sign-File "FieldLog\bin\DebugNET20\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword"
-		Sign-File "FieldLog\bin\DebugASPNET40\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword"
-	}
-	if (IsSelected sign-app)
-	{
-		Sign-File "FieldLogViewer\bin\Debug\FieldLogViewer.exe" "$signKeyFile" "$signPassword"
-		Sign-File "PdbConvert\bin\Debug\PdbConvert.exe" "$signKeyFile" "$signPassword"
-		Sign-File "LogSubmit\bin\Debug\LogSubmit.exe" "$signKeyFile" "$signPassword"
-		Sign-File "LogSubmit\bin\x86\Debug\LogSubmit.exe" "$signKeyFile" "$signPassword"
-	}
-}
-
 # Release builds
-if (IsAnySelected build-release commit publish)
+if (IsAnySelected build commit publish)
 {
 	Build-Solution "FieldLog.sln" "Release" "Any CPU" 8
 	Build-Solution "FieldLog.sln" "Release" "x86" 1
 	
-	# Archive debug symbols for later source lookup
-	EnsureDirExists ".local"
-	Exec-Console "PdbConvert\bin\Release\PdbConvert.exe" "$rootDir\FieldLogViewer\bin\Release\* /srcbase $rootDir /optimize /outfile $rootDir\.local\FieldLog-$revId.pdbx"
+	# Convert debug symbols to XML
+	Exec-Console "PdbConvert\bin\Release\PdbConvert.exe" "$rootDir\FieldLogViewer\bin\Release\* /srcbase $rootDir /optimize /outfile $rootDir\FieldLogViewer\bin\Release\FieldLog.pdbx"
 
-	if (IsAnySelected sign-lib publish)
+	Create-NuGetPackage "FieldLog\Unclassified.FieldLog.nuspec" "FieldLog\bin"
+	Create-Setup "Setup\FieldLog.iss" Release
+
+	if (IsSelected sign)
 	{
 		Sign-File "FieldLog\bin\ReleaseNET40\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword"
 		Sign-File "FieldLog\bin\ReleaseNET20\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword"
 		Sign-File "FieldLog\bin\ReleaseASPNET40\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword"
-	}
-	if (IsAnySelected sign-app publish)
-	{
 		Sign-File "FieldLogViewer\bin\Release\FieldLogViewer.exe" "$signKeyFile" "$signPassword"
 		Sign-File "PdbConvert\bin\Release\PdbConvert.exe" "$signKeyFile" "$signPassword"
 		Sign-File "LogSubmit\bin\Release\LogSubmit.exe" "$signKeyFile" "$signPassword"
 		Sign-File "LogSubmit\bin\x86\Release\LogSubmit.exe" "$signKeyFile" "$signPassword"
-	}
-
-	Create-NuGetPackage "FieldLog\Unclassified.FieldLog.nuspec" "FieldLog\bin"
-}
-
-# Release setups
-if (IsAnySelected setup-release commit publish)
-{
-	Create-Setup "Setup\FieldLog.iss" "Release"
-
-	if (IsAnySelected sign-setup publish)
-	{
 		Sign-File "Setup\bin\FieldLogSetup-$revId.exe" "$signKeyFile" "$signPassword"
 	}
 }
 
-# Install release setup
+# Install setup
 if (IsSelected install)
 {
 	Exec-File "Setup\bin\FieldLogSetup-$revId.exe" "/norestart /verysilent"
@@ -82,7 +48,6 @@ if (IsSelected commit)
 {
 	# Clean up test build files
 	Delete-File "Setup\bin\FieldLogSetup-$revId.exe"
-	Delete-File ".local\FieldLog-$revId.pdbx"
 
 	Git-Commit
 }
@@ -90,14 +55,18 @@ if (IsSelected commit)
 # Prepare publishing a release
 if (IsSelected publish)
 {
-	Git-Log ".local\FieldLogChanges.txt"
+	# Copy all necessary files into their own release directory
+	EnsureDirExists ".local\Release"
+	Copy-File "FieldLogViewer\bin\Release\FieldLog.pdbx" ".local\Release\FieldLog-$revId.pdbx"
+
+	Git-Log ".local\Release\FieldLogChanges.txt"
 }
 
 # Copy to website (local)
 if (IsSelected transfer-web)
 {
 	Copy-File "Setup\bin\FieldLogSetup-$revId.exe" "$webDir\files\source\fieldlog\"
-	Copy-File ".local\FieldLogChanges.txt" "$webDir\files\source\fieldlog\"
+	Copy-File ".local\Release\FieldLogChanges.txt" "$webDir\files\source\fieldlog\"
 	
 	$today = (Get-Date -Format "yyyy-MM-dd")
 	Exec-File "_scripts\bin\AutoReplace.exe" "$webDataFile fieldlog version=$revId date=$today"

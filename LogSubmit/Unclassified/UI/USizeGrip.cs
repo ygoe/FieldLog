@@ -2,12 +2,14 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using Unclassified.Util;
 
 namespace Unclassified.UI
 {
 	public class USizeGrip : Control
 	{
+		private const uint WM_NCHITTEST = 0x84;
+		private const int HTBOTTOMRIGHT = 17;
+
 		public static void AddToForm(Form form)
 		{
 			// Background transparency workaround: Draw USizeGrip control in parts.
@@ -159,9 +161,9 @@ namespace Unclassified.UI
 		protected override void WndProc(ref Message m)
 		{
 			// Responding to the hit test message does all the magic. :-)
-			if (m.Msg == WinApi.WM_NCHITTEST)
+			if (m.Msg == WM_NCHITTEST)
 			{
-				m.Result = new IntPtr((int)WinApi.WindowHitTestRegions.BottomRightSizeableCorner);
+				m.Result = new IntPtr(HTBOTTOMRIGHT);
 			}
 			else
 			{

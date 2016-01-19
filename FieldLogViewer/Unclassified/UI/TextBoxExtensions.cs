@@ -49,17 +49,17 @@ namespace Unclassified.UI
 			ownerType: typeof(TextBoxExtensions),
 			defaultMetadata: new PropertyMetadata(false, OnDisableInsertKeyChanged));
 
-		private static void OnDisableInsertKeyChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)
+		private static void OnDisableInsertKeyChanged(DependencyObject depObj, DependencyPropertyChangedEventArgs args)
 		{
-			if (d is TextBox && args != null)
+			if (depObj is TextBox && args != null)
 			{
 				if ((bool)args.NewValue)
 				{
-					(d as TextBox).PreviewKeyDown += TextBox_PreviewKeyDown;
+					(depObj as TextBox).PreviewKeyDown += TextBox_PreviewKeyDown;
 				}
 				else
 				{
-					(d as TextBox).PreviewKeyDown -= TextBox_PreviewKeyDown;
+					(depObj as TextBox).PreviewKeyDown -= TextBox_PreviewKeyDown;
 				}
 			}
 		}
@@ -112,21 +112,21 @@ namespace Unclassified.UI
 			propertyType: typeof(DelayedCall),
 			ownerType: typeof(TextBoxExtensions));
 
-		private static void OnUpdateDelayChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)
+		private static void OnUpdateDelayChanged(DependencyObject depObj, DependencyPropertyChangedEventArgs args)
 		{
-			if (d is TextBox && args != null)
+			if (depObj is TextBox && args != null)
 			{
 				if ((int)args.NewValue > 0)
 				{
-					(d as TextBox).GotFocus += TextBox_GotFocus;
-					(d as TextBox).TextChanged += TextBox_TextChanged;
-					(d as TextBox).LostFocus += TextBox_LostFocus;
+					(depObj as TextBox).GotFocus += TextBox_GotFocus;
+					(depObj as TextBox).TextChanged += TextBox_TextChanged;
+					(depObj as TextBox).LostFocus += TextBox_LostFocus;
 				}
 				else
 				{
-					(d as TextBox).GotFocus -= TextBox_GotFocus;
-					(d as TextBox).TextChanged -= TextBox_TextChanged;
-					(d as TextBox).LostFocus -= TextBox_LostFocus;
+					(depObj as TextBox).GotFocus -= TextBox_GotFocus;
+					(depObj as TextBox).TextChanged -= TextBox_TextChanged;
+					(depObj as TextBox).LostFocus -= TextBox_LostFocus;
 				}
 			}
 		}
@@ -211,5 +211,40 @@ namespace Unclassified.UI
 		}
 
 		#endregion On-demand focused binding update
+
+		#region Text manipulation
+
+		public static void InsertText(this TextBox textBox, string text, bool adjustSpaces = false)
+		{
+			int pos = textBox.SelectionStart;
+			string newText = textBox.Text;
+			if (textBox.SelectionLength > 0)
+			{
+				// Remove selected text
+				newText = newText.Remove(pos, textBox.SelectionLength);
+			}
+			// Insert new text
+			newText = newText.Insert(pos, text);
+			int addPos = 0;
+			if (adjustSpaces)
+			{
+				if (pos + text.Length < newText.Length && newText[pos + text.Length] != ' ')
+				{
+					// Not inserted at the end
+					newText = newText.Insert(pos + text.Length, " ");
+					addPos++;
+				}
+				if (pos > 0 && newText[pos - 1] != ' ')
+				{
+					// Not inserted at the beginning
+					newText = newText.Insert(pos, " ");
+					addPos++;
+				}
+			}
+			textBox.Text = newText;
+			textBox.SelectionStart = pos + text.Length + addPos;
+		}
+
+		#endregion Text manipulation
 	}
 }

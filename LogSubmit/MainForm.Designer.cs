@@ -35,7 +35,7 @@
 			this.MyCancelButton = new System.Windows.Forms.Button();
 			this.ContentPanel = new System.Windows.Forms.Panel();
 			this.progressSpinner1 = new Unclassified.UI.ProgressSpinner();
-			this.mouseFilter1 = new Unclassified.MouseFilter(this.components);
+			this.mouseFilter1 = new Unclassified.UI.MouseFilter(this.components);
 			this.tableLayoutPanel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -164,7 +164,7 @@
 		private System.Windows.Forms.Button NextButton;
 		private System.Windows.Forms.Button MyCancelButton;
 		private System.Windows.Forms.Panel ContentPanel;
-		private Unclassified.MouseFilter mouseFilter1;
+		private Unclassified.UI.MouseFilter mouseFilter1;
 		private Unclassified.UI.ProgressSpinner progressSpinner1;
 	}
 }

@@ -45,9 +45,9 @@ namespace Unclassified.LogSubmit.Views
 
 		private void TransportView_FontChanged(object sender, EventArgs args)
 		{
-			UIPreferences.UpdateFont(httpTransportView, httpTransportView.Font, Font);
-			UIPreferences.UpdateFont(mailTransportView, mailTransportView.Font, Font);
-			UIPreferences.UpdateFont(fileTransportView, fileTransportView.Font, Font);
+			UIPreferences.SetFont(httpTransportView, httpTransportView.Font, Font);
+			UIPreferences.SetFont(mailTransportView, mailTransportView.Font, Font);
+			UIPreferences.SetFont(fileTransportView, fileTransportView.Font, Font);
 		}
 
 		#endregion Event handlers

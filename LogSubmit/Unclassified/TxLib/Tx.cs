@@ -18,6 +18,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -580,8 +581,10 @@ namespace Unclassified.TxLib
 					{
 						FileSystemWatcher fsw = new FileSystemWatcher(Path.GetDirectoryName(fileName), Path.GetFileName(fileName));
 						fsw.InternalBufferSize = 4096;   // Minimum possible value
-						fsw.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Security | NotifyFilters.Size;
+						fsw.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Security | NotifyFilters.Size | NotifyFilters.FileName;
 						fsw.Changed += fsw_Changed;
+						fsw.Created += fsw_Changed;
+						fsw.Renamed += fsw_Changed;
 						fsw.EnableRaisingEvents = true;
 						fileWatchers[fileName] = fsw;
 					}
@@ -628,6 +631,13 @@ namespace Unclassified.TxLib
 
 		private static void fsw_Changed(object sender, FileSystemEventArgs args)
 		{
+			// A Renamed event is called twice when saving the file with TxEditor. The first
+			// renaming is from .txd to .txd.bak when creating the original backup file. This does
+			// not change the loaded dictionary file actually. The second renaming is from .txd.tmp
+			// to .txd when safe-writing the new dictionary file. This happens directly after the
+			// first event, before the reload timer has elapsed, so it doesn't hurt to handle both
+			// events.
+
 			lock (reloadTimerLock)
 			{
 				if (reloadTimer != null)
@@ -4602,6 +4612,7 @@ namespace Unclassified.TxLib
 	/// can be combined, other values should not be used.
 	/// </summary>
 	[Flags]
+	[Obfuscation(Exclude = true, ApplyToMembers = true, Feature = "renaming")]
 	public enum TxTime
 	{
 		/// <summary>

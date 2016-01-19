@@ -1,4 +1,9 @@
-﻿using System;
+﻿// Copyright (c) 2015, Yves Goergen, http://unclassified.software/source/consolehelper
+//
+// Copying and distribution of this file, with or without modification, are permitted provided the
+// copyright notice and this notice are preserved. This file is offered as-is, without any warranty.
+
+using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -510,10 +515,11 @@ namespace Unclassified.Util
 			}
 
 			string output = "";
+			bool haveReducedWidth = false;
 			do
 			{
 				int pos = width - 1;
-				if (pos > input.Length)
+				if (pos >= input.Length)
 				{
 					pos = input.Length;
 				}
@@ -533,7 +539,11 @@ namespace Unclassified.Util
 				{
 					input = input.Substring(pos + 1);
 					// Reduce the available width by the indenting for the following lines
-					width -= indent;
+					if (!haveReducedWidth)
+					{
+						width -= indent;
+						haveReducedWidth = true;
+					}
 				}
 				else
 				{
@@ -699,11 +709,44 @@ namespace Unclassified.Util
 		public static int ExitError(string message, int exitCode)
 		{
 			ClearLine();
-			WriteLine(message, ConsoleColor.Red);
+			using (new ConsoleColorScope(ConsoleColor.Red))
+			{
+				Console.Error.WriteLine(message);
+			}
 			WaitIfDebug();
 			return exitCode;
 		}
 
 		#endregion Interaction
 	}
+
+	#region ConsoleColorScope helper class
+
+	/// <summary>
+	/// Changes the console foreground color and changes it back again.
+	/// </summary>
+	public class ConsoleColorScope : IDisposable
+	{
+		private ConsoleColor previousColor;
+
+		/// <summary>
+		/// Changes the console foreground color.
+		/// </summary>
+		/// <param name="color">The new foreground color.</param>
+		public ConsoleColorScope(ConsoleColor color)
+		{
+			this.previousColor = Console.ForegroundColor;
+			Console.ForegroundColor = color;
+		}
+
+		/// <summary>
+		/// Changes the foreground color to its previous value.
+		/// </summary>
+		public void Dispose()
+		{
+			Console.ForegroundColor = previousColor;
+		}
+	}
+
+	#endregion ConsoleColorScope helper class
 }

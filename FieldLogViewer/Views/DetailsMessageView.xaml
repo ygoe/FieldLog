@@ -10,7 +10,7 @@
 	<Grid>
 		<Grid.Background>
 			<ImageBrush
-				ImageSource="/Images/diag_32_full.png"
+				ImageSource="/FieldLogViewer;component/Images/diag_32_full.png"
 				TileMode="Tile" Stretch="None"
 				Viewport="0,0,32,32" ViewportUnits="Absolute"
 				Opacity="0.012"/>

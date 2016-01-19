@@ -88,7 +88,8 @@ namespace Unclassified.LogSubmit
 
 			// Other initialisation
 			Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
-			UIPreferences.UpdateFormFont(this, Font, SystemFonts.MessageBoxFont);
+			UIPreferences.UpdateFont(this, Font, SystemFonts.MessageBoxFont);
+			UIPreferences.UpdateControlTheme(this);
 			USizeGrip.AddToForm(this);
 
 			systemMenu = new SystemMenu(this);
@@ -178,7 +179,7 @@ namespace Unclassified.LogSubmit
 		{
 			foreach (var view in views)
 			{
-				UIPreferences.UpdateFont(view, view.Font, Font);
+				UIPreferences.SetFont(view, view.Font, Font);
 			}
 		}
 

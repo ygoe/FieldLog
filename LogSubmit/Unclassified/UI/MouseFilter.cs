@@ -23,11 +23,12 @@
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Unclassified.Automation;
 using Unclassified.Util;
 
-namespace Unclassified
+namespace Unclassified.UI
 {
 	/// <summary>
 	/// Provides mouse filtering features like hiding the cursor after a timeout of inactivity or dispatching
@@ -134,10 +135,10 @@ namespace Unclassified
 
 		public bool PreFilterMessage(ref Message m)
 		{
-			if (m.Msg == WinApi.WM_MOUSEMOVE && autoHideCursor)
+			if (m.Msg == NativeMethods.WM_MOUSEMOVE && autoHideCursor)
 			{
 				Point p = new Point(m.LParam.ToInt32());
-				WinApi.ClientToScreen(m.HWnd, ref p);
+				NativeMethods.ClientToScreen(m.HWnd, ref p);
 				if (p != lastMousePoint)
 				{
 					lastMousePoint = p;
@@ -146,7 +147,7 @@ namespace Unclassified
 				}
 				return false;   // Don't block this message
 			}
-			else if (m.Msg == WinApi.WM_MOUSEWHEEL && dispatchMouseWheel)
+			else if (m.Msg == NativeMethods.WM_MOUSEWHEEL && dispatchMouseWheel)
 			{
 				Point p = new Point(m.LParam.ToInt32());
 
@@ -171,7 +172,8 @@ namespace Unclassified
 				}
 
 				// Regular window surface: find the deepest control below the mouse cursor
-				Control control = Form.ActiveForm;
+				//Control control = Form.ActiveForm;
+				Control control = Control.FromHandle(NativeMethods.GetForegroundWindow());   // Also finds ToolStripDropDowns, cf. implementation of Form.ActiveForm
 				while (control != null)
 				{
 					Point clientPoint = control.PointToClient(p);
@@ -186,7 +188,7 @@ namespace Unclassified
 
 					// Search up the parents for a scrollable panel
 					Control c = control;
-					while (!(c is Form))
+					while (c != null && !(c is Form))
 					{
 						Panel panel = c as Panel;
 						if (panel != null && panel.AutoScroll)
@@ -212,7 +214,7 @@ namespace Unclassified
 					//       keys MK_* (LOWORD(wParam)) or an unassigned bit of lParam.
 
 					//System.Diagnostics.Debug.WriteLine("Re-posting message to " + control.Name);
-					WinApi.PostMessage(control.Handle, WinApi.WM_MOUSEWHEEL, m.WParam, m.LParam);
+					NativeMethods.PostMessage(control.Handle, NativeMethods.WM_MOUSEWHEEL, m.WParam, m.LParam);
 
 					// If IMessageModifyAndFilter wasn't System.Windows.Form's internal, we could just
 					// implement that interface, modify the message and let it pass changed. But so we
@@ -251,6 +253,21 @@ namespace Unclassified
 				cursorHidden = false;
 				if (MouseShown != null) MouseShown(this, EventArgs.Empty);
 			}
+		}
+
+		private static class NativeMethods
+		{
+			[DllImport("user32.dll")]
+			public static extern bool ClientToScreen(IntPtr hWnd, ref Point lpPoint);
+
+			[DllImport("user32")]
+			public static extern IntPtr GetForegroundWindow();
+
+			[DllImport("user32")]
+			public static extern bool PostMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+			public const uint WM_MOUSEMOVE = 0x200;
+			public const uint WM_MOUSEWHEEL = 0x20A;
 		}
 	}
 }

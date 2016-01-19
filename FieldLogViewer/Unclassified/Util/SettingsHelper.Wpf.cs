@@ -1,4 +1,9 @@
-﻿using System;
+﻿// Copyright (c) 2015, Yves Goergen, http://unclassified.software/source/settingsadapterfactory
+//
+// Copying and distribution of this file, with or without modification, are permitted provided the
+// copyright notice and this notice are preserved. This file is offered as-is, without any warranty.
+
+using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
@@ -51,6 +56,17 @@ namespace Unclassified.Util
 				settings.Top = (int)window.RestoreBounds.Top;
 				settings.Width = (int)window.RestoreBounds.Width;
 				settings.Height = (int)window.RestoreBounds.Height;
+				settings.IsMaximized = window.WindowState == WindowState.Maximized;
+			};
+			window.Closed += (sender, args) =>
+			{
+				if (window.WindowState == WindowState.Normal)
+				{
+					settings.Left = (int)window.Left;
+					settings.Top = (int)window.Top;
+					settings.Width = (int)window.Width;
+					settings.Height = (int)window.Height;
+				}
 				settings.IsMaximized = window.WindowState == WindowState.Maximized;
 			};
 		}

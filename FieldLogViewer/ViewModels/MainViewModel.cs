@@ -1839,7 +1839,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			ViewCommandManager.Invoke("StartedReadingFiles");
 			IsLoadingFiles = true;
 
-			this.logItems.Clear();
+			logItems.Clear();
 
 			isLiveStopped = false;
 			StopLiveCommand.RaiseCanExecuteChanged();
@@ -1856,13 +1856,25 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		private void AddFileToHistory()
 		{
+			string tempInternetFilesPath = Path.Combine(
+				Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+				"Microsoft",
+				"Windows",
+				"Temporary Internet Files");
+			if (loadedBasePath.StartsWith(tempInternetFilesPath, StringComparison.OrdinalIgnoreCase))
+			{
+				// These files have been loaded from Outlook and will be gone soon.
+				// Do not add them to the list of recently loaded files.
+				return;
+			}
+
 			var list = new List<string>();
 			// Add current path
 			list.Add(loadedBasePath);
 			// Add all previous items, remove current path if it exists
 			list.AddRange(App.Settings.RecentlyLoadedFiles
 				.Where(f => !f.Equals(loadedBasePath, StringComparison.OrdinalIgnoreCase)));
-			App.Settings.RecentlyLoadedFiles = list.ToArray();
+			App.Settings.RecentlyLoadedFiles = list.Take(15).ToArray();
 			SetJumpList();
 		}
 

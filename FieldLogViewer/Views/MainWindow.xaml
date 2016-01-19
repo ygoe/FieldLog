@@ -266,7 +266,7 @@
 						<Setter Property="Template">
 							<Setter.Value>
 								<ControlTemplate TargetType="ListBoxItem">
-									<Border Background="White">
+									<Border Background="White" BorderThickness="0,0,0,1" BorderBrush="{Binding BottomBorderBrush}">
 										<ContentPresenter Height="17" VerticalAlignment="Top"/>
 									</Border>
 								</ControlTemplate>

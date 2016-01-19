@@ -119,6 +119,13 @@ namespace Unclassified.FieldLogViewer
 		/// name. The most recently loaded entry is first.
 		/// </summary>
 		string[] RecentlyLoadedFiles { get; set; }
+
+		/// <summary>
+		/// Gets or sets a value indicating whether a time-based separator between log items is
+		/// displayed in the log items list.
+		/// </summary>
+		[DefaultValue(true)]
+		bool ShowTimeSeparator { get; set; }
 	}
 
 	public enum ItemTimeType

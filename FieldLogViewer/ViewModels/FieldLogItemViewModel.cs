@@ -99,19 +99,19 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
-		public Color BackColor
+		public override Color BackColor
 		{
 			get
 			{
 				switch (Priority)
 				{
-					case FieldLogPriority.Trace: return Color.FromArgb(255, 255, 255, 255);
-					case FieldLogPriority.Checkpoint: return Color.FromArgb(255, 242, 243, 252);
-					case FieldLogPriority.Info: return Color.FromArgb(255, 223, 245, 249);
-					case FieldLogPriority.Notice: return Color.FromArgb(255, 229, 246, 218);
-					case FieldLogPriority.Warning: return Color.FromArgb(255, 246, 239, 190);
-					case FieldLogPriority.Error: return Color.FromArgb(255, 255, 195, 155);
-					case FieldLogPriority.Critical: return Color.FromArgb(255, 255, 145, 145);
+					case FieldLogPriority.Trace: return Color.FromRgb(255, 255, 255);
+					case FieldLogPriority.Checkpoint: return Color.FromRgb(242, 243, 252);
+					case FieldLogPriority.Info: return Color.FromRgb(223, 245, 249);
+					case FieldLogPriority.Notice: return Color.FromRgb(229, 246, 218);
+					case FieldLogPriority.Warning: return Color.FromRgb(246, 239, 190);
+					case FieldLogPriority.Error: return Color.FromRgb(255, 195, 155);
+					case FieldLogPriority.Critical: return Color.FromRgb(255, 145, 145);
 					default: return Colors.Transparent;
 				}
 			}

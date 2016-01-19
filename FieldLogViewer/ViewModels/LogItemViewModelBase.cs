@@ -1,7 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Media;
 using Unclassified.UI;
+using Unclassified.Util;
 
 namespace Unclassified.FieldLogViewer.ViewModels
 {
@@ -9,6 +11,37 @@ namespace Unclassified.FieldLogViewer.ViewModels
 	{
 		public int EventCounter { get; set; }
 		public DateTime Time { get; set; }
+
+		public TimeSpan TimeToNextItem
+		{
+			get { return GetValue<TimeSpan>("TimeToNextItem"); }
+			set { SetValue(value, "TimeToNextItem"); }
+		}
+
+		public void RefreshTimeToNextItem()
+		{
+			OnPropertyChanged("TimeToNextItem");
+		}
+
+		public virtual Color BackColor
+		{
+			get { return Colors.Transparent; }
+		}
+
+		[NotifiesOn("TimeToNextItem")]
+		public Brush BottomBorderBrush
+		{
+			get
+			{
+				if (App.Settings.ShowTimeSeparator)
+				{
+					long halfOpacityTicks = TimeSpan.FromMinutes(1).Ticks;
+					float opacity = 1 - 1 / (((float)TimeToNextItem.Ticks / halfOpacityTicks) + 1);
+					return new SolidColorBrush(BackColor.BlendWith(Color.FromRgb(0, 0, 0), 1 - opacity));
+				}
+				return Brushes.Transparent;
+			}
+		}
 
 		public int UtcOffset
 		{

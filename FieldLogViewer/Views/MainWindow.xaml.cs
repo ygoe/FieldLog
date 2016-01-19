@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using Unclassified.FieldLog;
@@ -48,6 +49,7 @@ namespace Unclassified.FieldLogViewer.Views
 		private bool isScrollAnimationPosted;
 		private DelayedCall updateScrollmapDc;
 		private bool scrollmapUpdatePending;
+		private ListCollectionView logItemsCollectionView;
 
 		#endregion Private data
 
@@ -68,6 +70,7 @@ namespace Unclassified.FieldLogViewer.Views
 
 			App.Settings.OnPropertyChanged(s => s.ShowWarningsErrorsInScrollBar, () => InvalidateScrollmap(false));
 			App.Settings.OnPropertyChanged(s => s.ShowSelectionInScrollBar, () => InvalidateScrollmap(false));
+			App.Settings.OnPropertyChanged(s => s.ShowTimeSeparator, () => RefreshTimeToNextItem(false));
 		}
 
 		#endregion Constructors
@@ -165,8 +168,10 @@ namespace Unclassified.FieldLogViewer.Views
 						{
 							if (c != null)
 							{
+								logItemsCollectionView = c as ListCollectionView;
 								c.CollectionChanged += LogItems_CollectionChanged;
 								InvalidateScrollmap();
+								RefreshTimeToNextItem(true);
 							}
 						},
 						true);
@@ -249,6 +254,80 @@ namespace Unclassified.FieldLogViewer.Views
 					}
 				}
 				prevItemTime = DateTime.UtcNow;
+
+				var collection = sender as ListCollectionView;
+				if (collection != null)
+				{
+					foreach (object newItem in args.NewItems)
+					{
+						var newLogItem = newItem as LogItemViewModelBase;
+						if (newLogItem != null)
+						{
+							int index = collection.IndexOf(newLogItem);
+							// Update current item based on next item
+							if (index + 1 < collection.Count)
+							{
+								var nextLogItem = collection.GetItemAt(index + 1) as LogItemViewModelBase;
+								if (nextLogItem != null)
+								{
+									newLogItem.TimeToNextItem = nextLogItem.Time - newLogItem.Time;
+								}
+							}
+							// Update previous item based on current item
+							if (index - 1 >= 0)
+							{
+								var prevLogItem = collection.GetItemAt(index - 1) as LogItemViewModelBase;
+								if (prevLogItem != null)
+								{
+									prevLogItem.TimeToNextItem = newLogItem.Time - prevLogItem.Time;
+								}
+							}
+						}
+					}
+				}
+			}
+			else if (args.Action == NotifyCollectionChangedAction.Reset)
+			{
+				var collection = sender as ListCollectionView;
+				if (collection != null)
+				{
+					// collection is the same as logItemsCollectionView which is used in that method
+					RefreshTimeToNextItem(true);
+				}
+			}
+		}
+
+		private void RefreshTimeToNextItem(bool update)
+		{
+			if (logItemsCollectionView != null)
+			{
+				if (update)
+				{
+					for (int index = 0; index < logItemsCollectionView.Count - 1; index++)
+					{
+						var newLogItem = logItemsCollectionView.GetItemAt(index) as LogItemViewModelBase;
+						if (newLogItem != null)
+						{
+							// Update current item based on next item
+							var nextLogItem = logItemsCollectionView.GetItemAt(index + 1) as LogItemViewModelBase;
+							if (nextLogItem != null)
+							{
+								newLogItem.TimeToNextItem = nextLogItem.Time - newLogItem.Time;
+							}
+						}
+					}
+				}
+				else
+				{
+					foreach (var item in logItemsCollectionView)
+					{
+						var logItem = item as LogItemViewModelBase;
+						if (logItem != null)
+						{
+							logItem.RefreshTimeToNextItem();
+						}
+					}
+				}
 			}
 		}
 

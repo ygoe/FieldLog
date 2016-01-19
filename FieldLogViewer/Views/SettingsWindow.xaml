@@ -64,6 +64,11 @@
 						Grid.Row="4" Grid.ColumnSpan="2" Margin="0,6,0,0" HorizontalAlignment="Left"
 						Content="Show metadata in stack frames"
 						IsChecked="{Binding Settings.ShowStackFrameMetadata}"/>
+
+					<CheckBox
+						Grid.Row="5" Grid.ColumnSpan="2" Margin="0,6,0,0" HorizontalAlignment="Left"
+						Content="Show time-based separator between log items"
+						IsChecked="{Binding Settings.ShowTimeSeparator}"/>
 				</Grid>
 			</TabItem>
 

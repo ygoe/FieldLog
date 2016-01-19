@@ -309,9 +309,12 @@ namespace Unclassified.FieldLog
 			}
 			else if (source == PresentationTraceSources.FreezableSource.Name)
 			{
-				if (id == 1)
+				if (id == 1 || id == 3 || id == 4)
 				{
-					return;   // Don't log this, it appears everywhere and comes from bugs in WPF
+					// "CanFreeze is returning false because …"
+					// Don't log this, it appears everywhere and comes from bugs in WPF.
+					// See also: https://social.msdn.microsoft.com/Forums/en-US/d377ca25-5867-4eeb-b011-ea7470490380/
+					return;
 				}
 				HandleFreezableMessage(id, ref msg, ref shortMsg);
 			}

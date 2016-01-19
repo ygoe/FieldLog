@@ -74,14 +74,6 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
-		public Color BackColor
-		{
-			get
-			{
-				return Colors.Transparent;
-			}
-		}
-
 		[NotifiesOn("IsSelected")]
 		public Brush Background
 		{

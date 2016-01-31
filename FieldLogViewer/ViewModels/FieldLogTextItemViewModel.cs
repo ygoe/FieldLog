@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Windows;
 using Unclassified.FieldLog;
 
 namespace Unclassified.FieldLogViewer.ViewModels
@@ -38,6 +39,14 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		}
 
 		public string TypeImageSource { get { return "/Images/TextItem_14.png"; } }
+
+		public Visibility DetailsImageVisibility
+		{
+			get
+			{
+				return !string.IsNullOrEmpty(Details) ? Visibility.Visible : Visibility.Collapsed;
+			}
+		}
 
 		public override string ToString()
 		{

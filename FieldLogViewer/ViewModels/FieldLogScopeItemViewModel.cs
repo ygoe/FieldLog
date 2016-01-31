@@ -67,6 +67,34 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
+		public Visibility LevelImageVisibility
+		{
+			get
+			{
+				switch (this.Type)
+				{
+					case FieldLogScopeType.Enter:
+					case FieldLogScopeType.Leave:
+						return Visibility.Visible;
+					default:
+						return Visibility.Collapsed;
+				}
+			}
+		}
+
+		public string LevelImageSource
+		{
+			get
+			{
+				switch (this.Type)
+				{
+					case FieldLogScopeType.Enter: return "/Images/Level_Enter_14.png";
+					case FieldLogScopeType.Leave: return "/Images/Level_Leave_14.png";
+					default: return null;
+				}
+			}
+		}
+
 		public string TypeAndName
 		{
 			get
@@ -74,9 +102,8 @@ namespace Unclassified.FieldLogViewer.ViewModels
 				switch (this.Type)
 				{
 					case FieldLogScopeType.Enter:
-						return "⏩ " + Name;
 					case FieldLogScopeType.Leave:
-						return "↩ " + Name;
+						return Name;
 
 					case FieldLogScopeType.ThreadStart:
 					case FieldLogScopeType.ThreadEnd:

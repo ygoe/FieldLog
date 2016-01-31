@@ -322,6 +322,7 @@
 										<ColumnDefinition Width="Auto"/>
 										<ColumnDefinition Width="Auto"/>
 										<ColumnDefinition Width="*"/>
+										<ColumnDefinition Width="Auto"/>
 									</Grid.ColumnDefinitions>
 
 									<Image Grid.Column="0" Source="{Binding TypeImageSource}" Width="14" Height="14"/>
@@ -367,7 +368,7 @@
 										</TextBlock.Text>
 									</TextBlock>
 									<TextBlock
-										Grid.Column="6" Width="13"
+										Grid.Column="6" MinWidth="12"
 										Margin="6,-1,0,-1" Padding="0,1"
 										Text="{Binding ThreadId}" TextTrimming="CharacterEllipsis" TextAlignment="Right"
 										Visibility="{Binding DataContext.Settings.ShowThreadIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
@@ -404,6 +405,7 @@
 											</TextBlock.Margin>
 										</TextBlock>
 									</Grid>
+									<Image Grid.Column="9" Source="/Images/TextDetails_14.png" Width="14" Height="14" Visibility="{Binding DetailsImageVisibility}"/>
 								</Grid>
 							</Border>
 						</Grid>
@@ -467,7 +469,7 @@
 										</TextBlock.Text>
 									</TextBlock>
 									<TextBlock
-										Grid.Column="6" Width="13"
+										Grid.Column="6" MinWidth="12"
 										Margin="6,-1,0,-1" Padding="0,1"
 										Text="{Binding ThreadId}" TextTrimming="CharacterEllipsis" TextAlignment="Right"
 										Visibility="{Binding DataContext.Settings.ShowThreadIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
@@ -567,7 +569,7 @@
 										</TextBlock.Text>
 									</TextBlock>
 									<TextBlock
-										Grid.Column="6" Width="13"
+										Grid.Column="6" MinWidth="12"
 										Margin="6,-1,0,-1" Padding="0,1"
 										Text="{Binding ThreadId}" TextTrimming="CharacterEllipsis" TextAlignment="Right"
 										Visibility="{Binding DataContext.Settings.ShowThreadIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
@@ -667,7 +669,7 @@
 										</TextBlock.Text>
 									</TextBlock>
 									<TextBlock
-										Grid.Column="6" Width="13"
+										Grid.Column="6" MinWidth="12"
 										Margin="6,-1,0,-1" Padding="0,1"
 										Text="{Binding ThreadId}" TextTrimming="CharacterEllipsis" TextAlignment="Right"
 										Visibility="{Binding DataContext.Settings.ShowThreadIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
@@ -695,14 +697,20 @@
 										</TextBlock.Background>
 									</TextBlock>
 									<Grid Grid.Column="8" Margin="8,0,0,0">
-										<TextBlock Text="{Binding TypeAndName}">
-											<TextBlock.Margin>
+										<Grid>
+											<Grid.Margin>
 												<MultiBinding Converter="{StaticResource IndentLevelToWidthConverter}">
 													<Binding Path="IndentLevel" Mode="OneWay"/>
 													<Binding Path="DataContext.Settings.IndentSize" ElementName="_this" Mode="OneWay"/>
 												</MultiBinding>
-											</TextBlock.Margin>
-										</TextBlock>
+											</Grid.Margin>
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="Auto"/>
+												<ColumnDefinition Width="*"/>
+											</Grid.ColumnDefinitions>
+											<Image Grid.Column="0" Source="{Binding LevelImageSource}" Width="14" Height="14" Visibility="{Binding LevelImageVisibility}"/>
+											<TextBlock Grid.Column="1" Text="{Binding TypeAndName}"/>
+										</Grid>
 									</Grid>
 								</Grid>
 							</Border>
@@ -767,7 +775,7 @@
 										</TextBlock.Text>
 									</TextBlock>
 									<TextBlock
-										Grid.Column="6" Width="13"
+										Grid.Column="6" MinWidth="12"
 										Margin="6,-1,0,-1" Padding="0,1"
 										Visibility="{Binding DataContext.Settings.ShowThreadIdColumn, ElementName=_this, Converter={StaticResource BoolToVisibilityConverter}}">
 									</TextBlock>

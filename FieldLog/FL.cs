@@ -3718,7 +3718,7 @@ namespace Unclassified.FieldLog
 		}
 
 		/// <summary>
-		/// Accepts FieldLogs default log path strategy or a path specified in the flconfig file.
+		/// Accepts FieldLog's default log path strategy or a path specified in the flconfig file.
 		/// </summary>
 		/// <remarks>
 		/// Calling this method just tells FieldLog that the default paths are okay and logs shall

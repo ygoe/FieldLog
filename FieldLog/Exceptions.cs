@@ -375,7 +375,18 @@ namespace Unclassified.FieldLog
 				Module = module.Assembly.GetName().Name;
 				//Module = module.Name;
 			}
-			Token = method.MetadataToken;
+			if (method.GetType().FullName == "System.Reflection.RuntimeMethodInfo")
+			{
+				// Only this implementation has a metadata token, not dynamic methods or other types
+				try
+				{
+					Token = method.MetadataToken;
+				}
+				catch (InvalidOperationException)
+				{
+					// Ignore it
+				}
+			}
 			ILOffset = stackFrame.GetILOffset();
 
 			// TODO: Include 'extern' indicator from the following tests (needs new file format)

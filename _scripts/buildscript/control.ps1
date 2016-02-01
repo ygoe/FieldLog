@@ -9,21 +9,22 @@ Set-VcsVersion "" "/require git"
 # FieldLog.*NET* projects are overlapping, don't build them in parallel
 Disable-ParallelBuild
 
-Restore-NuGetTool
-Restore-NuGetPackages "FieldLog.sln"
-
 # Release builds
 if (IsAnySelected build commit publish)
 {
+	Restore-NuGetPackages "FieldLog.sln"
 	Build-Solution "FieldLog.sln" "Release" "Any CPU" 8
 	Build-Solution "FieldLog.sln" "Release" "x86" 1
 	
 	# Convert debug symbols to XML
+	# (Can't use the pdbconvert module because we're just building PdbConvert.exe here)
 	Exec-Console "PdbConvert\bin\Release\PdbConvert.exe" "$rootDir\FieldLogViewer\bin\Release\* /srcbase $rootDir /optimize /outfile $rootDir\FieldLogViewer\bin\Release\FieldLog.pdbx"
 
 	Create-NuGetPackage "FieldLog\Unclassified.FieldLog.nuspec" "FieldLog\bin"
 	Create-Setup "Setup\FieldLog.iss" Release
 
+	# Add "publish" target here to sign published builds
+	# (requires a valid code signing certificate to publish)
 	if (IsSelected sign)
 	{
 		Sign-File "FieldLog\bin\ReleaseNET40\Unclassified.FieldLog.dll" "$signKeyFile" "$signPassword"

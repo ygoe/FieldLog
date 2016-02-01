@@ -46,8 +46,7 @@ function Git-Log($logFile, $time = 1)
 
 function Do-Git-Commit($action)
 {
-	Write-Host ""
-	Write-Host -ForegroundColor DarkCyan "Git commit..."
+	Show-ActionHeader "Git commit"
 
 	# Find the TortoiseGitProc binary
 	$tgitBin = Check-RegFilename "hklm:\SOFTWARE\TortoiseGit" "ProcPath"
@@ -64,14 +63,29 @@ function Do-Git-Commit($action)
 		WaitError "Git commit failed"
 		exit 1
 	}
+	
+	# Clean up the repository if necessary (uses PS 3 features: gci -file)
+	if ($PSVersionTable.PSVersion.Major -ge 3)
+	{
+		if ((Get-ChildItem "$rootDir\.git\objects" -File -Recurse).Count -gt 250)
+		{
+			Write-Host "Optimising Git repository..."
+			$gitBin = Find-Git
+			& $gitBin gc --prune=all --quiet
+			if (-not $?)
+			{
+				WaitError "Git gc failed"
+				exit 1
+			}
+		}
+	}
 }
 
 function Do-Git-Export($action)
 {
 	$archive = $action.archive
 	
-	Write-Host ""
-	Write-Host -ForegroundColor DarkCyan "Git export to $archive..."
+	Show-ActionHeader "Git export to $archive"
 
 	# Warn on modified working directory
 	# (Set a dummy format so that it won't go search an AssemblyInfo file somewhere. We don't provide a suitable path for that.)
@@ -85,24 +99,7 @@ function Do-Git-Export($action)
 	}
 	[System.Console]::OutputEncoding = $consoleEncoding
 
-	# Find the Git binary
-	$gitBin = Check-RegFilename "hklm:\Software\Microsoft\Windows\CurrentVersion\Uninstall\Git_is1" "InstallLocation"
-	$gitBin = Check-Filename "$gitBin\bin\git.exe"
-	if ($gitBin -eq $null)
-	{
-		$gitBin = Check-RegFilename "hklm:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Git_is1" "InstallLocation"
-		$gitBin = Check-Filename "$gitBin\bin\git.exe"
-	}
-	if ($gitBin -eq $null)
-	{
-		$gitBin = Check-RegFilename "hkcu:\Software\Microsoft\Windows\CurrentVersion\Uninstall\Git_is1" "InstallLocation"
-		$gitBin = Check-Filename "$gitBin\bin\git.exe"
-	}
-	if ($gitBin -eq $null)
-	{
-		WaitError "Git binary not found"
-		exit 1
-	}
+	$gitBin = Find-Git
 
 	# Find the 7-Zip binary
 	$sevenZipBin = Check-RegFilename "hklm:\SOFTWARE\7-Zip" "Path"
@@ -161,8 +158,7 @@ function Do-Git-Log($action)
 {
 	$logFile = $action.logFile
 	
-	Write-Host ""
-	Write-Host -ForegroundColor DarkCyan "Git log dump..."
+	Show-ActionHeader "Git log dump"
 	
 	# Stop on modified working directory
 	# (Set a dummy format so that it won't go search an AssemblyInfo file somewhere. We don't provide a suitable path for that.)
@@ -177,24 +173,7 @@ function Do-Git-Log($action)
 	}
 	[System.Console]::OutputEncoding = $consoleEncoding
 
-	# Find the Git binary
-	$gitBin = Check-RegFilename "hklm:\Software\Microsoft\Windows\CurrentVersion\Uninstall\Git_is1" "InstallLocation"
-	$gitBin = Check-Filename "$gitBin\bin\git.exe"
-	if ($gitBin -eq $null)
-	{
-		$gitBin = Check-RegFilename "hklm:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Git_is1" "InstallLocation"
-		$gitBin = Check-Filename "$gitBin\bin\git.exe"
-	}
-	if ($gitBin -eq $null)
-	{
-		$gitBin = Check-RegFilename "hkcu:\Software\Microsoft\Windows\CurrentVersion\Uninstall\Git_is1" "InstallLocation"
-		$gitBin = Check-Filename "$gitBin\bin\git.exe"
-	}
-	if ($gitBin -eq $null)
-	{
-		WaitError "Git binary not found"
-		exit 1
-	}
+	$gitBin = Find-Git
 
 	# Read the output log file and determine the last added revision
 	$data = ""
@@ -303,4 +282,34 @@ function Do-Git-Log($action)
 
 	# Open file in editor for manual edits of the raw changes
 	Start-Process (MakeRootedPath $logFile)
+}
+
+function Find-Git()
+{
+	$gitBin = Check-RegFilename "hklm:\Software\Microsoft\Windows\CurrentVersion\Uninstall\Git_is1" "InstallLocation"
+	$gitBin = Check-Filename "$gitBin\bin\git.exe"
+	if (!$gitBin)
+	{
+		$gitBin = Check-RegFilename "hklm:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Git_is1" "InstallLocation"
+		$gitBin = Check-Filename "$gitBin\bin\git.exe"
+	}
+	if (!$gitBin)
+	{
+		$gitBin = Check-RegFilename "hkcu:\Software\Microsoft\Windows\CurrentVersion\Uninstall\Git_is1" "InstallLocation"
+		$gitBin = Check-Filename "$gitBin\bin\git.exe"
+	}
+	if (!$gitBin)
+	{
+		# Search in %path%
+		if (Get-Command "git.exe" -ErrorAction SilentlyContinue)
+		{
+			$gitBin = "git.exe"
+		}
+	}
+	if (!$gitBin)
+	{
+		WaitError "Git binary not found"
+		exit 1
+	}
+	return $gitBin
 }

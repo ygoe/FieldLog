@@ -1,7 +1,10 @@
 ; Determine product and file version from the application to be installed
-#define RevFileName '..\FieldLogViewer\bin\Release\FieldLogViewer.exe'
-#define RevId GetStringFileInfo(RevFileName, 'ProductVersion')
-#define TruncRevId GetFileVersion(RevFileName)
+#ifndef BuildConfig
+	#define BuildConfig "Release"
+#endif
+#define RevFileName "..\FieldLogViewer\bin\" + BuildConfig + "\FieldLogViewer.exe"
+#define RevId GetStringFileInfo(RevFileName, "ProductVersion")
+#define ShortRevId GetFileVersion(RevFileName)
 
 ; Include 3rd-party software check and download support
 #include "include\products.iss"
@@ -10,11 +13,9 @@
 #include "include\products\fileversion.iss"
 #include "include\products\dotnetfxversion.iss"
 
-; Include modules for required products
+; Include modules ONLY for required products to be installed
 #include "include\products\msi31.iss"
 #include "include\products\dotnetfx40client.iss"
-#include "include\products\dotnetfx40full.iss"
-#include "include\products\dotnetfx45.iss"
 
 ; Include general helper functions
 #include "include\util-code.iss"
@@ -32,7 +33,7 @@ AppPublisherURL=http://unclassified.software/source/fieldlog
 
 ; Setup file version
 VersionInfoDescription=FieldLog Setup
-VersionInfoVersion={#TruncRevId}
+VersionInfoVersion={#ShortRevId}
 VersionInfoCompany=Yves Goergen
 
 ; General application information
@@ -40,11 +41,14 @@ AppId={{52CCCE83-0A6F-447D-AAE0-506431641858}
 AppMutex=Global\Unclassified.FieldLogViewer,Unclassified.FieldLogViewer
 MinVersion=0,5.01sp3
 ArchitecturesInstallIn64BitMode=x64
+; isxdl.dll may not be DEP compatible
+DEPCompatible=no
 
 ; General setup information
 DefaultDirName={pf}\Unclassified\FieldLog
 AllowUNCPath=False
 DefaultGroupName=FieldLog
+DisableWelcomePage=no
 DisableDirPage=auto
 DisableProgramGroupPage=auto
 ShowLanguageDialog=no
@@ -52,7 +56,6 @@ ChangesAssociations=yes
 
 ; Setup design
 ; Large image max. 164x314 pixels, small image max. 55x58 pixels
-WizardImageBackColor=$ffffff
 WizardImageStretch=no
 WizardImageFile=FieldLog_144.bmp
 WizardSmallImageFile=FieldLog_48.bmp
@@ -93,44 +96,42 @@ ClickFinish=Click Finish to exit the setup.
 Upgrade=&Upgrade
 UpdatedHeadingLabel=%n%n%n%n%nFieldLog was upgraded.
 Task_VSTool=Register as External Tool in Visual Studio (2010–2015)
-Task_DeleteConfig=Delete existing configuration
 NgenMessage=Optimising application performance (this may take a moment)
 OpenSingleFileCommand=Open single file
+Uninstall_DeleteConfig=Do you want to delete the configuration data incl. logs?
 
 ; Add translations after messages have been defined
 #include "FieldLog.de.iss"
 
 [Tasks]
 Name: VSTool; Description: "{cm:Task_VSTool}"
-Name: DeleteConfig; Description: "{cm:Task_DeleteConfig}"; Flags: unchecked
-#define Task_DeleteConfig_Index 1
 
 [Files]
 ; FieldLogViewer application files
-Source: "..\FieldLogViewer\bin\Release\FieldLogViewer.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\FieldLogViewer\bin\Release\TaskDialog.dll"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "..\FieldLog Documentation.pdf"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\FieldLogViewer\bin\{#BuildConfig}\FieldLogViewer.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\FieldLogViewer\bin\{#BuildConfig}\TaskDialog.dll"; DestDir: "{app}"; Flags: ignoreversion
+;Source: "..\FieldLog Documentation.pdf"; DestDir: "{app}"
 ; This is the signed version of the DLL:
-Source: "..\FieldLog\bin\ReleaseNET40\Unclassified.FieldLog.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\FieldLog\bin\{#BuildConfig}NET40\Unclassified.FieldLog.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\FieldLog\FileFormat.html"; DestDir: "{app}"
-Source: "..\FieldLogViewer\bin\Release\Sounds\*.mp3"; DestDir: "{app}\Sounds"
+Source: "..\FieldLogViewer\bin\{#BuildConfig}\Sounds\*.mp3"; DestDir: "{app}\Sounds"
 ; Sample configuration
 Source: "example-config.txt"; DestDir: "{app}"; DestName: "FieldLogViewer.exe.flconfig"; Permissions: users-modify
 
 ; PdbConvert tool
-Source: "..\PdbConvert\bin\Release\PdbConvert.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\PdbConvert\bin\{#BuildConfig}\PdbConvert.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 ; LogSubmit tool
-Source: "..\LogSubmit\bin\x86\Release\LogSubmit.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\LogSubmit\bin\x86\{#BuildConfig}\LogSubmit.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "submit.config"; DestDir: "{app}"
 
 ; FieldLog assembly
-Source: "..\FieldLog\bin\ReleaseNET20\Unclassified.FieldLog.dll"; DestDir: "{app}\FieldLog assembly (.NET 2.0)"; Flags: ignoreversion
-Source: "..\FieldLog\bin\ReleaseNET20\Unclassified.FieldLog.xml"; DestDir: "{app}\FieldLog assembly (.NET 2.0)"
-Source: "..\FieldLog\bin\ReleaseNET40\Unclassified.FieldLog.dll"; DestDir: "{app}\FieldLog assembly (.NET 4.0)"; Flags: ignoreversion
-Source: "..\FieldLog\bin\ReleaseNET40\Unclassified.FieldLog.xml"; DestDir: "{app}\FieldLog assembly (.NET 4.0)"
-Source: "..\FieldLog\bin\ReleaseASPNET40\Unclassified.FieldLog.dll"; DestDir: "{app}\FieldLog assembly (ASP.NET 4.0)"; Flags: ignoreversion
-Source: "..\FieldLog\bin\ReleaseASPNET40\Unclassified.FieldLog.xml"; DestDir: "{app}\FieldLog assembly (ASP.NET 4.0)"
+Source: "..\FieldLog\bin\{#BuildConfig}NET20\Unclassified.FieldLog.dll"; DestDir: "{app}\FieldLog assembly (.NET 2.0)"; Flags: ignoreversion
+Source: "..\FieldLog\bin\{#BuildConfig}NET20\Unclassified.FieldLog.xml"; DestDir: "{app}\FieldLog assembly (.NET 2.0)"
+Source: "..\FieldLog\bin\{#BuildConfig}NET40\Unclassified.FieldLog.dll"; DestDir: "{app}\FieldLog assembly (.NET 4.0)"; Flags: ignoreversion
+Source: "..\FieldLog\bin\{#BuildConfig}NET40\Unclassified.FieldLog.xml"; DestDir: "{app}\FieldLog assembly (.NET 4.0)"
+Source: "..\FieldLog\bin\{#BuildConfig}ASPNET40\Unclassified.FieldLog.dll"; DestDir: "{app}\FieldLog assembly (ASP.NET 4.0)"; Flags: ignoreversion
+Source: "..\FieldLog\bin\{#BuildConfig}ASPNET40\Unclassified.FieldLog.xml"; DestDir: "{app}\FieldLog assembly (ASP.NET 4.0)"
 
 ; FieldLog source code
 Source: "..\FieldLog\AppErrorDialog.cs"; DestDir: "{app}\FieldLog source code"
@@ -162,9 +163,6 @@ Source: "..\LICENSE-LGPL"; DestDir: "{app}"
 Name: "{app}\log"; Permissions: users-modify
 
 [InstallDelete]
-; Delete user configuration files if the task is selected
-Type: files; Name: "{userappdata}\Unclassified\FieldLog\FieldLogViewer.conf"; Tasks: DeleteConfig
-
 ; Older version of submit.config (added 2015-07)
 Type: files; Name: "{app}\submit.conf"
 
@@ -200,23 +198,8 @@ Filename: {app}\FieldLogViewer.exe; WorkingDir: {app}; Flags: nowait postinstall
 [UninstallRun]
 Filename: {win}\Microsoft.NET\Framework\v4.0.30319\ngen.exe; Parameters: "uninstall ""{app}\FieldLogViewer.exe"""; Flags: runhidden
 
-[UninstallDelete]
-; Delete user configuration files if not uninstalling for a downgrade
-Type: files; Name: "{userappdata}\Unclassified\FieldLog\FieldLogViewer.conf"; Check: not IsDowngradeUninstall
-Type: dirifempty; Name: "{userappdata}\Unclassified\FieldLog"
-Type: dirifempty; Name: "{userappdata}\Unclassified"
-
-; Delete log files if not uninstalling for a downgrade
-Type: files; Name: "{app}\log\FieldLogViewer-*.fl"; Check: not IsDowngradeUninstall
-Type: files; Name: "{app}\log\!README.txt"; Check: not IsDowngradeUninstall
-; TODO: Is the following required? http://stackoverflow.com/q/28383251/143684
-Type: dirifempty; Name: "{app}\log"
-Type: dirifempty; Name: "{app}"
-
 [Code]
 function InitializeSetup: Boolean;
-var
-	cmp: Integer;
 begin
 	Result := InitCheckDowngrade;
 
@@ -228,7 +211,7 @@ begin
 		msi31('3.1');
 
 		// If no .NET 4.0 is found, install the client profile (smallest)
-		if (not netfxinstalled(NetFx40Client, '') and not netfxinstalled(NetFx40Full, '')) then
+		if (not netfxinstalled(NetFx40Client, '') and not netfxinstalled(NetFx40Full, '') and not netfxinstalled(NetFx4x, '')) then
 			dotnetfx40client();
 	end;
 end;
@@ -236,7 +219,7 @@ end;
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
 	// Make upgrade install quicker
-	Result := ((PageID = wpSelectTasks) or (PageID = wpReady)) and PrevInstallExists;
+	Result := ((PageID = wpSelectTasks) or ((PageID = wpReady) and (GetArrayLength(products) = 0))) and PrevInstallExists;
 end;
 
 procedure CurPageChanged(CurPageID: Integer);
@@ -248,22 +231,6 @@ begin
 			// Change "Next" button to "Upgrade" on the first page, because it won't ask any more
 			WizardForm.NextButton.Caption := ExpandConstant('{cm:Upgrade}');
 			WizardForm.FinishedHeadingLabel.Caption := ExpandConstant('{cm:UpdatedHeadingLabel}');
-		end;
-	end;
-
-	if CurPageID = wpSelectTasks then
-	begin
-		if IsDowngradeSetup then
-		begin
-			// Pre-select task to delete existing configuration on downgrading (user can deselect it again)
-			// (Use the zero-based index of all rows in the tasks list GUI)
-			// Source: http://stackoverflow.com/a/10490352/143684
-			WizardForm.TasksList.Checked[{#Task_DeleteConfig_Index}] := true;
-		end
-		else
-		begin
-			// Clear possibly remembered value from previous downgrade install
-			WizardForm.TasksList.Checked[{#Task_DeleteConfig_Index}] := false;
 		end;
 	end;
 end;
@@ -282,6 +249,21 @@ end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
+	if CurUninstallStep = usUninstall then
+	begin
+		if IsCommandLineParamSet('verysilent') or
+			IsCommandLineParamSet('suppressmsgboxes') or
+			(MsgBox(ExpandConstant('{cm:Uninstall_DeleteConfig}'), mbConfirmation, MB_YESNO) = IDYES) then
+		begin
+			DeleteFile(ExpandConstant('{userappdata}\Unclassified\FieldLog\FieldLogViewer.conf'));
+			DeleteFile(ExpandConstant('{userappdata}\Unclassified\FieldLog\FieldLogViewer.conf.bak'));
+			RemoveDir(ExpandConstant('{userappdata}\Unclassified\FieldLog'));
+			RemoveDir(ExpandConstant('{userappdata}\Unclassified'));
+			
+			DelTree(ExpandConstant('{app}\log'), true, true, true);
+			RemoveDir(ExpandConstant('{app}'));
+		end;
+	end;
 	if CurUninstallStep = usPostUninstall then
 	begin
 		// Unregister FieldLogViewer as external tool in all Visual Studio versions after uninstall

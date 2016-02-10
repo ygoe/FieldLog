@@ -168,6 +168,11 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		/// </summary>
 		public bool IsQuickFilter { get { return QuickModifiedTime != DateTime.MinValue; } }
 
+		/// <summary>
+		/// Gets or sets a value indicating whether the filter has a problem and cannot be used.
+		/// </summary>
+		public bool IsFaulty { get; set; }
+
 		#endregion Data properties
 
 		#region Loading and saving
@@ -249,6 +254,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		/// </summary>
 		public void OnFilterChanged(bool affectsItems)
 		{
+			IsFaulty = false;
 			var handler = FilterChanged;
 			if (handler != null)
 			{
@@ -321,5 +327,22 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		}
 
 		#endregion Duplicate
+	}
+
+	public class FilterException : Exception
+	{
+		public FilterException()
+		{
+		}
+
+		public FilterException(string message)
+			: base(message)
+		{
+		}
+
+		public FilterException(string message, Exception inner)
+			: base(message, inner)
+		{
+		}
 	}
 }

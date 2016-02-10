@@ -90,7 +90,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 				{
 					case FieldLogScopeType.Enter: return "/Images/Level_Enter_14.png";
 					case FieldLogScopeType.Leave: return "/Images/Level_Leave_14.png";
-					default: return null;
+					default: return "/Images/Transparent_14.png";
 				}
 			}
 		}

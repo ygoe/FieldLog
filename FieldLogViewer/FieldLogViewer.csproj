@@ -363,6 +363,8 @@
     <Resource Include="Images\TextDetails_14.png" />
     <Resource Include="Images\Level_Enter_14.png" />
     <Resource Include="Images\Level_Leave_14.png" />
+    <Resource Include="Images\diag_32_red.png" />
+    <Resource Include="Images\diag_16_red.png" />
     <Content Include="Sounds\high.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

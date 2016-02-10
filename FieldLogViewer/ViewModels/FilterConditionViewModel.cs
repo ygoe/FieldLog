@@ -220,10 +220,12 @@ namespace Unclassified.FieldLogViewer.ViewModels
 					case FilterColumn.EnvironmentOSType:
 						return new EnumerationExtension<FilterComparison>(typeof(UseForEnumColumnAttribute)).ProvideTypedValue();
 
+					case FilterColumn.Priority:
+						return new EnumerationExtension<FilterComparison>(typeof(UseForOrderedEnumColumnAttribute)).ProvideTypedValue();
+
 					case FilterColumn.Time:
 						return new EnumerationExtension<FilterComparison>(typeof(UseForTimeColumnAttribute)).ProvideTypedValue();
 
-					case FilterColumn.Priority:
 					case FilterColumn.ThreadId:
 					case FilterColumn.WebRequestId:
 					case FilterColumn.ExceptionCode:
@@ -995,7 +997,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 					// User typed in an invalid partial time.
 					return false;
 				default:
-					throw new Exception("Invalid comparison for time column: " + Comparison);
+					throw new FilterException("Invalid comparison for time column: " + Comparison);
 			}
 		}
 
@@ -1018,7 +1020,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 					case FilterComparison.LessThan:
 						return prio < filterPrio;
 					default:
-						throw new Exception("Invalid comparison for Priority column: " + Comparison);
+						throw new FilterException("Invalid comparison for Priority column: " + Comparison);
 				}
 			}
 			else
@@ -1055,7 +1057,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 						}
 						return false;
 					default:
-						throw new Exception("Invalid comparison for ItemType column: " + Comparison);
+						throw new FilterException("Invalid comparison for ItemType column: " + Comparison);
 				}
 			}
 			else
@@ -1076,7 +1078,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 					case FilterComparison.NotEquals:
 						return scopeType == filterScopeType;
 					default:
-						throw new Exception("Invalid comparison for ScopeType column: " + Comparison);
+						throw new FilterException("Invalid comparison for ScopeType column: " + Comparison);
 				}
 			}
 			else
@@ -1097,7 +1099,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 					case FilterComparison.NotEquals:
 						return osType == filterOSType;
 					default:
-						throw new Exception("Invalid comparison for OSType column: " + Comparison);
+						throw new FilterException("Invalid comparison for OSType column: " + Comparison);
 				}
 			}
 			else
@@ -1126,7 +1128,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 					case FilterComparison.LessThan:
 						return osVersion < filterOSVersion;
 					default:
-						throw new Exception("Invalid comparison for OSVersion column: " + Comparison);
+						throw new FilterException("Invalid comparison for OSVersion column: " + Comparison);
 				}
 			}
 			else
@@ -1165,9 +1167,9 @@ namespace Unclassified.FieldLogViewer.ViewModels
 					return IsValid && Regex.IsMatch(str ?? "", Value ?? "", RegexOptions.IgnoreCase);
 				case FilterComparison.InList:
 				case FilterComparison.NotInList:
-					return Value.Split(';').Any(s => s.Trim() == (str ?? "").Trim());
+					return (Value ?? "").Split(';').Any(s => s.Trim() == (str ?? "").Trim());
 				default:
-					throw new Exception("Invalid comparison for string column: " + Comparison);
+					throw new FilterException("Invalid comparison for string column: " + Comparison);
 			}
 		}
 
@@ -1176,7 +1178,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			if (Comparison == FilterComparison.InList ||
 				Comparison == FilterComparison.NotInList)
 			{
-				return Value.Split(';').Any(li => li.Trim() == i.ToString());
+				return (Value ?? "").Split(';').Any(li => li.Trim() == i.ToString());
 			}
 			int filterInt;
 			if (int.TryParse(Value, out filterInt))
@@ -1195,7 +1197,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 					case FilterComparison.LessThan:
 						return i < filterInt;
 					default:
-						throw new Exception("Invalid comparison for int column: " + Comparison);
+						throw new FilterException("Invalid comparison for int column: " + Comparison);
 				}
 			}
 			else
@@ -1210,7 +1212,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			if (Comparison == FilterComparison.InList ||
 				Comparison == FilterComparison.NotInList)
 			{
-				return Value.Split(';').Any(ll => ll.Trim() == l.ToString());
+				return (Value ?? "").Split(';').Any(ll => ll.Trim() == l.ToString());
 			}
 			long filterLong;
 			if (long.TryParse(Value, out filterLong))
@@ -1229,7 +1231,7 @@ namespace Unclassified.FieldLogViewer.ViewModels
 					case FilterComparison.LessThan:
 						return l < filterLong;
 					default:
-						throw new Exception("Invalid comparison for long column: " + Comparison);
+						throw new FilterException("Invalid comparison for long column: " + Comparison);
 				}
 			}
 			else
@@ -1452,10 +1454,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 	[Obfuscation(Exclude = true, ApplyToMembers = true, Feature = "renaming")]
 	internal enum FilterComparison
 	{
-		[UseForEnumColumn, UseForNumberColumn, UseForStringColumn]
+		[UseForEnumColumn, UseForOrderedEnumColumn, UseForNumberColumn, UseForStringColumn]
 		[Description("=")]
 		Equals,
-		[UseForEnumColumn, UseForNumberColumn, UseForStringColumn]
+		[UseForEnumColumn, UseForOrderedEnumColumn, UseForNumberColumn, UseForStringColumn]
 		[Description("≠")]
 		NotEquals,
 		[UseForTimeColumn]
@@ -1473,16 +1475,16 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		[UseForTimeColumn]
 		[Description("is in minute")]
 		InMinute,
-		[UseForNumberColumn, UseForStringColumn, UseForTimeColumn]
+		[UseForOrderedEnumColumn, UseForNumberColumn, UseForStringColumn, UseForTimeColumn]
 		[Description("<")]
 		LessThan,
-		[UseForNumberColumn, UseForStringColumn, UseForTimeColumn]
+		[UseForOrderedEnumColumn, UseForNumberColumn, UseForStringColumn, UseForTimeColumn]
 		[Description("≤")]
 		LessOrEqual,
-		[UseForNumberColumn, UseForStringColumn, UseForTimeColumn]
+		[UseForOrderedEnumColumn, UseForNumberColumn, UseForStringColumn, UseForTimeColumn]
 		[Description("≥")]
 		GreaterOrEqual,
-		[UseForNumberColumn, UseForStringColumn, UseForTimeColumn]
+		[UseForOrderedEnumColumn, UseForNumberColumn, UseForStringColumn, UseForTimeColumn]
 		[Description(">")]
 		GreaterThan,
 		[UseForStringColumn]
@@ -1591,6 +1593,10 @@ namespace Unclassified.FieldLogViewer.ViewModels
 	#region Filter comparison usage attributes
 
 	internal class UseForEnumColumnAttribute : Attribute
+	{
+	}
+
+	internal class UseForOrderedEnumColumnAttribute : Attribute
 	{
 	}
 

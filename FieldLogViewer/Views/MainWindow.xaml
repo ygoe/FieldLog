@@ -801,6 +801,18 @@
 				</ListBox.Resources>
 			</ListBox>
 
+			<Border
+				BorderThickness="4"
+				Visibility="{Binding IsFaultyFilter, Converter={StaticResource BoolToVisibilityConverter}}">
+				<Border.BorderBrush>
+					<ImageBrush ImageSource="/Images/diag_16_red.png" Stretch="None" TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute" Opacity="0.3"/>
+				</Border.BorderBrush>
+				<StackPanel VerticalAlignment="Center" Margin="10">
+					<TextBlock TextAlignment="Center" Foreground="#f04040" FontWeight="Bold">The selected filter has a problem and cannot work properly.</TextBlock>
+					<TextBlock Margin="0,8,0,0" TextAlignment="Center" Foreground="#f04040" Text="{Binding FilterErrorMessage}"/>
+				</StackPanel>
+			</Border>
+
 			<Canvas HorizontalAlignment="Right" Margin="0,0,13,0" IsHitTestVisible="False">
 				<Path Name="WarningMap" Fill="#e0c720"/>
 				<Path Name="ErrorMap" Fill="#fa6400"/>

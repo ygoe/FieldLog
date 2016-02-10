@@ -1318,6 +1318,18 @@ namespace Unclassified.FieldLogViewer.ViewModels
 			}
 		}
 
+		public bool IsFaultyFilter
+		{
+			get { return GetValue<bool>("IsFaultyFilter"); }
+			set { SetValue(value, "IsFaultyFilter"); }
+		}
+
+		public string FilterErrorMessage
+		{
+			get { return GetValue<string>("FilterErrorMessage"); }
+			set { SetValue(value, "FilterErrorMessage"); }
+		}
+
 		#endregion Log items list
 
 		#region Filter
@@ -1700,13 +1712,35 @@ namespace Unclassified.FieldLogViewer.ViewModels
 		{
 			if (SelectedFilter != null)
 			{
-				args.Accepted =
-					SelectedFilter.IsMatch(args.Item) &&
-					(adhocFilterCondition == null || adhocFilterCondition.IsMatch(args.Item));
+				if (!SelectedFilter.IsFaulty)
+				{
+					try
+					{
+						args.Accepted =
+							SelectedFilter.IsMatch(args.Item) &&
+							(adhocFilterCondition == null || adhocFilterCondition.IsMatch(args.Item));
+						FilterErrorMessage = null;
+						IsFaultyFilter = false;
+					}
+					catch (Exception ex)
+					{
+						SelectedFilter.IsFaulty = true;
+						args.Accepted = false;
+						FL.Warning(ex, "Evaluating filter");
+						FilterErrorMessage = ex.Message;
+						IsFaultyFilter = true;
+					}
+				}
+				else
+				{
+					args.Accepted = false;
+				}
 			}
 			else
 			{
 				args.Accepted = true;
+				FilterErrorMessage = null;
+				IsFaultyFilter = false;
 			}
 		}
 

@@ -1131,6 +1131,17 @@ namespace Unclassified.FieldLogViewer.ViewModels
 
 		#region Toolbar and settings
 
+		public IEnumerable<string> RecentlyLoadedFiles
+		{
+			get
+			{
+				// Escape underscores in file names so they won't become accelerator underlines and
+				// be removed. This is undone in the click event handler.
+				return App.Settings.RecentlyLoadedFiles
+					.Select(path => path.Replace("_", "__"));
+			}
+		}
+
 		public bool IsLocalDebugMonitorActive
 		{
 			get

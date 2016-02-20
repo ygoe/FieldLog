@@ -76,7 +76,7 @@
 					Grid.Column="0"
 					Command="{Binding LoadLogCommand}" ToolTip="Load log" ToolTipService.ShowOnDisabled="True"
 					Focusable="False"
-					ItemsSource="{Binding Settings.RecentlyLoadedFiles}"
+					ItemsSource="{Binding RecentlyLoadedFiles}"
 					MenuItem.Click="SplitButton_Click">
 					<ui:SplitButton.Icon>
 						<ui:MenuIconImage Source="/Images/folder_open.png"/>

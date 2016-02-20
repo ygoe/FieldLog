@@ -196,7 +196,7 @@ namespace Unclassified.FieldLogViewer.Views
 				MainViewModel vm = DataContext as MainViewModel;
 				if (vm != null)
 				{
-					vm.OpenFiles(menuItem.Header.ToString());
+					vm.OpenFiles(menuItem.Header.ToString().Replace("__", "_"));
 				}
 			}
 		}

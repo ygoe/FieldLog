@@ -209,6 +209,10 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		private static bool hadRelevantLogItem;
 		/// <summary>
+		/// The time of the last log item written to the log.
+		/// </summary>
+		private static DateTime lastLoggedItemTime;
+		/// <summary>
 		/// The generation requested for flushing to disk.
 		/// </summary>
 		private static int pendingFlushGeneration;
@@ -2324,9 +2328,21 @@ namespace Unclassified.FieldLog
 				CheckAddBuffer(size);
 				currentBuffer.Add(item);
 				currentBufferSize += size;
+				lastLoggedItemTime = item.Time;
 			}
 			// Reset the send timeout
 			sendTimeout.Change(200, Timeout.Infinite);
+		}
+
+		internal static void LogInternal(FieldLogItem item, TimeSpan onlyIfLastItemWithinTime)
+		{
+			lock (currentBufferLock)
+			{
+				if (lastLoggedItemTime > item.Time - onlyIfLastItemWithinTime)
+				{
+					LogInternal(item);
+				}
+			}
 		}
 
 		/// <summary>

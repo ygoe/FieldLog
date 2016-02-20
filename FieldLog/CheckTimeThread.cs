@@ -88,7 +88,11 @@ namespace Unclassified.FieldLog
 					FL.RebaseTime();
 
 					string msg = "System time changed by " + offset.TotalMilliseconds.ToString("0.0", CultureInfo.InvariantCulture) + " ms";
-					FL.Info(msg, "Changes less than " + FL.CheckTimeThreshold + " ms are not reported.");
+					var item = new FieldLogTextItem(FieldLogPriority.Notice, msg, "Changes less than " + FL.CheckTimeThreshold + " ms are not reported.");
+					// Discard this log item if there was no other item logged within the last
+					// 10 seconds because it wouldn't be interesting anyway. If no other log items
+					// may have discontinuous timestamps, the time recalibration can occur silently.
+					FL.LogInternal(item, TimeSpan.FromSeconds(10));
 					Debug.WriteLine(msg);
 					prevLoggedOffset = 0;
 				}

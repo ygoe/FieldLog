@@ -416,7 +416,10 @@ namespace Unclassified.FieldLog
 				Type dataType = data.GetType();
 				string typeNamespace = dataType.Namespace;
 				string typeName = dataType.Name;
-				if (typeNamespace == "System" && typeName == "Type" ||
+				if (typeNamespace == "System" && typeName == "RuntimeType" ||
+					typeNamespace == "System" && typeName == "Type" ||
+					typeNamespace == "System.Data.Entity" && typeName == "DbSet`1" ||
+					typeNamespace == "System.Data.Entity.Core.Objects" && typeName == "ObjectContext" ||
 					typeNamespace == "System.Reflection" ||
 					typeNamespace == "System.Windows.Media" ||
 					typeNamespace == "System.Windows.Media.Imaging")

@@ -174,6 +174,13 @@ namespace Unclassified.FieldLog
 						{
 							dataSb.Append(" (0x").Append(((long)value).ToString("X16")).Append(")");
 						}
+
+						if (exType.FullName == "System.Data.Entity.Validation.DbEntityValidationException" &&
+							prop.Name == "EntityValidationErrors")
+						{
+							dataSb.Append("\n");
+							dataSb.Append(FieldLogDataItem.FormatValues(value));
+						}
 					}
 					else
 					{

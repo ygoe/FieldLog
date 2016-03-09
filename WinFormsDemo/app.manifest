@@ -40,11 +40,10 @@
 		</dependentAssembly>
 	</dependency>
 
-	<!-- Indicate dpi and high-res scrolling awareness -->
+	<!-- Indicate dpi awareness -->
 	<asmv3:application>
 		<asmv3:windowsSettings xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">
 			<dpiAware>true</dpiAware>
-			<highResolutionScrollingAware xmlns="http://schemas.microsoft.com/SMI/2013/WindowsSettings">true</highResolutionScrollingAware>
 		</asmv3:windowsSettings>
 	</asmv3:application>
 </assembly>

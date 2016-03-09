@@ -966,7 +966,7 @@ namespace Unclassified.FieldLog
 			}
 			else
 			{
-				AppErrorDialog.ShowError(allowContinue, errorMsg, exItem, true);
+				AppErrorDialog.ShowError(allowContinue, errorMsg, exItem, !allowContinue);
 
 				// We're still alive!
 				// Cancel the timer so that the process will not be terminated.

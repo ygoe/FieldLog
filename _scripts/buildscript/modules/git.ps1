@@ -67,7 +67,7 @@ function Do-Git-Commit($action)
 	# Clean up the repository if necessary (uses PS 3 features: gci -file)
 	if ($PSVersionTable.PSVersion.Major -ge 3)
 	{
-		if ((Get-ChildItem "$rootDir\.git\objects" -File -Recurse).Count -gt 250)
+		if ((Get-ChildItem "$rootDir\.git\objects" -File -Recurse).Count -gt 500)
 		{
 			Write-Host "Optimising Git repository..."
 			$gitBin = Find-Git

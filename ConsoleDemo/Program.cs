@@ -41,6 +41,7 @@ namespace ConsoleDemo
 			//TestTimerPrecision();
 			//TestOutputDebugString();
 			//TestTaskLogging();
+			//ThrowException1();
 
 			//NestTest(null);
 			//GenericTest<string>("");

@@ -202,6 +202,7 @@ namespace Unclassified.FieldLog
 		private Button terminateButton;
 		private Button continueButton;
 		private System.Windows.Forms.Timer terminateTimer;
+		private float scaleFactor = 1;
 
 		// Other fields
 		private Queue<ErrorInfo> nextErrors = new Queue<ErrorInfo>();
@@ -225,6 +226,10 @@ namespace Unclassified.FieldLog
 				title = appName + " – " + title;
 			}
 
+			AutoScaleDimensions = new SizeF(96, 96);
+			AutoScaleMode = AutoScaleMode.Dpi;
+			scaleFactor = CurrentAutoScaleDimensions.Width / 96;
+
 			BackColor = SystemColors.Window;
 			ControlBox = false;
 			MinimizeBox = false;
@@ -232,7 +237,7 @@ namespace Unclassified.FieldLog
 			Font = SystemFonts.MessageBoxFont;
 			FormBorderStyle = FormBorderStyle.FixedDialog;
 			ShowInTaskbar = false;
-			Size = new Size(550, 300);
+			Size = new Size(Scale(550), Scale(300));
 			StartPosition = FormStartPosition.CenterScreen;
 			Text = title;
 			TopMost = true;
@@ -260,7 +265,7 @@ namespace Unclassified.FieldLog
 				SystemFonts.MessageBoxFont.SizeInPoints * 1.3f,
 				SystemFonts.MessageBoxFont.Style);
 			introLabel.MaximumSize = new Size(ClientSize.Width, 0);
-			introLabel.Padding = new Padding(6, 4, 7, 6);
+			introLabel.Padding = Scale(new Padding(6, 4, 7, 6));
 			introLabel.Margin = new Padding();
 			introLabel.UseCompatibleTextRendering = false;
 			introLabel.UseMnemonic = false;
@@ -271,7 +276,7 @@ namespace Unclassified.FieldLog
 			errorPanel = new Panel();
 			errorPanel.AutoScroll = true;
 			errorPanel.Dock = DockStyle.Fill;
-			errorPanel.Margin = new Padding(7, 8, 10, 6);
+			errorPanel.Margin = Scale(new Padding(7, 8, 10, 6));
 			errorPanel.Padding = new Padding();
 			tablePanel.Controls.Add(errorPanel);
 			tablePanel.SetRow(errorPanel, 1);
@@ -290,8 +295,8 @@ namespace Unclassified.FieldLog
 
 			logLabel = new LinkLabel();
 			logLabel.AutoSize = true;
-			logLabel.MaximumSize = new Size(ClientSize.Width - 20, 0);
-			logLabel.Margin = new Padding(8, 6, 10, 0);
+			logLabel.MaximumSize = new Size(ClientSize.Width - Scale(20), 0);
+			logLabel.Margin = Scale(new Padding(8, 6, 10, 0));
 			logLabel.Padding = new Padding();
 			if (FL.LogFileBasePath != null)
 			{
@@ -316,7 +321,7 @@ namespace Unclassified.FieldLog
 
 			detailsLabel = new LinkLabel();
 			detailsLabel.AutoSize = true;
-			detailsLabel.Margin = new Padding(7, 6, 10, 10);
+			detailsLabel.Margin = Scale(new Padding(7, 6, 10, 10));
 			detailsLabel.Padding = new Padding();
 			detailsLabel.TabIndex = 11;
 			detailsLabel.Text = FL.AppErrorDialogDetails;
@@ -330,7 +335,7 @@ namespace Unclassified.FieldLog
 			TypeDescriptor.AddAttributes(typeof(Exception), attr);
 			grid = new PropertyGrid();
 			grid.Dock = DockStyle.Fill;
-			grid.Margin = new Padding(10, 10, 10, 10);
+			grid.Margin = Scale(new Padding(10, 10, 10, 10));
 			grid.ToolbarVisible = false;
 			grid.HelpVisible = false;
 			grid.PropertySort = PropertySort.Alphabetical;
@@ -356,7 +361,7 @@ namespace Unclassified.FieldLog
 							MethodInfo mi = view.GetType().GetMethod("MoveSplitterTo", BindingFlags.Instance | BindingFlags.NonPublic);
 							if (mi != null)
 							{
-								mi.Invoke(view, new object[] { 170 });
+								mi.Invoke(view, new object[] { Scale(170) });
 							}
 							mi = view.GetType().GetMethod("set_GrayTextColor", BindingFlags.Instance | BindingFlags.NonPublic);
 							if (mi != null)
@@ -371,9 +376,23 @@ namespace Unclassified.FieldLog
 			detailsLabel.LinkClicked += (s, e) =>
 			{
 				detailsLabel.Hide();
-				Height += 300;
-				Top -= Math.Min(Top - 4, 150);
-				tablePanel.RowStyles[4].Height = 350;
+				int maxHeight = Screen.FromControl(this).Bounds.Height;
+				int missingHeight = 0;
+				int desiredHeight = Height + Scale(300);
+				Height = desiredHeight;
+				if (Height < desiredHeight)
+				{
+					// A window is automatically constrained to the size of its screen, so we can
+					// compare the current size with what we had requested to know how much is
+					// missing for the layout.
+					missingHeight = desiredHeight - Height;
+				}
+				Top -= Scale(Math.Min(Top - 4, 150));
+				if (Top < 0)
+				{
+					Top = 0;
+				}
+				tablePanel.RowStyles[4].Height = Scale(350) - missingHeight;
 				grid.Visible = true;
 			};
 
@@ -383,7 +402,7 @@ namespace Unclassified.FieldLog
 			buttonsPanel.BackColor = SystemColors.Control;
 			buttonsPanel.Dock = DockStyle.Fill;
 			buttonsPanel.Margin = new Padding();
-			buttonsPanel.Padding = new Padding(10, 10, 10, 10);
+			buttonsPanel.Padding = Scale(new Padding(10, 10, 10, 10));
 			buttonsPanel.ColumnCount = 4;
 			buttonsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 			buttonsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
@@ -414,8 +433,8 @@ namespace Unclassified.FieldLog
 			nextButton.AutoSize = true;
 			nextButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
 			nextButton.FlatStyle = FlatStyle.System;
-			nextButton.Margin = new Padding(6, 0, 0, 0);
-			nextButton.Padding = new Padding(2, 1, 2, 1);
+			nextButton.Margin = Scale(new Padding(6, 0, 0, 0));
+			nextButton.Padding = Scale(new Padding(2, 1, 2, 1));
 			nextButton.Text = FL.AppErrorDialogNext;
 			nextButton.UseCompatibleTextRendering = false;
 			nextButton.UseVisualStyleBackColor = true;
@@ -432,8 +451,8 @@ namespace Unclassified.FieldLog
 			terminateButton.AutoSize = true;
 			terminateButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
 			terminateButton.FlatStyle = FlatStyle.System;
-			terminateButton.Margin = new Padding(6, 0, 0, 0);
-			terminateButton.Padding = new Padding(2, 1, 2, 1);
+			terminateButton.Margin = Scale(new Padding(6, 0, 0, 0));
+			terminateButton.Padding = Scale(new Padding(2, 1, 2, 1));
 			terminateButton.Text = FL.AppErrorDialogTerminate;
 			terminateButton.UseCompatibleTextRendering = false;
 			terminateButton.UseVisualStyleBackColor = true;
@@ -452,8 +471,8 @@ namespace Unclassified.FieldLog
 			continueButton.AutoSize = true;
 			continueButton.AutoSizeMode = AutoSizeMode.GrowAndShrink;
 			continueButton.FlatStyle = FlatStyle.System;
-			continueButton.Margin = new Padding(6, 0, 0, 0);
-			continueButton.Padding = new Padding(2, 1, 2, 1);
+			continueButton.Margin = Scale(new Padding(6, 0, 0, 0));
+			continueButton.Padding = Scale(new Padding(2, 1, 2, 1));
 			continueButton.Text = FL.AppErrorDialogContinue;
 			continueButton.UseCompatibleTextRendering = false;
 			continueButton.UseVisualStyleBackColor = true;
@@ -470,6 +489,26 @@ namespace Unclassified.FieldLog
 		#endregion Constructor (Form initialisation)
 
 		#region Private helper methods
+
+		/// <summary>
+		/// Applies the current DPI scale factor to a length value.
+		/// </summary>
+		/// <param name="length"></param>
+		/// <returns></returns>
+		private int Scale(int length)
+		{
+			return (int)Math.Round(length * scaleFactor);
+		}
+
+		/// <summary>
+		/// Applies the current DPI scale factor to a padding value.
+		/// </summary>
+		/// <param name="padding"></param>
+		/// <returns></returns>
+		private Padding Scale(Padding padding)
+		{
+			return new Padding(Scale(padding.Left), Scale(padding.Top), Scale(padding.Right), Scale(padding.Bottom));
+		}
 
 		private void EnableTerminateTimer()
 		{

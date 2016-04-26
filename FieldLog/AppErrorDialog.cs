@@ -237,7 +237,7 @@ namespace Unclassified.FieldLog
 			Font = SystemFonts.MessageBoxFont;
 			FormBorderStyle = FormBorderStyle.FixedDialog;
 			ShowInTaskbar = false;
-			Size = new Size(Scale(550), Scale(300));
+			Size = new Size(Scale(550), Scale(350));
 			StartPosition = FormStartPosition.CenterScreen;
 			Text = title;
 			TopMost = true;

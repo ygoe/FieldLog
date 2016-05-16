@@ -132,7 +132,7 @@ namespace Unclassified.Util
 		/// <returns></returns>
 		public static string GetLocationDisplayName(this ISettingsStore settingsStore)
 		{
-			if (settingsStore == null) throw new ArgumentNullException("settingsStore");
+			if (settingsStore == null) throw new ArgumentNullException(nameof(settingsStore));
 
 			FileSettingsStore fileStore = settingsStore as FileSettingsStore;
 			if (fileStore != null)
@@ -153,7 +153,7 @@ namespace Unclassified.Util
 		/// <returns>true if any key was removed, false if none existed or matched.</returns>
 		public static bool RemovePattern(this ISettingsStore settingsStore, string pattern)
 		{
-			if (settingsStore == null) throw new ArgumentNullException("settingsStore");
+			if (settingsStore == null) throw new ArgumentNullException(nameof(settingsStore));
 
 			bool anyRemoved = false;
 			foreach (string key in settingsStore.GetKeys())
@@ -176,7 +176,7 @@ namespace Unclassified.Util
 		/// <returns>An array of matching keys.</returns>
 		public static string[] GetKeysByPattern(this ISettingsStore settingsStore, string pattern)
 		{
-			if (settingsStore == null) throw new ArgumentNullException("settingsStore");
+			if (settingsStore == null) throw new ArgumentNullException(nameof(settingsStore));
 
 			Regex regex = new Regex(pattern);
 			bool hasCapture = regex.GetGroupNumbers().Length > 1;

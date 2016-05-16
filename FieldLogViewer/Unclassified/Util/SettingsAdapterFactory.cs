@@ -293,13 +293,16 @@ namespace Unclassified.Util
 
 					ilGen.Emit(OpCodes.Ldarg_0);
 					ilGen.Emit(OpCodes.Ldarg_1);   // settingsStore
-					// -> prefix + [propertyName]
+
+					// prefix + [propertyName]
 					ilGen.Emit(OpCodes.Ldarg_2);   // prefix
 					ilGen.Emit(OpCodes.Ldstr, propertyName);
 					ilGen.GenerateCall<string, string, string>("Concat");
-					// -> settingsStore.CreateList<>(prefix + [propertyName]);
+
+					// settingsStore.CreateList<>(prefix + [propertyName]);
 					ilGen.EmitCall(OpCodes.Call, method, null);
-					// -> [field] = ...
+
+					// [field] = ...
 					ilGen.Emit(OpCodes.Stfld, field);
 				}
 				else if (IsDictionaryType(field.FieldType))
@@ -320,13 +323,16 @@ namespace Unclassified.Util
 
 					ilGen.Emit(OpCodes.Ldarg_0);
 					ilGen.Emit(OpCodes.Ldarg_1);   // settingsStore
-					// -> prefix + [propertyName]
+
+					// prefix + [propertyName]
 					ilGen.Emit(OpCodes.Ldarg_2);   // prefix
 					ilGen.Emit(OpCodes.Ldstr, propertyName);
 					ilGen.GenerateCall<string, string, string>("Concat");
-					// -> settingsStore.CreateDictionary<,>(prefix + [propertyName]);
+
+					// settingsStore.CreateDictionary<,>(prefix + [propertyName]);
 					ilGen.EmitCall(OpCodes.Call, method, null);
-					// -> [field] = ...
+
+					// [field] = ...
 					ilGen.Emit(OpCodes.Stfld, field);
 				}
 				else if (field.FieldType.IsInterface)
@@ -340,16 +346,20 @@ namespace Unclassified.Util
 
 					ilGen.Emit(OpCodes.Ldarg_0);
 					ilGen.Emit(OpCodes.Ldarg_1);   // settingsStore
-					// -> prefix + [propertyName]
+
+					// prefix + [propertyName]
 					ilGen.Emit(OpCodes.Ldarg_2);   // prefix
 					ilGen.Emit(OpCodes.Ldstr, propertyName);
 					ilGen.GenerateCall<string, string, string>("Concat");
-					// -> + "."
+
+					// + "."
 					ilGen.Emit(OpCodes.Ldstr, ".");
 					ilGen.GenerateCall<string, string, string>("Concat");
-					// -> new [created implementation type](settingsStore, ...)
+
+					// new [created implementation type](settingsStore, ...)
 					ilGen.Emit(OpCodes.Newobj, generatedTypes[field.FieldType].GetConstructor(new[] { typeof(ISettingsStore), typeof(string) }));
-					// -> [field] = new ...
+
+					// [field] = new ...
 					ilGen.Emit(OpCodes.Stfld, field);
 				}
 			}
@@ -806,12 +816,12 @@ namespace Unclassified.Util
 					// Source: https://msdn.microsoft.com/en-us/library/bb1c1a6x.aspx
 					var bits = decimal.GetBits(d);
 					bool sign = (bits[3] & 0x80000000) != 0;
-					byte scale = (byte) ((bits[3] >> 16) & 0x7f);
+					byte scale = (byte)((bits[3] >> 16) & 0x7f);
 					ilGen.Emit(OpCodes.Ldc_I4, bits[0]);
 					ilGen.Emit(OpCodes.Ldc_I4, bits[1]);
 					ilGen.Emit(OpCodes.Ldc_I4, bits[2]);
 					ilGen.Emit(sign ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
-					ilGen.Emit(OpCodes.Ldc_I4, (int) scale);
+					ilGen.Emit(OpCodes.Ldc_I4, (int)scale);
 					var ctor = typeof(decimal).GetConstructor(new[] { typeof(int), typeof(int), typeof(int), typeof(bool), typeof(byte) });
 					ilGen.Emit(OpCodes.Newobj, ctor);
 				}
@@ -1711,18 +1721,12 @@ namespace Unclassified.Util
 		/// </summary>
 		/// <param name="key"></param>
 		/// <returns></returns>
-		public bool ContainsKey(TKey key)
-		{
-			return dictionary.ContainsKey(key);
-		}
+		public bool ContainsKey(TKey key) => dictionary.ContainsKey(key);
 
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public ICollection<TKey> Keys
-		{
-			get { return dictionary.Keys; }
-		}
+		public ICollection<TKey> Keys => dictionary.Keys;
 
 		/// <summary>
 		/// TODO
@@ -1742,18 +1746,12 @@ namespace Unclassified.Util
 		/// <param name="key"></param>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		public bool TryGetValue(TKey key, out TValue value)
-		{
-			return dictionary.TryGetValue(key, out value);
-		}
+		public bool TryGetValue(TKey key, out TValue value) => dictionary.TryGetValue(key, out value);
 
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public ICollection<TValue> Values
-		{
-			get { return dictionary.Values; }
-		}
+		public ICollection<TValue> Values => dictionary.Values;
 
 		/// <summary>
 		/// TODO

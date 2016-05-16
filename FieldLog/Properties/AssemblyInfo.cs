@@ -18,7 +18,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("FieldLog")]
 [assembly: AssemblyTitle("FieldLog")]
 [assembly: AssemblyDescription("FieldLog library")]
-[assembly: AssemblyCopyright("© Yves Goergen, GNU LGPL v3")]
+[assembly: AssemblyCopyright("© {copyright:2013} Yves Goergen, GNU LGPL v3")]
 [assembly: AssemblyCompany("unclassified software development")]
 
 // Assembly identity version. Must be a dotted-numeric version.

@@ -25,13 +25,13 @@ namespace Unclassified.FieldLogViewer
 			FieldLogTraceListener.Start();
 			TaskHelper.UnhandledTaskException = ex => FL.Critical(ex, "TaskHelper.UnhandledTaskException", true);
 
-			// Keep the setup away
-			GlobalMutex.Create("Unclassified.FieldLogViewer");
-
 			App.InitializeSettings();
 
 			// Make sure the settings are properly saved in the end
 			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+			// Keep the setup away
+			GlobalMutex.Create("Unclassified.FieldLogViewer");
+
 
 			App app = new App();
 			app.InitializeComponent();

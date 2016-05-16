@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("FieldLog")]
 [assembly: AssemblyTitle("LogSubmit")]
 [assembly: AssemblyDescription("FieldLog Submit Tool")]
-[assembly: AssemblyCopyright("© Yves Goergen, GNU GPL v3")]
+[assembly: AssemblyCopyright("© {copyright:2015} Yves Goergen, GNU GPL v3")]
 [assembly: AssemblyCompany("unclassified software development")]
 
 // Assembly identity version. Must be a dotted-numeric version.

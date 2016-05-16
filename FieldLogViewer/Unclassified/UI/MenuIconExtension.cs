@@ -37,5 +37,16 @@ namespace Unclassified.UI
 		{
 			return img;
 		}
+
+		/// <summary>
+		/// Wrapper method for direct calls to the class.
+		/// </summary>
+		/// <param name="sourceUri">The source URI of the image to display. Use the absolute path in the project, e. g. "/Images/myicon.png".</param>
+		/// <returns></returns>
+		public static object Value(string sourceUri)
+		{
+			var instance = new MenuIconExtension(sourceUri);
+			return instance.ProvideValue(null);
+		}
 	}
 }

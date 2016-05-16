@@ -1,4 +1,9 @@
-﻿using System;
+﻿// Copyright (c) 2016, Yves Goergen, http://unclassified.software/source/delegatecommand
+//
+// Copying and distribution of this file, with or without modification, are permitted provided the
+// copyright notice and this notice are preserved. This file is offered as-is, without any warranty.
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
@@ -15,22 +20,10 @@ namespace Unclassified.UI
 	{
 		#region Static disabled command
 
-		private static DelegateCommand disabledCommand;
-
 		/// <summary>
-		/// Gets a DelegateCommand instance that can never execute.
+		/// A <see cref="DelegateCommand"/> instance that does nothing and can never be executed.
 		/// </summary>
-		public static DelegateCommand Disabled
-		{
-			get
-			{
-				if (disabledCommand == null)
-				{
-					disabledCommand = new DelegateCommand(() => { }) { IsEnabled = false };
-				}
-				return disabledCommand;
-			}
-		}
+		public static readonly DelegateCommand Disabled = new DelegateCommand(() => { }) { IsEnabled = false };
 
 		#endregion Static disabled command
 
@@ -40,6 +33,7 @@ namespace Unclassified.UI
 		private readonly Func<object, bool> canExecute;
 		private List<WeakReference> weakHandlers;
 		private bool isEnabled = true;
+		private bool raiseCanExecuteChangedPending;
 
 		#endregion Private data
 
@@ -85,7 +79,7 @@ namespace Unclassified.UI
 		public DelegateCommand(Action<object> execute, Func<object, bool> canExecute)
 		{
 			if (execute == null)
-				throw new ArgumentNullException("execute");
+				throw new ArgumentNullException(nameof(execute));
 
 			this.execute = execute;
 			this.canExecute = canExecute;
@@ -131,12 +125,7 @@ namespace Unclassified.UI
 		/// Raises the <see cref="E:CanExecuteChanged"/> event.
 		/// </summary>
 		[DebuggerStepThrough]
-		public void RaiseCanExecuteChanged()
-		{
-			OnCanExecuteChanged(EventArgs.Empty);
-		}
-
-		private bool raiseCanExecuteChangedPending;
+		public void RaiseCanExecuteChanged() => OnCanExecuteChanged();
 
 		/// <summary>
 		/// Raises the <see cref="E:CanExecuteChanged"/> event after all other processing has
@@ -149,14 +138,11 @@ namespace Unclassified.UI
 			if (!raiseCanExecuteChangedPending)
 			{
 				// Don't do anything if not on the UI thread. The dispatcher event will never be
-				// fired there and probably there's nobody interested in changed properties
-				// anyway on that thread.
+				// fired there and probably there's nobody interested in changed properties anyway
+				// on that thread.
 				if (Dispatcher.CurrentDispatcher == Application.Current.Dispatcher)
 				{
-					Dispatcher.CurrentDispatcher.BeginInvoke(
-						(Action<EventArgs>)OnCanExecuteChanged,
-						DispatcherPriority.Loaded,
-						EventArgs.Empty);
+					Dispatcher.CurrentDispatcher.BeginInvoke((Action)OnCanExecuteChanged, DispatcherPriority.Loaded);
 					raiseCanExecuteChangedPending = true;
 				}
 			}
@@ -165,9 +151,8 @@ namespace Unclassified.UI
 		/// <summary>
 		/// Raises the <see cref="E:CanExecuteChanged"/> event.
 		/// </summary>
-		/// <param name="args">The <see cref="EventArgs"/> instance containing the event data.</param>
 		[DebuggerStepThrough]
-		protected virtual void OnCanExecuteChanged(EventArgs args)
+		protected virtual void OnCanExecuteChanged()
 		{
 			raiseCanExecuteChangedPending = false;
 			PurgeWeakHandlers();
@@ -177,10 +162,7 @@ namespace Unclassified.UI
 			foreach (WeakReference reference in handlers)
 			{
 				EventHandler handler = reference.Target as EventHandler;
-				if (handler != null)
-				{
-					handler(this, args);
-				}
+				handler?.Invoke(this, EventArgs.Empty);
 			}
 		}
 
@@ -220,10 +202,7 @@ namespace Unclassified.UI
 		/// Convenience method that invokes CanExecute without parameters.
 		/// </summary>
 		/// <returns>true if this command can be executed; otherwise, false.</returns>
-		public bool CanExecute()
-		{
-			return CanExecute(null);
-		}
+		public bool CanExecute() => CanExecute(null);
 
 		/// <summary>
 		/// Defines the method to be called when the command is invoked.
@@ -237,7 +216,6 @@ namespace Unclassified.UI
 			{
 				throw new InvalidOperationException("The command cannot be executed because CanExecute returned false.");
 			}
-
 			execute(parameter);
 		}
 
@@ -245,10 +223,7 @@ namespace Unclassified.UI
 		/// Convenience method that invokes the command without parameters.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">The <see cref="CanExecute(object)"/> method returns false.</exception>
-		public void Execute()
-		{
-			Execute(null);
-		}
+		public void Execute() => Execute(null);
 
 		/// <summary>
 		/// Invokes the command if the <see cref="CanExecute(object)"/> method returns true.
@@ -270,10 +245,7 @@ namespace Unclassified.UI
 		/// <see cref="CanExecute(object)"/> method returns true.
 		/// </summary>
 		/// <returns>true if this command was executed; otherwise, false.</returns>
-		public bool TryExecute()
-		{
-			return TryExecute(null);
-		}
+		public bool TryExecute() => TryExecute(null);
 
 		#endregion ICommand methods
 

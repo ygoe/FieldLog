@@ -95,6 +95,9 @@
     <Compile Include="Converters\ListItemsConverter.cs" />
     <Compile Include="Converters\RelativeTimeConverter.cs" />
     <Compile Include="Converters\SameThreadBrushConverter.cs" />
+    <Compile Include="Resources\MenuStyles.xaml.cs">
+      <DependentUpon>MenuStyles.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SourceInfo\Deobfuscator.cs" />
     <Compile Include="SourceInfo\DotfuscatorDeobfuscator.cs" />
     <Compile Include="SourceInfo\SeeUnsharpDeobfuscator.cs" />

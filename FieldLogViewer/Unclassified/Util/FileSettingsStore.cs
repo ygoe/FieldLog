@@ -185,42 +185,27 @@ namespace Unclassified.Util
 		/// <summary>
 		/// Gets the file name of the currently used setting file.
 		/// </summary>
-		public string FileName
-		{
-			get { return fileName; }
-		}
+		public string FileName => fileName;
 
 		/// <summary>
 		/// Gets a value indicating whether the instance is read-only.
 		/// </summary>
-		public bool IsReadOnly
-		{
-			get { return readOnly; }
-		}
+		public bool IsReadOnly => readOnly;
 
 		/// <summary>
 		/// Gets a value indicating whether the current settings file is encrypted.
 		/// </summary>
-		public bool IsEncrypted
-		{
-			get { return !string.IsNullOrEmpty(password); }
-		}
+		public bool IsEncrypted => !string.IsNullOrEmpty(password);
 
 		/// <summary>
 		/// Gets a value indicating whether there was a problem reading the file on loading.
 		/// </summary>
-		public bool HadProblem
-		{
-			get { return hadProblem; }
-		}
+		public bool HadProblem => hadProblem;
 
 		/// <summary>
 		/// Gets a value indicating whether the instance is disposed.
 		/// </summary>
-		public bool IsDisposed
-		{
-			get { return isDisposed; }
-		}
+		public bool IsDisposed => isDisposed;
 
 		#endregion Public properties
 
@@ -417,10 +402,7 @@ namespace Unclassified.Util
 		/// </summary>
 		/// <param name="key">The setting key.</param>
 		/// <returns></returns>
-		public bool GetBool(string key)
-		{
-			return GetBool(key, false);
-		}
+		public bool GetBool(string key) => GetBool(key, false);
 
 		/// <summary>
 		/// Gets the current bool value of a setting key, or a fallback value if the key is unset or
@@ -474,10 +456,7 @@ namespace Unclassified.Util
 		/// </summary>
 		/// <param name="key">The setting key.</param>
 		/// <returns></returns>
-		public int GetInt(string key)
-		{
-			return GetInt(key, 0);
-		}
+		public int GetInt(string key) => GetInt(key, 0);
 
 		/// <summary>
 		/// Gets the current int value of a setting key, or a fallback value if the key is unset or
@@ -532,10 +511,7 @@ namespace Unclassified.Util
 		/// </summary>
 		/// <param name="key">The setting key.</param>
 		/// <returns></returns>
-		public long GetLong(string key)
-		{
-			return GetLong(key, 0);
-		}
+		public long GetLong(string key) => GetLong(key, 0);
 
 		/// <summary>
 		/// Gets the current long value of a setting key, or a fallback value if the key is unset or
@@ -590,10 +566,7 @@ namespace Unclassified.Util
 		/// </summary>
 		/// <param name="key">The setting key.</param>
 		/// <returns></returns>
-		public double GetDouble(string key)
-		{
-			return GetDouble(key, double.NaN);
-		}
+		public double GetDouble(string key) => GetDouble(key, double.NaN);
 
 		/// <summary>
 		/// Gets the current double value of a setting key, or a fallback value if the key is unset
@@ -648,10 +621,7 @@ namespace Unclassified.Util
 		/// </summary>
 		/// <param name="key">The setting key.</param>
 		/// <returns></returns>
-		public decimal GetDecimal(string key)
-		{
-			return GetDecimal(key, 0m);
-		}
+		public decimal GetDecimal(string key) => GetDecimal(key, 0m);
 
 		/// <summary>
 		/// Gets the current decimal value of a setting key, or a fallback value if the key is unset
@@ -705,10 +675,7 @@ namespace Unclassified.Util
 		/// </summary>
 		/// <param name="key">The setting key.</param>
 		/// <returns></returns>
-		public string GetString(string key)
-		{
-			return GetString(key, "");
-		}
+		public string GetString(string key) => GetString(key, "");
 
 		/// <summary>
 		/// Gets the current string value of a setting key, or a fallback value if the key is unset.
@@ -756,10 +723,7 @@ namespace Unclassified.Util
 		/// </summary>
 		/// <param name="key">The setting key.</param>
 		/// <returns></returns>
-		public DateTime GetDateTime(string key)
-		{
-			return GetDateTime(key, DateTime.MinValue);
-		}
+		public DateTime GetDateTime(string key) => GetDateTime(key, DateTime.MinValue);
 
 		/// <summary>
 		/// Gets the current DateTime value of a setting key, or a fallback value if the key is
@@ -809,10 +773,7 @@ namespace Unclassified.Util
 		/// </summary>
 		/// <param name="key">The setting key.</param>
 		/// <returns></returns>
-		public TimeSpan GetTimeSpan(string key)
-		{
-			return GetTimeSpan(key, TimeSpan.Zero);
-		}
+		public TimeSpan GetTimeSpan(string key) => GetTimeSpan(key, TimeSpan.Zero);
 
 		/// <summary>
 		/// Gets the current TimeSpan value of a setting key, or a fallback value if the key is
@@ -942,7 +903,7 @@ namespace Unclassified.Util
 						if (!string.IsNullOrEmpty(this.password))
 						{
 #if WITH_FIELDLOG
-							FL.Trace("FileSettingsStore.Load", "fileName = " + fileName + "\nWith password");
+							FL.Trace("FileSettingsStore.Load", $"fileName = {fileName}\nWith password");
 #endif
 							using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read))
 							{
@@ -969,7 +930,7 @@ namespace Unclassified.Util
 						else
 						{
 #if WITH_FIELDLOG
-							FL.Trace("FileSettingsStore.Load", "fileName = " + fileName + "\nNo password");
+							FL.Trace("FileSettingsStore.Load", $"fileName = {fileName}\nNo password");
 #endif
 							using (StreamReader sr = new StreamReader(fileName))
 							{
@@ -1200,7 +1161,7 @@ namespace Unclassified.Util
 				File.Delete(fileName + ".broken");
 				File.Move(fileName, fileName + ".broken");
 #if WITH_FIELDLOG
-				FL.Trace("Broken settings file renamed", "New file name: " + fileName + ".broken");
+				FL.Trace("Broken settings file renamed", $"New file name: {fileName}.broken");
 #endif
 			}
 #if WITH_FIELDLOG
@@ -1216,11 +1177,7 @@ namespace Unclassified.Util
 			}
 #endif
 
-			var handler = LoadError;
-			if (handler != null)
-			{
-				handler(this, new SettingsFileErrorEventArgs(fileName, ex));
-			}
+			LoadError?.Invoke(this, new SettingsFileErrorEventArgs(fileName, ex));
 		}
 
 		/// <summary>
@@ -1563,11 +1520,7 @@ namespace Unclassified.Util
 		/// <param name="key">Name of the setting key that has changed.</param>
 		protected void OnPropertyChanged(string key)
 		{
-			var handler = this.PropertyChanged;
-			if (handler != null)
-			{
-				handler(this, new PropertyChangedEventArgs(key));
-			}
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(key));
 		}
 
 		#endregion INotifyPropertyChanged members

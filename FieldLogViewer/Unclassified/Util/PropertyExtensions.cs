@@ -223,7 +223,7 @@ namespace Unclassified.Util
 			Expression<Func<TSource, TProperty>> expr)
 		{
 			if (expr == null)
-				throw new ArgumentNullException("expr");
+				throw new ArgumentNullException(nameof(expr));
 			var memberExpr = expr.Body as MemberExpression;
 			if (memberExpr != null)
 			{

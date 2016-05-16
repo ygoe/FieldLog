@@ -139,23 +139,48 @@ namespace Unclassified.Util
 			return str.Substring(startIndex, length);
 		}
 
+		/// <summary>
+		/// Returns a string that has at most the specified length, with an optional ellipsis character.
+		/// </summary>
+		/// <param name="str">The source string.</param>
+		/// <param name="maxLength">The maximum length of the string to return.</param>
+		/// <param name="ellipsis">The string to append if it exceeds <paramref name="maxLength"/>.</param>
+		/// <returns></returns>
+		public static string LimitLength(this string str, int maxLength, string ellipsis = "…")
+		{
+			if (str == null)
+			{
+				return str;
+			}
+			if (ellipsis != null)
+			{
+				maxLength -= ellipsis.Length;
+			}
+			if (maxLength < 0)
+			{
+				maxLength = 0;
+			}
+			if (str.Length > maxLength)
+			{
+				return str.Substring(0, maxLength) + ellipsis;
+			}
+			return str;
+		}
+
 		#endregion String conversions
 
 		#region Number parsing
 
 		/// <summary>
-		/// Converts the current string to an <see cref="Int32"/> value. Throws an exception if the
+		/// Converts the current string to an <see cref="int"/> value. Throws an exception if the
 		/// string cannot be converted.
 		/// </summary>
 		/// <param name="str">The string to convert.</param>
 		/// <returns>The converted value.</returns>
-		public static int ToInt32(this string str)
-		{
-			return Convert.ToInt32(str);
-		}
+		public static int ToInt32(this string str) => Convert.ToInt32(str);
 
 		/// <summary>
-		/// Converts the current string to an <see cref="Int32"/> value, if possible, or returns the
+		/// Converts the current string to an <see cref="int"/> value, if possible, or returns the
 		/// fallback value instead.
 		/// </summary>
 		/// <param name="str">The string to convert.</param>
@@ -169,18 +194,15 @@ namespace Unclassified.Util
 		}
 
 		/// <summary>
-		/// Converts the current string to an <see cref="Int64"/> value. Throws an exception if the
+		/// Converts the current string to an <see cref="long"/> value. Throws an exception if the
 		/// string cannot be converted.
 		/// </summary>
 		/// <param name="str">The string to convert.</param>
 		/// <returns>The converted value.</returns>
-		public static long ToInt64(this string str)
-		{
-			return Convert.ToInt64(str);
-		}
+		public static long ToInt64(this string str) => Convert.ToInt64(str);
 
 		/// <summary>
-		/// Converts the current string to an <see cref="Int64"/> value, if possible, or returns the
+		/// Converts the current string to an <see cref="long"/> value, if possible, or returns the
 		/// fallback value instead.
 		/// </summary>
 		/// <param name="str">The string to convert.</param>

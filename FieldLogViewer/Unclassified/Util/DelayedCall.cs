@@ -1,3 +1,8 @@
+// Copyright (c) 2016, Yves Goergen, http://unclassified.software/source/delayedcall
+//
+// Copying and distribution of this file, with or without modification, are permitted provided the
+// copyright notice and this notice are preserved. This file is offered as-is, without any warranty.
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -124,10 +129,7 @@ namespace Unclassified.Util
 		/// <summary>
 		/// Gets a value indicating whether the instance has been disposed.
 		/// </summary>
-		public bool IsDisposed
-		{
-			get { return isDisposed; }
-		}
+		public bool IsDisposed => isDisposed;
 
 		/// <summary>
 		/// Creates a new <see cref="DelayedCall"/> instance.
@@ -192,13 +194,7 @@ namespace Unclassified.Util
 		/// used in the current thread. If this property is false, the *Async methods must be used
 		/// instead.
 		/// </summary>
-		public static bool SupportsSynchronization
-		{
-			get
-			{
-				return SynchronizationContext.Current != null;
-			}
-		}
+		public static bool SupportsSynchronization => SynchronizationContext.Current != null;
 
 		/// <summary>
 		/// Prepares a <see cref="DelayedCall"/> instance.
@@ -209,7 +205,7 @@ namespace Unclassified.Util
 		protected static void PrepareDCObject(DelayedCall dc, int milliseconds, bool async)
 		{
 			if (milliseconds < 0)
-				throw new ArgumentOutOfRangeException("milliseconds", "The new timeout must be 0 or greater.");
+				throw new ArgumentOutOfRangeException(nameof(milliseconds), "The new timeout must be 0 or greater.");
 
 			// Get the current synchronization context if required, with dummy fallback
 			dc.context = null;
@@ -451,7 +447,7 @@ namespace Unclassified.Util
 						isCancelled = true;
 					}
 
-					if (callback != null) callback();
+					callback?.Invoke();
 				},
 				null);
 		}
@@ -618,7 +614,7 @@ namespace Unclassified.Util
 						if (isCancelled) return;
 					}
 
-					if (callback != null) callback(data);
+					callback?.Invoke(data);
 				},
 				null);
 		}
@@ -740,7 +736,7 @@ namespace Unclassified.Util
 						if (isCancelled) return;
 					}
 
-					if (callback != null) callback(data1, data2);
+					callback?.Invoke(data1, data2);
 				},
 				null);
 		}
@@ -873,7 +869,7 @@ namespace Unclassified.Util
 						if (isCancelled) return;
 					}
 
-					if (callback != null) callback(data1, data2, data3);
+					callback?.Invoke(data1, data2, data3);
 				},
 				null);
 		}

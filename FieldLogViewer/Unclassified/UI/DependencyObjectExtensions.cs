@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Media;
 
@@ -29,7 +30,7 @@ namespace Unclassified.UI
 			for (int i = 0; i < childrenCount && foundChild == null; i++)
 			{
 				var child = VisualTreeHelper.GetChild(source, i);
-				if (child.GetType() != typeof(TChild))
+				if (!(child is TChild))
 				{
 					// Not the requested type, recursively drill down the tree
 					foundChild = FindVisualChild<TChild>(child, predicate);
@@ -69,7 +70,7 @@ namespace Unclassified.UI
 			for (int i = 0; i < childrenCount && foundChild == null; i++)
 			{
 				var child = VisualTreeHelper.GetChild(source, i);
-				if (child.GetType() != typeof(TChild))
+				if (!(child is TChild))
 				{
 					// Not the requested type, recursively drill down the tree
 					foundChild = FindVisualChild<TChild>(child, childName);
@@ -110,26 +111,52 @@ namespace Unclassified.UI
 			for (int i = 0; i < childrenCount; i++)
 			{
 				var child = VisualTreeHelper.GetChild(source, i);
-				if (child.GetType() != typeof(TChild))
+				if (child is TChild)
 				{
-					// Not the requested type, recursively drill down the tree
-					foundChildren.AddRange(FindAllVisualChildren<TChild>(child, predicate));
-				}
-				else if (predicate != null)
-				{
-					// Compare the predicate
-					if (predicate(child))
+					if (predicate == null || predicate(child))
 					{
 						foundChildren.Add((TChild)child);
 					}
 				}
-				else
-				{
-					// Type matches, no name requested
-					foundChildren.Add((TChild)child);
-				}
+				
+				// Recursively drill down the tree
+				foundChildren.AddRange(FindAllVisualChildren<TChild>(child, predicate));
 			}
 			return foundChildren;
+		}
+
+		/// <summary>
+		/// Dumps all children of the current object in the visual tree into a string.
+		/// </summary>
+		/// <typeparam name="TChild">The type of the requested child object.</typeparam>
+		/// <param name="source">The object in which to find the child.</param>
+		/// <param name="predicate">A predicate that determines whether to accept a child.</param>
+		/// <param name="level">Nesting level, used internally.</param>
+		/// <returns>The found child objects, or an empty string.</returns>
+		public static string DumpAllVisualChildren<TChild>(this DependencyObject source, Predicate<DependencyObject> predicate = null, int level = 0)
+			where TChild : DependencyObject
+		{
+			if (source == null)
+				throw new ArgumentNullException("source");
+
+			StringBuilder foundChildren = new StringBuilder();
+			int childrenCount = VisualTreeHelper.GetChildrenCount(source);
+			for (int i = 0; i < childrenCount; i++)
+			{
+				var child = VisualTreeHelper.GetChild(source, i);
+				if (child is TChild)
+				{
+					if (predicate == null || predicate(child))
+					{
+						foundChildren.Append(new string('\t', level));
+						foundChildren.AppendLine(child.ToString());
+					}
+				}
+
+				// Recursively drill down the tree
+				foundChildren.Append(DumpAllVisualChildren<TChild>(child, predicate, level + 1));
+			}
+			return foundChildren.ToString();
 		}
 
 		/// <summary>

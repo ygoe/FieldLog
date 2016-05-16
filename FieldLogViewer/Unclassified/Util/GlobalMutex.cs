@@ -43,10 +43,7 @@ namespace Unclassified.Util
 		/// <summary>
 		/// Gets the static instance of the global mutex.
 		/// </summary>
-		public static GlobalMutex Instance
-		{
-			get { return instance; }
-		}
+		public static GlobalMutex Instance => instance;
 
 		#endregion Static members
 
@@ -151,10 +148,7 @@ namespace Unclassified.Util
 		/// The mutex may only be released by the thread that owns it. Otherwise, an exception will
 		/// be thrown.
 		/// </remarks>
-		public bool CheckThread()
-		{
-			return Thread.CurrentThread == ownerThread;
-		}
+		public bool CheckThread() => Thread.CurrentThread == ownerThread;
 
 		#endregion Synchronisation methods
 

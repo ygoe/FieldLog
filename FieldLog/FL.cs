@@ -1088,17 +1088,30 @@ namespace Unclassified.FieldLog
 
 			if (htmlFormat)
 			{
-				msg = "<li>" + EncodeHtml(ex.Message) + " (" + EncodeHtml(ex.GetType().FullName) + ")";
+				msg = "<li>" + EncodeHtml(ex.Message);
+				if (ex.GetType().Name.EndsWith("Exception"))
+				{
+					msg += " (" + EncodeHtml(ex.GetType().Name) + ")";
+				}
 			}
 			else
 			{
 				if (level == 0)
 				{
-					msg = ex.Message + " (" + ex.GetType().FullName + ")\n";
+					msg = ex.Message;
+					if (ex.GetType().Name.EndsWith("Exception"))
+					{
+						msg += " (" + ex.GetType().Name + ")\n";
+					}
 				}
 				else
 				{
-					msg = new string(' ', (level - 1) * 4) + "> " + ex.Message + " (" + ex.GetType().FullName + ")\n";
+					msg = new string(' ', (level - 1) * 4) + "> " + ex.Message;
+					if (ex.GetType().Name.EndsWith("Exception"))
+					{
+						msg += " (" + ex.GetType().Name + ")";
+					}
+					msg += "\n";
 				}
 			}
 

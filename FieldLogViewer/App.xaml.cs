@@ -34,6 +34,12 @@ namespace Unclassified.FieldLogViewer
 				ReAddResourceDictionary("/Resources/RealWindows8.xaml");
 			}
 
+			// Use special styles for High DPI screens (at least 200% text scaling)
+			if (OSInfo.ScreenDpi >= 192)
+			{
+				ReAddResourceDictionary("/Resources/HighDpi.xaml");
+			}
+
 			// Create main window and view model
 			var view = new MainWindow();
 			var viewModel = new MainViewModel();

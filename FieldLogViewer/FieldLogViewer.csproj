@@ -191,6 +191,10 @@
     <Compile Include="Views\SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Resources\HighDpi.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Resources\Other.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

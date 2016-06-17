@@ -57,7 +57,18 @@ namespace Unclassified.UI
 			Setter setter = new Setter(Image.OpacityProperty, 0.5);
 			trg.Setters.Add(setter);
 			imgStyle.Triggers.Add(trg);
-			this.Style = imgStyle;
+			Style = imgStyle;
+
+			Loaded += MenuIconImage_Loaded;
+		}
+
+		private void MenuIconImage_Loaded(object sender, RoutedEventArgs args)
+		{
+			// Use non-blurry image scaling for 200% or higher scaling (High DPI)
+			if (PresentationSource.FromVisual(this)?.CompositionTarget.TransformToDevice.M11 >= 2.0)
+			{
+				RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.NearestNeighbor);
+			}
 		}
 	}
 }

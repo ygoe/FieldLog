@@ -116,19 +116,24 @@ function Do-Push-NuGetPackage($action)
 
 function Find-NuGet()
 {
+	# (Tracing messages commented out for debugging purposes)
+	#Write-Host "Testing" (Join-Path $absToolsPath "NuGet.exe")
 	$nugetBin = Check-FileName (Join-Path $absToolsPath "NuGet.exe")
 	if (!$nugetBin)
 	{
+		#Write-Host "Testing" "$env:LOCALAPPDATA\NuGet\NuGet.exe"
 		$nugetBin = Check-FileName "$env:LOCALAPPDATA\NuGet\NuGet.exe"
 	}
 	if (!$nugetBin)
 	{
 		# NuGet path: https://github.com/aspnet/Logging/blob/dev/build.cmd
+		#Write-Host "Testing" "$env:LOCALAPPDATA\NuGet\NuGet.latest.exe"
 		$nugetBin = Check-FileName "$env:LOCALAPPDATA\NuGet\NuGet.latest.exe"
 	}
 	if (!$nugetBin)
 	{
 		# Search in %path%
+		#Write-Host "Searching NuGet.exe in PATH"
 		if (Get-Command "NuGet.exe" -ErrorAction SilentlyContinue)
 		{
 			$nugetBin = "NuGet.exe"
@@ -140,12 +145,14 @@ function Find-NuGet()
 		try
 		{
 			$nugetBin = "$env:LOCALAPPDATA\NuGet\NuGet.exe"
+			#Write-Host "Creating directory " (Split-Path -parent $nugetBin)
+			New-Item -Force -ItemType directory -Path (Split-Path -parent $nugetBin) | Out-Null
 			$webclient = New-Object System.Net.WebClient
 			$webclient.DownloadFile("https://dist.nuget.org/win-x86-commandline/latest/nuget.exe", $nugetBin)
 		}
 		catch
 		{
-			Write-Host $_
+			Write-Host $_.Exception.ToString()
 			WaitError "Downloading NuGet tool failed"
 			exit 1
 		}

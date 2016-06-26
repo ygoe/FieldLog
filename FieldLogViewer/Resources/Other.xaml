@@ -5,7 +5,7 @@
 
 	<ui:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
 
-	<Style x:Key="ReadOnlyTextBoxStyle" TargetType="{x:Type TextBox}">
+	<Style x:Key="ReadOnlyTextBoxStyle" TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
 		<Setter Property="Padding" Value="0"/>
 		<Setter Property="IsReadOnly" Value="True"/>
 		<Setter Property="BorderThickness" Value="0"/>
@@ -15,17 +15,17 @@
 		<Setter Property="TextWrapping" Value="Wrap"/>
 	</Style>
 
-	<Style x:Key="LightButtonStyle" TargetType="Button">
+	<Style x:Key="LightButtonStyle" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
 		<Setter Property="Background" Value="Transparent"/>
 		<Setter Property="BorderBrush" Value="Transparent"/>
 	</Style>
 
-	<Style x:Key="LightToggleButtonStyle" TargetType="ToggleButton">
+	<Style x:Key="LightToggleButtonStyle" TargetType="ToggleButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
 		<Setter Property="Background" Value="Transparent"/>
 		<Setter Property="BorderBrush" Value="Transparent"/>
 	</Style>
 
-	<Style x:Key="LightComboBoxStyle" TargetType="ComboBox">
+	<Style x:Key="LightComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
 		<Setter Property="Background" Value="Transparent"/>
 		<Setter Property="BorderBrush" Value="Transparent"/>
 	</Style>
@@ -34,7 +34,12 @@
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate>
-					<Border BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" BorderThickness="1,0,0,0" Margin="4,0" Opacity="0.7"/>
+					<Border
+						BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"
+						BorderThickness="1,0,0,0"
+						SnapsToDevicePixels="True"
+						Margin="4,0"
+						Opacity="0.7"/>
 				</ControlTemplate>
 			</Setter.Value>
 		</Setter>

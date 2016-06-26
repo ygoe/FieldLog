@@ -29,9 +29,15 @@ namespace Unclassified.FieldLogViewer
 			ThreadPool.SetMinThreads(20, ioThreads);
 
 			// Fix WPF's built-in themes
-			if (OSInfo.IsWindows8OrNewer)
+			if (OSInfo.IsWindows10OrNewer)
+			{
+				ReAddResourceDictionary("/Resources/RealWindows10.xaml");
+				ReAddResourceDictionary("/Resources/Other.xaml");
+			}
+			else if (OSInfo.IsWindows8OrNewer)
 			{
 				ReAddResourceDictionary("/Resources/RealWindows8.xaml");
+				ReAddResourceDictionary("/Resources/Other.xaml");
 			}
 
 			// Use special styles for High DPI screens (at least 200% text scaling)

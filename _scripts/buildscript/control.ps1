@@ -9,6 +9,12 @@ Set-VcsVersion "" "/require git"
 # FieldLog.*NET* projects are overlapping, don't build them in parallel
 Disable-ParallelBuild
 
+if ((IsSelected commit) -and !(Git-IsModified))
+{
+	QuitMessage "Nothing to commit."
+	exit 0
+}
+
 # Release builds
 if (IsAnySelected build commit publish)
 {

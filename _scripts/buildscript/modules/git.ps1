@@ -8,7 +8,7 @@
 
 # Commits the working directory modifications to the current branch.
 #
-# Requires TortoiseGit to be installed (which requires Git for Windows).
+# Requires TortoiseGit to be installed (which requires Git).
 #
 function Git-Commit($time = 5)
 {
@@ -20,7 +20,7 @@ function Git-Commit($time = 5)
 #
 # $archive = The file name of the archive to create.
 #
-# Requires Git for Windows and 7-Zip to be installed.
+# Requires Git and 7-Zip to be installed.
 #
 function Git-Export($archive, $time = 5)
 {
@@ -34,11 +34,21 @@ function Git-Export($archive, $time = 5)
 #
 # $logFile = The file name of the log file to update and open.
 #
-# Requires Git for Windows to be installed.
+# Requires Git to be installed.
 #
 function Git-Log($logFile, $time = 1)
 {
 	$action = @{ action = "Do-Git-Log"; logFile = $logFile; time = $time }
+	$global:actions += $action
+}
+
+# Downloads all LFS objects.
+#
+# Requires Git and Git LFS to be installed.
+#
+function Git-LfsPull($time = 3)
+{
+	$action = @{ action = "Do-Git-LfsPull"; time = $time }
 	$global:actions += $action
 }
 
@@ -58,7 +68,7 @@ function Do-Git-Commit($action)
 	
 	# Wait until the started process has finished
 	& $tgitBin /command:commit /path:"$rootDir" | Out-Host
-	if (-not $?)
+	if ($LASTEXITCODE -ne 0)
 	{
 		WaitError "Git commit failed"
 		exit 1
@@ -72,7 +82,7 @@ function Do-Git-Commit($action)
 			Write-Host "Optimising Git repository..."
 			$gitBin = Find-Git
 			& $gitBin gc --prune=all --quiet
-			if (-not $?)
+			if ($LASTEXITCODE -ne 0)
 			{
 				WaitError "Git gc failed"
 				exit 1
@@ -121,7 +131,7 @@ function Do-Git-Export($action)
 
 	Push-Location "$rootDir"
 	& $gitBin checkout-index -a --prefix ".tmp.export\"
-	if (-not $?)
+	if ($LASTEXITCODE -ne 0)
 	{
 		WaitError "Git export failed"
 		exit 1
@@ -142,7 +152,7 @@ function Do-Git-Export($action)
 		$_ -notmatch "^\s*$" -and `
 		$_ -notmatch "^Compressing "
 	}
-	if (-not $?)
+	if ($LASTEXITCODE -ne 0)
 	{
 		Pop-Location
 		WaitError "Creating Git export archive failed"
@@ -284,6 +294,20 @@ function Do-Git-Log($action)
 	Start-Process (MakeRootedPath $logFile)
 }
 
+function Do-Git-LfsPull($action)
+{
+	Show-ActionHeader "Git LFS pull"
+	
+	$gitBin = Find-Git
+
+	& $gitBin lfs pull >$null
+	if ($LASTEXITCODE -ne 0)
+	{
+		WaitError "Git LFS pull failed"
+		exit 1
+	}
+}
+
 function Find-Git()
 {
 	$gitBin = Check-RegFilename "hklm:\Software\Microsoft\Windows\CurrentVersion\Uninstall\Git_is1" "InstallLocation"
@@ -312,4 +336,19 @@ function Find-Git()
 		exit 1
 	}
 	return $gitBin
+}
+
+function Git-IsModified()
+{
+	# (Set a dummy format so that it won't go search an AssemblyInfo file somewhere. We don't provide a suitable path for that.)
+	$consoleEncoding = [System.Console]::OutputEncoding
+	[System.Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+	& (Join-Path $absToolsPath "NetRevisionTool") /format dummy /rejectmod "$rootDir" >$null 2>$null
+	if ($LASTEXITCODE -ne 0)
+	{
+		[System.Console]::OutputEncoding = $consoleEncoding
+		return $true
+	}
+	[System.Console]::OutputEncoding = $consoleEncoding
+	return $false
 }

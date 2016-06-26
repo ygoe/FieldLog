@@ -6,7 +6,7 @@
 	UseLayoutRounding="True"
 	ShowInTaskbar="False"
 	Title="About FieldLogViewer"
-	Height="290" Width="370" ResizeMode="NoResize"
+	Height="300" Width="370" ResizeMode="NoResize"
 	WindowStartupLocation="CenterOwner"
 	Background="White">
 

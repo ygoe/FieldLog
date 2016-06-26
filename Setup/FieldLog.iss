@@ -109,6 +109,7 @@ Name: VSTool; Description: "{cm:Task_VSTool}"
 [Files]
 ; FieldLogViewer application files
 Source: "..\FieldLogViewer\bin\{#BuildConfig}\FieldLogViewer.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\FieldLogViewer\bin\{#BuildConfig}\FieldLogViewer.exe.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\FieldLogViewer\bin\{#BuildConfig}\TaskDialog.dll"; DestDir: "{app}"; Flags: ignoreversion
 ;Source: "..\FieldLog Documentation.pdf"; DestDir: "{app}"
 ; This is the signed version of the DLL:

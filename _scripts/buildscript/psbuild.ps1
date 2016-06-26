@@ -72,25 +72,32 @@ public class Utils
 	[DllImport("kernel32.dll")]
 	private static extern uint GetFileType(IntPtr hFile);
 
-	[DllImport("kernel32.dll")]
+	[DllImport("kernel32.dll", SetLastError = true)]
 	private static extern IntPtr GetStdHandle(int nStdHandle);
 
-	[DllImport("kernel32.dll")]
+	[DllImport("kernel32.dll", SetLastError = true)]
 	private static extern IntPtr GetConsoleWindow();
 
 	[DllImport("user32.dll")]
 	private static extern bool IsWindowVisible(IntPtr hWnd);
 
+	[DllImport("kernel32.dll", SetLastError = true)]
+	private static extern bool GetConsoleMode(IntPtr hConsoleHandle, out uint lpMode);
+
 	public static bool IsInteractiveAndVisible
 	{
 		get
 		{
+			uint mode;
 			return Environment.UserInteractive &&
 				GetConsoleWindow() != IntPtr.Zero &&
 				IsWindowVisible(GetConsoleWindow()) &&
-				GetFileType(GetStdHandle(-10)) == 2 &&   // STD_INPUT_HANDLE is FILE_TYPE_CHAR
-				GetFileType(GetStdHandle(-11)) == 2 &&   // STD_OUTPUT_HANDLE
-				GetFileType(GetStdHandle(-12)) == 2;     // STD_ERROR_HANDLE
+				GetFileType(GetStdHandle(-10)) == 2 &&           // STD_INPUT_HANDLE is FILE_TYPE_CHAR
+				GetConsoleMode(GetStdHandle(-10), out mode) &&   // STD_INPUT_HANDLE has a console
+				GetFileType(GetStdHandle(-11)) == 2 &&           // STD_OUTPUT_HANDLE
+				GetConsoleMode(GetStdHandle(-11), out mode) &&   // STD_OUTPUT_HANDLE has a console
+				GetFileType(GetStdHandle(-12)) == 2 &&           // STD_ERROR_HANDLE
+				GetConsoleMode(GetStdHandle(-12), out mode);     // STD_ERROR_HANDLE has a console
 		}
 	}
 }
@@ -164,6 +171,20 @@ function Show-ActionHeader($text, $text2)
 	if ($Host.UI.RawUI.CursorPosition.Y -gt $global:actionHeaderRow)
 	{
 		Write-Host ""
+	}
+	# If output is being redirected there is no colour highlighting. Print a separator line to make
+	# it easier to find the build actions.
+	if (![Utils]::IsInteractiveAndVisible)
+	{
+		if ([System.Console]::OutputEncoding -eq [System.Text.Encoding]::UTF8)
+		{
+			# U+2550: Single thin horizontal line
+			Write-Host (([char]0x2500).ToString() * 60)
+		}
+		else
+		{
+			Write-Host ("-" * 60)
+		}
 	}
 	Write-Host -ForegroundColor DarkCyan "$text..." -NoNewLine
 	if ($text2)
@@ -306,6 +327,22 @@ function WaitError($msg)
 	& (Join-Path $absToolsPath "FlashConsoleWindow") -noprogress
 }
 
+# Shows a message and quits after a timeout.
+#
+function QuitMessage($msg)
+{
+	Write-Host ""
+	Write-Host -ForegroundColor Green $msg
+	if ([Utils]::IsInteractiveAndVisible)
+	{
+		& (Join-Path $absToolsPath "FlashConsoleWindow") -progress 100
+		Write-Host "Press any key to exit" -NoNewLine
+		Wait-Key $false 10000 $true
+		Write-Host ""
+	}
+	& (Join-Path $absToolsPath "FlashConsoleWindow") -noprogress
+}
+
 # Returns the system platform (x86, x64).
 #
 function Get-Platform()
@@ -428,6 +465,22 @@ function AreAllSelected()
 #
 function Begin-BuildScript($projectTitle)
 {
+	# If output is being redirected there is no colour highlighting and we're likely running in a
+	# build server that produces lots of other output. Print a separator line to make it easier to
+	# find the beginning of our build script.
+	if (![Utils]::IsInteractiveAndVisible)
+	{
+		if ([System.Console]::OutputEncoding -eq [System.Text.Encoding]::UTF8)
+		{
+			# U+2550: Double horizontal line
+			Write-Host (([char]0x2550).ToString() * 60)
+		}
+		else
+		{
+			Write-Host ("=" * 60)
+		}
+	}
+	
 	$Host.UI.RawUI.WindowTitle = "$projectTitle build"
 	Write-Host -ForegroundColor White -BackgroundColor Black "$projectTitle build script"
 	Write-Host ""
@@ -531,16 +584,7 @@ function End-BuildScript()
 		$duration = ($endTime - $global:startTime).TotalSeconds.ToString("0") + " seconds"
 	}
 
-	Write-Host ""
-	Write-Host -ForegroundColor Green "Build succeeded in $duration."
-	if ([Utils]::IsInteractiveAndVisible)
-	{
-		& (Join-Path $absToolsPath "FlashConsoleWindow") -progress 100
-		Write-Host "Press any key to exit" -NoNewLine
-		Wait-Key $false 10000 $true
-		Write-Host ""
-	}
-	& (Join-Path $absToolsPath "FlashConsoleWindow") -noprogress
+	QuitMessage "Build succeeded in $duration."
 }
 
 # ==============================  MODULE SUPPORT  ==============================

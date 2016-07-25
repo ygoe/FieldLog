@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Xml;
 using PdbConvert.Symbols;
+using Unclassified.Util;
 
 namespace PdbConvert
 {
@@ -39,18 +40,38 @@ namespace PdbConvert
 				// Change to the file's directory so that we can find referenced assemblies
 				Environment.CurrentDirectory = Path.GetDirectoryName(fileName);
 				ISymbolReader reader = SymbolAccess.GetReaderForFile(fileName);
-				assembly = Assembly.ReflectionOnlyLoadFrom(fileName);
+				if (reader == null)
+				{
+					ConsoleHelper.WriteLine("Warning: Cannot read symbols for: " + fileName, ConsoleColor.Yellow);
+					try
+					{
+						DateTime asmTime = new FileInfo(fileName).LastWriteTimeUtc;
+						DateTime symTime = new FileInfo(Path.ChangeExtension(fileName, ".pdb")).LastWriteTimeUtc;
+						if (Math.Abs((asmTime - symTime).TotalSeconds) > 10)
+						{
+							ConsoleHelper.WriteLine("  Hint: .pdb file time does not match assembly file time. Either delete or update the symbols file.", ConsoleColor.Yellow);
+						}
+					}
+					catch
+					{
+						// Ignore errors
+					}
+				}
+				else
+				{
+					assembly = Assembly.ReflectionOnlyLoadFrom(fileName);
 
-				xmlWriter.WriteStartElement("module");
-				xmlWriter.WriteAttributeString("file", Path.GetFileName(fileName).ToLowerInvariant());
-				xmlWriter.WriteAttributeString("version", GetAssemblyVersion(assembly));
-				xmlWriter.WriteAttributeString("config", GetAssemblyConfiguration(assembly));
+					xmlWriter.WriteStartElement("module");
+					xmlWriter.WriteAttributeString("file", Path.GetFileName(fileName).ToLowerInvariant());
+					xmlWriter.WriteAttributeString("version", GetAssemblyVersion(assembly));
+					xmlWriter.WriteAttributeString("config", GetAssemblyConfiguration(assembly));
 
-				WriteDocList(reader);
-				//WriteEntryPoint(reader);
-				WriteAllMethods(reader);
+					WriteDocList(reader);
+					//WriteEntryPoint(reader);
+					WriteAllMethods(reader);
 
-				xmlWriter.WriteEndElement();   // </module>
+					xmlWriter.WriteEndElement();   // </module>
+				}
 			}
 			Environment.CurrentDirectory = currDir;
 

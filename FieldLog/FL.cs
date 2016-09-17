@@ -100,6 +100,14 @@ namespace Unclassified.FieldLog
 		[DllImport("user32.dll")]
 		private static extern bool IsWindowVisible(IntPtr hWnd);
 
+		/// <summary>
+		/// Retrieves the current system date and time with the highest possible level of precision
+		/// (less than 1 µs). The retrieved information is in Coordinated Universal Time (UTC) format.
+		/// </summary>
+		/// <param name="systemTimeAsFileTime"></param>
+		[DllImport("kernel32.dll")]
+		private static extern void GetSystemTimePreciseAsFileTime(out long systemTimeAsFileTime);
+
 		#endregion Native interop
 
 		#region Constants
@@ -171,6 +179,11 @@ namespace Unclassified.FieldLog
 		/// The UTC date and time at the start of the Stopwatch.
 		/// </summary>
 		private static DateTime startTime;
+		/// <summary>
+		/// Indicates whether the native GetSystemTimePreciseAsFileTime method is available on this
+		/// platform. It can be used by the <see cref="UtcNow"/> property.
+		/// </summary>
+		private static bool supportsGetSystemTimePreciseAsFileTime = true;
 		/// <summary>
 		/// The Stopwatch to measure high-precision relative time.
 		/// </summary>
@@ -421,6 +434,12 @@ namespace Unclassified.FieldLog
 		/// </summary>
 		static FL()
 		{
+			// Initialise supportsGetSystemTimePreciseAsFileTime
+			if (!OSInfo.IsWindows8OrNewer)
+				supportsGetSystemTimePreciseAsFileTime = false;
+			else
+				UtcNow.AddTicks(0);
+
 			CalibrateTime();
 			if (IsInUnitTest) return;   // Don't do anything else during unit tests
 			CheckTimeThread.Start();
@@ -640,12 +659,26 @@ namespace Unclassified.FieldLog
 		/// Gets the high-precision UTC time.
 		/// </summary>
 		/// <remarks>
-		/// This call takes ~50 ns on 2013 hardware, DateTime.UtcNow takes ~20 ns.
+		/// This call takes ~50 ns on 2013 hardware (Windows 7), DateTime.UtcNow takes ~20 ns.
 		/// </remarks>
 		public static DateTime UtcNow
 		{
 			get
 			{
+				if (supportsGetSystemTimePreciseAsFileTime)
+				{
+					try
+					{
+						long systemTimeAsFileTime;
+						GetSystemTimePreciseAsFileTime(out systemTimeAsFileTime);
+						return DateTime.FromFileTimeUtc(systemTimeAsFileTime);
+					}
+					catch
+					{
+						// Remember not to try again, use old fallback method
+						supportsGetSystemTimePreciseAsFileTime = false;
+					}
+				}
 				return startTime.AddTicks(stopwatch.Elapsed.Ticks);
 			}
 		}

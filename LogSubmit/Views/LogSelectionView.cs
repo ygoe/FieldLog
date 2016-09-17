@@ -334,6 +334,23 @@ namespace Unclassified.LogSubmit.Views
 				CheckLogBasePath(Path.Combine(Path.GetTempPath(), baseName + "-log", baseName), logPaths);
 			}
 
+			// Find *.fl in appDir
+			var seenNames = new HashSet<string>();
+			foreach (string fileName in Directory.GetFiles(appDir, "*.fl"))
+			{
+				string baseName = Path.GetFileNameWithoutExtension(fileName);
+				var match = Regex.Match(baseName, @"^(.+)-[0-9]-[0-9]+$");
+				if (match.Success)
+				{
+					string logName = match.Groups[1].Value;
+					if (!seenNames.Contains(logName))
+					{
+						CheckLogBasePath(Path.Combine(appDir, logName), logPaths);
+						seenNames.Add(logName);
+					}
+				}
+			}
+
 			if (logPaths.Count == 1)
 			{
 				SetLogBasePath(logPaths.Values.First().LogBasePath);

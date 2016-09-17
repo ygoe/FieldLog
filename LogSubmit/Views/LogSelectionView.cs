@@ -148,6 +148,7 @@ namespace Unclassified.LogSubmit.Views
 					catch
 					{
 						MessageBox.Show(
+							FindForm(),
 							Tx.T("msg.logpath parameter invalid", "value", basePath),
 							Tx.T("msg.title.error"),
 							MessageBoxButtons.OK,

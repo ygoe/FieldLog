@@ -116,6 +116,7 @@
 			this.EMailTextBox.Size = new System.Drawing.Size(478, 20);
 			this.EMailTextBox.TabIndex = 5;
 			this.EMailTextBox.WordWrap = false;
+			this.EMailTextBox.Validating += new System.ComponentModel.CancelEventHandler(this.EMailTextBox_Validating);
 			// 
 			// label3
 			// 

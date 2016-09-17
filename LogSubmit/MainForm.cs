@@ -119,6 +119,7 @@ namespace Unclassified.LogSubmit
 			catch (Exception ex)
 			{
 				MessageBox.Show(
+					this,
 					Tx.T("msg.command line error", "msg", ex.Message),
 					Tx.T("msg.title.error"),
 					MessageBoxButtons.OK,
@@ -137,6 +138,7 @@ namespace Unclassified.LogSubmit
 				catch
 				{
 					MessageBox.Show(
+						this,
 						Tx.T("msg.logpath parameter invalid", "value", logPathOption.Value),
 						Tx.T("msg.title.error"),
 						MessageBoxButtons.OK,
@@ -160,6 +162,7 @@ namespace Unclassified.LogSubmit
 				catch
 				{
 					MessageBox.Show(
+						this,
 						Tx.T("msg.endtime parameter invalid", "value", endTimeOption.Value),
 						Tx.T("msg.title.error"),
 						MessageBoxButtons.OK,
@@ -199,6 +202,7 @@ namespace Unclassified.LogSubmit
 			if (!FinishEnabled && fromErrorDlgOption.IsSet)
 			{
 				switch (MessageBox.Show(
+					this,
 					Tx.T("msg.cancel before submit", "cmd", Path.GetFileNameWithoutExtension(Application.ExecutablePath)),
 					Text,
 					MessageBoxButtons.YesNoCancel,
@@ -244,7 +248,7 @@ namespace Unclassified.LogSubmit
 				AssemblyInfoUtil.AppCopyright + "\n" +
 				"http://unclassified.software/source/fieldlog";
 
-			MessageBox.Show(msg, Tx.T("about.title"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+			MessageBox.Show(this, msg, Tx.T("about.title"), MessageBoxButtons.OK, MessageBoxIcon.Information);
 		}
 
 		#endregion Form event handlers

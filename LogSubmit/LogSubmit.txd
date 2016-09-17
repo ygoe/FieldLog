@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- TxTranslation dictionary file. Use TxEditor to edit this file. http://unclassified.software/txtranslation -->
 <translation xml:space="preserve">
 	<culture name="de">
 		<text key="about.title">Über</text>
@@ -51,6 +52,7 @@ Sie können dieses Übertragungsprogramm auch manuell durch Starten von {cmd} im
 		<text key="msg.error.http response token">Die Serverantwort enthält das falsche Token.</text>
 		<text key="msg.error.mapi x64">Vielleicht unterstützt Ihre Standard-E-Mail-Anwendung kein 64-Bit-MAPI.</text>
 		<text key="msg.error.outlook fallback failed">Outlook ist verfügbar, aber ebenfalls fehlgeschlagen:</text>
+		<text key="msg.invalid e-mail address">Die E-Mail-Adresse sieht nicht richtig aus. Bitte korrigieren Sie die Eingabe oder nennen Sie Kontaktdaten im Kommentar.</text>
 		<text key="msg.logpath parameter invalid">Der Parameter /logpath ist ungültig: {value}</text>
 		<text key="msg.no log files selected">Keine Protokolldateien ausgewählt. Bitte prüfen Sie den angegebenen Zeitraum.</text>
 		<text key="msg.previous operation">Der Vorgang konnte nicht gestartet werden, weil ein vorheriger Vorgang noch nicht beendet wurde. Bitte warten Sie, bis der laufende Vorgang beendet ist, und versuchen Sie es erneut, indem Sie zur vorherigen Seite gehen und wieder zu dieser Seite zurückkehren.</text>
@@ -320,6 +322,7 @@ You can also start this submit tool manually by running {cmd} from the applicati
 		<text key="msg.error.http response token">The server response included the wrong token.</text>
 		<text key="msg.error.mapi x64">Maybe your default e-mail application does not support 64 bit MAPI.</text>
 		<text key="msg.error.outlook fallback failed">Outlook is available but failed, too:</text>
+		<text key="msg.invalid e-mail address">The e-mail address does not look valid. Please correct it or provide contact details in the comments.</text>
 		<text key="msg.logpath parameter invalid">The /logpath parameter is invalid: {value}</text>
 		<text key="msg.no log files selected">No log files selected. Please check the specified time span.</text>
 		<text key="msg.previous operation">The operation could not be started because a previous operation has not yet stopped. Please wait for the current operation to stop and retry by going back and returning to this page again.</text>

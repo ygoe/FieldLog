@@ -132,6 +132,7 @@ namespace Unclassified.LogSubmit.Views
 				else
 				{
 					MessageBox.Show(
+						FindForm(),
 						Tx.T("msg.previous operation"),
 						Tx.T("msg.title.error"),
 						MessageBoxButtons.OK,

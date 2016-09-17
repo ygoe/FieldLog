@@ -4107,6 +4107,10 @@ namespace Unclassified.FieldLog
 					sw.WriteLine();
 					sw.WriteLine("After installation, double-click on one file to open the entire group.");
 					sw.WriteLine();
+					sw.WriteLine("When copying log files, please include ALL files or use the LogSubmit tool");
+					sw.WriteLine("because events are spread over multiple files and even the newest file");
+					sw.WriteLine("only contains a part of the necessary data!");
+					sw.WriteLine();
 					sw.WriteLine("For further information about FieldLog or the log viewer, please consult");
 					sw.WriteLine("the above website.");
 				}

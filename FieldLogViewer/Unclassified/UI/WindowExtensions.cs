@@ -72,6 +72,8 @@ namespace Unclassified.UI
 
 		#endregion Native interop
 
+		#region Title bar
+
 		/// <summary>
 		/// Hides the icon in the window title bar.
 		/// </summary>
@@ -189,6 +191,10 @@ namespace Unclassified.UI
 			return false;
 		}
 
+		#endregion Title bar
+
+		#region Window state
+
 		/// <summary>
 		/// Determines whether the window has been closed and cannot be shown anymore.
 		/// </summary>
@@ -201,5 +207,38 @@ namespace Unclassified.UI
 			if (ps == null) return true;
 			return ps.IsDisposed;
 		}
+
+		#endregion Window state
+
+		#region Visible area
+
+		/// <summary>
+		/// Moves the window into the visible screen area.
+		/// </summary>
+		public static void MoveToVisibleArea(this Window window)
+		{
+			// Source: http://stackoverflow.com/a/37927012/143684
+			//         (Taskbar detection is broken and not used here.)
+			// Note that "window.BringIntoView()" does not work.
+			// Note that Window bounds are already in logical ("virtual") pixels, not device pixels.
+			if (window.Top < SystemParameters.VirtualScreenTop)
+			{
+				window.Top = SystemParameters.VirtualScreenTop;
+			}
+			if (window.Left < SystemParameters.VirtualScreenLeft)
+			{
+				window.Left = SystemParameters.VirtualScreenLeft;
+			}
+			if (window.Left + window.Width > SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth)
+			{
+				window.Left = SystemParameters.VirtualScreenWidth + SystemParameters.VirtualScreenLeft - window.Width;
+			}
+			if (window.Top + window.Height > SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight)
+			{
+				window.Top = SystemParameters.VirtualScreenHeight + SystemParameters.VirtualScreenTop - window.Height;
+			}
+		}
+
+		#endregion Visible area
 	}
 }

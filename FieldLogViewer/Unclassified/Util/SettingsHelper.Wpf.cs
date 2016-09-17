@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using Unclassified.UI;
 
 namespace Unclassified.Util
 {
@@ -37,6 +38,9 @@ namespace Unclassified.Util
 				window.Width = settings.Width;
 				window.Height = settings.Height;
 				window.WindowState = settings.IsMaximized ? WindowState.Maximized : WindowState.Normal;
+
+				// Prevent windows stuck invisible on now disconnected monitors
+				window.MoveToVisibleArea();
 			}
 
 			// Write back any changes to the settings.

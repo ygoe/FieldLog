@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using Microsoft.Win32;
 using Unclassified.TxLib;
 
 namespace Unclassified.LogSubmit.Views
@@ -45,12 +46,14 @@ namespace Unclassified.LogSubmit.Views
 		public void Activate(bool forward)
 		{
 			UpdateButtons();
+			RestoreEMailAddress();
 		}
 
 		public void Deactivate(bool forward)
 		{
 			SharedData.Instance.Notes = NotesTextBox.Text;
 			SharedData.Instance.EMailAddress = EMailTextBox.Text.Trim();
+			SaveEMailAddress();
 		}
 
 		#endregion Public methods
@@ -68,6 +71,40 @@ namespace Unclassified.LogSubmit.Views
 			// Simplified syntax rules, see https://en.wikipedia.org/wiki/Email_address#Syntax
 			string pattern = @"^[a-z0-9!#$%&'*+\-/=?^_`{|}~.]+@[a-z0-9\-.]+\.[a-z]{2,}$";
 			return Regex.IsMatch(email, pattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+		}
+
+		private void SaveEMailAddress()
+		{
+			try
+			{
+				using (var key = Registry.CurrentUser.CreateSubKey(@"Software\Unclassified\FieldLog\LogSubmit"))
+				{
+					key.SetValue("LastEMailAddress", EMailTextBox.Text.Trim());
+				}
+			}
+			catch
+			{
+				// Not important
+			}
+		}
+
+		private void RestoreEMailAddress()
+		{
+			try
+			{
+				using (var key = Registry.CurrentUser.CreateSubKey(@"Software\Unclassified\FieldLog\LogSubmit"))
+				{
+					string value = key.GetValue("LastEMailAddress") as string;
+					if (value != null)
+					{
+						EMailTextBox.Text = value;
+					}
+				}
+			}
+			catch
+			{
+				// Not important
+			}
 		}
 
 		#endregion Private methods

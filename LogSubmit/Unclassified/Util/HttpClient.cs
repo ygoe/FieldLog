@@ -163,7 +163,7 @@ namespace Unclassified.Util
 		{
 			lastRequestedUri = uri;
 
-			HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uri);
+			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
 			if (backgroundWorker != null)
 			{
 				request.AllowWriteStreamBuffering = false;

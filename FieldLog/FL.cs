@@ -437,11 +437,10 @@ namespace Unclassified.FieldLog
 			// Initialise supportsGetSystemTimePreciseAsFileTime
 			if (!OSInfo.IsWindows8OrNewer)
 				supportsGetSystemTimePreciseAsFileTime = false;
-			else
-				UtcNow.AddTicks(0);
-
 			CalibrateTime();
 			if (IsInUnitTest) return;   // Don't do anything else during unit tests
+			if (supportsGetSystemTimePreciseAsFileTime)
+				UtcNow.AddTicks(0);
 			CheckTimeThread.Start();
 
 			LogFirstChanceExceptions = true;

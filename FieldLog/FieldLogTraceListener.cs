@@ -270,6 +270,13 @@ namespace Unclassified.FieldLog
 			// Name comparisons roughly in a descending order of frequency, to optimise performance
 			if (source == PresentationTraceSources.DataBindingSource.Name)
 			{
+				if (id == 2)
+				{
+					// "Cannot find governing FrameworkElement …"
+					// Don't log this, it's an internal bug in WPF or at least an irrelevant
+					// implementation detail, certainly no error.
+					return;
+				}
 				HandleDataBindingMessage(id, ref msg, ref shortMsg);
 			}
 			else if (source == PresentationTraceSources.RoutedEventSource.Name)

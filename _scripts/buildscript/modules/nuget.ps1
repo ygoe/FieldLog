@@ -63,9 +63,10 @@ function Do-Restore-NuGetPackages($action)
 
 	$nugetBin = Find-NuGet
 
-	& $nugetBin restore (MakeRootedPath $solutionFile) -NonInteractive > $null
+	$textOut = & $nugetBin restore (MakeRootedPath $solutionFile) -NonInteractive 2>&1
 	if (-not $?)
 	{
+		Write-Host $textOut
 		WaitError "Restoring NuGet packages failed"
 		exit 1
 	}
@@ -80,9 +81,10 @@ function Do-Create-NuGetPackage($action)
 
 	$nugetBin = Find-NuGet
 
-	& $nugetBin pack (MakeRootedPath $specFile) -OutputDirectory (MakeRootedPath $outDir) -Version $shortRevId -NonInteractive > $null
+	$textOut = & $nugetBin pack (MakeRootedPath $specFile) -OutputDirectory (MakeRootedPath $outDir) -Version $shortRevId -NonInteractive 2>&1
 	if (-not $?)
 	{
+		Write-Host $textOut
 		WaitError "Creating NuGet package failed"
 		exit 1
 	}
@@ -101,11 +103,11 @@ function Do-Push-NuGetPackage($action)
 
 	if ($apiKey)
 	{
-		& $nugetBin push (MakeRootedPath $packageFile) -ApiKey $apiKey -NonInteractive
+		& $nugetBin push (MakeRootedPath $packageFile) -ApiKey $apiKey -NonInteractive -Source https://www.nuget.org/api/v2/package
 	}
 	else
 	{
-		& $nugetBin push (MakeRootedPath $packageFile) -NonInteractive
+		& $nugetBin push (MakeRootedPath $packageFile) -NonInteractive -Source https://www.nuget.org/api/v2/package
 	}
 	if (-not $?)
 	{

@@ -168,6 +168,7 @@ function Move-Cursor($count)
 #
 function Show-ActionHeader($text, $text2)
 {
+	# Add an empty line if something was written since the last action header (cursor moved down)
 	if ($Host.UI.RawUI.CursorPosition.Y -gt $global:actionHeaderRow)
 	{
 		Write-Host ""
@@ -176,15 +177,7 @@ function Show-ActionHeader($text, $text2)
 	# it easier to find the build actions.
 	if (![Utils]::IsInteractiveAndVisible)
 	{
-		if ([System.Console]::OutputEncoding -eq [System.Text.Encoding]::UTF8)
-		{
-			# U+2550: Single thin horizontal line
-			Write-Host (([char]0x2500).ToString() * 60)
-		}
-		else
-		{
-			Write-Host ("-" * 60)
-		}
+		Write-SingleLine
 	}
 	Write-Host -ForegroundColor DarkCyan "$text..." -NoNewLine
 	if ($text2)
@@ -457,6 +450,32 @@ function AreAllSelected()
 	return $true
 }
 
+function Write-DoubleLine()
+{
+	if ([System.Console]::OutputEncoding -eq [System.Text.Encoding]::UTF8)
+	{
+		# U+2550: Double horizontal line
+		Write-Host (([char]0x2550).ToString() * 60)
+	}
+	else
+	{
+		Write-Host ("=" * 60)
+	}
+}
+
+function Write-SingleLine()
+{
+	if ([System.Console]::OutputEncoding -eq [System.Text.Encoding]::UTF8)
+	{
+		# U+2550: Single thin horizontal line
+		Write-Host (([char]0x2500).ToString() * 60)
+	}
+	else
+	{
+		Write-Host ("-" * 60)
+	}
+}
+
 # ==============================  BUILD SCRIPT FUNCTIONS  ==============================
 
 # Begins the build script definition.
@@ -470,15 +489,7 @@ function Begin-BuildScript($projectTitle)
 	# find the beginning of our build script.
 	if (![Utils]::IsInteractiveAndVisible)
 	{
-		if ([System.Console]::OutputEncoding -eq [System.Text.Encoding]::UTF8)
-		{
-			# U+2550: Double horizontal line
-			Write-Host (([char]0x2550).ToString() * 60)
-		}
-		else
-		{
-			Write-Host ("=" * 60)
-		}
+		Write-DoubleLine
 	}
 	
 	$Host.UI.RawUI.WindowTitle = "$projectTitle build"
@@ -585,6 +596,10 @@ function End-BuildScript()
 	}
 
 	QuitMessage "Build succeeded in $duration."
+	if (![Utils]::IsInteractiveAndVisible)
+	{
+		Write-DoubleLine
+	}
 }
 
 # ==============================  MODULE SUPPORT  ==============================

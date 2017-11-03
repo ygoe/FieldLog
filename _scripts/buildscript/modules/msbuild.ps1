@@ -14,7 +14,7 @@
 #
 # To disable parallel build, set the variable $noParallelBuild = $true.
 #
-# Requires MSBuild from Visual Studio 2015, 2013, 2012 or the .NET Framework 4.0 to be installed.
+# Requires MSBuild from Visual Studio 2017, 2015, 2013, 2012 or the .NET Framework 4.0 to be installed.
 #
 function Build-Solution($solutionFile, $configuration, $buildPlatform, $time = 5)
 {
@@ -46,7 +46,19 @@ function Do-Build-Solution($action)
 	# Find the MSBuild binary
 	if ((Get-Platform) -eq "x64" -and $buildPlatform -ne "x86")
 	{
-		$msbuildBin = Check-FileName "$pfx86\MSBuild\14.0\bin\amd64\MSBuild.exe"
+		$msbuildBin = Check-FileName "$pfx86\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin\amd64\MSBuild.exe"
+		if (!$msbuildBin)
+		{
+			$msbuildBin = Check-FileName "$pfx86\Microsoft Visual Studio\2017\Professional\MSBuild\15.0\Bin\amd64\MSBuild.exe"
+		}
+		if (!$msbuildBin)
+		{
+			$msbuildBin = Check-FileName "$pfx86\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\amd64\MSBuild.exe"
+		}
+		if (!$msbuildBin)
+		{
+			$msbuildBin = Check-FileName "$pfx86\MSBuild\14.0\bin\amd64\MSBuild.exe"
+		}
 		if (!$msbuildBin)
 		{
 			$msbuildBin = Check-FileName "$pfx86\MSBuild\12.0\bin\amd64\MSBuild.exe"
@@ -58,7 +70,19 @@ function Do-Build-Solution($action)
 	}
 	else
 	{
-		$msbuildBin = Check-FileName "$pfx86\MSBuild\14.0\bin\MSBuild.exe"
+		$msbuildBin = Check-FileName "$pfx86\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin\MSBuild.exe"
+		if (!$msbuildBin)
+		{
+			$msbuildBin = Check-FileName "$pfx86\Microsoft Visual Studio\2017\Professional\MSBuild\15.0\Bin\MSBuild.exe"
+		}
+		if (!$msbuildBin)
+		{
+			$msbuildBin = Check-FileName "$pfx86\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe"
+		}
+		if (!$msbuildBin)
+		{
+			$msbuildBin = Check-FileName "$pfx86\MSBuild\14.0\bin\MSBuild.exe"
+		}
 		if (!$msbuildBin)
 		{
 			$msbuildBin = Check-FileName "$pfx86\MSBuild\12.0\bin\MSBuild.exe"

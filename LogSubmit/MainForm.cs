@@ -234,12 +234,6 @@ namespace Unclassified.LogSubmit
 			Cleanup();
 		}
 
-		protected override void WndProc(ref Message msg)
-		{
-			base.WndProc(ref msg);
-			systemMenu.HandleMessage(ref msg);
-		}
-
 		private void OnSysMenuAbout()
 		{
 			string msg =

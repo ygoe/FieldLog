@@ -65,7 +65,7 @@ UninstallDisplayName=FieldLog
 UninstallDisplayIcon={app}\FieldLogViewer.exe
 
 ; Setup package creation
-OutputDir=bin
+OutputDir=out
 OutputBaseFilename=FieldLogSetup-{#RevId}
 SolidCompression=True
 InternalCompressLevel=max

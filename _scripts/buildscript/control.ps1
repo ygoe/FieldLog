@@ -40,21 +40,21 @@ if (IsAnySelected build commit publish)
 		Sign-File "PdbConvert\bin\Release\PdbConvert.exe" "$signKeyFile" "$signPassword"
 		Sign-File "LogSubmit\bin\Release\LogSubmit.exe" "$signKeyFile" "$signPassword"
 		Sign-File "LogSubmit\bin\x86\Release\LogSubmit.exe" "$signKeyFile" "$signPassword"
-		Sign-File "Setup\bin\FieldLogSetup-$revId.exe" "$signKeyFile" "$signPassword"
+		Sign-File "Setup\out\FieldLogSetup-$revId.exe" "$signKeyFile" "$signPassword"
 	}
 }
 
 # Install setup
 if (IsSelected install)
 {
-	Exec-File "Setup\bin\FieldLogSetup-$revId.exe" "/norestart /verysilent"
+	Exec-File "Setup\out\FieldLogSetup-$revId.exe" "/norestart /verysilent"
 }
 
 # Commit to repository
 if (IsSelected commit)
 {
 	# Clean up test build files
-	Delete-File "Setup\bin\FieldLogSetup-$revId.exe"
+	Delete-File "Setup\out\FieldLogSetup-$revId.exe"
 
 	Git-Commit
 }
@@ -72,11 +72,11 @@ if (IsSelected publish)
 # Copy to website (local)
 if (IsSelected transfer-web)
 {
-	Copy-File "Setup\bin\FieldLogSetup-$revId.exe" "$webDir\files\source\fieldlog\"
+	Copy-File "Setup\out\FieldLogSetup-$revId.exe" "$webDir\files\source\fieldlog\"
 	Copy-File ".local\Release\FieldLogChanges.txt" "$webDir\files\source\fieldlog\"
 	
 	$today = (Get-Date -Format "yyyy-MM-dd")
-	Exec-File "_scripts\bin\AutoReplace.exe" "$webDataFile fieldlog version=$revId date=$today"
+	Exec-File "_scripts\tools\AutoReplace.exe" "$webDataFile fieldlog version=$revId date=$today"
 }
 
 # Upload to NuGet
